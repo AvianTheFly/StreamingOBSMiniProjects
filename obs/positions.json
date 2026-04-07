@@ -1,0 +1,29 @@
+{
+    "scene": "LeagueGameAssets",
+    "sources": {
+        "BearTriangle": {
+            "positionX": 1671.0,
+            "positionY": 346.0,
+            "scaleX": 0.1259765625,
+            "scaleY": 0.1263020783662796
+        },
+        "TurtleTriangle": {
+            "positionX": 1781.0,
+            "positionY": 334.0,
+            "scaleX": 0.1357421875,
+            "scaleY": 0.1360677033662796
+        },
+        "RamTriangle": {
+            "positionX": 1647.0,
+            "positionY": 244.0,
+            "scaleX": 0.1640625,
+            "scaleY": 0.1640625
+        },
+        "PhoenixTriangle": {
+            "positionX": 1784.0,
+            "positionY": 246.0,
+            "scaleX": 0.1328125,
+            "scaleY": 0.1334635466337204
+        }
+    }
+}

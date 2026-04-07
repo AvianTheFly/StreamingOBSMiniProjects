@@ -1,0 +1,20 @@
+{
+    "scene": "InstantReplay",
+    "source": "InstantReplayLogo",
+    "positionX": 639.0,
+    "positionY": -70.0,
+    "scaleX": 0.4173177182674408,
+    "scaleY": 0.4169921875,
+    "rotation": 0.0,
+    "filter_3d_block": {
+        "pos_x_percent": 0,
+        "pos_y_percent": 0,
+        "scale": 110,
+        "thickness": 30,
+        "tilt_x_deg": -27.7,
+        "tilt_y_deg": 0,
+        "tilt_z_deg": 0,
+        "wiggle": 95,
+        "wiggle_rot": true
+    }
+}

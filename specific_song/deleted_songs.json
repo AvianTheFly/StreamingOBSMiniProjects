@@ -1,0 +1,30 @@
+[
+  {
+    "id": "example_song",
+    "name": "Example Song",
+    "source": "example_song",
+    "aliases": [
+      "example",
+      "the example one",
+      "that example song"
+    ]
+  },
+  {
+    "id": "gigachad",
+    "name": "Gigachad",
+    "source": "gigachad",
+    "aliases": []
+  },
+  {
+    "id": "El Gato in my mind",
+    "name": "El Gato In My Mind",
+    "source": "El Gato in my mind",
+    "aliases": []
+  },
+  {
+    "id": "el gato",
+    "name": "El Gato",
+    "source": "el gato",
+    "aliases": []
+  }
+]

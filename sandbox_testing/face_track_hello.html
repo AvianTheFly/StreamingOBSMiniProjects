@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { margin: 0; overflow: hidden; background: transparent; }
+    canvas { display: block; }
+    #status {
+      position: fixed; top: 10px; left: 10px;
+      color: lime; font-family: monospace; font-size: 14px;
+      background: rgba(0,0,0,0.6); padding: 6px 10px; border-radius: 4px; z-index: 1;
+    }
+    /* --- control panel --- */
+    #panel {
+      position: fixed; top: 10px; right: 10px; z-index: 10;
+      background: rgba(0,0,0,0.8); color: #ddd; font-family: monospace; font-size: 13px;
+      padding: 12px 16px; border-radius: 6px; min-width: 220px;
+    }
+    #panel label { display: flex; align-items: center; gap: 6px; margin: 4px 0; }
+    #panel select, #panel input[type=range] { flex: 1; }
+    #panel button { margin-top: 8px; width: 100%; padding: 6px; cursor: pointer; }
+    #panel .val { width: 45px; text-align: right; font-size: 12px; color: #aaa; }
+    /* --- draggable plank overlay --- */
+    #overlay {
+      display: none;
+      position: absolute; border: 2px dashed red;
+      cursor: move; user-select: none; touch-action: none;
+      transform-origin: center center;
+    }
+    #overlay img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+    /* resize handle bottom-right */
+    #overlay .handle-resize {
+      position: absolute; right: -6px; bottom: -6px; width: 16px; height: 16px;
+      cursor: nwse-resize; background: rgba(255,255,0,0.5); border: 2px solid yellow;
+      border-radius: 50%;
+    }
+    /* rotate handle top-right */
+    #overlay .handle-rotate {
+      position: absolute; right: -6px; top: -6px; width: 16px; height: 16px;
+      cursor: grab; background: rgba(0,255,0,0.5); border: 2px solid lime;
+      border-radius: 50%;
+    }
+    #overlay-hint {
+      position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
+      color: yellow; font-family: monospace; font-size: 13px;
+      background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 4px; z-index: 10;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+<video id="video" autoplay playsinline style="display:none;"></video>
+<canvas id="canvas"></canvas>
+<div id="status">Loading MediaPipe...</div>
+
+<!-- draggable overlay -->
+<div id="overlay">
+  <img src="plank.png" draggable="false">
+  <div class="handle-resize"></div>
+  <div class="handle-rotate"></div>
+</div>
+<div id="overlay-hint">Drag box to move, yellow dot to diagonal-resize, green dot to rotate</div>
+
+<!-- control panel -->
+<div id="panel">
+  <div style="font-size:12px;color:#888;margin-bottom:4px;padding-top:4px;border-top:1px solid #333">3D ANCHORS</div>
+  <label>
+    Temple:
+    <select id="temple">
+      <option value="139">Left (139)</option>
+      <option value="368">Right (368)</option>
+    </select>
+  </label>
+  <label>
+    Nose:
+    <select id="nose">
+      <option value="4">Tip (4)</option>
+      <option value="6">Bridge (6)</option>
+      <option value="2">Sub-tip (2)</option>
+      <option value="195">Base (195)</option>
+    </select>
+  </label>
+
+  <div style="font-size:12px;color:#888;margin-bottom:4px;padding-top:6px;border-top:1px solid #333">PLACEMENT</div>
+  <label>Anchor 0-1: <input type="range" id="interp" min="0" max="100" value="10"><span class="val" id="interpv">0.10</span></label>
+  <label>Off X: <input type="range" id="offX" min="-200" max="200" value="-60"><span class="val" id="offXv">-60</span></label>
+  <label>Off Y: <input type="range" id="offY" min="-100" max="300" value="60"><span class="val" id="offYv">60</span></label>
+  <label>Width: <input type="range" id="szW" min="20" max="400" value="120"><span class="val" id="szWv">120</span></label>
+  <label>Height: <input type="range" id="szH" min="20" max="400" value="120"><span class="val" id="szHv">120</span></label>
+  <label>Scale: <input type="range" id="scale3d" min="10" max="200" value="100"><span class="val" id="scale3dv">1.00</span></label>
+  <label>Rotation: <input type="range" id="rot" min="-180" max="180" value="0"><span class="val" id="rotv">0&deg;</span></label>
+  <label>
+    Occlusion:
+    <input type="checkbox" id="occlude">
+  </label>
+  <button id="saveBtn">Save Config</button>
+  <button id="toggleEdit">Drag to Place</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/face_mesh.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.js"></script>
+<script>
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const status = document.getElementById('status');
+const overlay = document.getElementById('overlay');
+const overlayHint = document.getElementById('overlay-hint');
+canvas.width = 1280;
+canvas.height = 720;
+
+const _plankImg = new Image();
+_plankImg.onload = () => { window._plank = _plankImg; };
+_plankImg.src = 'plank.png';
+
+// --- config ---
+let cfg = {
+  temple: '139', nose: '4',
+  interp: 0.10,
+  offX: -60, offY: 60,
+  w: 120, h: 120,
+  scaleMult: 1.0,
+  rotation: 0,
+  lastDist: 0  // reference distance (captured when first face detected)
+};
+
+// try load saved config
+fetch('/load-config').then(r => r.json()).then(data => {
+  Object.assign(cfg, data);
+  document.getElementById('temple').value = cfg.temple;
+  document.getElementById('nose').value = cfg.nose;
+  document.getElementById('interp').value = Math.round(cfg.interp * 100);
+  document.getElementById('offX').value = cfg.offX;
+  document.getElementById('offY').value = cfg.offY;
+  document.getElementById('szW').value = cfg.w;
+  document.getElementById('szH').value = cfg.h;
+  document.getElementById('scale3d').value = Math.round(cfg.scaleMult * 100);
+  document.getElementById('rot').value = cfg.rotation;
+  updateUI();
+}).catch(() => {});
+
+function updateUI() {
+  document.getElementById('interpv').textContent = cfg.interp.toFixed(2);
+  document.getElementById('offXv').textContent = cfg.offX;
+  document.getElementById('offYv').textContent = cfg.offY;
+  document.getElementById('szWv').textContent = cfg.w;
+  document.getElementById('szHv').textContent = cfg.h;
+  document.getElementById('scale3dv').textContent = cfg.scaleMult.toFixed(2);
+  document.getElementById('rotv').innerHTML = cfg.rotation + '&deg;';
+}
+
+// --- panel event listeners ---
+document.getElementById('temple').addEventListener('change', e => { cfg.temple = e.target.value; cfg.lastDist = 0; });
+document.getElementById('nose').addEventListener('change', e => { cfg.nose = e.target.value; cfg.lastDist = 0; });
+document.getElementById('interp').addEventListener('input', e => { cfg.interp = +e.target.value / 100; updateUI(); });
+document.getElementById('offX').addEventListener('input', e => { cfg.offX = +e.target.value; updateUI(); });
+document.getElementById('offY').addEventListener('input', e => { cfg.offY = +e.target.value; updateUI(); });
+document.getElementById('szW').addEventListener('input', e => { cfg.w = +e.target.value; updateUI(); });
+document.getElementById('szH').addEventListener('input', e => { cfg.h = +e.target.value; updateUI(); });
+document.getElementById('scale3d').addEventListener('input', e => { cfg.scaleMult = +e.target.value / 100; updateUI(); });
+document.getElementById('rot').addEventListener('input', e => { cfg.rotation = +e.target.value; updateUI(); });
+
+// save
+document.getElementById('saveBtn').addEventListener('click', () => {
+  fetch('/save-config', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(cfg)
+  }).then(r => r.json()).then(() => {
+    document.getElementById('saveBtn').textContent = 'Saved!';
+    setTimeout(() => document.getElementById('saveBtn').textContent = 'Save Config', 1500);
+  });
+});
+
+// toggle edit mode
+let editMode = false;
+document.getElementById('toggleEdit').addEventListener('click', () => {
+  editMode = !editMode;
+  overlay.style.display = editMode ? 'block' : 'none';
+  overlayHint.style.display = editMode ? 'block' : 'none';
+  document.getElementById('toggleEdit').textContent = editMode ? 'Done Placing' : 'Drag to Place';
+});
+
+// --- drag & resize & rotate ---
+let mode = null, dragOX, dragOY, dragSaveOffX, dragSaveOffY, dragSaveW, dragSaveH, dragSaveRot;
+
+overlay.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  const target = e.target;
+  if (target.classList.contains('handle-rotate')) {
+    mode = 'rotate';
+    dragOX = e.clientX; dragOY = e.clientY;
+    dragSaveRot = cfg.rotation;
+  } else if (target.classList.contains('handle-resize')) {
+    mode = 'resize';
+    dragOX = e.clientX; dragOY = e.clientY;
+    dragSaveW = cfg.w; dragSaveH = cfg.h;
+  } else {
+    mode = 'drag';
+    dragOX = e.clientX; dragOY = e.clientY;
+    dragSaveOffX = cfg.offX; dragSaveOffY = cfg.offY;
+  }
+  overlay.setPointerCapture(e.pointerId);
+});
+
+overlay.addEventListener('pointermove', e => {
+  if (!mode) return;
+  if (mode === 'drag') {
+    cfg.offX = dragSaveOffX + (e.clientX - dragOX);
+    cfg.offY = dragSaveOffY + (e.clientY - dragOY);
+  } else if (mode === 'resize') {
+    // diagonal uniform resize of both width and height
+    const dx = e.clientX - dragOX;
+    cfg.w = Math.max(20, Math.round(dragSaveW + dx));
+    cfg.h = Math.max(20, Math.round(dragSaveH + dx));
+  } else if (mode === 'rotate') {
+    const rect = overlay.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const a1 = Math.atan2(dragOY - cy, dragOX - cx);
+    const a2 = Math.atan2(e.clientY - cy, e.clientX - cx);
+    cfg.rotation = Math.round(Math.max(-180, Math.min(180, dragSaveRot + (a2 - a1) * 180 / Math.PI)));
+  }
+  document.getElementById('offX').value = cfg.offX;
+  document.getElementById('offY').value = cfg.offY;
+  document.getElementById('szW').value = cfg.w;
+  document.getElementById('szH').value = cfg.h;
+  document.getElementById('rot').value = cfg.rotation;
+  updateUI();
+});
+
+overlay.addEventListener('pointerup', () => { mode = null; });
+
+// --- MediaPipe ---
+const faceMesh = new FaceMesh({
+  locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/${file}`
+});
+
+faceMesh.setOptions({
+  maxNumFaces: 1,
+  refineLandmarks: true,
+  minDetectionConfidence: 0.5,
+  minTrackingConfidence: 0.5
+});
+
+faceMesh.onResults(onResults);
+
+function onResults(results) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.save();
+  ctx.translate(canvas.width, 0);
+  ctx.scale(-1, 1);
+  ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) {
+    status.textContent = 'No face detected';
+    return;
+  }
+
+  status.textContent = 'Face found!';
+  const landmarks = results.multiFaceLandmarks[0];
+
+  ctx.save();
+  ctx.translate(canvas.width, 0);
+  ctx.scale(-1, 1);
+
+  const p = (id) => ({ x: landmarks[id].x * canvas.width, y: landmarks[id].y * canvas.height });
+
+  // --- face drawing helpers ---
+  function drawRing(ids, color, lw) {
+    ctx.beginPath(); ctx.strokeStyle = color;
+    ctx.lineWidth = lw || 3; ctx.shadowColor = color; ctx.shadowBlur = 8;
+    ids.forEach((id, i) => { const {x, y} = p(id); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+    ctx.closePath(); ctx.stroke();
+  }
+
+  function drawTriangle(ids, color) {
+    ctx.beginPath(); ctx.strokeStyle = color;
+    ctx.lineWidth = 3; ctx.shadowColor = color; ctx.shadowBlur = 8;
+    const pts = ids.map(id => p(id));
+    ctx.moveTo(pts[0].x, pts[0].y); ctx.lineTo(pts[1].x, pts[1].y); ctx.lineTo(pts[2].x, pts[2].y);
+    ctx.closePath(); ctx.stroke();
+  }
+
+  function dot(id, color, r) {
+    const {x, y} = p(id);
+    ctx.beginPath(); ctx.fillStyle = color; ctx.shadowBlur = 0;
+    ctx.arc(x, y, r || 3, 0, Math.PI * 2); ctx.fill();
+  }
+
+  // === face overlays ===
+  drawRing([33,7,163,144,145,153,154,155,133,173,157,158,159,160,161,246], '#00ccff');
+  drawRing([362,382,381,380,374,373,390,249,263,466,388,387,386,385,384,398], '#00ccff');
+  dot(468, '#ff00ff', 5); dot(473, '#ff00ff', 5);
+  drawRing([6,197,195,5,4,129,98,97,2,326,327], '#ffcc00');
+  drawRing([61,146,91,181,84,17,314,405,321,375,291,409,270,269,267,0,37,39,40,185,61], '#ff4444', 3);
+  drawRing([78,95,88,178,87,14,317,402,318,324,308,415,310,311,312,407,273,269,267,0,37,39,40,78], '#ff8888', 2);
+  drawRing([10,338,297,332,284,251,389,356,454,323,361,288,397,365,379,378,400,377,152,148,176,149,150,136,172,58,132,93,234,127,162,21,54,103,67], '#00ff00', 4);
+  drawTriangle([127, 234, 139], '#ff8800');
+  drawTriangle([356, 454, 368], '#ff8800');
+  drawTriangle([10, 151, 9], '#00ff88');
+  drawTriangle([172, 152, 148], '#00ff88');
+  drawTriangle([143, 117, 123], '#cc44ff');
+  drawTriangle([372, 346, 352], '#cc44ff');
+  dot(13, '#ff0000', 5); dot(0, '#ff0000', 5);
+
+  // ========================================
+  // === IMPROVED TRACKING (1-2-3 combo) ===
+  // ========================================
+
+  // --- 1) MULTI-ANCHOR center of mass ---
+  // Anchor points forming stable face frame
+  const anchorIds = ['10', '152', '139', '368'];  // forehead, chin, left temple, right temple
+  const anchorPts = anchorIds.map(id => p(id));
+
+  // draw anchor dots
+  const anchorColors = ['#00ff88', '#00ff00', '#ff8800', '#ff8800'];
+  anchorIds.forEach((id, i) => dot(id, anchorColors[i], 5));
+
+  // center of mass of all anchor points (cancels out head-turn jitter)
+  const centerX = anchorPts.reduce((s, a) => s + a.x, 0) / anchorPts.length;
+  const centerY = anchorPts.reduce((s, a) => s + a.y, 0) / anchorPts.length;
+
+  // connect pairs between anchors (debug grid)
+  ctx.save();
+  ctx.shadowBlur = 0;
+  ctx.setLineDash([3, 5]);
+  ctx.lineWidth = 1;
+  for (let i = 0; i < anchorPts.length; i++) {
+    for (let j = i + 1; j < anchorPts.length; j++) {
+      ctx.strokeStyle = `rgba(255,255,255,0.15)`;
+      ctx.beginPath();
+      ctx.moveTo(anchorPts[i].x, anchorPts[i].y);
+      ctx.lineTo(anchorPts[j].x, anchorPts[j].y);
+      ctx.stroke();
+    }
+  }
+
+  // center dot
+  ctx.strokeStyle = '#fff';
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, 4, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // --- 3) FACE SPAN as depth proxy ---
+  // Use the diagonal distance across the face bounding area:
+  // forehead(10)->chin(152) gives the face height in pixels,
+  // templeL(139)->templeR(368) gives the face width
+  // The diagonal of these two gives a good sense of "how far away you are"
+  const faceHeight = Math.hypot(p('10').x - p('152').x, p('10').y - p('152').y);
+  const faceWidth = Math.hypot(p('139').x - p('368').x, p('139').y - p('368').y);
+  const faceSpan = Math.hypot(faceHeight, faceWidth);
+
+  // capture reference span on first detection
+  if (!window._refSpan) {
+    window._refSpan = faceSpan;
+  }
+
+  // scale factor: when your face is bigger, you're closer
+  const rawScale = faceSpan / window._refSpan;
+
+  // --- unmirror X (we computed positions under scale(-1,1)) ---
+  const unmirrorX = (x) => canvas.width - x;
+  const unmirrorY = (y) => y;  // Y is not mirrored
+
+  // --- raw target position ---
+  const rawX = unmirrorX(centerX) + cfg.offX;
+  const rawY = unmirrorY(centerY) + cfg.offY;
+
+  ctx.restore();  // undo the mirrored canvas transform for remaining work
+
+  // --- 2) TEMPORAL SMOOTHING ---
+  const lerpSpeed = 0.12;
+  if (!window._hasSmoothed) {
+    window._smoothX = rawX;
+    window._smoothY = rawY;
+    window._smoothScale = rawScale;
+    window._hasSmoothed = true;
+  }
+  window._smoothX = window._smoothX * (1 - lerpSpeed) + rawX * lerpSpeed;
+  window._smoothY = window._smoothY * (1 - lerpSpeed) + rawY * lerpSpeed;
+  window._smoothScale = window._smoothScale * (1 - lerpSpeed) + rawScale * lerpSpeed;
+
+  const plankX = window._smoothX;
+  const plankY = window._smoothY;
+  const scale = window._smoothScale;
+
+  // final scale
+  const finalScaleX = (cfg.w / 120) * scale * cfg.scaleMult;
+  const finalScaleY = (cfg.h / 120) * scale * cfg.scaleMult;
+
+  // draw plank on the final smoothed position
+  if (_plankImg.complete && _plankImg.naturalWidth > 0) {
+    ctx.save();
+    ctx.shadowBlur = 0;
+    ctx.translate(plankX, plankY);
+    ctx.rotate(cfg.rotation * Math.PI / 180);
+    ctx.scale(finalScaleX, finalScaleY);
+    ctx.drawImage(_plankImg, -60, -60, 120, 120);  // base size 120x120, scaled
+    ctx.restore();
+
+    // --- OCCLUSION: erase plank region where face is ---
+    if (document.getElementById('occlude').checked) {
+      const faceOutline = [
+        10,338,297,332,284,251,389,356,454,323,361,288,397,365,379,378,400,377,152,148,176,149,150,136,172,58,132,93,234,127,162,21,54,103,67
+      ];
+      ctx.save();
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillStyle = 'rgba(0,0,0,1)';
+      ctx.beginPath();
+      ctx.moveTo(unmirrorX(p(faceOutline[0]).x), unmirrorY(p(faceOutline[0]).y));
+      for (let i = 1; i < faceOutline.length; i++) {
+        ctx.lineTo(unmirrorX(p(faceOutline[i]).x), unmirrorY(p(faceOutline[i]).y));
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  // debug: smooth->raw dotted line
+  ctx.save();
+  ctx.shadowBlur = 0;
+  ctx.setLineDash([2, 4]);
+  ctx.strokeStyle = 'rgba(255,255,100,0.5)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(window._smoothX, window._smoothY);
+  ctx.lineTo(rawX, rawY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // debug info
+  status.textContent = `Face found | span=${faceSpan.toFixed(1)} | scale=${scale.toFixed(2)} | lerpSpeed=${lerpSpeed}`;
+
+  // --- sync overlay DOM ---
+  if (editMode) {
+    const sPlankX = canvas.offsetLeft + plankX - (cfg.w / 2) * scale * cfg.scaleMult;
+    const sPlankY = canvas.offsetTop + plankY - (cfg.h / 2) * scale * cfg.scaleMult;
+    overlay.style.left = sPlankX + 'px';
+    overlay.style.top = sPlankY + 'px';
+    overlay.style.width = Math.round((cfg.w) * scale * cfg.scaleMult) + 'px';
+    overlay.style.height = Math.round((cfg.h) * scale * cfg.scaleMult) + 'px';
+    overlay.style.transform = `rotate(${cfg.rotation}deg)`;
+  }
+}
+
+let _processing = false;
+const camera = new Camera(video, {
+  onFrame: async () => {
+    if (_processing) return;
+    _processing = true;
+    await faceMesh.send({ image: video });
+    _processing = false;
+  },
+  width: 1280,
+  height: 720
+});
+
+camera.start().then(() => {
+  status.textContent = 'Camera started';
+}).catch(err => {
+  status.textContent = 'Camera error: ' + err.message;
+  console.error(err);
+});
+</script>
+</body>
+</html>
