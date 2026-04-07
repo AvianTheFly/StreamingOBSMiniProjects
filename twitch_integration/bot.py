@@ -17,6 +17,8 @@ import ssl
 import threading
 import time
 
+from events import emit
+
 from .config import (
     IRC_SERVER,
     IRC_PORT,
@@ -177,6 +179,26 @@ def _on_hello(bot, username, message):
     bot.send_message(f"Hello {username}! I'm alive and connected to the OBS Hub.")
 
 
-@command("!info")
-def _on_info(bot, username, message):
-    bot.send_message(f"I'm connected to the stream! Use !commands to see what I can do.")
+@command("!commands")
+def _on_commands(bot, username, message):
+    bot.send_message("Available commands: !hello, !commands, !png <name>")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Show a PNG overlay in OBS.
+#
+#  A separate mini-project subscribes to "show_png" and does the actual OBS
+#  work (look up the file, show_source, etc.).  The Twitch bot only emits
+#  the event — it knows nothing about the target project.
+# ─────────────────────────────────────────────────────────────────────────────
+
+@command("!png")
+def _on_png(bot, username, message):
+    parts = message.split(maxsplit=1)
+    if len(parts) < 2:
+        bot.send_message(f"Usage: !png <name>  (e.g. !png cat)")
+        return
+
+    name = parts[1].strip()
+    emit("show_png", name=name, user=username)
+    print(f"[twitch] !png command → emit 'show_png' (name={name})")

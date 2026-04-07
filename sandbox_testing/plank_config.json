@@ -1,7 +1,64 @@
 {
-  "anchor": "152",
-  "offX": -144,
-  "offY": -43,
-  "size": 246,
-  "rotation": -14
+  "slots": [
+    {
+      "name": "plank.png",
+      "cfg": {
+        "source": "shoulders",
+        "offX": -263,
+        "offY": -116,
+        "w": 172,
+        "h": 215,
+        "scaleMult": 0.76,
+        "rotation": 159
+      }
+    },
+    {
+      "name": "\u00e2\u20ac\u201d",
+      "cfg": {
+        "source": "shoulders",
+        "offX": 0,
+        "offY": 0,
+        "w": 200,
+        "h": 200,
+        "scaleMult": 1,
+        "rotation": 0
+      }
+    },
+    {
+      "name": "\u00e2\u20ac\u201d",
+      "cfg": {
+        "source": "shoulders",
+        "offX": 0,
+        "offY": 0,
+        "w": 200,
+        "h": 200,
+        "scaleMult": 1,
+        "rotation": 0
+      }
+    },
+    {
+      "name": "\u00e2\u20ac\u201d",
+      "cfg": {
+        "source": "shoulders",
+        "offX": 0,
+        "offY": 0,
+        "w": 200,
+        "h": 200,
+        "scaleMult": 1,
+        "rotation": 0
+      }
+    },
+    {
+      "name": "\u00e2\u20ac\u201d",
+      "cfg": {
+        "source": "shoulders",
+        "offX": 0,
+        "offY": 0,
+        "w": 200,
+        "h": 200,
+        "scaleMult": 1,
+        "rotation": 0
+      }
+    }
+  ]
 }

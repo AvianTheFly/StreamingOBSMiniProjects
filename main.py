@@ -26,6 +26,15 @@ from __future__ import annotations
 
 import os
 
+# Enable UTF-8 mode (Python 3.7+) so all text I/O is UTF-8 regardless of locale.
+# Crucial on Windows where the default is cp1252 and emoji crashes print().
+os.environ["PYTHONUTF8"] = "1"
+
+# Load local-only .env for secrets (OBS_PASSWORD, TWITCH_OAUTH_TOKEN, …)
+# File is git-ignored so it never reaches the repo.
+from dotenv import load_dotenv
+load_dotenv()  # no-op if .env is absent — safe on CI / other machines
+
 # Force unbuffered stdout/stderr so print() output appears immediately
 # instead of getting stuck in Python's internal buffer.
 os.environ["PYTHONUNBUFFERED"] = "1"
@@ -119,13 +128,13 @@ def main() -> None:
         from obs import get_obs
         get_obs()
     except Exception as exc:
-        print(f"\n  ❌  {exc}")
+        print(f"\n  [!] OBS connection failed: {exc}")
         print("       Fix OBS connection in obs/obs_config.py and try again.")
         return
 
     projects = _discover_projects()
     if not projects:
-        print("\n  ❌  No mini-projects found.")
+        print("\n  [!] No mini-projects found.")
         print("       Add a sub-folder with __init__.py + main.py exposing run().")
         return
 
