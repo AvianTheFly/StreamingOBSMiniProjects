@@ -1,10 +1,9 @@
 # list_audio_devices.py
-# Run this once from the hub root to find your VB-Cable device index.
+# Lists all audio input/output devices detected by sounddevice.
 #
 #   python list_audio_devices.py
 #
-# Look for a device with "CABLE Output" in the name — that's the one.
-# Copy its index number into specific_song/config.py as BASS_DEVICE_INDEX.
+# Useful for diagnosing audio routing or finding a specific device index.
 
 import sounddevice as sd
 
@@ -18,5 +17,3 @@ for i, dev in enumerate(sd.query_devices()):
         f"{int(dev['default_samplerate'])}"
     )
 print()
-print("Look for 'CABLE Output (VB-Audio Virtual Cable)' with IN > 0.")
-print("Use that index as BASS_DEVICE_INDEX in specific_song/config.py.")

@@ -1,2 +1,0 @@
-PTT_KEY = "<"
-RECORD_TIMEOUT_SECONDS: float = 10.0

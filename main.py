@@ -3,61 +3,114 @@ main.py  (hub root)
 ===================
 Discovers and runs all mini-projects concurrently.
 
-Each project is a proper Python *package* (folder with __init__.py).
-Projects are imported as  `<folder_name>.main`  — never by path injection —
-so every internal import inside a project is unambiguous and thread-safe
-with no locking, eviction, or sys.path surgery required.
-
-Adding a new project
---------------------
-1. Create  <hub_root>/<project_name>/__init__.py   (can be empty)
-2. Create  <hub_root>/<project_name>/main.py       exposing  run(q, stop_event)
-3. Use ONLY package-relative imports inside the project:
-       from .config import FOO          # NOT  from config import FOO
-       from .utils  import helper       # NOT  from utils  import helper
-4. That's it — the hub discovers and starts it automatically.
-
-Shutdown
---------
-  Ctrl+C  →  sets stop_event, joins all project threads, exits.
+Now supports CLI filtering:
+  py -3.11 main.py --debug
+  py -3.11 main.py --only project_a project_b
+  py -3.11 main.py --skip project_x
 """
 
 from __future__ import annotations
 
+import argparse
 import os
+import sys
+from pathlib import Path
 
-# Enable UTF-8 mode (Python 3.7+) so all text I/O is UTF-8 regardless of locale.
-# Crucial on Windows where the default is cp1252 and emoji crashes print().
+# ─────────────────────────────────────────────────────────────────────────────
+#  CLI args (must be parsed before importing log)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Run OBS hub mini-projects.")
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Enable DEBUG logging.",
+    )
+    parser.add_argument(
+        "--only",
+        nargs="+",
+        metavar="PROJECT",
+        help="Run only the specified mini-project(s).",
+    )
+    parser.add_argument(
+        "--skip",
+        nargs="+",
+        metavar="PROJECT",
+        help="Skip the specified mini-project(s).",
+    )
+    return parser.parse_args()
+
+
+ARGS = _parse_args()
+
+# UTF-8 everywhere — prevents emoji / non-ASCII crashes on Windows (cp1252 default).
 os.environ["PYTHONUTF8"] = "1"
-
-# Load local-only .env for secrets (OBS_PASSWORD, TWITCH_OAUTH_TOKEN, …)
-# File is git-ignored so it never reaches the repo.
-from dotenv import load_dotenv
-load_dotenv()  # no-op if .env is absent — safe on CI / other machines
-
-# Force unbuffered stdout/stderr so print() output appears immediately
-# instead of getting stuck in Python's internal buffer.
 os.environ["PYTHONUNBUFFERED"] = "1"
+
+if ARGS.debug:
+    os.environ["LOG_LEVEL"] = "DEBUG"
+
+# Load .env before anything else so OBS_PASSWORD, TWITCH_OAUTH_TOKEN, etc. are available.
+from dotenv import load_dotenv
+load_dotenv()
+
+# ── Logging must start before any other import so all output goes through the
+# queue writer and the Windows console-freeze fix is active from the first line.
+import log
+log.start()
 
 import importlib
 import inspect
 import queue
-import sys
 import threading
 import time
-from pathlib import Path
 
-# ── Hub root is the directory this file lives in ──────────────────────────────
+# ── Hub root on sys.path ─────────────────────────────────────────────────────
 _ROOT = Path(__file__).resolve().parent
-
-# The root must be on sys.path so that  `import meme_songs.main`  works.
-# Insert only once; importlib handles everything else.
 _ROOT_STR = str(_ROOT)
 if _ROOT_STR not in sys.path:
     sys.path.insert(0, _ROOT_STR)
 
-# Folders that are NOT mini-projects (shared hub infrastructure)
-_SKIP: set[str] = {"obs", "voice", "__pycache__", "tools"}
+# Projects can also live in "mini projects/".
+_MINI_PROJECTS_DIR = _ROOT / "mini projects"
+if _MINI_PROJECTS_DIR.is_dir():
+    _mp_str = str(_MINI_PROJECTS_DIR)
+    if _mp_str not in sys.path:
+        sys.path.append(_mp_str)
+
+# Folders that are NOT mini-projects.
+_SKIP: set[str] = {"obs", "voice", "__pycache__", "tools", "sandbox_testing", "mini projects"}
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Helpers
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _normalize_names(values: list[str] | None) -> set[str]:
+    return {v.strip() for v in (values or []) if v and v.strip()}
+
+
+def _filter_projects(projects: list[dict], only: set[str], skip: set[str]) -> list[dict]:
+    available = {p["name"] for p in projects}
+
+    unknown_only = sorted(only - available)
+    unknown_skip = sorted(skip - available)
+
+    for name in unknown_only:
+        log.warn("hub", f"--only requested unknown project '{name}'")
+    for name in unknown_skip:
+        log.warn("hub", f"--skip requested unknown project '{name}'")
+
+    filtered = projects
+
+    if only:
+        filtered = [p for p in filtered if p["name"] in only]
+
+    if skip:
+        filtered = [p for p in filtered if p["name"] not in skip]
+
+    return filtered
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -66,50 +119,67 @@ _SKIP: set[str] = {"obs", "voice", "__pycache__", "tools"}
 
 def _discover_projects() -> list[dict]:
     """
-    Scan _ROOT for sub-folders that look like mini-projects and import them
-    as proper packages.
+    Scan for sub-folders that look like mini-projects and import them.
 
     A folder qualifies when it:
-      • is a directory
-      • is not in _SKIP and doesn't start with '.' or '_'
+      • is a directory, not in _SKIP, and does not start with '.' or '_'
       • contains both __init__.py  AND  main.py
       • main.py exposes a callable  run(input_queue, stop_event, ...)
     """
     projects: list[dict] = []
+    seen_names: set[str] = set()
 
-    for folder in sorted(_ROOT.iterdir()):
-        if (
-            not folder.is_dir()
-            or folder.name in _SKIP
-            or folder.name.startswith((".", "_"))
-        ):
-            continue
+    scan_dirs = [_ROOT]
+    if _MINI_PROJECTS_DIR.is_dir():
+        scan_dirs.append(_MINI_PROJECTS_DIR)
 
-        # Require both markers of a proper package
-        if not (folder / "__init__.py").exists():
-            print(f"[hub] Skipping '{folder.name}' — no __init__.py (not a package).")
-            continue
-        if not (folder / "main.py").exists():
-            print(f"[hub] Skipping '{folder.name}' — no main.py.")
-            continue
+    for scan_root in scan_dirs:
+        for folder in sorted(scan_root.iterdir()):
+            if (
+                not folder.is_dir()
+                or folder.name in _SKIP
+                or folder.name.startswith((".", "_"))
+            ):
+                continue
 
-        pkg_name = f"{folder.name}.main"
-        try:
-            module = importlib.import_module(pkg_name)
-        except Exception as exc:
-            print(f"[hub] Could not import '{pkg_name}': {exc}")
-            continue
+            if folder.name in seen_names:
+                log.warn("hub", f"Skipping '{folder.name}' in '{scan_root.name}/' — already loaded.")
+                continue
 
-        if not callable(getattr(module, "run", None)):
-            print(f"[hub] Skipping '{folder.name}' — main.py has no run() function.")
-            continue
+            if not (folder / "__init__.py").exists():
+                log.debug("hub", f"Skipping '{folder.name}' — no __init__.py")
+                continue
+            if not (folder / "main.py").exists():
+                log.debug("hub", f"Skipping '{folder.name}' — no main.py")
+                continue
 
-        projects.append({
-            "name"  : folder.name,
-            "module": module,
-            "queue" : queue.Queue(),
-            "thread": None,
-        })
+            pkg_name = f"{folder.name}.main"
+            try:
+                module = importlib.import_module(pkg_name)
+            except Exception as exc:
+                log.error("hub", f"Could not import '{pkg_name}': {exc}")
+                continue
+
+            if not callable(getattr(module, "run", None)):
+                log.warn("hub", f"Skipping '{folder.name}' — main.py has no run() function.")
+                continue
+
+            seen_names.add(folder.name)
+
+            # Import interface.py to trigger auto-registration with project_registry.
+            try:
+                importlib.import_module(f"{folder.name}.interface")
+            except ImportError:
+                pass
+            except Exception as exc:
+                log.warn("hub", f"Could not import '{folder.name}.interface': {exc}")
+
+            projects.append({
+                "name": folder.name,
+                "module": module,
+                "queue": queue.Queue(),
+                "thread": None,
+            })
 
     return projects
 
@@ -119,50 +189,104 @@ def _discover_projects() -> list[dict]:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def main() -> None:
-    print("=" * 60)
+    print("=" * 62)
     print("  OBS Hub")
-    print("=" * 60)
+    print("=" * 62)
 
     # Verify OBS connection before starting anything
     try:
         from obs import get_obs
-        get_obs()
+        client = get_obs()
+        print("  OBS: Connected")
     except Exception as exc:
-        print(f"\n  [!] OBS connection failed: {exc}")
-        print("       Fix OBS connection in obs/obs_config.py and try again.")
+        print(f"\n  [ERROR] OBS connection failed: {exc}")
+        print("  Fix connection settings in obs/obs_config.py and retry.")
         return
 
     projects = _discover_projects()
+
+    # Register cross-project coordination rules now that all interfaces are
+    # loaded.  hub_rules.py is the single source of truth for which projects
+    # pause/resume when another project starts playing.
+    import hub_rules  # noqa: F401 — imported for side-effects (rule registration)
+
+    only_names = _normalize_names(ARGS.only)
+    skip_names = _normalize_names(ARGS.skip)
+    projects = _filter_projects(projects, only_names, skip_names)
+
     if not projects:
-        print("\n  [!] No mini-projects found.")
-        print("       Add a sub-folder with __init__.py + main.py exposing run().")
+        print("\n  [ERROR] No mini-projects selected.")
+        print("  Check your --only / --skip arguments.")
         return
 
-    print(f"\n  Found {len(projects)} project(s):\n")
+    # ── Scene ownership table ─────────────────────────────────────────────────
+    from shared import project_registry
+
+    print(f"\n  {len(projects)} project(s) loaded:\n")
+    name_col = max(len(p["name"]) for p in projects) + 2
+    scene_col = 40
+    divider = f"  {'─' * name_col}┼{'─' * scene_col}"
+    print(f"  {'Project':<{name_col}}│ OBS Scenes")
+    print(divider)
     for p in projects:
-        print(f"    • {p['name']}")
+        iface = project_registry.get(p["name"])
+        scenes = ", ".join(iface.controlled_scenes) if iface else "(no interface)"
+        print(f"  {p['name']:<{name_col}}│ {scenes}")
+    print(divider)
+
+    level_name = {
+        log.DEBUG: "DEBUG",
+        log.INFO: "INFO",
+        log.WARN: "WARN",
+        log.ERROR: "ERROR",
+    }
+    print(f"\n  Log level : {level_name.get(log._level, 'INFO')}")
+    print(f"  Debug arg : {'ON' if ARGS.debug else 'OFF'}")
+    print(f"  Only      : {', '.join(sorted(only_names)) if only_names else '(all)'}")
+    print(f"  Skip      : {', '.join(sorted(skip_names)) if skip_names else '(none)'}")
+    print("  Shutdown  : Ctrl+C")
     print()
-    print("  Each project manages its own hotkeys.")
-    print("  Shutdown: Ctrl+C\n")
 
     stop_event = threading.Event()
 
-    # done_queue is kept for backwards-compatibility with projects that were
-    # written to accept a third positional argument.  The hub itself never
-    # reads from it.
+    # done_queue kept for backward-compat with 3-arg run() signatures.
     done_queue: queue.Queue[str] = queue.Queue()
+ ##ORIGINAL
+    # for p in projects:
+        # run_fn = p["module"].run
+        # sig = inspect.signature(run_fn)
 
+        # n_required = sum(
+            # 1 for param in sig.parameters.values()
+            # if param.default is inspect.Parameter.empty
+        # )
+        
+       
+        # def _make_target(fn, q: queue.Queue, n: int):
+            # if n >= 3:
+                # return lambda: fn(q, stop_event, done_queue)
+            # return lambda: fn(q, stop_event)
+
+        # t = threading.Thread(
+            # target=_make_target(run_fn, p["queue"], n_required),
+            # name=p["name"],
+            # daemon=True,
+        # )
+        # t.start()
+        # p["thread"] = t
+
+    # print("  Selected projects running.\n")
+    #NOT ORIGINAL
     for p in projects:
         run_fn = p["module"].run
-        sig    = inspect.signature(run_fn)
+        sig = inspect.signature(run_fn)
 
-        # Count parameters that have no default value (i.e. are required)
         n_required = sum(
             1 for param in sig.parameters.values()
             if param.default is inspect.Parameter.empty
         )
 
-        def _make_target(fn, q: queue.Queue, n: int) -> callable:
+        def _make_target(fn, q, n):
             if n >= 3:
                 return lambda: fn(q, stop_event, done_queue)
             return lambda: fn(q, stop_event)
@@ -172,33 +296,30 @@ def main() -> None:
             name=p["name"],
             daemon=True,
         )
+
         t.start()
         p["thread"] = t
 
-    print("  All projects running.\n")
+        # ⬇️ add this
+        time.sleep(2)
 
     # Start the shared voice listener.
-    # Projects that need voice grab  sys.modules["voice.listener"]  directly;
-    # they never import the voice package themselves.
     try:
         from voice import listener as voice_mod
-        print("  [voice] Listener module imported.")
         voice_mod.start(stop_event)
+        print("  [voice] Whisper listener started.")
     except Exception as exc:
         import traceback
         print(f"\n  [voice] Could not start voice listener: {exc}")
         traceback.print_exc()
-        print("       Voice input will be unavailable.\n")
+        print("  Voice input will be unavailable.\n")
 
-    # ── Main thread: tight-ish sleep loop so Ctrl+C is always delivered ───────
-    # stop_event.wait() swallows KeyboardInterrupt on Windows.
     try:
         while not stop_event.is_set():
             time.sleep(0.2)
     except KeyboardInterrupt:
         print("\n  Ctrl+C received.")
 
-    # ── Graceful shutdown ─────────────────────────────────────────────────────
     print("  Shutting down…")
     stop_event.set()
 
@@ -207,7 +328,7 @@ def main() -> None:
         if t and t.is_alive():
             t.join(timeout=3)
             if t.is_alive():
-                print(f"  [hub] Warning: '{p['name']}' did not stop within 3 s.")
+                log.warn("hub", f"'{p['name']}' did not stop within 3 s.")
 
     print("  Goodbye.")
 

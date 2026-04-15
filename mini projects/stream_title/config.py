@@ -1,0 +1,2 @@
+PTT_KEY = "<"
+RECORD_TIMEOUT_SECONDS: float = 2.0

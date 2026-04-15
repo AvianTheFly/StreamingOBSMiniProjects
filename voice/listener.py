@@ -5,13 +5,18 @@ Push-to-talk recorder for obs_hub.
 
 Workflow
 --------
-1. Hub calls start_recording() when user presses ili macro
-2. Mic accumulates raw float32 chunks into a growing buffer
-3. Hub calls stop_and_transcribe() when user presses kjk macro
-4. Whisper transcribes the buffer and the result is forwarded to the focused
-   project's queue via the send_fn supplied at call time.
+1. A project calls start_recording(owner) when the user presses its trigger hotkey.
+   Only ONE project can record at a time.  If another is already recording, the
+   call is rejected and logs a warning.
+2. Mic accumulates raw float32 chunks into a growing buffer.
+3. The project calls stop_and_transcribe(send_fn, owner) when:
+   - The trigger hotkey is pressed again  (double-trigger)
+   - The user presses the 'C' stop key
+   - The 2-second auto-timeout fires
+4. Whisper transcribes the buffer and calls send_fn(text) from a background thread.
 
-No RMS gate, no VAD segmentation — the user controls the utterance boundaries.
+The mic stream is always open (no startup delay).  Audio is only buffered when
+_recording is True — Whisper never sees audio until a trigger is pressed.
 """
 
 from __future__ import annotations
@@ -43,20 +48,18 @@ _model  = None                          # WhisperModel — loaded once
 _stream = None                          # sounddevice InputStream — kept open always
 _audio_q: queue.Queue[np.ndarray] = queue.Queue()
 
-_recording = False
-_rec_lock  = threading.Lock()
+_recording       = False
+_recording_owner = ""                   # tag of the project that owns the current recording
+_rec_lock        = threading.Lock()
 _buffer: list[np.ndarray] = []
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  Public API  (called by hub main.py)
+#  Public API
 # ─────────────────────────────────────────────────────────────────────────────
 
 def start(stop_event: threading.Event) -> None:
-    """
-    Load Whisper and open the microphone.  Call once at hub startup.
-    Recording does NOT begin until start_recording() is called.
-    """
+    """Load Whisper and open the microphone.  Call once at hub startup."""
     t = threading.Thread(
         target=_init_and_drain,
         args=(stop_event,),
@@ -66,31 +69,66 @@ def start(stop_event: threading.Event) -> None:
     t.start()
 
 
-def start_recording() -> None:
-    """Begin accumulating mic audio into the internal buffer."""
-    global _recording, _buffer
-    with _rec_lock:
-        _buffer    = []
-        _recording = True
-    print("  🎙️  Recording... (press 'kjk' macro to send)")
-
-
-def stop_and_transcribe(send_fn: SendFn) -> None:
+def start_recording(owner: str = "unknown") -> bool:
     """
-    Stop recording, then transcribe + forward in a background thread so the
-    key handler returns immediately.
+    Begin accumulating mic audio for `owner`.
 
-    send_fn — callable that routes the transcribed string to the focused
-              project's input queue.  Pass `lambda _: None` to discard.
+    Returns True if recording started successfully.
+    Returns False if another project is already recording — the caller should
+    abort its recording flow.  Nothing is modified in that case.
     """
-    global _recording
+    global _recording, _buffer, _recording_owner
     with _rec_lock:
-        _recording     = False
-        audio_snapshot = list(_buffer)
+        if _recording:
+            print(
+                f"  [voice] ⚠  '{owner}' tried to start recording, "
+                f"but '{_recording_owner}' is already active — ignored."
+            )
+            return False
+        _buffer          = []
+        _recording       = True
+        _recording_owner = owner
+
+    print(f"  [voice] 🎙️  Recording started [{owner}]. "
+          f"Press trigger again or 'C' to send, auto-stops in 2s.")
+    return True
+
+
+def stop_and_transcribe(send_fn: SendFn, owner: str = "") -> None:
+    """
+    Stop recording and transcribe in a background thread.
+
+    owner — the tag passed to start_recording().  If it doesn't match the
+            current owner the call is silently rejected.  Pass "" to force-stop
+            regardless of owner (e.g. on hub shutdown).
+    send_fn — called with the transcribed string from a background thread.
+              Pass `lambda _: None` to discard (e.g. on cancel).
+    """
+    global _recording, _recording_owner
+    with _rec_lock:
+        if not _recording:
+            if owner:
+                print(f"  [voice] '{owner}' called stop_and_transcribe but nothing is recording.")
+            return
+        if owner and _recording_owner and owner != _recording_owner:
+            print(
+                f"  [voice] ⚠  '{owner}' tried to stop recording owned by "
+                f"'{_recording_owner}' — ignored."
+            )
+            return
+        _recording       = False
+        audio_snapshot   = list(_buffer)
         _buffer.clear()
+        stopped_owner    = _recording_owner
+        _recording_owner = ""
+
+    chunk_count = len(audio_snapshot)
+    duration    = chunk_count * MIC_CHUNK_SAMPLES / MIC_SAMPLE_RATE
+    print(f"  [voice] 🛑  Recording stopped [{stopped_owner}]. "
+          f"{chunk_count} chunk(s) / {duration:.2f}s buffered.")
 
     if not audio_snapshot:
-        print("  [voice] Nothing recorded.")
+        print("  [voice] Nothing recorded — buffer was empty.")
         return
 
     threading.Thread(
@@ -132,13 +170,11 @@ def _init_and_drain(stop_event: threading.Event) -> None:
         print("  [voice] sounddevice not installed — run: pip install sounddevice")
         return
 
-    # Resolve which device to use and what sample rate it supports
-    device_idx   = MIC_DEVICE  # None = sounddevice default
-    device_info  = sd.query_devices(device_idx, "input")
-    device_name  = device_info["name"]
-    native_rate  = int(device_info["default_samplerate"])
+    device_idx  = MIC_DEVICE
+    device_info = sd.query_devices(device_idx, "input")
+    device_name = device_info["name"]
+    native_rate = int(device_info["default_samplerate"])
 
-    # Prefer the configured rate; fall back to native if hardware rejects 16kHz
     chosen_rate = MIC_SAMPLE_RATE
     if native_rate != MIC_SAMPLE_RATE:
         print(
@@ -151,7 +187,6 @@ def _init_and_drain(stop_event: threading.Event) -> None:
             print(f"  [voice] sounddevice status: {status}")
         _audio_q.put(indata[:, 0].copy())   # mono float32
 
-    # Try to open at MIC_SAMPLE_RATE; if that fails, try native rate
     for rate in ([MIC_SAMPLE_RATE] if native_rate == MIC_SAMPLE_RATE
                  else [MIC_SAMPLE_RATE, native_rate]):
         try:
@@ -170,8 +205,7 @@ def _init_and_drain(stop_event: threading.Event) -> None:
             if rate != MIC_SAMPLE_RATE:
                 print(
                     f"  [voice] WARNING: running at {rate} Hz instead of 16000 Hz. "
-                    "Whisper accuracy may be reduced. "
-                    "Set MIC_SAMPLE_RATE to match in hub_config.py."
+                    "Whisper accuracy may be reduced."
                 )
             break
         except Exception as e:
@@ -182,7 +216,7 @@ def _init_and_drain(stop_event: threading.Event) -> None:
         print("  [voice] Failed to open microphone. Run mic_test.py to diagnose.")
         return
 
-    print("  [voice] Ready — press 'ili' macro to start recording.")
+    print("  [voice] Ready — press a trigger hotkey to start recording.")
 
     # ── Drain loop: only writes to _buffer when _recording is True ───────────
     try:
@@ -205,7 +239,9 @@ def _transcribe_and_send(chunks: list[np.ndarray], send_fn: SendFn) -> None:
         print("  [voice] Whisper not ready yet — try again in a moment.")
         return
 
-    audio = np.concatenate(chunks)
+    audio    = np.concatenate(chunks)
+    duration = len(audio) / MIC_SAMPLE_RATE
+    print(f"  [voice] Transcribing {duration:.2f}s of audio…")
 
     try:
         segments, _ = _model.transcribe(
@@ -221,8 +257,8 @@ def _transcribe_and_send(chunks: list[np.ndarray], send_fn: SendFn) -> None:
         return
 
     if not text:
-        print("  [voice] Transcription was empty — nothing sent.")
+        print("  [voice] Transcription empty — VAD filtered everything (silence or noise).")
         return
 
-    print(f"  🎤  {text}")
+    print(f"  [voice] 🎤  Transcribed: \"{text}\"")
     send_fn(text)

@@ -13,9 +13,14 @@ venv/
 
 # Secrets — NEVER commit
 .env
+**/twitch_config.json
 
 # Backups
 *.bak
+
+# Large binary / model directories
+voice/vosk-model*/
+*.zip
 
 # IDE
 .vscode/

@@ -1,13 +1,17 @@
 # obs/interaction.py
 #
 # Every OBS action any mini-project might want, in one place.
-# Import get_obs() and call these directly, or use the helper wrappers below.
+#
+# Do NOT import from this file directly. Use the package instead:
+#
+#   from obs import show_source, hide_source, switch_scene, ...
+#
+# All public functions are re-exported from obs/__init__.py.
 
 from __future__ import annotations
 
 import json
 import math
-import os
 import random
 import threading
 import time
@@ -35,7 +39,7 @@ def _get_scene_item_id(obs, scene: str, source: str, retries: int = 3, delay: fl
     )
 
 
-def show_source_scene(scene: str, source: str) -> None:
+def show_source(scene: str, source: str) -> None:
     """Turn on a scene item."""
     obs = get_obs()
     item_id = _get_scene_item_id(obs, scene, source)
@@ -53,11 +57,6 @@ def hide_source(scene: str, source: str) -> None:
         stop = client._idle_spin_events.pop(source, None)
         if stop:
             stop.set()
-
-
-def show_source(scene: str, source: str) -> None:
-    """Turn on a scene item."""
-    show_source_scene(scene, source)
 
 
 def show_source_animated(
@@ -373,6 +372,23 @@ def list_scenes() -> list[str]:
     return [s["sceneName"] for s in get_obs().get_scene_list().scenes]
 
 
+def create_scene_if_missing(scene: str) -> bool:
+    """
+    Create an OBS scene if it does not already exist.
+    Returns True if it was created, False if it already existed.
+    """
+    try:
+        existing = list_scenes()
+        if scene in existing:
+            return False
+        get_obs().create_scene(scene)
+        print(f"[OBS] Created scene: {scene!r}")
+        return True
+    except Exception as e:
+        print(f"[OBS] create_scene_if_missing failed for {scene!r}: {e}")
+        return False
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 #  Media / playback
 # ─────────────────────────────────────────────────────────────────────────────
@@ -386,12 +402,36 @@ def get_media_state(source: str) -> str | None:
         return None
 
 
+def stop_media(source: str) -> None:
+    """Stop a media source."""
+    try:
+        get_obs().trigger_media_input_action(source, "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_STOP")
+    except Exception as e:
+        print(f"[OBS] stop_media failed for '{source}': {e}")
+
+
 def restart_media(source: str) -> None:
     """Seek a media source back to the beginning and play it."""
     try:
         get_obs().trigger_media_input_action(source, "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_RESTART")
     except Exception as e:
         print(f"[OBS] restart_media failed for '{source}': {e}")
+
+
+def pause_media(source: str) -> None:
+    """Pause a media source at its current position."""
+    try:
+        get_obs().trigger_media_input_action(source, "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PAUSE")
+    except Exception as e:
+        print(f"[OBS] pause_media failed for '{source}': {e}")
+
+
+def play_media(source: str) -> None:
+    """Resume a paused media source from its current position."""
+    try:
+        get_obs().trigger_media_input_action(source, "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PLAY")
+    except Exception as e:
+        print(f"[OBS] play_media failed for '{source}': {e}")
 
 
 def wait_for_media_end(
@@ -435,19 +475,22 @@ def wait_for_media_end(
 def create_media_source(scene: str, source_name: str, filepath: str | Path, hidden: bool = True) -> bool:
     """
     Add an ffmpeg_source (mp4/audio file) to a scene.
-    Tries both obsws-python call signatures for compatibility.
-    Returns True on success.
+
+    Returns:
+        True  -> a new OBS input was actually created
+        False -> the input already existed or creation failed
     """
     settings = {
-        "local_file"         : str(filepath),
-        "is_local_file"      : True,
-        "restart_on_activate": True,
+        "local_file": str(filepath),
+        "is_local_file": True,
+        "restart_on_activate": False,
         "close_when_inactive": True,
-        "looping"            : False,
+        "hw_decode": True,
+        "looping": False,
     }
     obs = get_obs()
 
-    # Try positional (older obsws-python requires sceneItemEnabled as 5th arg)
+    # Older obsws-python signature
     try:
         obs.create_input(scene, source_name, "ffmpeg_source", settings, not hidden)
         return True
@@ -455,15 +498,17 @@ def create_media_source(scene: str, source_name: str, filepath: str | Path, hidd
         pass
     except Exception as e:
         if "already exists" in str(e).lower():
-            return True
+            return False
         print(f"[OBS] create_media_source failed (positional): {e}")
         return False
 
-    # Try keyword args (newer obsws-python, disable separately)
+    # Newer obsws-python signature
     try:
         resp = obs.create_input(
-            sceneName=scene, inputName=source_name,
-            inputKind="ffmpeg_source", inputSettings=settings,
+            sceneName=scene,
+            inputName=source_name,
+            inputKind="ffmpeg_source",
+            inputSettings=settings,
         )
         if hidden:
             try:
@@ -477,7 +522,7 @@ def create_media_source(scene: str, source_name: str, filepath: str | Path, hidd
         return True
     except Exception as e:
         if "already exists" in str(e).lower():
-            return True
+            return False
         print(f"[OBS] create_media_source failed (kwargs): {e}")
         return False
 
@@ -497,14 +542,58 @@ def delete_source(scene: str, source_name: str) -> bool:
         pass  # already gone
     return True
 
-
+def create_scene_item(scene: str, source_name: str, enabled: bool = True) -> int:
+    """
+    Add an existing global input to a scene as a new scene item.
+    Returns the new scene_item_id.
+    """
+    resp = get_obs().create_scene_item(scene, source_name, enabled)
+    return resp.scene_item_id
+    
 def list_sources(scene: str) -> dict[str, int]:
-    """Returns {source_name: scene_item_id} for every source in the scene."""
+    """Return {source_name: scene_item_id} for every source in the scene."""
+    obs = get_obs()
+
+    try:
+        resp = obs.get_scene_item_list(scene)
+    except Exception as e:
+        print(f"[OBS] get_scene_item_list failed for scene '{scene}': {e}")
+        return {}
+
+    if resp is None:
+        print(f"[OBS] get_scene_item_list({scene!r}) returned None")
+        return {}
+
+    items = getattr(resp, "scene_items", None)
+    if items is None:
+        print(f"[OBS] get_scene_item_list({scene!r}) returned no scene_items")
+        return {}
+
+    out = {}
+    for item in items:
+        if isinstance(item, dict):
+            name = item.get("sourceName")
+            item_id = item.get("sceneItemId")
+        else:
+            name = getattr(item, "sourceName", None) or getattr(item, "source_name", None)
+            item_id = getattr(item, "sceneItemId", None) or getattr(item, "scene_item_id", None)
+
+        if name and item_id is not None:
+            out[str(name)] = int(item_id)
+
+    return out
+    
+def list_group_sources(scene: str) -> dict[str, int]:
+    """Returns {source_name: scene_item_id} for only group sources in the scene."""
     try:
         resp = get_obs().get_scene_item_list(scene)
-        return {item["sourceName"]: item["sceneItemId"] for item in resp.scene_items}
+        return {
+            item["sourceName"]: item["sceneItemId"]
+            for item in resp.scene_items
+            if item.get("isGroup")
+        }
     except Exception as e:
-        print(f"[OBS] list_sources failed for scene '{scene}': {e}")
+        print(f"[OBS] list_group_sources failed for scene '{scene}': {e}")
         return {}
 
 
@@ -534,10 +623,6 @@ def set_text(source: str, text: str) -> None:
 # ─────────────────────────────────────────────────────────────────────────────
 #  Filters
 # ─────────────────────────────────────────────────────────────────────────────
-
-def set_filter_enabled(source: str, filter_name: str, enabled: bool) -> None:
-    get_obs().set_source_filter_enabled(source, filter_name, enabled)
-
 
 def get_source_filters(source: str) -> list[dict]:
     """
@@ -588,24 +673,50 @@ def remove_source_filter(source: str, filter_name: str) -> None:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+#  Scene item ID resolution
+# ─────────────────────────────────────────────────────────────────────────────
+
+def get_scene_item_id(scene: str, source: str) -> int:
+    """
+    Return the integer scene-item ID for `source` in `scene`.
+
+    Use this when you need to cache an item_id for a hot animation loop —
+    then pass it to set_source_transform_by_id() to avoid repeated lookups.
+    Raises RuntimeError if the source cannot be found after retries.
+    """
+    return _get_scene_item_id(get_obs(), scene, source)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 #  Transform / position
 # ─────────────────────────────────────────────────────────────────────────────
 
 def set_source_transform(scene: str, source: str, transform: dict) -> None:
     """
-    Update position/scale/rotation of a scene item.
+    Update position/scale/rotation of a scene item (resolves source name → id).
     transform keys: positionX, positionY, scaleX, scaleY, rotation, etc.
     """
     obs = get_obs()
-    item_id = obs.get_scene_item_id(scene, source).scene_item_id
+    item_id = _get_scene_item_id(obs, scene, source)
     obs.set_scene_item_transform(scene, item_id, transform)
+
+
+def set_source_transform_by_id(scene: str, item_id: int, transform: dict) -> None:
+    """
+    Update position/scale/rotation using a pre-resolved scene-item ID.
+
+    Use this in animation loops where the item_id is already cached —
+    it skips the get_scene_item_id() lookup on every frame, which matters
+    at 20–25 fps.  Obtain the id once with get_scene_item_id().
+    """
+    get_obs().set_scene_item_transform(scene, item_id, transform)
 
 
 def get_source_transform(scene: str, source: str) -> dict:
     obs = get_obs()
-    item_id = obs.get_scene_item_id(scene, source).scene_item_id
-    return obs.get_scene_item_transform(scene, item_id).scene_item_transform
-
+    item_id = _get_scene_item_id(obs, scene, source)
+    resp = obs.get_scene_item_transform(scene, item_id)
+    return getattr(resp, "scene_item_transform", resp)
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  Audio routing / volume
@@ -665,28 +776,46 @@ def set_input_volume_mul(input_name: str, mul: float) -> None:
 
 
 def get_input_list() -> list[str]:
-    """Return a list of all OBS input names (useful for debugging audio targets)."""
+    """Return a list of all OBS input names."""
     try:
         resp = get_obs().get_input_list()
-        return [getattr(i, "input_name", str(i)) for i in getattr(resp, "inputs", [])]
+        names: list[str] = []
+
+        for item in getattr(resp, "inputs", []):
+            if isinstance(item, dict):
+                name = item.get("inputName") or item.get("input_name")
+            else:
+                name = getattr(item, "inputName", None) or getattr(item, "input_name", None)
+
+            if name:
+                names.append(str(name))
+
+        return names
     except Exception as e:
         print(f"[OBS] Could not get input list: {e}")
         return []
 
 
-def _get_input_names() -> list[str]:
-    """Return a clean list of input names from get_input_list()."""
-    obs_client = get_obs()
-    raw = getattr(obs_client.get_input_list(), "inputs", [])
-    names: list[str] = []
-    for item in raw:
-        if isinstance(item, dict):
-            name = item.get("inputName", "")
-        else:
-            name = getattr(item, "input_name", str(item))
-        if name:
-            names.append(name)
-    return names
+def set_input_mute(source: str, muted: bool) -> None:
+    """Mute or unmute an audio input source.
+
+    muted=True  → source is silenced (no audio to stream/monitor).
+    muted=False → source is restored to normal.
+    """
+    try:
+        get_obs().set_input_mute(source, muted)
+    except Exception as e:
+        print(f"[OBS] set_input_mute failed for '{source}' (muted={muted}): {e}")
+
+
+def get_input_mute(source: str) -> bool | None:
+    """Return True if the source is muted, False if not, None on error."""
+    try:
+        resp = get_obs().get_input_mute(source)
+        return resp.input_muted
+    except Exception as e:
+        print(f"[OBS] get_input_mute failed for '{source}': {e}")
+        return None
 
 
 def set_desktop_audio_volume(level_percent: float, input_name: str | None = None) -> None:
@@ -694,13 +823,12 @@ def set_desktop_audio_volume(level_percent: float, input_name: str | None = None
     Set an OBS Audio Mixer slider volume by name.
 
     level_percent: Target volume as a percentage (0–100).
-    input_name:     Exact OBS input name. If None, runs a debug scan on first
-                    call and auto-detects 'Desktop Audio' / similar.
+    input_name:    Exact OBS input name. If None, auto-detects 'Desktop Audio'.
     """
     obs_client = get_obs()
 
     if input_name is None:
-        inputs = _get_input_names()
+        inputs = get_input_list()
         print(f"[OBS] Available inputs ({len(inputs)}):")
         for inp in inputs:
             print(f"  • {inp!r}")
@@ -727,6 +855,22 @@ def set_desktop_audio_volume(level_percent: float, input_name: str | None = None
         print(f"[OBS] Input {input_name!r} volume → {level_percent:.0f}%")
     except Exception as e:
         print(f"[OBS] Failed to set volume for {input_name!r}: {e}")
+
+
+def set_input_audio_tracks(source: str, tracks: dict) -> None:
+    """
+    Set which OBS audio output tracks an input is sent to.
+
+    tracks: mapping of track-number string → bool, e.g.:
+        {"1": False, "2": True, "3": True, "4": True, "5": True, "6": True}
+
+    Typical use — route a media source to tracks 2-6 only (exclude track 1):
+        obs.set_input_audio_tracks(source, {"1": False, "2": True, ..., "6": True})
+    """
+    get_obs().send("SetInputAudioTracks", {
+        "inputName": source,
+        "inputAudioTracks": tracks,
+    })
 
 
 def configure_input_audio(
@@ -771,10 +915,7 @@ def save_replay_buffer_and_wait(timeout: float = 15.0) -> str | None:
     Returns None if the event doesn't arrive within `timeout` seconds.
     """
     from obsws_python import EventClient  # noqa: PLC0415
-
-    HOST     = os.environ.get("OBS_HOST", "localhost")
-    PORT     = int(os.environ.get("OBS_PORT", "4455"))
-    PASSWORD = os.environ.get("OBS_PASSWORD", "")
+    from .obs_config import OBS_HOST as HOST, OBS_PORT as PORT, OBS_PASSWORD as PASSWORD
 
     saved_event = threading.Event()
     path_holder: list[str] = []
@@ -812,13 +953,41 @@ def set_media_source_file(source: str, filepath: str | Path) -> None:
     get_obs().set_input_settings(
         source,
         {
-            "local_file"         : str(filepath),
-            "is_local_file"      : True,
-            "restart_on_activate": False,
-            "looping"            : False,
+            "local_file"   : str(filepath),
+            "is_local_file": True,
         },
         overlay=True,
     )
+
+
+def configure_media_source_properties(
+    source: str,
+    *,
+    restart_on_activate: bool | None = None,
+    close_when_inactive: bool | None = None,
+    looping: bool | None = None,
+    hw_decode: bool | None = None,
+) -> None:
+    """
+    Set behavioural properties on an ffmpeg_source input.  Only the keyword
+    arguments you supply are changed; omitted ones are left as-is in OBS.
+
+    restart_on_activate  — restart from beginning every time the source is shown
+    close_when_inactive  — release the file handle when the source is hidden
+    looping              — loop the media when it reaches the end
+    hw_decode            — use hardware decoding when available
+    """
+    settings: dict = {}
+    if restart_on_activate is not None:
+        settings["restart_on_activate"] = restart_on_activate
+    if close_when_inactive is not None:
+        settings["close_when_inactive"] = close_when_inactive
+    if looping is not None:
+        settings["looping"] = looping
+    if hw_decode is not None:
+        settings["hw_decode"] = hw_decode
+    if settings:
+        get_obs().set_input_settings(source, settings, overlay=True)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -844,18 +1013,8 @@ def set_stream_title(title: str) -> None:
     obs_client = get_obs()
     try:
         resp = obs_client.send("GetStreamServiceSettings", {})
-
-        # DEBUG: print the raw response structure so we know what OBS gives us
-        import pprint
-        print(f"[OBS] DEBUG GetStreamServiceSettings response:")
-        for attr in dir(resp):
-            if not attr.startswith("_"):
-                print(f"  {attr} = {pprint.pformat(getattr(resp, attr))}")
-
         settings = getattr(resp, "stream_service_settings", {})
         service_type = getattr(resp, "stream_service_type", "rtmp_common")
-
-        print(f"[OBS] settings type: {type(settings).__name__}, service_type: {service_type!r}")
 
         if isinstance(settings, dict):
             settings["title"] = title
@@ -865,6 +1024,6 @@ def set_stream_title(title: str) -> None:
             })
             print(f"[OBS] Stream title → {title!r}")
         else:
-            print(f"[OBS] Unexpected response from GetStreamServiceSettings")
+            print(f"[OBS] set_stream_title: unexpected settings type {type(settings).__name__!r}")
     except Exception as e:
         print(f"[OBS] set_stream_title failed: {e}")
