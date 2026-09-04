@@ -79,7 +79,12 @@ class SingleSourceStateStore:
             self._data = self._load()
             if isinstance(self._data.get("baseline"), dict):
                 return
-            self._data["baseline"] = self.snapshot_current_state()
+            baseline = self.snapshot_current_state()
+            if self.include_filters:
+                # The OBS input is shared, but filters belong to the loaded
+                # media file. An asset without an override has no filters.
+                baseline["filters"] = []
+            self._data["baseline"] = baseline
             self._save()
             print(f"{self.tag} Captured single-source baseline for '{self.source_name}'.")
 
@@ -88,7 +93,8 @@ class SingleSourceStateStore:
         with self._lock:
             self._data = self._load()
         baseline = _normalize_snapshot(self._data.get("baseline"))
-        override = _normalize_snapshot((self._data.get("overrides") or {}).get(stem))
+        stem_key = str(stem or "").strip().casefold()
+        override = _normalize_snapshot((self._data.get("overrides") or {}).get(stem_key))
         target = _merge_snapshots(baseline, override)
         _apply_snapshot(
             self.scene,
@@ -107,13 +113,21 @@ class SingleSourceStateStore:
         with self._lock:
             self._data = self._load()
             baseline = _normalize_snapshot(self._data.get("baseline"))
+            if self.include_filters:
+                # Migrate any legacy source-wide baseline filters into this
+                # loaded asset. The shared source itself must stay filterless.
+                baseline["filters"] = []
+                raw_baseline = self._data.get("baseline")
+                if isinstance(raw_baseline, dict):
+                    raw_baseline["filters"] = []
             diff = _snapshot_diff(baseline, current)
             overrides = self._data.setdefault("overrides", {})
+            stem_key = str(stem or "").strip().casefold()
             if diff:
-                overrides[stem] = diff
-                print(f"{self.tag} Saved single-source override for '{stem}'.")
+                overrides[stem_key] = diff
+                print(f"{self.tag} Saved single-source override for '{stem_key}'.")
             else:
-                overrides.pop(stem, None)
+                overrides.pop(stem_key, None)
             self._save()
 
     def snapshot_current_state(self) -> dict[str, Any]:
@@ -303,9 +317,7 @@ def _apply_snapshot(
     if apply_transform and transform:
         obs.set_source_transform(scene, source_name, transform)
 
-    # A shared OBS source owns its filters. Projects that only need per-file
-    # layout/volume state must not remove and recreate that filter chain on
-    # every play; doing so both loses manual filters and causes a visible hitch.
+    # Swap the complete per-asset filter chain along with the media file.
     if apply_filters:
         _apply_filters(source_name, snapshot.get("filters") or [])
 
@@ -322,6 +334,8 @@ def _apply_snapshot(
 
 def _apply_filters(source_name: str, desired_filters: list[dict[str, Any]]) -> None:
     current = _snapshot_filters(source_name)
+    if _filters_equal(current, desired_filters):
+        return
     for item in current:
         try:
             obs.remove_source_filter(source_name, item["name"])

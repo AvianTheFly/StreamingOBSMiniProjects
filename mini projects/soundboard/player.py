@@ -44,14 +44,13 @@ class SoundboardPlayer:
         self._current_stem: str | None = None
         self._current_file: Path | None = None
         self._play_thread: threading.Thread | None = None
-        # Filters belong to the one shared OBS source and should remain exactly
-        # as the user configured them. Only per-file transforms are stored.
+        # The OBS input is shared, but filters are saved/restored per media file.
         self._state_store = SingleSourceStateStore(
             project_dir=_PROJECT_DIR,
             scene=CONFIG.scene,
             source_name=SINGLE_SOURCE_NAME,
             tag=_TAG,
-            include_filters=False,
+            include_filters=True,
             include_audio=False,
             include_audio_volume=False,
             include_media_settings=False,
@@ -133,6 +132,12 @@ class SoundboardPlayer:
 
         try:
             print(f"{_TAG} Playing: '{SINGLE_SOURCE_NAME}'")
+
+            # Capture edits made in OBS while the previously loaded asset was
+            # stopped/hidden, before local_file is hot-swapped.
+            loaded_file = self._current_media_file()
+            if loaded_file is not None:
+                self._state_store.capture_override_for_stem(loaded_file.stem)
 
             self._stop_and_hide_source()
             current_file = self._current_media_file()

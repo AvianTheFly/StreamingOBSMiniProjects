@@ -41,6 +41,14 @@ reference but are disabled and are not discovered by the Hub.
 Mini projects should stay thin. If two projects need the same behavior, put it in
 `lib/`, `obs/`, `voice/`, or `tools/` and call it from project config/glue.
 
+## Shared OBS Media Sources
+
+Soundboard and TikTok intentionally reuse one OBS media source and hot-swap its
+`local_file`; do not create one OBS source per asset. Filters are still per
+asset: capture the outgoing file's complete filter chain before a swap and
+apply the incoming file's saved chain afterward. An asset with no saved filter
+state must load with no filters.
+
 ## Configuration
 
 Copy `.env.example` to `.env` and fill in machine-specific paths and secrets.

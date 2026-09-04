@@ -560,7 +560,7 @@ def run_media_project(
                 scene=cfg.scene,
                 source_name=_shared_source,
                 tag=f"[{cfg.project_name}]",
-                include_filters=False,
+                include_filters=True,
                 include_audio=False,
                 include_audio_volume=False,
                 include_media_settings=False,
@@ -682,6 +682,9 @@ def run_media_project(
             source_state_store = _single_source_store_for(source_name)
             try:
                 if source_state_store is not None:
+                    loaded_file = str(_get_obs_input_settings(source_name).get("local_file") or "").strip()
+                    if loaded_file:
+                        source_state_store.capture_override_for_stem(Path(loaded_file).stem)
                     source_state_store.apply_for_stem(name)
                 apply_runtime_media_settings(source_name)
                 apply_runtime_audio_settings(source_name, name)
@@ -773,6 +776,9 @@ def run_media_project(
         source_state_store = _single_source_store_for(source_name)
         try:
             if source_state_store is not None:
+                loaded_file = str(_get_obs_input_settings(source_name).get("local_file") or "").strip()
+                if loaded_file:
+                    source_state_store.capture_override_for_stem(Path(loaded_file).stem)
                 source_state_store.apply_for_stem(name)
             apply_runtime_media_settings(source_name)
             apply_runtime_audio_settings(source_name, name)
