@@ -1,0 +1,782 @@
+{
+  "version": 1,
+  "baseline": {
+    "filters": [],
+    "transform": {
+      "alignment": 5,
+      "boundsAlignment": 0,
+      "boundsHeight": 537.0,
+      "boundsType": "OBS_BOUNDS_SCALE_INNER",
+      "boundsWidth": 302.0,
+      "cropBottom": 0.0,
+      "cropLeft": 0.0,
+      "cropRight": 0.0,
+      "cropTop": 0.0,
+      "positionX": 0.0,
+      "positionY": 330.0,
+      "rotation": 0.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0
+    },
+    "audio": {
+      "monitor_type": "OBS_MONITORING_TYPE_MONITOR_ONLY",
+      "muted": false,
+      "tracks": {
+        "1": true,
+        "2": true,
+        "3": true,
+        "4": true,
+        "5": true,
+        "6": true
+      }
+    },
+    "media_settings": {
+      "hw_decode": true,
+      "looping": false,
+      "restart_on_activate": false,
+      "close_when_inactive": true
+    }
+  },
+  "overrides": {
+    "hit the nexus not the vlad": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 266.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 472.5,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 414.0,
+        "rotation": 0.0,
+        "scaleX": 0.36931392550468445,
+        "scaleY": 0.36931392550468445
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "control ward edit": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 324.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 265.0,
+        "positionX": 23.0,
+        "positionY": 283.0,
+        "rotation": 0.0,
+        "scaleX": 0.29984527826309204,
+        "scaleY": 0.29984527826309204
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "echoes back to full health": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 324.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 265.0,
+        "positionX": 23.0,
+        "positionY": 283.0,
+        "rotation": 0.0,
+        "scaleX": 0.29984527826309204,
+        "scaleY": 0.29984527826309204
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "i dont like this build": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 351.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 417.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 333.5,
+        "rotation": 0.0,
+        "scaleX": 0.48847147822380066,
+        "scaleY": 0.48847147822380066
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "the jungler telling you to play safe": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 290.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 515.5,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 387.0,
+        "rotation": 0.0,
+        "scaleX": 0.2685311734676361,
+        "scaleY": 0.2685311734676361
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "trying to fight the top laner": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 324.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 265.0,
+        "positionX": 23.0,
+        "positionY": 283.0,
+        "rotation": 0.0,
+        "scaleX": 0.29984527826309204,
+        "scaleY": 0.29984527826309204
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "miss the caitlyn ult": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 324.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 265.0,
+        "positionX": 23.0,
+        "positionY": 283.0,
+        "rotation": 0.0,
+        "scaleX": 0.29984527826309204,
+        "scaleY": 0.29984527826309204
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "send it": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 324.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 265.0,
+        "positionX": 23.0,
+        "positionY": 283.0,
+        "rotation": 0.0,
+        "scaleX": 0.29984527826309204,
+        "scaleY": 0.29984527826309204
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "welcome to league of legends": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 323.5,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 310.5,
+        "rotation": 0.0,
+        "scaleX": 0.449153333902359,
+        "scaleY": 0.449153333902359
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "loading screen mastery": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 323.5,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 310.5,
+        "rotation": 0.0,
+        "scaleX": 0.449153333902359,
+        "scaleY": 0.449153333902359
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "that was a terrible game i should not have queued up.": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 324.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 265.0,
+        "positionX": 23.0,
+        "positionY": 283.0,
+        "rotation": 0.0,
+        "scaleX": 0.29984527826309204,
+        "scaleY": 0.29984527826309204
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "i am addicted to league of legends": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 324.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 265.0,
+        "positionX": 23.0,
+        "positionY": 283.0,
+        "rotation": 0.0,
+        "scaleX": 0.29984527826309204,
+        "scaleY": 0.29984527826309204
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "enemy team vs my team": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 323.5,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 310.5,
+        "rotation": 0.0,
+        "scaleX": 0.449153333902359,
+        "scaleY": 0.449153333902359
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "cc'd for so long": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 324.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 265.0,
+        "positionX": 23.0,
+        "positionY": 283.0,
+        "rotation": 0.0,
+        "scaleX": 0.29984527826309204,
+        "scaleY": 0.29984527826309204
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "just walk away": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 266.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 472.5,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 414.0,
+        "rotation": 0.0,
+        "scaleX": 0.36931392550468445,
+        "scaleY": 0.36931392550468445
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "win lane lose game": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 290.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 515.5,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 387.0,
+        "rotation": 0.0,
+        "scaleX": 0.2685311734676361,
+        "scaleY": 0.2685311734676361
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "you have no mana": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 316.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 578.5,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 412.0,
+        "rotation": 0.0,
+        "scaleX": 0.4394714832305908,
+        "scaleY": 0.4394714832305908
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "i know i can't beat you but he can": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 211.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 507.5,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 452.0,
+        "rotation": 0.0,
+        "scaleX": 0.29399269819259644,
+        "scaleY": 0.29399269819259644
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "kamikaze proxy flip": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 290.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 515.5,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 387.0,
+        "rotation": 0.0,
+        "scaleX": 0.2685311734676361,
+        "scaleY": 0.2685311734676361
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "we win those": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 323.5,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 310.5,
+        "rotation": 0.0,
+        "scaleX": 0.449153333902359,
+        "scaleY": 0.449153333902359
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "support being the easiest role": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 324.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 265.0,
+        "positionX": 23.0,
+        "positionY": 283.0,
+        "rotation": 0.0,
+        "scaleX": 0.29984527826309204,
+        "scaleY": 0.29984527826309204
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "why would we ff": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 324.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 265.0,
+        "positionX": 23.0,
+        "positionY": 283.0,
+        "rotation": 0.0,
+        "scaleX": 0.29984527826309204,
+        "scaleY": 0.29984527826309204
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "girls only play the cute champions": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 324.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 265.0,
+        "positionX": 23.0,
+        "positionY": 283.0,
+        "rotation": 0.0,
+        "scaleX": 0.29984527826309204,
+        "scaleY": 0.29984527826309204
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "go to sleep": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 222.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 537.5,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 442.5,
+        "rotation": 0.0,
+        "scaleX": 0.4199851155281067,
+        "scaleY": 0.4199851155281067
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "alt t d by urgot": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 324.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 265.0,
+        "positionX": 23.0,
+        "positionY": 283.0,
+        "rotation": 0.0,
+        "scaleX": 0.29984527826309204,
+        "scaleY": 0.29984527826309204
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "level one chilling": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 324.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 265.0,
+        "positionX": 23.0,
+        "positionY": 283.0,
+        "rotation": 0.0,
+        "scaleX": 0.29984527826309204,
+        "scaleY": 0.29984527826309204
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "typing at the end of the game": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 324.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 265.0,
+        "positionX": 23.0,
+        "positionY": 283.0,
+        "rotation": 0.0,
+        "scaleX": 0.29984527826309204,
+        "scaleY": 0.29984527826309204
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "kayle farming": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 323.5,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 310.5,
+        "rotation": 0.0,
+        "scaleX": 0.449153333902359,
+        "scaleY": 0.449153333902359
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "bull shit champion": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 266.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 472.5,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 414.0,
+        "rotation": 0.0,
+        "scaleX": 0.36931392550468445,
+        "scaleY": 0.36931392550468445
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "jungler diff": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 323.5,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 310.5,
+        "rotation": 0.0,
+        "scaleX": 0.449153333902359,
+        "scaleY": 0.449153333902359
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "support vs tank": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 324.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 265.0,
+        "positionX": 23.0,
+        "positionY": 283.0,
+        "rotation": 0.0,
+        "scaleX": 0.29984527826309204,
+        "scaleY": 0.29984527826309204
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "oops my girlfriend is sleeping": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 324.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 265.0,
+        "positionX": 23.0,
+        "positionY": 283.0,
+        "rotation": 0.0,
+        "scaleX": 0.29984527826309204,
+        "scaleY": 0.29984527826309204
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "gamers don't know how to talk to girls": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 324.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 265.0,
+        "positionX": 23.0,
+        "positionY": 283.0,
+        "rotation": 0.0,
+        "scaleX": 0.29984527826309204,
+        "scaleY": 0.29984527826309204
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "tahm kench escaped me": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 323.5,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 310.5,
+        "rotation": 0.0,
+        "scaleX": 0.449153333902359,
+        "scaleY": 0.449153333902359
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "why doesn't anyone play yuumi": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 324.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 265.0,
+        "positionX": 23.0,
+        "positionY": 283.0,
+        "rotation": 0.0,
+        "scaleX": 0.29984527826309204,
+        "scaleY": 0.29984527826309204
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "mom get the camera": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 266.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 472.5,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 414.0,
+        "rotation": 0.0,
+        "scaleX": 0.36931392550468445,
+        "scaleY": 0.36931392550468445
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "rengar is so scary": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 575.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 324.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 265.0,
+        "positionX": 23.0,
+        "positionY": 283.0,
+        "rotation": 0.0,
+        "scaleX": 0.29984527826309204,
+        "scaleY": 0.29984527826309204
+      },
+      "audio": {},
+      "media_settings": {}
+    }
+  }
+}

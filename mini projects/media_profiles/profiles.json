@@ -1,0 +1,86 @@
+{
+  "profiles": [
+    {
+      "key": "soundboard",
+      "name": "Soundboard",
+      "enabled": true,
+      "asset_dir_env": "SOUNDBOARD_ASSETS_DIR",
+      "asset_dir_default": "F:\\EVERYTHING STREAM RELATED\\Assets\\VisualAndAudio\\soundboard",
+      "scene": "soundboard",
+      "obs_source_prefix": "sb__",
+      "single_source_mode": true,
+      "shared_source_slots": 1,
+      "event_name": "soundboard.play",
+      "trigger_sequences": [["/", "*"]],
+      "trigger_max_interval": 0.5,
+      "auto_record_timeout": 2.0,
+      "manual_trigger_window": 1.5,
+      "media_swap_settle_ms": 175,
+      "valid_extensions": [".mp3", ".mp4", ".wav", ".ogg", ".webm"],
+      "features": {
+        "manual_hotkeys_enabled": true,
+        "voice_commands_enabled": true,
+        "random_commands_enabled": false,
+        "categories_enabled": true,
+        "obs_layout_enabled": true,
+        "audio_settings_enabled": true,
+        "trigger_restarts_listen": true
+      },
+      "matching": {
+        "strategy": "hybrid",
+        "fuzzy_scorer": "WRatio",
+        "fuzzy_threshold": 75,
+        "semantic_gap": 15,
+        "fuzzy_weight": 0.7,
+        "token_weight": 0.3,
+        "embedding_weight": 0.0
+      },
+      "audio": {
+        "monitor": "OBS_MONITORING_TYPE_MONITOR_AND_OUTPUT",
+        "default_volume_db": 0
+      }
+    },
+    {
+      "key": "tik_tok",
+      "name": "TikTok",
+      "enabled": true,
+      "asset_dir_env": "TIKTOK_ASSETS_DIR",
+      "scene": "TikTok",
+      "obs_source_prefix": "tt__",
+      "single_source_mode": true,
+      "event_name": "tiktok.play",
+      "trigger_sequences": [["+", "+"]],
+      "trigger_max_interval": 0.3,
+      "auto_record_timeout": 2.0,
+      "manual_trigger_window": 1.0,
+      "valid_extensions": [".mp3", ".mp4", ".wav", ".ogg", ".webm"],
+      "features": {
+        "manual_hotkeys_enabled": true,
+        "voice_commands_enabled": true,
+        "random_commands_enabled": false,
+        "categories_enabled": true,
+        "obs_layout_enabled": true,
+        "audio_settings_enabled": true
+      },
+      "matching": {
+        "strategy": "hybrid",
+        "fuzzy_scorer": "WRatio",
+        "fuzzy_threshold": 75,
+        "semantic_gap": 15,
+        "fuzzy_weight": 0.7,
+        "token_weight": 0.3,
+        "embedding_weight": 0.0
+      },
+      "source_bounds": {
+        "left": 0,
+        "right": 1618,
+        "top": 330,
+        "bottom": 213
+      },
+      "audio": {
+        "monitor": "OBS_MONITORING_TYPE_MONITOR_AND_OUTPUT",
+        "default_volume_db": 0
+      }
+    }
+  ]
+}
