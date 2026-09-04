@@ -762,233 +762,6 @@ def _poll_loop(stop: threading.Event) -> None:
         stop.wait(2.0)
 
 
-# ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â
-# Project-creation templates
-# ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â
-
-_BLANK_MAIN = """\
-\"\"\"
-{name}/main.py
-\"\"\"
-from __future__ import annotations
-
-import queue
-import threading
-
-
-def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
-    print("[{name}] started.")
-    while not stop_event.is_set():
-        try:
-            msg = input_queue.get(timeout=0.5)
-            print(f"[{name}] received: {{msg}}")
-        except queue.Empty:
-            pass
-    print("[{name}] stopped.")
-"""
-
-_MEDIA_PLAYER_MAIN = """\
-\"\"\"
-{name}/main.py  ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â  media-player mini-project (generated)
-\"\"\"
-from __future__ import annotations
-
-import queue
-import threading
-
-from lib.shared_media.media_project import run_media_project
-from .config import CONFIG
-
-_live: dict = {{}}
-
-
-def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
-    run_media_project(
-        cfg=CONFIG,
-        input_queue=input_queue,
-        stop_event=stop_event,
-        live_state=_live,
-    )
-"""
-
-_MEDIA_PLAYER_CONFIG = """\
-# {name}/config.py  ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â  media-player config (generated)
-import os
-from pathlib import Path
-from lib.shared_media.media_config import MediaProjectConfig
-
-CONFIG = MediaProjectConfig(
-    project_name       = "{display_name}",
-    asset_dir          = os.environ.get("{env_key}_ASSETS_DIR", ""),
-    scene              = "{display_name}",
-    obs_source_prefix  = "{prefix}__",
-    valid_extensions   = {{".mp3", ".mp4", ".webm", ".wav"}},
-    trigger_sequences  = [["/", "*"]],
-    trigger_max_interval = 0.6,
-)
-HOTKEYS_FILE = Path(__file__).parent / "hotkeys.json"
-"""
-
-_EVENT_HANDLER_MAIN = """\
-\"\"\"
-{name}/main.py  ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â  event-handler mini-project (generated)
-\"\"\"
-from __future__ import annotations
-
-import queue
-import threading
-
-import events as hub_events
-
-
-def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
-    def _on_event(data: dict) -> None:
-        print(f"[{name}] event received: {{data}}")
-
-    hub_events.subscribe("{event_name}", _on_event)
-    print(f"[{name}] listening for '{event_name}'")
-
-    try:
-        while not stop_event.is_set():
-            stop_event.wait(1.0)
-    finally:
-        hub_events.unsubscribe("{event_name}", _on_event)
-        print("[{name}] stopped.")
-"""
-
-_VOICE_TRIGGERED_MAIN = """\
-\"\"\"
-{name}/main.py  ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â  voice-triggered mini-project (generated)
-\"\"\"
-from __future__ import annotations
-
-import queue
-import threading
-
-from pynput import keyboard
-from shared import VoicePTT, SequenceTrigger
-
-_TRIGGER_SEQUENCE   = ["{t1}", "{t2}", "{t3}"]
-_TRIGGER_INTERVAL   = 0.6
-_RECORD_TIMEOUT     = 5.0
-_TAG                = "[{name}]"
-
-
-def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
-    trigger = SequenceTrigger(_TRIGGER_SEQUENCE, _TRIGGER_INTERVAL)
-
-    ptt = VoicePTT(
-        timeout=_RECORD_TIMEOUT,
-        on_transcript=lambda text: input_queue.put(text.strip()),
-        tag="{name}",
-    )
-
-    def _on_kb(key):
-        try:
-            c = key.char
-        except AttributeError:
-            return
-        if trigger.register_key(c):
-            ptt.on_trigger()
-
-    listener = keyboard.Listener(on_press=_on_kb)
-    listener.start()
-    print(f"{{_TAG}} started ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â trigger: {{_TRIGGER_SEQUENCE}}")
-
-    while not stop_event.is_set():
-        try:
-            text = input_queue.get(timeout=0.5)
-            if text:
-                print(f"{{_TAG}} transcript: {{text!r}}")
-                # TODO: handle transcript
-        except queue.Empty:
-            pass
-
-    listener.stop()
-    ptt.cancel("shutdown")
-    print(f"{{_TAG}} stopped.")
-"""
-
-_INTERFACE_TEMPLATE = """\
-# {name}/interface.py  ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â  generated ProjectInterface
-from shared import ProjectInterface, ProjectStatus, project_registry
-
-_live: dict = {{}}
-
-
-class _{cls}Interface(ProjectInterface):
-    name              = "{name}"
-    controlled_scenes: list[str] = []
-
-    def get_status(self) -> ProjectStatus:
-        return ProjectStatus(
-            name              = self.name,
-            is_active         = False,
-            current_activity  = None,
-            controlled_scenes = self.controlled_scenes,
-            can_revert        = False,
-        )
-
-    def revert(self) -> None:
-        pass
-
-
-interface = _{cls}Interface()
-project_registry.register(interface)
-"""
-
-
-def _create_project(project_dir: Path, name: str, template: str, params: dict) -> None:
-    project_dir.mkdir(parents=True)
-    display  = name.replace("_", " ").title()
-    cls_name = name.replace("_", " ").title().replace(" ", "")
-    env_key  = name.upper()
-    prefix   = name[:3].lower()
-
-    (project_dir / "__init__.py").write_text("", encoding="utf-8")
-
-    # interface.py (all templates get one)
-    iface = _INTERFACE_TEMPLATE.format(name=name, cls=cls_name)
-    (project_dir / "interface.py").write_text(iface, encoding="utf-8")
-
-    if template == "media_player":
-        (project_dir / "main.py").write_text(
-            _MEDIA_PLAYER_MAIN.format(name=name), encoding="utf-8"
-        )
-        (project_dir / "config.py").write_text(
-            _MEDIA_PLAYER_CONFIG.format(
-                name=name, display_name=display, env_key=env_key, prefix=prefix
-            ),
-            encoding="utf-8",
-        )
-        (project_dir / "hotkeys.json").write_text(
-            json.dumps({"hotkeys": [], "categories": []}, indent=2),
-            encoding="utf-8",
-        )
-        (project_dir / "phrases.json").write_text(
-            json.dumps([], indent=2), encoding="utf-8"
-        )
-
-    elif template == "event_handler":
-        event_name = params.get("event_name", "my_event")
-        (project_dir / "main.py").write_text(
-            _EVENT_HANDLER_MAIN.format(name=name, event_name=event_name),
-            encoding="utf-8",
-        )
-
-    elif template == "voice_triggered":
-        seq = params.get("trigger_sequence", "/ * *").split()
-        t1, t2, t3 = (seq + ["*", "*", "*"])[:3]
-        (project_dir / "main.py").write_text(
-            _VOICE_TRIGGERED_MAIN.format(name=name, t1=t1, t2=t2, t3=t3),
-            encoding="utf-8",
-        )
-
-    else:
-        # blank
-        (project_dir / "main.py").write_text(
-            _BLANK_MAIN.format(name=name), encoding="utf-8"
-        )
 
 
 # ÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚ÂÃƒÂ¢Ã¢â‚¬Â¢Ã‚Â
@@ -1057,7 +830,6 @@ class _Handler(http.server.BaseHTTPRequestHandler):
         elif path.startswith("/api/workflows/"):     self._post_workflow(path)
         elif path == "/api/editor-profiles":        self._post_editor_profiles()
         elif path == "/api/editor-project-settings": self._post_editor_project_settings()
-        elif path == "/api/projects/create":        self._post_create()
         elif path == "/api/audio":                  self._post_audio()
         elif path == "/api/obs/audio":              self._post_obs_audio()
         elif path.startswith("/api/projects/"):     self._post_project(path)
@@ -1429,6 +1201,13 @@ class _Handler(http.server.BaseHTTPRequestHandler):
             self._svs_lobbies()
         elif name == "sound_effects" and action == "library":
             self._sfx_library()
+        elif name == "instant_replay" and action == "clips":
+            try:
+                from instant_replay.interface import _live
+                list_clips = _live.get("list_clips")
+                self._json(200, {"clips": list_clips() if callable(list_clips) else []})
+            except Exception as exc:
+                self._err(500, str(exc))
         else:
             self._err(404, "Unknown action")
 
@@ -1555,28 +1334,6 @@ class _Handler(http.server.BaseHTTPRequestHandler):
         except Exception as exc:
             self._err(500, str(exc))
 
-    def _post_create(self):
-        body     = self._body()
-        raw_name = body.get("name", "").strip().lower().replace(" ", "_")
-        template = body.get("template", "blank")
-
-        if not raw_name:
-            self._err(400, "Project name required")
-            return
-        if not re.match(r"^[a-z][a-z0-9_]*$", raw_name):
-            self._err(400, "Name must start with a letter and contain only a-z, 0-9, _")
-            return
-
-        dest = _PROJECT_ROOT / "mini projects" / raw_name
-        if dest.exists():
-            self._err(409, f"Project '{raw_name}' already exists")
-            return
-
-        try:
-            _create_project(dest, raw_name, template, body)
-            self._json(200, {"ok": True, "name": raw_name, "path": str(dest)})
-        except Exception as exc:
-            self._err(500, str(exc))
 
     def _post_project(self, path: str):
         parts = path[len("/api/projects/"):].split("/")
@@ -1596,6 +1353,23 @@ class _Handler(http.server.BaseHTTPRequestHandler):
             self._svs_post(action, body)
         elif name == "sound_effects":
             self._sfx_post(action, body)
+        elif name == "instant_replay" and action == "play":
+            try:
+                from instant_replay.interface import _live
+                play_clip = _live.get("play_clip")
+                if not callable(play_clip):
+                    self._err(409, "Instant Replay is not ready")
+                    return
+                clip_path = str(body.get("path") or "")
+                threading.Thread(
+                    target=play_clip,
+                    args=(clip_path,),
+                    daemon=True,
+                    name="instant-replay-ui-play",
+                ).start()
+                self._json(200, {"ok": True})
+            except Exception as exc:
+                self._err(500, str(exc))
         else:
             self._err(404, "Unknown action")
 

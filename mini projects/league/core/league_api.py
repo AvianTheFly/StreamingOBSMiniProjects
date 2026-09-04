@@ -28,8 +28,7 @@ from ..handlers.lifecycle import (
     make_game_start_handler, make_game_end_handler,
 )
 from ..handlers.player_events import (
-    make_death_handler, make_respawn_handler,
-    make_respawn_sfx_handler, make_recall_complete_handler,
+    make_death_handler, make_respawn_handler, make_recall_complete_handler,
 )
 from ..handlers.level_up import make_level_up_handler
 from ..handlers.map_events import (
@@ -89,7 +88,6 @@ class LeagueAPIWatcher:
         # ── State-diff events ─────────────────────────────────────────────
         self.events.register("death",           make_death_handler())
         self.events.register("respawn",         make_respawn_handler())
-        self.events.register("respawn_3s",      make_respawn_sfx_handler())
         self.events.register("game_end",        make_game_end_handler())
         self.events.register("recall_complete", make_recall_complete_handler())
         self.events.register("level_changed",   make_level_up_handler())

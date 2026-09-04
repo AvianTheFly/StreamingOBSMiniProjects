@@ -6,6 +6,8 @@ import { toast }   from "../toast.js";
 import { esc }     from "../utils.js";
 
 let _unwatch = null;
+let _refreshTimer = null;
+let _clips = [];
 
 export function mount(container) {
   container.innerHTML = `
@@ -58,6 +60,14 @@ export function mount(container) {
         <b>Revert</b> cancels replay and returns to the normal scene.
       </p>
     </div>
+
+    <div class="card mt-16">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span>Saved Clips</span>
+        <button class="btn btn-secondary btn-sm" id="irRefreshClipsBtn">Refresh</button>
+      </div>
+      <div id="irClips" class="ir-copy ir-copy--small">Loading clips…</div>
+    </div>
   `;
 
   container.querySelector("#irPauseBtn").addEventListener("click", async () => {
@@ -75,12 +85,63 @@ export function mount(container) {
     catch(e) { toast.error(e.message); }
   });
 
+  container.querySelector("#irRefreshClipsBtn").addEventListener("click", _loadClips);
+  _loadClips();
+  _refreshTimer = setInterval(_loadClips, 5000);
+
   _unwatch = state.watch("projects", _update);
   _update(state.get("projects"));
 }
 
 export function unmount() {
   if (_unwatch) { _unwatch(); _unwatch = null; }
+  if (_refreshTimer) { clearInterval(_refreshTimer); _refreshTimer = null; }
+}
+
+async function _loadClips() {
+  const target = document.getElementById("irClips");
+  if (!target) return;
+  try {
+    const data = await api.getReplayClips();
+    _clips = Array.isArray(data.clips) ? data.clips : [];
+    if (!_clips.length) {
+      target.innerHTML = "No saved replay clips found.";
+      return;
+    }
+    target.innerHTML = `
+      <div style="overflow:auto">
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr><th style="text-align:left;padding:8px">Saved</th><th style="text-align:left;padding:8px">Clip</th><th style="text-align:left;padding:8px">Type</th><th style="text-align:right;padding:8px">Size</th><th></th></tr></thead>
+          <tbody>${_clips.map((clip, index) => `
+            <tr style="border-top:1px solid var(--border)">
+              <td style="padding:8px;white-space:nowrap">${esc(new Date((clip.saved_at || 0) * 1000).toLocaleString())}</td>
+              <td style="padding:8px">${esc(clip.name || "Unnamed")}${clip.tag ? `<br><span style="color:var(--muted)">Tag: ${esc(clip.tag)}</span>` : ""}</td>
+              <td style="padding:8px">${esc(clip.scope || "saved")}</td>
+              <td style="padding:8px;text-align:right;white-space:nowrap">${_formatBytes(clip.size_bytes || 0)}</td>
+              <td style="padding:8px;text-align:right"><button class="btn btn-secondary btn-sm" data-play-clip="${index}">Play</button></td>
+            </tr>`).join("")}</tbody>
+        </table>
+      </div>`;
+    target.querySelectorAll("[data-play-clip]").forEach(button => {
+      button.addEventListener("click", async () => {
+        const clip = _clips[Number(button.dataset.playClip)];
+        if (!clip) return;
+        try {
+          await api.playReplayClip(clip.path);
+          toast.success(`Playing ${clip.name}`);
+        } catch (error) {
+          toast.error(error.message);
+        }
+      });
+    });
+  } catch (error) {
+    target.textContent = `Could not load clips: ${error.message}`;
+  }
+}
+
+function _formatBytes(value) {
+  const mb = Number(value || 0) / 1048576;
+  return mb >= 1024 ? `${(mb / 1024).toFixed(1)} GB` : `${mb.toFixed(1)} MB`;
 }
 
 function _update(projects) {

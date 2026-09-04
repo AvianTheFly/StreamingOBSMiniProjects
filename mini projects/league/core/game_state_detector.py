@@ -12,12 +12,7 @@
 
 import time
 
-from ..config import (
-    RECALL_MIN_WAIT,
-    RECALL_WATCH_WINDOW,
-    RESPAWN_SFX_SCENE,
-    RESPAWN_SFX_SOURCE,
-)
+from ..config import RECALL_MIN_WAIT, RECALL_WATCH_WINDOW
 
 
 class GameStateDetector:
@@ -40,12 +35,6 @@ class GameStateDetector:
         self._recall_start_time = 0.0
         self._recall_last_mana  = 0.0
         self._recall_last_time  = 0.0
-
-        # ── Respawn-timer watcher ──────────────────────────────────────────
-        # When respawnTimer counts down to ~3s, play the Halo Respawn sound.
-        self._respawn_sfx_fired       = False   # once per death cycle
-        self._respawn_sfx_threshold   = 3.0
-        self._respawn_last_timer      = 0.0
 
     # ── Public API ────────────────────────────────────────────────────────────
 
@@ -89,35 +78,16 @@ class GameStateDetector:
 
     def _detect_death_respawn(self, me) -> None:
         is_dead = me.get("isDead", False)
-        respawn_timer = me.get("respawnTimer", 0.0)
-
         if self.last_is_dead is None:
             self.last_is_dead = is_dead
-            self._respawn_last_timer = respawn_timer
             return
 
         if not self.last_is_dead and is_dead:
             # Just died — set up respawn-timer baseline
             self.events.emit("death", me)
             self._recall_watching = False
-            self._respawn_sfx_fired = False
-            self._respawn_last_timer = respawn_timer
         elif self.last_is_dead and not is_dead:
             self.events.emit("respawn", me)
-            self._respawn_sfx_fired = False
-            self._respawn_last_timer = respawn_timer
-        else:
-            # Still dead — check if respawnTimer crossed the 3-second threshold
-            if self._respawn_sfx_fired or respawn_timer <= 0:
-                self._respawn_last_timer = respawn_timer
-                self.last_is_dead = is_dead
-                return
-            if (self._respawn_last_timer >= self._respawn_sfx_threshold
-                    and respawn_timer < self._respawn_sfx_threshold):
-                self._respawn_sfx_fired = True
-                self.events.emit("respawn_3s", me)
-
-        self._respawn_last_timer = respawn_timer
         self.last_is_dead = is_dead
 
     def _detect_level_change(self, me) -> None:

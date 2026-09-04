@@ -40,6 +40,10 @@ export const api = {
   pauseProject:  (name) => _req("POST", `/api/projects/${name}/pause`),
   resumeProject: (name) => _req("POST", `/api/projects/${name}/resume`),
 
+  // ── Instant replay ────────────────────────────────────────────────────
+  getReplayClips: () => _req("GET", "/api/projects/instant_replay/clips"),
+  playReplayClip: (path) => _req("POST", "/api/projects/instant_replay/play", { path }),
+
   // ── Specific song ─────────────────────────────────────────────────────
   getSongLibrary:    ()       => _req("GET",  "/api/projects/specific_song/library"),
   getSongCategories: ()       => _req("GET",  "/api/projects/specific_song/categories"),
@@ -67,6 +71,4 @@ export const api = {
   getObsAudio: ()                => _req("GET",  "/api/obs/audio"),
   setObsAudio: (input, changes)  => _req("POST", "/api/obs/audio", { input, ...changes }),
 
-  // ── Create project ────────────────────────────────────────────────────
-  createProject: (data) => _req("POST", "/api/projects/create", data),
 };

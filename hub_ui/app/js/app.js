@@ -20,7 +20,6 @@ import * as leaguePage       from "./pages/league.js";
 import * as instantRepPage   from "./pages/instant-replay.js";
 import * as mixerPage        from "./pages/mixer.js";
 import * as audioPage        from "./pages/audio.js";
-import * as createPage       from "./pages/create.js";
 import * as genericPage      from "./pages/project-generic.js";
 
 // ── Page registry ─────────────────────────────────────────────────────────────
@@ -32,7 +31,6 @@ const PAGES = {
   "settings":                      settingsPage,
   "mixer":                         mixerPage,
   "audio":                         audioPage,
-  "create":                        createPage,
   "projects/specific_song":        specificSongPage,
   "projects/scene_voice_switcher": sceneSwPage,
   "projects/soundboard":           soundboardPage,

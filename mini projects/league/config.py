@@ -22,7 +22,6 @@ REQUEST_TIMEOUT        = 2
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── Respawn SFX (Halo sound at 3 seconds) ─────────────────────────────────────
-RESPAWN_SFX_SCENE  = "Sound Effects"
 RESPAWN_SFX_SOURCE = "Halo Respawn sound effect"
 
 # ── Death / Respawn ───────────────────────────────────────────────────────────

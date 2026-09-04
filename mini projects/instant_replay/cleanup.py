@@ -6,7 +6,7 @@ Manages raw replay clips and produces permanent highlight reels.
 Directory layout
 ----------------
   REPLAY_DIR/          <- OBS replay buffer writes here; trimmed clips land here too.
-                          Startup cleanup only removes app-managed temp clip files.
+                          App-managed clips are kept until they are merged.
   REPLAY_DIR/edited/   <- Permanent highlight reels, one MKV per game session.
                           Never touched by the startup wipe.
 
@@ -46,48 +46,8 @@ from .config import EDITED_DIR, REPLAY_DIR
 _TAG = "[instant_replay.cleanup]"
 _WINDOW_SECONDS = 600       # 10-minute fallback grouping window
 _MIN_OVERLAP_SECONDS = 1.5  # ignore overlaps smaller than this (timestamp imprecision)
-_MANAGED_ROOT_SUFFIXES = (
-    "_ir_trimmed.mkv",
-    ".overlap_trim.mkv",
-    ".concat.txt",
-)
-
 _SESSIONS_FILE = Path.home() / ".claude" / "game_sessions.json"
 _COUNTER_FILE  = Path.home() / ".claude" / "ir_game_counter.json"
-
-
-# ---------------------------------------------------------------------------
-#  Startup wipe
-
-def wipe_raw_clips_on_startup() -> None:
-    """
-    Delete only app-managed temporary clip files from REPLAY_DIR root.
-    This intentionally leaves unrelated recordings alone.
-    """
-    raw_dir    = Path(REPLAY_DIR)
-    edited_dir = Path(EDITED_DIR)
-
-    if not raw_dir.exists():
-        raw_dir.mkdir(parents=True, exist_ok=True)
-
-    edited_dir.mkdir(parents=True, exist_ok=True)
-
-    deleted = 0
-    for f in raw_dir.iterdir():
-        if f.is_dir():
-            continue  # skip edited/ and any other subdirectory
-        if not _is_managed_root_file(f):
-            continue
-        try:
-            f.unlink()
-            deleted += 1
-        except OSError as exc:
-            print(f"{_TAG} Could not delete {f.name}: {exc}")
-
-    if deleted:
-        print(f"{_TAG} Startup wipe: removed {deleted} raw file(s) from {raw_dir}")
-    else:
-        print(f"{_TAG} Startup wipe: REPLAY_DIR already clean.")
 
 
 # ---------------------------------------------------------------------------
@@ -137,11 +97,6 @@ def _find_trimmed() -> list[tuple[datetime, Path]]:
                 result.append((ts, f))
     result.sort(key=lambda x: x[0])
     return result
-
-
-def _is_managed_root_file(path: Path) -> bool:
-    """True when the file is a temp/generated replay artifact we own."""
-    return any(path.name.endswith(suffix) for suffix in _MANAGED_ROOT_SUFFIXES)
 
 
 def _safe_unlink(path: Path, *, missing_ok: bool = True) -> bool:

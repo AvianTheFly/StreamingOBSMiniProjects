@@ -144,6 +144,14 @@ class SoundboardPlayer:
                     f"OBS did not confirm file swap to '{filepath.name}' (current: '{current_name}')."
                 )
 
+            # Changing local_file can make OBS start decoding immediately. Stop
+            # that implicit start before the one intentional restart below, or
+            # short clips can be heard twice.
+            try:
+                obs.stop_media(SINGLE_SOURCE_NAME)
+            except Exception:
+                pass
+
             self._apply_runtime_media_settings()
             self._state_store.apply_for_stem(stem)
             self._apply_layout_rule(stem, filepath, categories)
@@ -234,6 +242,7 @@ class SoundboardPlayer:
         except Exception as exc:
             print(f"{_TAG} Could not ensure shared OBS source: {exc}")
         self._apply_runtime_media_settings()
+        self._stop_and_hide_source()
         self._state_store.ensure_baseline()
 
     def _refresh_layout_rules_if_needed(self) -> None:

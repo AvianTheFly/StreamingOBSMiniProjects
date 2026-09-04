@@ -115,9 +115,24 @@ from .config import (
 from .kill_tracker import KillTracker
 from .cleanup import (
     start_deferred, run_for_game,
-    list_edited_reels, wipe_raw_clips_on_startup,
+    list_edited_reels,
     _read_next_game_num, _write_next_game_num,
 )
+
+
+_REPLAY_MEDIA_EXTENSIONS = {".mkv", ".mp4", ".mov", ".webm"}
+
+
+def _replay_files_on_disk() -> list[Path]:
+    root = Path(REPLAY_DIR)
+    if not root.is_dir():
+        return []
+    files = [
+        path
+        for path in root.rglob("*")
+        if path.is_file() and path.suffix.lower() in _REPLAY_MEDIA_EXTENSIONS
+    ]
+    return sorted(files, key=lambda path: path.stat().st_mtime, reverse=True)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -389,9 +404,6 @@ def run(
     # voice_mod is looked up lazily inside _on_listen_key() so that the hub
     # has time to start voice.listener after launching project threads.
 
-    # ── Startup wipe — clear raw clips from last session ─────────────────────
-    wipe_raw_clips_on_startup()
-
     # ── Kill tracker ──────────────────────────────────────────────────────────
     tracker = KillTracker(stop_event)
     tracker.start()
@@ -453,6 +465,38 @@ def run(
     # Track previous game state to detect game-end resets.
     _was_in_game: list[bool] = [False]
 
+    def _list_clips() -> list[dict]:
+        """Return saved replay files, newest first, for the Hub UI."""
+        with _lock:
+            current = {str(Path(item["path"]).resolve()): dict(item) for item in _clip_registry}
+            previous = {str(Path(item["path"]).resolve()): dict(item) for item in _previous_game_clips}
+
+        rows = []
+        edited_root = Path(EDITED_DIR).resolve()
+        for path in _replay_files_on_disk():
+            try:
+                resolved = path.resolve()
+                stat = path.stat()
+            except OSError:
+                continue
+            key = str(resolved)
+            metadata = current.get(key) or previous.get(key) or {}
+            scope = "current game" if key in current else ("previous game" if key in previous else "saved")
+            try:
+                if resolved.is_relative_to(edited_root):
+                    scope = "highlight reel"
+            except ValueError:
+                pass
+            rows.append({
+                "name": path.name,
+                "path": str(resolved),
+                "tag": str(metadata.get("tag") or ""),
+                "saved_at": float(metadata.get("saved_at") or stat.st_mtime),
+                "size_bytes": int(stat.st_size),
+                "scope": scope,
+            })
+        return rows
+
     # ── Scene / audio return helper ───────────────────────────────────────────
 
     def _end_replay(*, cancelled: bool = False) -> None:
@@ -485,6 +529,7 @@ def run(
     _live["replay_active"] = _replay_active
     _live["replay_paused"] = _replay_paused
     _live["end_replay"]    = _end_replay
+    _live["list_clips"]     = _list_clips
 
     def _pause_other_projects() -> None:
         with _lock:
@@ -819,9 +864,10 @@ def run(
     def _get_most_recent_clip() -> list[str]:
         """Return [path] or [] if no clips."""
         with _lock:
-            if not _clip_registry:
-                return []
-            return [_clip_registry[-1]["path"]]
+            if _clip_registry:
+                return [_clip_registry[-1]["path"]]
+        files = _replay_files_on_disk()
+        return [str(files[0])] if files else []
 
     def _get_all_clips_in_order() -> list[str]:
         with _lock:
@@ -895,6 +941,10 @@ def run(
         try:
             _pause_other_projects()
             for i, clip in enumerate(clips):
+                clip_path = Path(clip)
+                if not clip_path.is_file() or clip_path.stat().st_size <= 0:
+                    print(f"[instant_replay] ❌ Clip is missing or empty: {clip}")
+                    continue
                 label = f"Clip {i + 1}/{len(clips)}" if is_multi else ""
                 print(f"[instant_replay] ▶  Playing: {clip}{' — ' + label if label else ''}")
 
@@ -933,12 +983,49 @@ def run(
                     _replay_active[0] = True
 
                 try:
+                    obs.configure_media_source_properties(
+                        SOURCE_NAME,
+                        restart_on_activate=False,
+                        close_when_inactive=False,
+                        looping=False,
+                        clear_on_media_end=True,
+                    )
+                    obs.stop_media(SOURCE_NAME)
+                    obs.show_source(SCENE, SOURCE_NAME)
                     set_media_source_file(SOURCE_NAME, clip)
+                    # Setting local_file can start the source by itself. Stop
+                    # that implicit attempt, then perform exactly one restart.
+                    time.sleep(0.15)
+                    stop_media(SOURCE_NAME)
                     restart_media(SOURCE_NAME)
-                    # Give OBS a moment to load the media source before we start polling.
-                    time.sleep(0.2)
                 except Exception as exc:
                     print(f"[instant_replay] ❌ OBS playback error: {exc}")
+                    _end_replay(cancelled=True)
+                    return
+
+                # OBS often reports STOPPED/NONE briefly while a new file is
+                # opening. Wait for real playback before treating those states
+                # as an ended clip.
+                start_deadline = time.time() + 5.0
+                started = False
+                while time.time() < start_deadline:
+                    if _cancel_watcher.is_set():
+                        break
+                    status = obs.get_media_status(SOURCE_NAME) or {}
+                    state = status.get("state")
+                    cursor_ms = status.get("cursor_ms")
+                    try:
+                        has_progress = cursor_ms is not None and float(cursor_ms) > 0
+                    except (TypeError, ValueError):
+                        has_progress = False
+                    if state == "OBS_MEDIA_STATE_PLAYING" or has_progress:
+                        started = True
+                        break
+                    if state == "OBS_MEDIA_STATE_ERROR":
+                        break
+                    time.sleep(0.10)
+                if not started:
+                    print(f"[instant_replay] ❌ OBS never started: {clip_path.name}")
                     _end_replay(cancelled=True)
                     return
 
@@ -1001,6 +1088,20 @@ def run(
                 _is_multi_clip_active[0] = False
             _skip_clip.clear()
             _resume_other_projects()
+
+    def _play_clip_path(path_value: str) -> None:
+        root = Path(REPLAY_DIR).resolve()
+        candidate = Path(path_value).resolve()
+        try:
+            allowed = candidate.is_relative_to(root)
+        except ValueError:
+            allowed = False
+        if not allowed or not candidate.is_file():
+            print(f"[instant_replay] Refusing unknown clip path: {path_value}")
+            return
+        _play_all_clips_sequential([str(candidate)])
+
+    _live["play_clip"] = _play_clip_path
 
     # ── Voice dispatch (called from background thread by voice.listener) ──────
 

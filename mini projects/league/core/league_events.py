@@ -11,7 +11,6 @@ class LeagueEvents:
             # ── Player state ───────────────────────────────────────────────
             "death":             [],
             "respawn":           [],
-            "respawn_3s":        [],
             "level_changed":     [],
             "recall_complete":   [],
 

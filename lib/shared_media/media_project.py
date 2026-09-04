@@ -124,6 +124,12 @@ def _start_media_source_playback(
     file_applied = _wait_for_media_source_file(source_name, filepath, timeout=min(2.0, max(0.5, start_timeout)))
     if not file_applied:
         return False
+    # A local_file change can itself start the OBS media input. Cancel that
+    # implicit start so this helper has exactly one playback start below.
+    try:
+        obs.stop_media(source_name)
+    except Exception:
+        pass
     try:
         obs.show_source(scene, source_name)
     except Exception:
@@ -137,7 +143,6 @@ def _start_media_source_playback(
     except Exception:
         pass
 
-    attempts = 0
     deadline = time.time() + max(1.0, start_timeout)
     saw_progress = False
     while time.time() < deadline:
@@ -156,9 +161,6 @@ def _start_media_source_playback(
         if state in _MEDIA_STATE_STARTING:
             time.sleep(0.05)
             continue
-        if attempts < 2:
-            obs.restart_media(source_name)
-            attempts += 1
         time.sleep(0.08)
 
     return False
@@ -566,13 +568,31 @@ def run_media_project(
             store.ensure_baseline()
             source_state_stores[_shared_source] = store
 
+    managed_sources = (
+        set(_shared_sources)
+        if _single_source_mode
+        else {source_name for _path, source_name in name_index.values()}
+    )
+    # Managed media sources should be dormant until this module explicitly
+    # plays one. This also repairs old OBS scenes where an SFX source was left
+    # visible and played merely because the scene became active.
+    for source_name in managed_sources:
+        try:
+            obs.stop_media(source_name)
+        except Exception:
+            pass
+        try:
+            obs.hide_source(cfg.scene, source_name)
+        except Exception:
+            pass
+
     if startup_event is not None:
         startup_event.set()
         print(f"[{cfg.project_name}] Startup initialization complete.")
 
     def hide_all_sources() -> None:
         with visible_lock:
-            to_hide = set(visible_sources)
+            to_hide = set(visible_sources) | managed_sources
             visible_sources.clear()
 
         for name in to_hide:
@@ -699,8 +719,8 @@ def run_media_project(
                         print(f"[{cfg.project_name}] Playback may not have started cleanly for '{filepath.name}'.")
                         raise RuntimeError(f"Shared source '{source_name}' did not start playback cleanly.")
                 else:
+                    obs.stop_media(source_name)
                     obs.show_source(cfg.scene, source_name)
-                    obs.set_media_source_file(source_name, filepath)
                     obs.restart_media(source_name)
                 obs.wait_for_media_end(
                     source_name,
@@ -785,8 +805,8 @@ def run_media_project(
                     print(f"[{cfg.project_name}] Concurrent playback may not have started cleanly for '{filepath.name}'.")
                     raise RuntimeError(f"Shared source '{source_name}' did not start playback cleanly.")
             else:
+                obs.stop_media(source_name)
                 obs.show_source(cfg.scene, source_name)
-                obs.set_media_source_file(source_name, filepath)
                 obs.restart_media(source_name)
             obs.wait_for_media_end(
                 source_name,
