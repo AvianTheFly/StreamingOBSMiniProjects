@@ -12,21 +12,26 @@ import atexit
 import queue
 import threading
 
-from pynput import keyboard
-
+from lib.global_hotkeys import key_char, subscribe_global_hotkeys, unsubscribe_global_hotkeys
 from .core.league_api import LeagueAPIWatcher
 
 
 _RECALL_KEY = "b"   # case-insensitive; catches both 'b' and 'B'
 
 
-def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
+def run(
+    input_queue: queue.Queue,
+    stop_event: threading.Event,
+    *,
+    startup_event: threading.Event | None = None,
+) -> None:
     """Entry point called by the hub's main.py."""
 
     watcher = LeagueAPIWatcher(stop_event)
 
     from .interface import _live
     _live["watcher"] = watcher
+    _live["kill_audio_player"] = watcher.kill_audio_player
 
     # Crash-safe: the poll loop runs in a daemon thread, so the hub's 3-second
     # join timeout may expire before the 30-second deferred session save fires.
@@ -42,22 +47,19 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
     watcher_thread.start()
 
     # Keyboard listener — fires on every key press
-    def on_press(key):
-        try:
-            char = key.char
-        except AttributeError:
-            return  # special key (shift, ctrl, etc.) — ignore
-
+    def on_press(key) -> None:
+        char = key_char(key)
         if char and char.lower() == _RECALL_KEY:
             watcher.on_recall_key()
 
-    kb = keyboard.Listener(on_press=on_press)
-    kb.start()
+    kb_token = subscribe_global_hotkeys(on_press)
     print(f"[league] Keyboard listener armed (recall key: '{_RECALL_KEY}').")
+    if startup_event is not None:
+        startup_event.set()
 
     # Block until the hub sets stop_event
     stop_event.wait()
 
-    kb.stop()
+    unsubscribe_global_hotkeys(kb_token)
     watcher_thread.join(timeout=3)
     print("[league] Stopped.")

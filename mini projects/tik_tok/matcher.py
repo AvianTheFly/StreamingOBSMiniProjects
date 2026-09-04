@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from shared_media.media_phrase_matcher import match_phrase
+from lib.shared_media.media_phrase_matcher import match_phrase
 from .config import CONFIG
 
 

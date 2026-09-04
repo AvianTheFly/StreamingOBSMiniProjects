@@ -16,6 +16,7 @@ _live: dict = {}
 class _SoundEffectsInterface(ProjectInterface):
     name              = "sound_effects"
     controlled_scenes = ["Sound Effects"]
+    produces_audio    = True
 
     def get_status(self) -> ProjectStatus:
         visible   = _live.get("visible_sources") or set()

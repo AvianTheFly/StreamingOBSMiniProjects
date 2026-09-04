@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from shared_media.media_project import create_project_interface
+from lib.shared_media.media_project import create_project_interface
 from .config import CONFIG
 from .main import _live
 

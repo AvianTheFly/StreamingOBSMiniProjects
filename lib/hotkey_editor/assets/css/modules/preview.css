@@ -1,0 +1,106 @@
+.preview-pane {
+  position: absolute;
+  right: 0.9rem;
+  bottom: 0.9rem;
+  width: min(320px, calc(100% - 1.8rem));
+  background: rgba(15,18,25,0.94);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--r);
+  box-shadow: 0 14px 28px rgba(0,0,0,0.35);
+  backdrop-filter: blur(8px);
+  overflow: hidden;
+  z-index: 6;
+}
+
+.preview-head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 0.7rem;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+.preview-badge {
+  font-size: 0.62rem;
+  line-height: 1;
+  color: var(--accent);
+  border: 1px solid var(--accent-gl2);
+  background: var(--accent-gl);
+  border-radius: 999px;
+  padding: 0.22rem 0.45rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+.preview-meta { min-width: 0; flex: 1; }
+.preview-name {
+  font-size: 0.74rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.preview-sub { font-size: 0.64rem; color: var(--text-dim); }
+.preview-trim {
+  min-height: 1.45rem;
+  padding: 0.22rem 0.52rem;
+  flex-shrink: 0;
+  border-radius: 7px;
+  color: #fff;
+  background: var(--accent);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+.preview-trim:hover:not(:disabled) { background: var(--accent-dk); }
+.preview-trim:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+.preview-close {
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 4px;
+  color: var(--text-mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.preview-close:hover { color: var(--danger); background: rgba(224,92,92,0.12); }
+
+.preview-body {
+  padding: 0.65rem;
+  min-height: 94px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.08));
+}
+.preview-empty {
+  padding: 1rem;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  line-height: 1.7;
+}
+.preview-media {
+  width: 100%;
+  max-height: 180px;
+  border-radius: 8px;
+  background: #000;
+  outline: none;
+}
+
+/* ── Trim controls (inside preview body) ────────────────────────────── */
+.trim-controls {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.trim-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.trim-row input[type="range"] { flex: 1; }

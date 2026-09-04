@@ -1,25 +1,33 @@
-"""
-hub_config.py
-=============
-Voice / mic settings for the OBS hub.
+from __future__ import annotations
 
-Per-project hotkeys are defined within each project's own files.
-"""
+import os
 
-# ── Voice / ASR ───────────────────────────────────────────────────────────────
-WHISPER_MODEL:    str   = "large-v3"
-WHISPER_DEVICE:   str   = "cuda"
-WHISPER_COMPUTE:  str   = "float16"    # float16 is optimal for 2080Ti
-WHISPER_LANGUAGE: str   = "en"
 
-# ── Microphone ────────────────────────────────────────────────────────────────
-# Run mic_test.py first to identify the correct device index.
-# Set MIC_DEVICE to the number shown by mic_test.py, e.g. MIC_DEVICE = 2
-# Leave as None to use the system default.
-MIC_DEVICE: int | None = 1
+def _env_int(name: str, default: int | None) -> int | None:
+    raw = os.environ.get(name)
+    if raw is None or raw.strip() == "":
+        return default
+    if raw.strip().lower() in {"none", "default"}:
+        return None
+    return int(raw)
 
-MIC_SAMPLE_RATE:   int   = 16_000      # Hz — Whisper requires 16 kHz input
-MIC_CHUNK_SAMPLES: int   = 512         # samples per audio callback tick (~32 ms at 16 kHz)
-RMS_THRESHOLD:     float = 0.01        # 0.0–1.0; raise if you get false triggers in silence
-SPEECH_PAD_CHUNKS: int   = 20          # silent chunks to wait before ending an utterance (~0.64 s)
-MIN_SPEECH_CHUNKS: int   = 8           # discard clips shorter than this (~0.26 s)
+
+def _env_float(name: str, default: float) -> float:
+    raw = os.environ.get(name)
+    return default if raw is None or raw.strip() == "" else float(raw)
+
+
+# Voice / ASR. WHISPER_MODEL may be a model name such as "large-v3" or a local
+# model directory path if you keep models outside this repo.
+WHISPER_MODEL: str = os.environ.get("WHISPER_MODEL", "large-v3")
+WHISPER_DEVICE: str = os.environ.get("WHISPER_DEVICE", "cuda")
+WHISPER_COMPUTE: str = os.environ.get("WHISPER_COMPUTE", "float16")
+WHISPER_LANGUAGE: str = os.environ.get("WHISPER_LANGUAGE", "en")
+
+# Microphone. Run tools/mic_test.py first to identify the correct device index.
+MIC_DEVICE: int | None = _env_int("MIC_DEVICE", 1)
+MIC_SAMPLE_RATE: int = _env_int("MIC_SAMPLE_RATE", 16_000) or 16_000
+MIC_CHUNK_SAMPLES: int = _env_int("MIC_CHUNK_SAMPLES", 512) or 512
+RMS_THRESHOLD: float = _env_float("RMS_THRESHOLD", 0.01)
+SPEECH_PAD_CHUNKS: int = _env_int("SPEECH_PAD_CHUNKS", 20) or 20
+MIN_SPEECH_CHUNKS: int = _env_int("MIN_SPEECH_CHUNKS", 8) or 8

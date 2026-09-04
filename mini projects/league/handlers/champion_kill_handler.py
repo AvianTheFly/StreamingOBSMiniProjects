@@ -27,7 +27,7 @@ from ..config import (
 )
 
 
-def make_champion_kill_handler():
+def make_champion_kill_handler(kill_audio_player=None):
     # ── Streak state (lives inside the closure, protected by _lock) ───────────
     _lock              = threading.Lock()
     _revealed: list    = []      # sources currently visible
@@ -155,6 +155,8 @@ def make_champion_kill_handler():
         print(f"[league] You killed {victim}!")
         threading.Thread(target=_flash_border,         daemon=True).start()
         threading.Thread(target=_reveal_next_triangle, daemon=True).start()
+        if kill_audio_player is not None:
+            threading.Thread(target=kill_audio_player.play_random, daemon=True).start()
 
     def handle_assist(event: dict):
         if not ASSIST_KILL_ENABLED:
@@ -163,6 +165,8 @@ def make_champion_kill_handler():
         print(f"[league] You assisted on {victim}!")
         threading.Thread(target=_flash_border,         daemon=True).start()
         threading.Thread(target=_reveal_next_triangle, daemon=True).start()
+        if kill_audio_player is not None:
+            threading.Thread(target=kill_audio_player.play_random, daemon=True).start()
 
     def force_streak_reset():
         """

@@ -10,6 +10,7 @@ _live is populated by main.py after the player and random-mode state are created
 from __future__ import annotations
 
 from shared import ProjectInterface, ProjectStatus, project_registry
+from .player import SINGLE_SOURCE_NAME
 
 _live: dict = {}
 
@@ -17,6 +18,7 @@ _live: dict = {}
 class _SpecificSongInterface(ProjectInterface):
     name              = "specific_song"
     controlled_scenes = ["SpecificSongs"]
+    produces_audio    = True
 
     def get_status(self) -> ProjectStatus:
         player      = _live.get("player")
@@ -61,6 +63,16 @@ class _SpecificSongInterface(ProjectInterface):
         player = _live.get("player")
         if player:
             player.resume()
+
+    def volume_state(self) -> dict:
+        player = _live.get("player")
+        if not player:
+            return {"profile": "default"}
+        return {
+            "profile": "default",
+            "current_stem": player.current_stem,
+            "source_name": SINGLE_SOURCE_NAME if player.current_stem else None,
+        }
 
 
 interface = _SpecificSongInterface()

@@ -1,0 +1,77 @@
+<section class="panel-right">
+  <div class="right-header">
+    <div class="right-mode-tabs" id="right-mode-tabs">
+      <button class="right-mode active" type="button" data-mode="hotkeys">Hotkeys</button>
+      <button class="right-mode" type="button" data-mode="categories">Categories</button>
+      <button class="right-mode" type="button" data-mode="phrases">Voice Phrases</button>
+      <button class="right-mode" type="button" data-mode="layout">OBS</button>
+      <button class="right-mode" type="button" data-mode="move-assets">Move Assets</button>
+    </div>
+    <span class="right-header-spacer"></span>
+    <div class="category-panel-tools" id="category-panel-tools" hidden>
+      <input class="category-panel-search" id="category-panel-search" type="text" placeholder="Find category" autocomplete="off" />
+      <input class="category-panel-new" id="category-name" type="text" placeholder="New category" autocomplete="off" maxlength="40" />
+      <button class="btn-category-add" id="category-add" type="button">Add Category</button>
+    </div>
+    <button class="btn-add-group" id="add-group-btn" type="button" title="Create an empty group">+ Empty Group</button>
+  </div>
+
+  <div class="key-groups" id="key-groups">
+    <div class="groups-empty" id="groups-empty">
+      <div class="empty-kbd">KEY</div>
+      <div class="empty-title">No keys assigned yet</div>
+      <div class="empty-sub">Use the small keyboard button on a file,<br>then press any key to assign it.</div>
+    </div>
+  </div>
+  <div class="category-groups" id="category-groups" hidden></div>
+  <div class="phrases-panel" id="phrases-panel" hidden></div>
+  <div class="layout-panel" id="layout-panel" hidden></div>
+  <div class="move-assets-panel" id="move-assets-panel" hidden></div>
+
+  <div class="unbound-section" id="unbound-section" style="display:none">
+    <div class="unbound-header" id="unbound-header">
+      <span class="unbound-toggle-icon">></span>
+      <span class="unbound-label-text">Unbound Groups</span>
+      <span class="unbound-count-badge" id="unbound-count-badge">0</span>
+    </div>
+    <div class="unbound-groups-wrap" id="unbound-groups-wrap"></div>
+  </div>
+
+  <aside class="preview-pane" id="preview-pane">
+    <div class="preview-head">
+      <span class="preview-badge" id="preview-badge">Preview</span>
+      <div class="preview-meta">
+        <div class="preview-name" id="preview-name">Nothing selected</div>
+        <div class="preview-sub" id="preview-sub">Click a file on the left to preview it.</div>
+      </div>
+      <button class="preview-trim" id="preview-trim" type="button" title="Open trim editor" disabled>Trim</button>
+      <button class="preview-close" id="preview-close" type="button" title="Stop preview">x</button>
+    </div>
+    <div class="preview-body" id="preview-body">
+      <div class="preview-empty">Audio and video previews appear here.</div>
+    </div>
+    <div class="trim-panel" id="trim-panel" style="display:none">
+      <div class="trim-row">
+        <span class="trim-label">Clip</span>
+        <span class="trim-range" id="trim-range-label">0.00s to 0.00s</span>
+      </div>
+      <div class="trim-controls">
+        <label class="trim-field">
+          <span>Start</span>
+          <input type="range" id="trim-start" min="0" max="0" step="0.01" value="0" />
+          <span class="trim-time" id="trim-start-label">0.00s</span>
+        </label>
+        <label class="trim-field">
+          <span>End</span>
+          <input type="range" id="trim-end" min="0" max="0" step="0.01" value="0" />
+          <span class="trim-time" id="trim-end-label">0.00s</span>
+        </label>
+      </div>
+      <div class="trim-actions">
+        <button class="btn-trim" id="trim-reset" type="button">Reset</button>
+        <button class="btn-trim accent" id="trim-save" type="button">Save Trim</button>
+      </div>
+      <div class="trim-status" id="trim-status"></div>
+    </div>
+  </aside>
+</section>

@@ -1,5 +1,10 @@
 # league/config.py
 
+from pathlib import Path
+
+
+_PROJECT_DIR = Path(__file__).resolve().parent
+
 # ── League API ────────────────────────────────────────────────────────────────
 LEAGUE_API_URL         = "https://127.0.0.1:2999/liveclientdata/allgamedata"
 POLL_INTERVAL          = 0.5
@@ -172,3 +177,43 @@ ACE_SCENE    = "LeagueGameAssets"
 ACE_SOURCE   = "AceOverlay"
 ACE_DURATION = 6.0
 ACE_ENABLED  = False
+
+
+# -- Kill audio (single OBS source, swapped per event) -----------------------
+LEAGUE_KILL_AUDIO_DIR = Path(r"F:\EVERYTHING STREAM RELATED\Assets\VisualAndAudio\league events\kills")
+LEAGUE_KILL_AUDIO_SCENE = "Sound Effects"
+LEAGUE_KILL_AUDIO_PREFIX = "league__"
+LEAGUE_KILL_AUDIO_MONITOR = "OBS_MONITORING_TYPE_MONITOR_ONLY"
+LEAGUE_KILL_AUDIO_DEFAULT_VOLUME_DB = 0.0
+LEAGUE_KILL_AUDIO_EXTENSIONS = {".mp3", ".wav", ".ogg", ".m4a", ".aac", ".flac", ".mp4", ".mkv", ".mov", ".webm"}
+LEAGUE_AUDIO_HOTKEYS_FILE = _PROJECT_DIR / "audio_hotkeys.json"
+
+
+def discover_editor_projects() -> list[dict]:
+    return [
+        {
+            "key": "league",
+            "name": "League",
+            "profile_dir": _PROJECT_DIR,
+            "asset_dir": LEAGUE_KILL_AUDIO_DIR,
+            "hotkeys_file": LEAGUE_AUDIO_HOTKEYS_FILE,
+            "extensions": sorted(LEAGUE_KILL_AUDIO_EXTENSIONS),
+            "config_defaults": {
+                "asset_dir": str(LEAGUE_KILL_AUDIO_DIR),
+                "scene": LEAGUE_KILL_AUDIO_SCENE,
+                "obs_source_prefix": LEAGUE_KILL_AUDIO_PREFIX,
+                "project_volume_db": 0.0,
+                "profile_volume_db": 0.0,
+                "audio_settings_enabled": True,
+                "categories_enabled": False,
+                "obs_layout_enabled": False,
+                "single_source_mode": True,
+            },
+            "features": {
+                "audio_settings_enabled": True,
+                "categories_enabled": False,
+                "obs_layout_enabled": False,
+            },
+            "can_create_profiles": False,
+        }
+    ]

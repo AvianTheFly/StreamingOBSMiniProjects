@@ -80,10 +80,9 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-from pynput import keyboard
-
 import obs
-from shared import VoicePTT, music_service
+from lib.global_hotkeys import key_char, subscribe_global_hotkeys, unsubscribe_global_hotkeys
+from shared import VoicePTT, project_registry
 from obs import (
     save_replay_buffer_and_wait,
     set_media_source_file,
@@ -379,7 +378,12 @@ def _parse_command(text: str) -> tuple[str | None, str, float, bool]:
 #  Hub entry point
 # ─────────────────────────────────────────────────────────────────────────────
 
-def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
+def run(
+    input_queue: queue.Queue,
+    stop_event: threading.Event,
+    *,
+    startup_event: threading.Event | None = None,
+) -> None:
     """Called by the hub in a daemon thread."""
 
     # voice_mod is looked up lazily inside _on_listen_key() so that the hub
@@ -423,6 +427,8 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
 
     # Whether the replay scene is currently active.
     _replay_active = [False]
+    _replay_paused = [False]
+    _paused_other_projects = [False]
 
     # True while _play_all_clips_sequential is running with 2+ clips.
     # Used by the hotkey handler to decide skip-to-next vs cancel-all.
@@ -458,12 +464,13 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
             if not _replay_active[0]:
                 return
             _replay_active[0] = False
+            _replay_paused[0] = False
 
         _cancel_watcher.set()
 
         # Unmute FIRST so there's no gap even if the scene switch lags.
         _unmute_desktop()
-        music_service.resume()  # un-pause specific_song if we paused it
+        _resume_other_projects()
 
         reason = "cancelled" if cancelled else "ended"
         try:
@@ -476,7 +483,53 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
 
     from .interface import _live
     _live["replay_active"] = _replay_active
+    _live["replay_paused"] = _replay_paused
     _live["end_replay"]    = _end_replay
+
+    def _pause_other_projects() -> None:
+        with _lock:
+            if _paused_other_projects[0]:
+                return
+            _paused_other_projects[0] = True
+        project_registry.pause_all(except_="instant_replay")
+
+    def _resume_other_projects() -> None:
+        with _lock:
+            if not _paused_other_projects[0]:
+                return
+            _paused_other_projects[0] = False
+        project_registry.resume_all(except_="instant_replay")
+
+    def _pause_replay() -> None:
+        with _lock:
+            if not _replay_active[0] or _replay_paused[0]:
+                return
+            _replay_paused[0] = True
+        try:
+            obs.pause_media(SOURCE_NAME)
+        except Exception as exc:
+            print(f"[instant_replay] Could not pause replay media: {exc}")
+        _unmute_desktop()
+        print("[instant_replay] Paused replay.")
+
+    def _resume_replay() -> None:
+        with _lock:
+            if not _replay_active[0] or not _replay_paused[0]:
+                return
+            _replay_paused[0] = False
+        try:
+            switch_scene(SCENE)
+        except Exception as exc:
+            print(f"[instant_replay] Could not switch back to replay scene: {exc}")
+        _mute_desktop()
+        try:
+            obs.play_media(SOURCE_NAME)
+        except Exception as exc:
+            print(f"[instant_replay] Could not resume replay media: {exc}")
+        print("[instant_replay] Resumed replay.")
+
+    _live["pause_replay"] = _pause_replay
+    _live["resume_replay"] = _resume_replay
 
     # ── Logo animation helpers ────────────────────────────────────────────────
 
@@ -840,6 +893,7 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
         _skip_clip.clear()
 
         try:
+            _pause_other_projects()
             for i, clip in enumerate(clips):
                 label = f"Clip {i + 1}/{len(clips)}" if is_multi else ""
                 print(f"[instant_replay] ▶  Playing: {clip}{' — ' + label if label else ''}")
@@ -855,8 +909,6 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
 
                 _cancel_watcher.clear()
                 _skip_clip.clear()
-
-                music_service.pause()  # pause specific_song music during replay
 
                 try:
                     switch_scene(SCENE)
@@ -910,6 +962,12 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
                             pass
                         break  # inner break → next iteration of for-loop
 
+                    with _lock:
+                        replay_paused = _replay_paused[0]
+                    if replay_paused:
+                        time.sleep(0.10)
+                        continue
+
                     # Check if media naturally ended
                     state = get_media_state(SOURCE_NAME)
                     if state in ("OBS_MEDIA_STATE_ENDED", "OBS_MEDIA_STATE_STOPPED",
@@ -934,14 +992,15 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
                     # replay scene so there's no flicker before the next clip loads.
                     with _lock:
                         _replay_active[0] = False
+                        _replay_paused[0] = False
                     _unmute_desktop()
-                    music_service.resume()
                     time.sleep(0.25)  # brief gap between clips
 
         finally:
             with _lock:
                 _is_multi_clip_active[0] = False
             _skip_clip.clear()
+            _resume_other_projects()
 
     # ── Voice dispatch (called from background thread by voice.listener) ──────
 
@@ -996,20 +1055,18 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
     # ── Keyboard listener ─────────────────────────────────────────────────────
 
     def on_press(key) -> None:
-        try:
-            char = key.char
-        except AttributeError:
-            return
+        char = key_char(key)
         if char == HOTKEY_LISTEN:
-            _on_listen_key()
+            threading.Thread(target=_on_listen_key, daemon=True).start()
 
-    kb = keyboard.Listener(on_press=on_press)
-    kb.start()
+    kb_token = subscribe_global_hotkeys(on_press)
     print(
         f"[instant_replay] ⌨  Armed — press '{HOTKEY_LISTEN}' to start recording, "
         "then press 'C' or trigger again to transcribe (auto-transcribes in 2s). "
         "Say 'save [tag]', 'mark', or 'play [spec]'."
     )
+    if startup_event is not None:
+        startup_event.set()
 
     # ── Main loop — processes nothing directly but keeps the thread alive ─────
     # (commands are dispatched inline from _dispatch via the voice callback)
@@ -1056,5 +1113,5 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
     # ── Cleanup ───────────────────────────────────────────────────────────────
     ptt.cancel("shutdown")
     _end_replay(cancelled=True)
-    kb.stop()
+    unsubscribe_global_hotkeys(kb_token)
     print("[instant_replay] Stopped.")

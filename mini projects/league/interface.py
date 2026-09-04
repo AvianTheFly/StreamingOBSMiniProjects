@@ -10,9 +10,8 @@ watcher (which is passive — it just reads the League API and reacts).
 
 Scene ownership
 ---------------
-league owns ONLY the "LeagueGameAssets" scene.
-  - Sound Effects scene is owned by the sound_effects project.
-    league requests SFX via  events.emit("sfx.play", source=...)
+league owns the "LeagueGameAssets" scene and one dedicated audio source in
+"Sound Effects" for kill/assist callouts.
   - Scene switching ("Test" / "Lobbies") is owned by scene_voice_switcher.
     league triggers it via  events.emit("game.connected") / events.emit("game.disconnected")
 """
@@ -55,7 +54,8 @@ _OVERLAY_SOURCES: list[tuple[str, str]] = [
 
 class _LeagueInterface(ProjectInterface):
     name              = "league"
-    controlled_scenes = ["LeagueGameAssets"]
+    controlled_scenes = ["LeagueGameAssets", "Sound Effects"]
+    produces_audio    = True
 
     def get_status(self) -> ProjectStatus:
         watcher   = _live.get("watcher")
@@ -75,6 +75,15 @@ class _LeagueInterface(ProjectInterface):
                 obs.hide_source(scene, source)
             except Exception:
                 pass
+        player = _live.get("kill_audio_player")
+        if player:
+            player.stop()
+
+    def volume_state(self) -> dict:
+        player = _live.get("kill_audio_player")
+        if not player:
+            return {"profile": "default"}
+        return player.volume_state()
 
 
 interface = _LeagueInterface()

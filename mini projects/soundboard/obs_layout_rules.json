@@ -1,0 +1,72 @@
+{
+  "scene": "soundboard",
+  "prefix": "sb__",
+  "rules": {
+    "640x360": {
+      "positionX": 0.0,
+      "positionY": 0.0,
+      "boundsWidth": 640.0,
+      "boundsHeight": 360.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "cropLeft": 0.0,
+      "cropTop": 0.0,
+      "cropRight": 0.0,
+      "cropBottom": 0.0,
+      "boundsType": "OBS_BOUNDS_NONE",
+      "alignment": 5,
+      "boundsAlignment": 0,
+      "rotation": 0.0
+    },
+    "960x720": {
+      "positionX": 0.0,
+      "positionY": 0.0,
+      "boundsWidth": 960.0,
+      "boundsHeight": 720.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "cropLeft": 0.0,
+      "cropTop": 0.0,
+      "cropRight": 0.0,
+      "cropBottom": 0.0,
+      "boundsType": "OBS_BOUNDS_NONE",
+      "alignment": 5,
+      "boundsAlignment": 0,
+      "rotation": 0.0
+    },
+    "1280x720": {
+      "positionX": 0.0,
+      "positionY": 389.58659810274344,
+      "boundsWidth": 1014.1397703532225,
+      "boundsHeight": 570.4536208236877,
+      "scaleX": 0.7922966955884551,
+      "scaleY": 0.7922966955884552,
+      "cropLeft": 0.0,
+      "cropTop": 199.35107073329007,
+      "cropRight": 0.0,
+      "cropBottom": 86.38536258922777,
+      "boundsType": "OBS_BOUNDS_NONE",
+      "alignment": 5,
+      "boundsAlignment": 0,
+      "rotation": 0.0
+    },
+    "720x1280": {
+      "positionX": 0.0,
+      "positionY": 0.0,
+      "boundsWidth": 720.0,
+      "boundsHeight": 1280.0,
+      "scaleX": 1.0,
+      "scaleY": 1.0,
+      "cropLeft": 0.0,
+      "cropTop": 0.0,
+      "cropRight": 0.0,
+      "cropBottom": 0.0,
+      "boundsType": "OBS_BOUNDS_NONE",
+      "alignment": 5,
+      "boundsAlignment": 0,
+      "rotation": 0.0
+    }
+  },
+  "overrides": {},
+  "updated_at": "2026-04-18 02:19:22"
+}

@@ -9,6 +9,7 @@ import time
 from dataclasses import dataclass, field
 
 
+
 # ── Hotkey sequence trigger ───────────────────────────────────────────────────
 #
 # Any project that needs a typed key-sequence hotkey can use this directly:
@@ -24,9 +25,42 @@ class SequenceTrigger:
     max_interval seconds.  Returns True exactly once per completed sequence.
     """
 
-    def __init__(self, sequence: list, max_interval: float) -> None:
+    _SHIFT_EQUIV = {
+        "~": "`",
+        "!": "1",
+        "@": "2",
+        "#": "3",
+        "$": "4",
+        "%": "5",
+        "^": "6",
+        "&": "7",
+        "*": "8",
+        "(": "9",
+        ")": "0",
+        "_": "-",
+        "+": "=",
+        "{": "[",
+        "}": "]",
+        "|": "\\",
+        ":": ";",
+        "\"": "'",
+        "<": ",",
+        ">": ".",
+        "?": "/",
+    }
+
+    def __init__(
+        self,
+        sequence: list,
+        max_interval: float,
+        *,
+        strict_first_char: bool = True,
+        shift_agnostic_tail: bool = True,
+    ) -> None:
         self.sequence     = [str(k) for k in sequence]
         self.max_interval = float(max_interval)
+        self.strict_first_char = bool(strict_first_char)
+        self.shift_agnostic_tail = bool(shift_agnostic_tail)
         self._buffer: list = []
         self._times:  list = []
 
@@ -44,13 +78,38 @@ class SequenceTrigger:
             self._buffer.pop(0)
             self._times.pop(0)
 
-        if self._buffer == self.sequence:
+        if self._matches_buffer():
             elapsed = self._times[-1] - self._times[0]
             if elapsed <= self.max_interval:
                 self.reset()
                 return True
 
         return False
+
+    @classmethod
+    def _normalize_shift_agnostic(cls, value: str) -> str:
+        if not value:
+            return ""
+        base = cls._SHIFT_EQUIV.get(value, value)
+        return base.lower() if len(base) == 1 else str(base).lower()
+
+    def _matches_buffer(self) -> bool:
+        if len(self._buffer) != len(self.sequence):
+            return False
+
+        for index, (actual, expected) in enumerate(zip(self._buffer, self.sequence)):
+            actual = str(actual)
+            expected = str(expected)
+            if index == 0 and self.strict_first_char:
+                if actual != expected:
+                    return False
+                continue
+            if self.shift_agnostic_tail:
+                if self._normalize_shift_agnostic(actual) != self._normalize_shift_agnostic(expected):
+                    return False
+            elif actual != expected:
+                return False
+        return True
 
 
 # ── Push-to-talk voice helper ─────────────────────────────────────────────────
@@ -82,11 +141,10 @@ class VoicePTT:
 
     on_trigger()   → starts recording + arms an auto-transcribe timer.
                      If already recording and double_trigger_stops=True, stops and
-                     transcribes immediately (same as pressing 'C').
+                     transcribes immediately.
                      If double_trigger_stops=False, does nothing when already recording.
     cancel(reason) → discards in-progress audio without transcribing.
 
-    Press 'C' at any time while recording to stop and transcribe immediately.
     Recording also auto-transcribes after `timeout` seconds.
     Only one project can record at a time — start_recording() is rejected if
     another project already owns the mic.
@@ -121,9 +179,9 @@ class VoicePTT:
         self._lockout_seconds      = lockout_seconds
         self._lockout_until        = 0.0   # monotonic timestamp; 0 = no lockout
         self._lock                 = threading.Lock()
+        self._trigger_lock         = threading.Lock()
         self._recording            = False
         self._timer: threading.Timer | None = None
-        self._kb_stop_listener     = None
         self._state                = self._STATE_IDLE
         self._processing_started   = 0.0
         self._gen                  = 0     # increments on each _do_stop; guards stale callbacks
@@ -145,6 +203,22 @@ class VoicePTT:
 
     def on_trigger(self) -> None:
         """Start recording, or stop+transcribe if already recording and double_trigger_stops=True."""
+        threading.Thread(
+            target=self._on_trigger_worker,
+            daemon=True,
+            name=f"{self._tag or 'voice'}-ptt-trigger",
+        ).start()
+
+    def _on_trigger_worker(self) -> None:
+        if not self._trigger_lock.acquire(blocking=False):
+            return
+        try:
+            self._on_trigger_sync()
+        finally:
+            self._trigger_lock.release()
+
+    def _on_trigger_sync(self) -> None:
+        """Worker-side implementation for on_trigger()."""
         voice_mod = sys.modules.get("voice.listener")
         if voice_mod is None:
             print(f"[{self._tag}] Voice module not ready.")
@@ -183,12 +257,10 @@ class VoicePTT:
             self._timer = t
             t.start()
 
-        print(f"  [{self._tag}] Listening… (trigger again or 'C' to send)")
-        # Arm the 'C' stop-key listener outside the lock
-        self._arm_stop_listener()
+        print(f"  [{self._tag}] Listening… (trigger again to send)")
 
     def _do_stop(self) -> None:
-        """Stop recording and transcribe — called by 'C' key, double-trigger, or timeout."""
+        """Stop recording and transcribe after a double-trigger or timeout."""
         voice_mod = sys.modules.get("voice.listener")
         with self._lock:
             if not self._recording:
@@ -203,7 +275,6 @@ class VoicePTT:
 
         if t:
             t.cancel()
-        self._disarm_stop_listener()
         self._lockout_until = time.monotonic() + self._lockout_seconds
 
         print(f"  [{self._tag}] Processing…")
@@ -220,36 +291,6 @@ class VoicePTT:
         if voice_mod:
             voice_mod.stop_and_transcribe(_on_transcript_done, self._tag)
 
-    def _arm_stop_listener(self) -> None:
-        """Start a background pynput listener that fires _do_stop when 'C' is pressed."""
-        try:
-            from pynput import keyboard as kb_mod
-        except ImportError:
-            return
-
-        def on_press(key):
-            try:
-                if key.char == "C":
-                    self._do_stop()
-                    return False  # unregisters this listener from within
-            except AttributeError:
-                pass
-
-        listener = kb_mod.Listener(on_press=on_press)
-        with self._lock:
-            self._kb_stop_listener = listener
-        listener.start()
-
-    def _disarm_stop_listener(self) -> None:
-        """Stop and clear the 'C' key listener."""
-        with self._lock:
-            listener = self._kb_stop_listener
-            self._kb_stop_listener = None
-        if listener is not None:
-            # Stop in a background thread to avoid deadlock when called
-            # from within the listener's own on_press callback.
-            threading.Thread(target=listener.stop, daemon=True).start()
-
     def cancel(self, reason: str = "") -> None:
         """Discard any in-progress recording without transcribing."""
         voice_mod = sys.modules.get("voice.listener")
@@ -264,7 +305,6 @@ class VoicePTT:
 
         if t:
             t.cancel()
-        self._disarm_stop_listener()
         if voice_mod:
             try:
                 voice_mod.stop_and_transcribe(lambda _: None, self._tag)
@@ -386,6 +426,7 @@ class ProjectInterface:
     """
     name:              str       = ""
     controlled_scenes: list[str] = []
+    produces_audio:    bool      = False  # True → this project outputs audible audio
 
     def get_status(self) -> ProjectStatus:
         raise NotImplementedError
@@ -409,6 +450,39 @@ class ProjectInterface:
         Default: no-op.
         """
         pass
+
+    def action_catalog(self) -> list[dict]:
+        """
+        Optional list of user-facing actions this project supports.
+        Hub/editor UIs use this to build buttons and hotkey editors.
+        """
+        actions = [
+            {"key": "pause", "label": "Pause Playback", "description": "Pause current activity."},
+            {"key": "resume", "label": "Resume Playback", "description": "Resume paused activity."},
+        ]
+        try:
+            status = self.get_status()
+            if status.can_revert:
+                actions.append({"key": "revert", "label": "Revert", "description": "Stop and clean up OBS state."})
+        except Exception:
+            pass
+        return actions
+
+    def run_action(self, action: str, **kwargs) -> dict:
+        """Run a named interface action. Projects can override for richer verbs."""
+        if action == "revert":
+            self.revert()
+        elif action == "pause":
+            self.pause()
+        elif action == "resume":
+            self.resume()
+        else:
+            return {"ok": False, "error": f"Unsupported project action: {action}"}
+        return {"ok": True, "action": action}
+
+    def volume_state(self) -> dict:
+        """Optional project/profile volume snapshot for hub display."""
+        return {}
 
 
 class _ProjectRegistry:

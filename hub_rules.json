@@ -1,0 +1,22 @@
+[
+  {
+    "requester": "soundboard",
+    "pause": [
+      "tik_tok",
+      "sound_effects",
+      "specific_song"
+    ],
+    "resume_on_finish": true
+  },
+  {
+    "requester": "tik_tok",
+    "pause": [
+      "soundboard",
+      "sound_effects",
+      "instant_replay",
+      "specific_song",
+      "love_me"
+    ],
+    "resume_on_finish": true
+  }
+]

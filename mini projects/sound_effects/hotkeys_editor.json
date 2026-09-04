@@ -1,0 +1,52 @@
+{
+  "profiles": {
+    "default": {
+      "project_volume_db": -3.0,
+      "profile_volume_db": 0.0,
+      "file_volume_offsets": {
+        "Deja Vu": 0.0,
+        "Halo Respawn sound effect": 0.0,
+        "How could this happen to me": 0.0,
+        "I shouldve seen that coming": 0.0,
+        "JOHN CENA": 0.0,
+        "OH NO NO NO NO": 0.0,
+        "Pedro": 0.0,
+        "Sigma Boy": 0.0,
+        "anime brainrot opening": 0.0,
+        "celebrate": 0.0,
+        "chill guy": 0.0,
+        "coffin dnace": 0.0,
+        "crab rave": 0.0,
+        "dancing music": 0.0,
+        "dang it": 0.0,
+        "die die die": 0.0,
+        "dont be suspicious": 0.0,
+        "epic newt newt": 0.0,
+        "fuck": 0.0,
+        "fun celebration": 0.0,
+        "gambling": 0.0,
+        "gangsta paradise": 0.0,
+        "hooray": 0.0,
+        "hype up music": 0.0,
+        "i love you": 0.0,
+        "im cooked": 0.0,
+        "im falling in love": 0.0,
+        "leave me alone": 0.0,
+        "love cat song": 0.0,
+        "meow meow": 0.0,
+        "mom frog": 0.0,
+        "oh no": 0.0,
+        "rat dance": 0.0,
+        "run": 0.0,
+        "sad music": 0.0,
+        "sad violin": 0.0,
+        "that was smart": 0.0,
+        "troll lol": 0.0,
+        "what just happened": 0.0,
+        "who is she": 0.0,
+        "woops": 0.0,
+        "you saved me": 0.0
+      }
+    }
+  }
+}

@@ -15,6 +15,7 @@ _live: dict = {}
 class _LoveMeInterface(ProjectInterface):
     name              = "love_me"
     controlled_scenes = ["LoveMe"]
+    produces_audio    = True
 
     def get_status(self) -> ProjectStatus:
         player    = _live.get("player")

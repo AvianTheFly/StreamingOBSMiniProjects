@@ -1,239 +1,94 @@
-"""
-main.py  (hub root)
-===================
-Discovers and runs all mini-projects concurrently.
-
-Now supports CLI filtering:
-  py -3.11 main.py --debug
-  py -3.11 main.py --only project_a project_b
-  py -3.11 main.py --skip project_x
-"""
-
 from __future__ import annotations
 
 import argparse
+import inspect
 import os
-import sys
-from pathlib import Path
+import queue
+import threading
+import time
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  CLI args (must be parsed before importing log)
-# ─────────────────────────────────────────────────────────────────────────────
+from lib.paths import ensure_import_paths, load_project_env
+from lib.project_registry import (
+    discover_runnable_projects,
+    filter_projects,
+    normalize_project_names,
+)
+
+
+PROJECT_START_READY_TIMEOUT_SECONDS = 20.0
+
 
 def _parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run OBS hub mini-projects.")
-    parser.add_argument(
-        "--debug",
-        action="store_true",
-        help="Enable DEBUG logging.",
-    )
+    parser = argparse.ArgumentParser(description="Run OBS hub mini projects.")
+    parser.add_argument("--debug", action="store_true", help="Enable DEBUG logging.")
     parser.add_argument(
         "--only",
         nargs="+",
         metavar="PROJECT",
-        help="Run only the specified mini-project(s).",
+        help="Run only the specified mini project(s).",
     )
     parser.add_argument(
         "--skip",
         nargs="+",
         metavar="PROJECT",
-        help="Skip the specified mini-project(s).",
+        help="Skip the specified mini project(s).",
     )
     return parser.parse_args()
 
 
 ARGS = _parse_args()
 
-# UTF-8 everywhere — prevents emoji / non-ASCII crashes on Windows (cp1252 default).
+# Keep Windows consoles and background logs predictable before log.py starts.
 os.environ["PYTHONUTF8"] = "1"
 os.environ["PYTHONUNBUFFERED"] = "1"
-
 if ARGS.debug:
     os.environ["LOG_LEVEL"] = "DEBUG"
 
-# Load .env before anything else so OBS_PASSWORD, TWITCH_OAUTH_TOKEN, etc. are available.
-from dotenv import load_dotenv
-load_dotenv()
+ensure_import_paths()
+load_project_env()
 
-# ── Logging must start before any other import so all output goes through the
-# queue writer and the Windows console-freeze fix is active from the first line.
 import log
+
 log.start()
 
-import importlib
-import inspect
-import queue
-import threading
-import time
+from lib.process_priority import raise_priority
 
-# ── Hub root on sys.path ─────────────────────────────────────────────────────
-_ROOT = Path(__file__).resolve().parent
-_ROOT_STR = str(_ROOT)
-if _ROOT_STR not in sys.path:
-    sys.path.insert(0, _ROOT_STR)
-
-# Projects can also live in "mini projects/".
-_MINI_PROJECTS_DIR = _ROOT / "mini projects"
-if _MINI_PROJECTS_DIR.is_dir():
-    _mp_str = str(_MINI_PROJECTS_DIR)
-    if _mp_str not in sys.path:
-        sys.path.append(_mp_str)
-
-# Folders that are NOT mini-projects.
-_SKIP: set[str] = {"obs", "voice", "__pycache__", "tools", "sandbox_testing", "mini projects"}
+raise_priority()
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  Helpers
-# ─────────────────────────────────────────────────────────────────────────────
-
-def _normalize_names(values: list[str] | None) -> set[str]:
-    return {v.strip() for v in (values or []) if v and v.strip()}
-
-
-def _filter_projects(projects: list[dict], only: set[str], skip: set[str]) -> list[dict]:
-    available = {p["name"] for p in projects}
-
-    unknown_only = sorted(only - available)
-    unknown_skip = sorted(skip - available)
-
-    for name in unknown_only:
-        log.warn("hub", f"--only requested unknown project '{name}'")
-    for name in unknown_skip:
-        log.warn("hub", f"--skip requested unknown project '{name}'")
-
-    filtered = projects
-
-    if only:
-        filtered = [p for p in filtered if p["name"] in only]
-
-    if skip:
-        filtered = [p for p in filtered if p["name"] not in skip]
-
-    return filtered
+def _run_target(
+    run_fn,
+    project_queue: queue.Queue,
+    stop_event: threading.Event,
+    done_queue: queue.Queue,
+    startup_event: threading.Event,
+):
+    params = inspect.signature(run_fn).parameters
+    kwargs = {}
+    if "done_queue" in params:
+        kwargs["done_queue"] = done_queue
+    if "startup_event" in params:
+        kwargs["startup_event"] = startup_event
+    return lambda: run_fn(project_queue, stop_event, **kwargs)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  Project discovery
-# ─────────────────────────────────────────────────────────────────────────────
-
-def _discover_projects() -> list[dict]:
-    """
-    Scan for sub-folders that look like mini-projects and import them.
-
-    A folder qualifies when it:
-      • is a directory, not in _SKIP, and does not start with '.' or '_'
-      • contains both __init__.py  AND  main.py
-      • main.py exposes a callable  run(input_queue, stop_event, ...)
-    """
-    projects: list[dict] = []
-    seen_names: set[str] = set()
-
-    scan_dirs = [_ROOT]
-    if _MINI_PROJECTS_DIR.is_dir():
-        scan_dirs.append(_MINI_PROJECTS_DIR)
-
-    for scan_root in scan_dirs:
-        for folder in sorted(scan_root.iterdir()):
-            if (
-                not folder.is_dir()
-                or folder.name in _SKIP
-                or folder.name.startswith((".", "_"))
-            ):
-                continue
-
-            if folder.name in seen_names:
-                log.warn("hub", f"Skipping '{folder.name}' in '{scan_root.name}/' — already loaded.")
-                continue
-
-            if not (folder / "__init__.py").exists():
-                log.debug("hub", f"Skipping '{folder.name}' — no __init__.py")
-                continue
-            if not (folder / "main.py").exists():
-                log.debug("hub", f"Skipping '{folder.name}' — no main.py")
-                continue
-
-            pkg_name = f"{folder.name}.main"
-            try:
-                module = importlib.import_module(pkg_name)
-            except Exception as exc:
-                log.error("hub", f"Could not import '{pkg_name}': {exc}")
-                continue
-
-            if not callable(getattr(module, "run", None)):
-                log.warn("hub", f"Skipping '{folder.name}' — main.py has no run() function.")
-                continue
-
-            seen_names.add(folder.name)
-
-            # Import interface.py to trigger auto-registration with project_registry.
-            try:
-                importlib.import_module(f"{folder.name}.interface")
-            except ImportError:
-                pass
-            except Exception as exc:
-                log.warn("hub", f"Could not import '{folder.name}.interface': {exc}")
-
-            projects.append({
-                "name": folder.name,
-                "module": module,
-                "queue": queue.Queue(),
-                "thread": None,
-            })
-
-    return projects
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-#  Entry point
-# ─────────────────────────────────────────────────────────────────────────────
-
-def main() -> None:
-    print("=" * 62)
-    print("  OBS Hub")
-    print("=" * 62)
-
-    # Verify OBS connection before starting anything
-    try:
-        from obs import get_obs
-        client = get_obs()
-        print("  OBS: Connected")
-    except Exception as exc:
-        print(f"\n  [ERROR] OBS connection failed: {exc}")
-        print("  Fix connection settings in obs/obs_config.py and retry.")
-        return
-
-    projects = _discover_projects()
-
-    # Register cross-project coordination rules now that all interfaces are
-    # loaded.  hub_rules.py is the single source of truth for which projects
-    # pause/resume when another project starts playing.
-    import hub_rules  # noqa: F401 — imported for side-effects (rule registration)
-
-    only_names = _normalize_names(ARGS.only)
-    skip_names = _normalize_names(ARGS.skip)
-    projects = _filter_projects(projects, only_names, skip_names)
-
-    if not projects:
-        print("\n  [ERROR] No mini-projects selected.")
-        print("  Check your --only / --skip arguments.")
-        return
-
-    # ── Scene ownership table ─────────────────────────────────────────────────
+def _print_project_table(projects: list) -> None:
     from shared import project_registry
 
     print(f"\n  {len(projects)} project(s) loaded:\n")
-    name_col = max(len(p["name"]) for p in projects) + 2
+    name_col = max(len(project.name) for project in projects) + 2
     scene_col = 40
-    divider = f"  {'─' * name_col}┼{'─' * scene_col}"
-    print(f"  {'Project':<{name_col}}│ OBS Scenes")
+    divider = f"  {'-' * name_col}+{'-' * scene_col}"
+    print(f"  {'Project':<{name_col}}| OBS Scenes")
     print(divider)
-    for p in projects:
-        iface = project_registry.get(p["name"])
+    for project in projects:
+        iface = project_registry.get(project.name)
         scenes = ", ".join(iface.controlled_scenes) if iface else "(no interface)"
-        print(f"  {p['name']:<{name_col}}│ {scenes}")
+        print(f"  {project.name:<{name_col}}| {scenes}")
     print(divider)
 
+
+def _print_runtime_options(only_names: set[str], skip_names: set[str], debug: bool = False) -> None:
     level_name = {
         log.DEBUG: "DEBUG",
         log.INFO: "INFO",
@@ -241,95 +96,154 @@ def main() -> None:
         log.ERROR: "ERROR",
     }
     print(f"\n  Log level : {level_name.get(log._level, 'INFO')}")
-    print(f"  Debug arg : {'ON' if ARGS.debug else 'OFF'}")
+    print(f"  Debug arg : {'ON' if debug else 'OFF'}")
     print(f"  Only      : {', '.join(sorted(only_names)) if only_names else '(all)'}")
     print(f"  Skip      : {', '.join(sorted(skip_names)) if skip_names else '(none)'}")
     print("  Shutdown  : Ctrl+C")
     print()
 
-    stop_event = threading.Event()
 
-    # done_queue kept for backward-compat with 3-arg run() signatures.
+def _check_obs_connection() -> bool:
+    try:
+        from obs import get_obs
+
+        get_obs()
+        print("  OBS: Connected")
+        return True
+    except Exception as exc:
+        print(f"\n  [ERROR] OBS connection failed: {exc}")
+        print("  Fix connection settings in obs/obs_config.py or .env and retry.")
+        return False
+
+
+def _start_projects(projects: list, stop_event: threading.Event) -> None:
     done_queue: queue.Queue[str] = queue.Queue()
- ##ORIGINAL
-    # for p in projects:
-        # run_fn = p["module"].run
-        # sig = inspect.signature(run_fn)
 
-        # n_required = sum(
-            # 1 for param in sig.parameters.values()
-            # if param.default is inspect.Parameter.empty
-        # )
-        
-       
-        # def _make_target(fn, q: queue.Queue, n: int):
-            # if n >= 3:
-                # return lambda: fn(q, stop_event, done_queue)
-            # return lambda: fn(q, stop_event)
+    for project in projects:
+        startup_event = threading.Event()
+        target = _run_target(project.module.run, project.queue, stop_event, done_queue, startup_event)
+        thread = threading.Thread(target=target, name=project.name, daemon=True)
+        thread.start()
+        project.thread = thread
+        if startup_event.wait(timeout=PROJECT_START_READY_TIMEOUT_SECONDS):
+            print(f"  [{project.name}] Startup ready.")
+            continue
+        if not thread.is_alive():
+            print(f"  [{project.name}] Startup thread exited before ready signal.")
+        else:
+            print(
+                f"  [{project.name}] Startup ready signal timed out after "
+                f"{PROJECT_START_READY_TIMEOUT_SECONDS:.0f}s; continuing."
+            )
 
-        # t = threading.Thread(
-            # target=_make_target(run_fn, p["queue"], n_required),
-            # name=p["name"],
-            # daemon=True,
-        # )
-        # t.start()
-        # p["thread"] = t
+    print("  Selected projects running.\n")
 
-    # print("  Selected projects running.\n")
-    #NOT ORIGINAL
-    for p in projects:
-        run_fn = p["module"].run
-        sig = inspect.signature(run_fn)
 
-        n_required = sum(
-            1 for param in sig.parameters.values()
-            if param.default is inspect.Parameter.empty
-        )
-
-        def _make_target(fn, q, n):
-            if n >= 3:
-                return lambda: fn(q, stop_event, done_queue)
-            return lambda: fn(q, stop_event)
-
-        t = threading.Thread(
-            target=_make_target(run_fn, p["queue"], n_required),
-            name=p["name"],
-            daemon=True,
-        )
-
-        t.start()
-        p["thread"] = t
-
-        # ⬇️ add this
-        time.sleep(2)
-
-    # Start the shared voice listener.
+def _start_voice(stop_event: threading.Event) -> None:
     try:
         from voice import listener as voice_mod
+
         voice_mod.start(stop_event)
-        print("  [voice] Whisper listener started.")
+        print("  [voice] Whisper listener starting.")
     except Exception as exc:
         import traceback
+
         print(f"\n  [voice] Could not start voice listener: {exc}")
         traceback.print_exc()
         print("  Voice input will be unavailable.\n")
 
+
+def _wait_for_shutdown(stop_event: threading.Event) -> None:
     try:
         while not stop_event.is_set():
             time.sleep(0.2)
     except KeyboardInterrupt:
         print("\n  Ctrl+C received.")
+        stop_event.set()
 
-    print("  Shutting down…")
+
+def _join_projects(projects: list) -> None:
+    for project in projects:
+        thread = project.thread
+        if thread and thread.is_alive():
+            thread.join(timeout=3)
+            if thread.is_alive():
+                log.warn("hub", f"'{project.name}' did not stop within 3 s.")
+
+
+def run_hub(
+    stop_event: threading.Event,
+    *,
+    only: list[str] | None = None,
+    skip: list[str] | None = None,
+    debug: bool = False,
+) -> list:
+    """
+    Start all hub mini-project threads and return the list of started projects.
+
+    Unlike main(), this does NOT block — the caller controls the stop_event and
+    is responsible for calling _join_projects(projects) on shutdown.
+    Used by hub.py to run the hub alongside the UI server.
+    """
+    if debug:
+        os.environ["LOG_LEVEL"] = "DEBUG"
+
+    if not _check_obs_connection():
+        return []
+
+    projects = discover_runnable_projects(logger=log)
+
+    import hub_rules  # noqa: F401
+
+    only_names = normalize_project_names(only)
+    skip_names = normalize_project_names(skip)
+    projects = filter_projects(projects, only=only_names, skip=skip_names, logger=log)
+
+    if not projects:
+        print("\n  [ERROR] No mini projects selected.")
+        return []
+
+    _print_project_table(projects)
+    _print_runtime_options(only_names, skip_names, debug=debug)
+    _start_voice(stop_event)
+    _start_projects(projects, stop_event)
+
+    return projects
+
+
+def main() -> None:
+    print("=" * 62)
+    print("  OBS Hub")
+    print("=" * 62)
+
+    if not _check_obs_connection():
+        return
+
+    projects = discover_runnable_projects(logger=log)
+
+    # Import after discovery so all project interfaces are registered.
+    import hub_rules  # noqa: F401
+
+    only_names = normalize_project_names(ARGS.only)
+    skip_names = normalize_project_names(ARGS.skip)
+    projects = filter_projects(projects, only=only_names, skip=skip_names, logger=log)
+
+    if not projects:
+        print("\n  [ERROR] No mini projects selected.")
+        print("  Check your --only / --skip arguments.")
+        return
+
+    _print_project_table(projects)
+    _print_runtime_options(only_names, skip_names, debug=ARGS.debug)
+
+    stop_event = threading.Event()
+    _start_voice(stop_event)
+    _start_projects(projects, stop_event)
+    _wait_for_shutdown(stop_event)
+
+    print("  Shutting down...")
     stop_event.set()
-
-    for p in projects:
-        t = p["thread"]
-        if t and t.is_alive():
-            t.join(timeout=3)
-            if t.is_alive():
-                log.warn("hub", f"'{p['name']}' did not stop within 3 s.")
-
+    _join_projects(projects)
     print("  Goodbye.")
 
 

@@ -38,6 +38,7 @@ from hub_config import (
 )
 
 SendFn = Callable[[str], None]
+READY_WAIT_SECONDS = 30.0
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -47,6 +48,8 @@ SendFn = Callable[[str], None]
 _model  = None                          # WhisperModel — loaded once
 _stream = None                          # sounddevice InputStream — kept open always
 _audio_q: queue.Queue[np.ndarray] = queue.Queue()
+_ready_event = threading.Event()
+_startup_error: str | None = None
 
 _recording       = False
 _recording_owner = ""                   # tag of the project that owns the current recording
@@ -78,6 +81,18 @@ def start_recording(owner: str = "unknown") -> bool:
     abort its recording flow.  Nothing is modified in that case.
     """
     global _recording, _buffer, _recording_owner
+    if not _ready_event.is_set():
+        if _startup_error:
+            print(f"  [voice] Voice listener unavailable: {_startup_error}")
+            return False
+        print(f"  [voice] Waiting for Whisper/mic startup before recording [{owner}]...")
+        if not _ready_event.wait(timeout=READY_WAIT_SECONDS):
+            if _startup_error:
+                print(f"  [voice] Voice listener unavailable: {_startup_error}")
+                return False
+            print(f"  [voice] WARNING: '{owner}' could not record because the mic is not ready yet.")
+            return False
+
     with _rec_lock:
         if _recording:
             print(
@@ -85,6 +100,7 @@ def start_recording(owner: str = "unknown") -> bool:
                 f"but '{_recording_owner}' is already active — ignored."
             )
             return False
+        _clear_audio_queue()
         _buffer          = []
         _recording       = True
         _recording_owner = owner
@@ -92,6 +108,11 @@ def start_recording(owner: str = "unknown") -> bool:
     print(f"  [voice] 🎙️  Recording started [{owner}]. "
           f"Press trigger again or 'C' to send, auto-stops in 2s.")
     return True
+
+
+def is_ready() -> bool:
+    """Return True once Whisper is loaded and the mic drain loop is running."""
+    return _ready_event.is_set()
 
 
 def stop_and_transcribe(send_fn: SendFn, owner: str = "") -> None:
@@ -144,7 +165,9 @@ def stop_and_transcribe(send_fn: SendFn, owner: str = "") -> None:
 
 def _init_and_drain(stop_event: threading.Event) -> None:
     """Load Whisper, open mic stream, then drain the audio queue forever."""
-    global _model, _stream
+    global _model, _stream, _startup_error
+    _ready_event.clear()
+    _startup_error = None
 
     # ── Load Whisper ──────────────────────────────────────────────────────────
     try:
@@ -160,6 +183,7 @@ def _init_and_drain(stop_event: threading.Event) -> None:
         )
         print("  [voice] Whisper ready.")
     except Exception as e:
+        _startup_error = f"failed to load Whisper: {e}"
         print(f"  [voice] Failed to load Whisper: {e}")
         return
 
@@ -167,11 +191,17 @@ def _init_and_drain(stop_event: threading.Event) -> None:
     try:
         import sounddevice as sd
     except ImportError:
+        _startup_error = "sounddevice is not installed; run with the Python environment that has it"
         print("  [voice] sounddevice not installed — run: pip install sounddevice")
         return
 
     device_idx  = MIC_DEVICE
-    device_info = sd.query_devices(device_idx, "input")
+    try:
+        device_info = sd.query_devices(device_idx, "input")
+    except Exception as e:
+        _startup_error = f"could not query input device {device_idx}: {e}"
+        print(f"  [voice] Could not query input device {device_idx}: {e}")
+        return
     device_name = device_info["name"]
     native_rate = int(device_info["default_samplerate"])
 
@@ -196,6 +226,7 @@ def _init_and_drain(stop_event: threading.Event) -> None:
                 channels=1,
                 dtype="float32",
                 blocksize=MIC_CHUNK_SAMPLES,
+                latency="high",
                 callback=_sd_callback,
             )
             _stream.start()
@@ -213,9 +244,12 @@ def _init_and_drain(stop_event: threading.Event) -> None:
             _stream = None
 
     if _stream is None:
+        _startup_error = "failed to open microphone"
         print("  [voice] Failed to open microphone. Run mic_test.py to diagnose.")
         return
 
+    _clear_audio_queue()
+    _ready_event.set()
     print("  [voice] Ready — press a trigger hotkey to start recording.")
 
     # ── Drain loop: only writes to _buffer when _recording is True ───────────
@@ -230,8 +264,18 @@ def _init_and_drain(stop_event: threading.Event) -> None:
                 if _recording:
                     _buffer.append(chunk)
     finally:
+        _ready_event.clear()
         _stream.stop()
         _stream.close()
+
+
+def _clear_audio_queue() -> None:
+    """Drop mic chunks captured before the next recording window starts."""
+    while True:
+        try:
+            _audio_q.get_nowait()
+        except queue.Empty:
+            break
 
 
 def _transcribe_and_send(chunks: list[np.ndarray], send_fn: SendFn) -> None:

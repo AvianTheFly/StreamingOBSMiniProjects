@@ -26,5 +26,41 @@
     "name": "El Gato",
     "source": "el gato",
     "aliases": []
+  },
+  {
+    "id": "epic awe noot noot",
+    "name": "Epic Awe Noot Noot",
+    "source": "epic awe noot noot",
+    "aliases": []
+  },
+  {
+    "id": "run",
+    "name": "Run",
+    "source": "run",
+    "aliases": []
+  },
+  {
+    "id": "Super Man Meme",
+    "name": "Super Man Meme",
+    "source": "Super Man Meme",
+    "aliases": []
+  },
+  {
+    "id": "Lost Kings — INSOMNIA - Lost Kings (1080p, h264, youtube)",
+    "name": "Lost Kings — Insomnia - Lost Kings (1080P, H264, Youtube)",
+    "source": "Lost Kings — INSOMNIA - Lost Kings (1080p, h264, youtube)",
+    "aliases": []
+  },
+  {
+    "id": "hate everything",
+    "name": "Hate Everything",
+    "source": "hate everything",
+    "aliases": []
+  },
+  {
+    "id": "pain",
+    "name": "Pain",
+    "source": "pain",
+    "aliases": []
   }
 ]

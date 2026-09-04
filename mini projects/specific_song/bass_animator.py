@@ -80,8 +80,15 @@ def _smooth_toward(current: float, target: float, dt: float, tau: float) -> floa
 
 
 class BassAnimator:
-    def __init__(self, source_name: str, audio_file: Path | None = None) -> None:
+    def __init__(
+        self,
+        source_name: str,
+        audio_file: Path | None = None,
+        *,
+        label: str | None = None,
+    ) -> None:
         self.source_name = source_name
+        self.label = label or source_name
         self._audio_file = audio_file
         self._scene_item_id: int | None = None
         self._detector = BassDetector(
@@ -120,7 +127,7 @@ class BassAnimator:
             name=f"bass_anim:{self.source_name}",
         )
         self._thread.start()
-        print(f"{_TAG} visualizer started for '{self.source_name}'")
+        print(f"{_TAG} visualizer started for '{self.label}'")
 
     def request_exit(self) -> None:
         if self._thread is None or not self._thread.is_alive():
@@ -137,7 +144,7 @@ class BassAnimator:
             self._thread = None
         self._remove_mask()
         self._reset_transform()
-        print(f"{_TAG} visualizer stopped for '{self.source_name}'")
+        print(f"{_TAG} visualizer stopped for '{self.label}'")
 
     def _loop(self) -> None:
         self._animate_jump(entering=True)

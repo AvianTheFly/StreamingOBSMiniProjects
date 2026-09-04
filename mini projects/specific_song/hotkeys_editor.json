@@ -1,0 +1,172 @@
+{
+  "live_profile": "default",
+  "active_profile": "default",
+  "profiles": {
+    "default": {
+      "trigger_sequences": "",
+      "hotkeys": {},
+      "interface_hotkeys": {
+        "start_listen": "",
+        "stop_listen": "",
+        "abort_listen": "",
+        "pause": "",
+        "resume": "",
+        "stop": "",
+        "random": "",
+        "next": "",
+        "reload": ""
+      },
+      "project_volume_db": -12.0,
+      "profile_volume_db": 0.0,
+      "file_volume_offsets": {
+        "Am I Dreaming": -18.91,
+        "Annihilate": -2.44,
+        "Breath Backstreet Euphoria": -8.44,
+        "Con La Brisa": -20.5,
+        "Cry for me": -18.91,
+        "DERNIERE DANCE FUNK": -4.3,
+        "DIE WITH A SMILE": -22.08,
+        "End of beginning": -13.59,
+        "I hope your life sucks": 11.77,
+        "I'm an albatroz": -15.81,
+        "Kora Skrillex": -4.54,
+        "Loreen": -22.08,
+        "Lost Kings - PROMISES - Lost Kings (720p, h264, youtube)": -8.12,
+        "Mortals Funk Remix": -8.44,
+        "Mumbai Power": -20.5,
+        "ODST": -20.5,
+        "Royalty": -5.24,
+        "Self Love": -5.24,
+        "Teeth": -5.24,
+        "When you win in UNO": -8.44,
+        "among us": 4.46,
+        "beggin": -4.54,
+        "big chungus vs shaggy unravel meme (full version) - zenny (720p, h264)": -20.5,
+        "blinding light": -4.51,
+        "braces": 1.06,
+        "cat drum": 1.49,
+        "cat rave": -4.51,
+        "el gato on my mind": -8.44,
+        "evil morty": -24.27,
+        "ferris bueller mashup": -18.91,
+        "giga chad": -5.24,
+        "gvx": 4.46,
+        "hate everything": 3.56,
+        "heads will roll": -8.44,
+        "home": 5.42,
+        "how can we go back to being friends": -5.24,
+        "im sipping tea in your hood": -8.44,
+        "lilith": -4.51,
+        "lose it": -15.81,
+        "lost kings insomnia": -8.44,
+        "mask off": 0.46,
+        "middle of the night": -13.76,
+        "midnight thoughts": 8.49,
+        "monster": 0.5,
+        "no game no life": 11.77,
+        "notion": -8.44,
+        "pain": -2.41,
+        "pink pony club": -22.08,
+        "power trip": -2.99,
+        "running up the hill": 11.77,
+        "skibbity": -4.54,
+        "strangers": 3.56,
+        "sunflower": -4.51,
+        "sweden": -9.51,
+        "take it off": -20.5,
+        "tech it": -22.08,
+        "time in a bottle": -5.24,
+        "toothless": 1.49,
+        "videoplayback": -18.91,
+        "videoplayback (2)": 1.78,
+        "wasteland": 8.49,
+        "wii music": -9.51,
+        "you broke my heart": -4.54,
+        "you can be king agian": 0.0,
+        "yum yum": -18.91,
+        "murder in my mind": -8.44,
+        "star boy": -15.72
+      },
+      "group_names": {},
+      "display_names": {},
+      "categories": [
+        "cool",
+        "feelings",
+        "fun",
+        "Hype",
+        "love",
+        "phonk",
+        "soft"
+      ],
+      "sound_categories": {
+        "cat rave": [
+          "fun"
+        ],
+        "giga chad": [
+          "Hype"
+        ],
+        "Annihilate": [
+          "cool"
+        ],
+        "among us": [
+          "Hype"
+        ],
+        "Am I Dreaming": [
+          "cool"
+        ],
+        "el gato on my mind": [
+          "Hype"
+        ],
+        "gvx": [
+          "phonk"
+        ],
+        "I hope your life sucks": [
+          "cool"
+        ],
+        "how can we go back to being friends": [
+          "feelings"
+        ],
+        "lilith": [
+          "Hype"
+        ],
+        "beggin": [
+          "cool"
+        ],
+        "big chungus vs shaggy unravel meme (full version) - zenny (720p, h264)": [
+          "Hype"
+        ],
+        "blinding light": [
+          "cool"
+        ],
+        "braces": [
+          "soft"
+        ],
+        "Breath Backstreet Euphoria": [
+          "Hype"
+        ],
+        "cat drum": [
+          "fun"
+        ],
+        "Con La Brisa": [
+          "soft",
+          "cool"
+        ],
+        "Cry for me": [
+          "cool"
+        ],
+        "DERNIERE DANCE FUNK": [
+          "phonk"
+        ],
+        "DIE WITH A SMILE": [
+          "cool",
+          "love"
+        ],
+        "End of beginning": [
+          "feelings"
+        ]
+      },
+      "empty_groups": [],
+      "unbound_groups": []
+    }
+  }
+}

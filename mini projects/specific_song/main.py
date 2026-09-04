@@ -34,13 +34,13 @@ import threading
 import random
 from pathlib import Path
 
-from pynput import keyboard
-
+from lib.global_hotkeys import key_char, subscribe_global_hotkeys, unsubscribe_global_hotkeys
 from .config import (
     TRIGGER_SEQUENCE,
     TRIGGER_MAX_INTERVAL,
     RECORD_TIMEOUT_SECONDS,
     MATCH_THRESHOLD,
+    ASSETS_DIR,
     OBS_SOURCE_PREFIX,
     SONGS_JSON,
     MANUAL_TRIGGER_SONGS,
@@ -49,11 +49,24 @@ from .config import (
 from .trigger import SequenceTrigger
 from .matcher import find_best_match, rank_matches
 from .player import SongPlayer
+from .full_sync import apply as apply_full_sync
 
 from shared import music_service
 
 _HERE = Path(__file__).resolve().parent
 _TAG = "[specific_song]"
+_HUB_SETTINGS_FILE = _HERE.parent.parent / "hub_settings.json"
+
+
+def _get_trigger_mode() -> str:
+    try:
+        data = json.loads(_HUB_SETTINGS_FILE.read_text(encoding="utf-8"))
+        modes = data.get("project_trigger_modes") or {}
+        mode = modes.get("specific_song", "abort")
+        return mode if mode in ("abort", "pause", "keep_playing") else "abort"
+    except Exception:
+        return "abort"
+_SYNC_MEDIA_EXTS = (".mp4", ".mp3", ".wav", ".flac", ".m4a", ".aac", ".ogg", ".opus", ".webm")
 
 # ── Voice command aliases ──────────────────────────────────────────────────────
 _CMD_ALIASES: dict[str, list[str]] = {
@@ -150,10 +163,34 @@ def _parse_command(text: str) -> tuple[str, str] | None:
     return None
 
 
-def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
+def _sync_assets_to_library() -> None:
+    """Startup sync: assets dir is the source of truth for songs.json + OBS."""
+    if not ASSETS_DIR.exists():
+        print(f"{_TAG} ⚠  Songs asset dir not found — skipping startup sync: {ASSETS_DIR}")
+        return
+
+    media_files = sorted(
+        p for p in ASSETS_DIR.iterdir()
+        if p.is_file() and p.suffix.lower() in _SYNC_MEDIA_EXTS
+    )
+    print(f"{_TAG} 🔄  Startup sync from assets dir ({len(media_files)} media files)...")
+    try:
+        apply_full_sync(media_files)
+    except Exception as exc:
+        print(f"{_TAG} ❌  Startup sync failed: {exc}")
+
+
+def run(
+    input_queue: queue.Queue,
+    stop_event: threading.Event,
+    *,
+    startup_event: threading.Event | None = None,
+) -> None:
     """Called by the hub in a dedicated daemon thread."""
 
     trigger = SequenceTrigger(TRIGGER_SEQUENCE, TRIGGER_MAX_INTERVAL)
+
+    _sync_assets_to_library()
 
     player = SongPlayer()
     music_service.register(player)
@@ -259,6 +296,43 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
             return []
         with open(SONGS_JSON, encoding="utf-8") as f:
             data = json.load(f)
+
+        # Merge aliases from phrases.json (managed by the hotkey editor)
+        phrases_path = _HERE / "phrases.json"
+        if phrases_path.exists():
+            try:
+                raw = json.loads(phrases_path.read_text(encoding="utf-8"))
+                ext_phrases = {
+                    k: v for k, v in raw.items()
+                    if not k.startswith("_") and isinstance(v, list)
+                }
+                for song in data:
+                    source = song.get("source", "")
+                    if source and source in ext_phrases:
+                        existing = set(song.get("aliases", []))
+                        extra    = {str(a).strip() for a in ext_phrases[source] if str(a).strip()}
+                        song["aliases"] = sorted(existing | extra)
+            except Exception as e:
+                print(f"{_TAG} ⚠  Could not merge phrases.json: {e}")
+        else:
+            # Bootstrap phrases.json from existing aliases on first run
+            try:
+                bootstrap = {}
+                for song in data:
+                    if song.get("aliases") and song.get("source"):
+                        bootstrap[song["source"]] = song["aliases"]
+                if bootstrap:
+                    payload = {
+                        "_comment": "Keys are song source stems. Values are alternate voice phrases.",
+                        **bootstrap,
+                    }
+                    phrases_path.write_text(
+                        json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8"
+                    )
+                    print(f"{_TAG} 📝  Bootstrapped phrases.json from {len(bootstrap)} song alias(es).")
+            except Exception:
+                pass
+
         print(f"{_TAG} 📚  {len(data)} song(s) loaded from songs.json")
         for s in data:
             aliases = s.get("aliases", [])
@@ -269,6 +343,28 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
     library = _load_library()
 
     def _load_categories() -> dict[str, list[str]]:
+        # Prefer the hotkey editor's state file (categories + sound_categories)
+        editor_state_path = _HERE / "hotkeys_editor.json"
+        if editor_state_path.exists():
+            try:
+                state     = json.loads(editor_state_path.read_text(encoding="utf-8"))
+                profiles  = state.get("profiles", {})
+                live_prof = state.get("live_profile", "default")
+                profile   = profiles.get(live_prof) or profiles.get("default") or {}
+                cat_names = [str(c) for c in profile.get("categories", []) if str(c).strip()]
+                if cat_names:
+                    result: dict[str, list[str]] = {cat: [] for cat in cat_names}
+                    for stem, cats in profile.get("sound_categories", {}).items():
+                        for cat in (cats if isinstance(cats, list) else [cats]):
+                            if cat in result:
+                                result[cat].append(str(stem))
+                    print(f"{_TAG} 🏷  {len(result)} category(ies) from editor: "
+                          f"{', '.join(sorted(result)) or '(none)'}")
+                    return result
+            except Exception as e:
+                print(f"{_TAG} ⚠  Could not read editor categories: {e}")
+
+        # Fallback: categories.json (hub UI or manual)
         cats_path = _HERE / "categories.json"
         if not cats_path.exists():
             return {}
@@ -283,12 +379,40 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
 
     categories: dict[str, list[str]] = _load_categories()
 
+    def _load_manual_triggers() -> dict[str, str]:
+        """Load manual trigger hotkeys from hotkeys.json (written by the hotkey editor)."""
+        hotkeys_path = _HERE / "hotkeys.json"
+        if hotkeys_path.exists():
+            try:
+                raw = json.loads(hotkeys_path.read_text(encoding="utf-8"))
+                loaded = {k: v for k, v in raw.items()
+                          if isinstance(k, str) and isinstance(v, str)}
+                if loaded:
+                    return loaded
+            except Exception:
+                pass
+        return dict(MANUAL_TRIGGER_SONGS)  # fallback to config.py constants
+
+    # Mutable container so _trigger_reload and _on_kb_press share one reference
+    _manual_triggers_ref: list[dict[str, str]] = [_load_manual_triggers()]
+
+    def _trigger_reload() -> None:
+        nonlocal library
+        library = _load_library()
+        categories.clear()
+        categories.update(_load_categories())
+        _manual_triggers_ref[0] = _load_manual_triggers()
+
+    _live["start_random"] = _start_random_mode
+    _live["reload"]       = _trigger_reload
+
     def _voice_mod():
         return sys.modules.get("voice.listener")
 
     # ── Recording state machine ───────────────────────────────────────────────
     _rec_lock = threading.Lock()
     _recording: list[bool] = [False]
+    _paused_for_trigger: list[bool] = [False]  # True when song was paused (not aborted) for this trigger window
     _auto_timer: list[threading.Timer | None] = [None]
     _hard_timer: list[threading.Timer | None] = [None]
 
@@ -327,7 +451,10 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
             return False
         started = vm.start_recording("specific_song")
         if not started:
-            print(f"{_TAG} ⚠  Could not start recording — mic is busy.")
+            if hasattr(vm, "is_ready") and not vm.is_ready():
+                print(f"{_TAG} ⚠  Could not start recording — Whisper/mic is still starting.")
+            else:
+                print(f"{_TAG} ⚠  Could not start recording — mic is busy.")
             return False
         return True
 
@@ -341,12 +468,25 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
         hard_t.start()
 
     def _start_listening() -> None:
-        _stop_random_mode()
-        if player.is_busy:
-            player.abort()
-            print(f"{_TAG} ⏹  Song stopped — opening mic.")
+        with _rand_lock:
+            in_random = _rand_active[0]
+        _paused_for_trigger[0] = False
+        mode = _get_trigger_mode()
+        if not in_random and player.is_busy:
+            if mode == "abort":
+                player.abort()
+                print(f"{_TAG} ⏹  Song stopped — opening mic.")
+            elif mode == "pause":
+                player.pause()
+                _paused_for_trigger[0] = True
+                print(f"{_TAG} ⏸  Song paused — opening mic. Speak to swap, stay silent to resume.")
+            elif mode == "keep_playing":
+                print(f"{_TAG} 🎤  Song still playing — opening mic. Speak to swap.")
 
         if not _open_mic():
+            if _paused_for_trigger[0]:
+                _paused_for_trigger[0] = False
+                player.resume()
             return
 
         with _rec_lock:
@@ -388,6 +528,9 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
             t.start()
 
     def _stop_and_send() -> None:
+        with _rec_lock:
+            if not _recording[0]:
+                return
         _do_send()
         print(f"{_TAG} ✋  Forced send.")
 
@@ -399,49 +542,64 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
         if vm:
             vm.stop_and_transcribe(lambda _: None, "specific_song")
 
-    def _on_kb_press(key):
-        try:
-            char = key.char
-        except AttributeError:
+    def _release_recording_if_active(*, send: bool) -> None:
+        """Keep local state and voice.listener ownership in sync on all exits."""
+        with _rec_lock:
+            was_recording = _recording[0]
+        if not was_recording:
             return
+        if send:
+            _do_send()
+        else:
+            _discard_recording()
+
+    def _run_hotkey_action(fn, *args) -> None:
+        threading.Thread(target=fn, args=args, daemon=True).start()
+
+    def _handle_manual_trigger(char: str, stem: str) -> None:
+        if stem:
+            _discard_recording()
+            source = OBS_SOURCE_PREFIX + stem
+            print(f"{_TAG} ⚡  Manual trigger '{seq_str}{char}' → '{source}'")
+            _stop_random_mode()
+            if player.is_busy:
+                player.abort()
+            player.play_async(source)
+        else:
+            _discard_recording()
+            print(f"{_TAG} ⚠  '{seq_str}{char}' is not configured — set it in config.py.")
+
+    def _on_kb_press(key):
+        char = key_char(key)
         if not char:
             return
 
         with _manual_lock:
-            if _in_manual_window[0] and char in MANUAL_TRIGGER_SONGS:
+            if _in_manual_window[0] and char in _manual_triggers_ref[0]:
                 _in_manual_window[0] = False
                 if _pending_rec_timer[0] is not None:
                     _pending_rec_timer[0].cancel()
                     _pending_rec_timer[0] = None
 
-                stem = MANUAL_TRIGGER_SONGS[char]
-                if stem:
-                    _discard_recording()
-                    source = OBS_SOURCE_PREFIX + stem
-                    print(f"{_TAG} ⚡  Manual trigger '{seq_str}{char}' → '{source}'")
-                    _stop_random_mode()
-                    if player.is_busy:
-                        player.abort()
-                    player.play_async(source)
-                else:
-                    _discard_recording()
-                    print(f"{_TAG} ⚠  '{seq_str}{char}' is not configured — set it in config.py.")
+                stem = _manual_triggers_ref[0][char]
+                _run_hotkey_action(_handle_manual_trigger, char, stem)
                 return
 
-        if char == "C" and not _in_manual_window[0]:
-            _stop_and_send()
+        if char.lower() == "c" and not _in_manual_window[0]:
+            _run_hotkey_action(_stop_and_send)
             return
 
         if trigger.register_key(char):
-            _on_trigger()
+            _run_hotkey_action(_on_trigger)
 
-    kb_listener = keyboard.Listener(on_press=_on_kb_press)
-    kb_listener.start()
-    manual_keys = "".join(MANUAL_TRIGGER_SONGS.keys())
+    kb_token = subscribe_global_hotkeys(_on_kb_press)
+    manual_keys = "".join(_manual_triggers_ref[0].keys())
     print(
         f"{_TAG} ⌨️   Hotkey '{seq_str}' armed (within {int(TRIGGER_MAX_INTERVAL * 1000)} ms) — "
         f"then speak or press [{manual_keys}] for a direct song."
     )
+    if startup_event is not None:
+        startup_event.set()
 
     while not stop_event.is_set():
         try:
@@ -459,18 +617,14 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
             cmd, qualifier = cmd_result
 
             if cmd == "abort":
-                with _rec_lock:
-                    _recording[0] = False
-                _cancel_timers()
+                _release_recording_if_active(send=False)
                 _stop_random_mode()
                 player.abort()
                 print(f"{_TAG} ⚡  Aborted.")
                 continue
 
             if cmd == "random":
-                with _rec_lock:
-                    _recording[0] = False
-                _cancel_timers()
+                _release_recording_if_active(send=False)
                 _start_random_mode(qualifier.strip() or None)
                 continue
 
@@ -485,9 +639,7 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
                 continue
 
             if cmd == "stop":
-                with _rec_lock:
-                    _recording[0] = False
-                _cancel_timers()
+                _release_recording_if_active(send=False)
                 _stop_random_mode()
                 player.abort()
                 print(f"{_TAG} ⏹  Stopped.")
@@ -512,7 +664,13 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
                 print(f"{_TAG}    Closest (all below threshold {MATCH_THRESHOLD:.0%}):")
                 for song, score in top:
                     print(f"         {score * 100:5.1f}%  {song['name']}")
+            if _paused_for_trigger[0]:
+                _paused_for_trigger[0] = False
+                player.resume()
+                print(f"{_TAG} ▶  No match — resuming paused song.")
             continue
+
+        _paused_for_trigger[0] = False
 
         song, score = result
         file_stem = song.get("source", "")
@@ -531,14 +689,12 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
         print(f"{_TAG} ▶  Starting: '{obs_source_name}'")
         player.play_async(obs_source_name)
 
-    kb_listener.stop()
+    unsubscribe_global_hotkeys(kb_token)
     with _manual_lock:
         if _pending_rec_timer[0] is not None:
             _pending_rec_timer[0].cancel()
             _pending_rec_timer[0] = None
-    with _rec_lock:
-        _recording[0] = False
-    _cancel_timers()
+    _release_recording_if_active(send=False)
     _stop_random_mode()
     player.abort()
     player.stop()

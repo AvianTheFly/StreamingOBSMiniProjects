@@ -165,6 +165,16 @@ class PlayCoordinator:
             name=f"coordinator:{requester}",
         ).start()
 
+    def clear_rules(self) -> None:
+        """Remove all registered rules (called by UI when replacing rule set)."""
+        with self._lock:
+            self._rules.clear()
+
+    def get_rules(self) -> list[CoordinationRule]:
+        """Return a snapshot of all currently registered rules."""
+        with self._lock:
+            return list(self._rules)
+
     def announce_finished(self, requester: str) -> None:
         """
         Announce that a play session has ended.

@@ -1,0 +1,75 @@
+.app-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 1.25rem;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+#page-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.h-sep { width: 1px; height: 1.1rem; background: var(--border-hi); }
+
+.h-stats {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.76rem;
+  color: var(--text-mid);
+}
+.h-stats b { color: var(--text); font-weight: 600; }
+
+#stat-dir {
+  font-family: 'Cascadia Code', 'Consolas', monospace;
+  font-size: 0.67rem;
+  color: var(--text-dim);
+  max-width: 32%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.h-actions {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  margin-left: auto;
+}
+
+.h-page-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-mid);
+  white-space: nowrap;
+}
+
+.btn-undo {
+  background: var(--surface3);
+  color: var(--text-mid);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--r-sm);
+  padding: 0.34rem 0.75rem;
+  font-size: 0.8rem;
+  transition: all 0.12s;
+}
+.btn-undo:hover:not(:disabled) { color: var(--text); border-color: #3d4870; }
+.btn-undo:disabled { opacity: 0.22; cursor: default; }
+
+.btn-save {
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--r-sm);
+  padding: 0.34rem 1.1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: background 0.12s, opacity 0.12s;
+}
+.btn-save:hover:not(:disabled) { background: var(--accent-dk); }
+.btn-save:disabled { opacity: 0.35; cursor: default; }

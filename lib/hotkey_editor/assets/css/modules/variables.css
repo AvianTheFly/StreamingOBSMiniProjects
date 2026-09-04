@@ -1,0 +1,21 @@
+    :root {
+      --bg:         #090b10;
+      --surface:    #0f1219;
+      --surface2:   #151a24;
+      --surface3:   #1b2030;
+      --surface4:   #21273a;
+      --border:     #1f2535;
+      --border-hi:  #2c3450;
+      --accent:     #5b8dee;
+      --accent-dk:  #3f6fd4;
+      --accent-gl:  rgba(91,141,238,0.10);
+      --accent-gl2: rgba(91,141,238,0.18);
+      --danger:     #e05c5c;
+      --success:    #4db87a;
+      --warn:       #e0a040;
+      --text:       #d8dff0;
+      --text-mid:   #68789a;
+      --text-dim:   #343d55;
+      --r:          12px;
+      --r-sm:       7px;
+    }

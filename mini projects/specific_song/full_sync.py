@@ -3,7 +3,7 @@ specific_song/full_sync.py
 ==========================
 Three-layer sync: Assets folder → songs.json → OBS scene.
 
-    Layer 1  →  2 : Adds/removes entries in songs.json to match .mp4 files on disk.
+    Layer 1  →  2 : Adds/removes entries in songs.json to match media files on disk.
                     New entries get an empty aliases list — fill them in manually.
                     Removed entries are moved to deleted_songs.json (preserving
                     their aliases so they can be restored if the file comes back).
@@ -13,7 +13,7 @@ Three-layer sync: Assets folder → songs.json → OBS scene.
 
                     OBS source names are prefixed with OBS_SOURCE_PREFIX (default
                     "ss__") so they never collide with other sub-projects that
-                    share the same .mp4 stem names (e.g. meme_songs).
+                    share the same media-file stem names (e.g. meme_songs).
                     songs.json and the asset filenames are NOT affected.
 
 Usage
@@ -36,11 +36,16 @@ sys.path.insert(0, str(_HERE))
 
 from config import ASSETS_DIR, SONGS_JSON, SCENE, OBS_SOURCE_PREFIX
 
+# The one shared OBS source for all songs — file path is swapped at play time.
+SINGLE_SOURCE_NAME = OBS_SOURCE_PREFIX + "player"
+
 # ── OBS connection (from environment — see .env.example) ───────────────────────
 OBS_HOST     = os.environ.get("OBS_HOST", "localhost")
 OBS_PORT     = int(os.environ.get("OBS_PORT", "4455"))
 OBS_PASSWORD = os.environ.get("OBS_PASSWORD", "yG6CQ8Oza14hilps")
 OBS_TIMEOUT  = 10   # seconds
+
+_MEDIA_EXTS = (".mp4", ".mp3", ".wav", ".flac", ".m4a", ".aac", ".ogg", ".opus", ".webm")
 
 # Deleted entries are kept here so aliases survive if you restore a song file.
 _DELETED_JSON = SONGS_JSON.parent / "deleted_songs.json"
@@ -136,10 +141,10 @@ def _obs_delete(req, obs_name: str, item_id: int) -> bool:
     return True
 
 
-def _obs_create(req, obs_name: str, mp4_path: Path) -> bool:
-    """Add a hidden ffmpeg_source for mp4_path under obs_name."""
+def _obs_create(req, obs_name: str, media_path: Path) -> bool:
+    """Add a hidden ffmpeg_source for media_path under obs_name."""
     settings = {
-        "local_file"         : str(mp4_path),
+        "local_file"         : str(media_path),
         "is_local_file"      : True,
         "restart_on_activate": False,
         "close_when_inactive": True,
@@ -185,16 +190,16 @@ def _obs_create(req, obs_name: str, mp4_path: Path) -> bool:
 #  Diff logic
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _json_diff(mp4_files: list[Path], songs: list[dict], deleted: dict[str, dict]):
+def _json_diff(media_files: list[Path], songs: list[dict], deleted: dict[str, dict]):
     """
     Compare disk files vs songs.json.
 
     Returns:
-        to_remove   — song records in songs.json with no matching .mp4
-        to_restore  — deleted records whose .mp4 has reappeared
-        to_add      — new .mp4 files not in songs.json or deleted list
+        to_remove   — song records in songs.json with no matching media file
+        to_restore  — deleted records whose media file has reappeared
+        to_add      — new media files not in songs.json or deleted list
     """
-    disk = {p.stem: p for p in mp4_files}
+    disk = {p.stem: p for p in media_files}
     existing_sources = {s["source"] for s in songs}
 
     to_remove  = [s for s in songs  if s["source"] not in disk]
@@ -204,54 +209,41 @@ def _json_diff(mp4_files: list[Path], songs: list[dict], deleted: dict[str, dict
     return to_remove, to_restore, to_add
 
 
-def _obs_diff(songs: list[dict], obs_sources: dict[str, int], mp4_map: dict[str, Path]):
+def _obs_single_source_diff(obs_sources: dict[str, int], media_map: dict[str, Path]):
     """
-    Compare songs.json vs the OBS sources that belong to this project.
-
-    Only sources whose name starts with OBS_SOURCE_PREFIX are considered —
-    we never touch sources owned by other sub-projects.
+    Compare OBS scene contents against the desired single-source state.
 
     Returns:
-        to_create — songs that have no corresponding prefixed OBS source
-        to_delete — prefixed OBS sources with no matching songs.json entry
+        need_create  — True if SINGLE_SOURCE_NAME does not exist yet
+        to_delete    — per-file sources (prefix + any stem != "player") to remove
+        placeholder  — a media file to use when creating the single source
     """
-    # The OBS name for a song is OBS_SOURCE_PREFIX + song["source"]
-    expected_obs_names = {
-        OBS_SOURCE_PREFIX + s["source"]
-        for s in songs
-        if s["source"] in mp4_map
-    }
-
-    # Filter to only the sources that belong to this project
     our_sources = {
         name: iid
         for name, iid in obs_sources.items()
         if name.startswith(OBS_SOURCE_PREFIX)
     }
 
-    to_create = [
-        s for s in songs
-        if s["source"] in mp4_map
-        and OBS_SOURCE_PREFIX + s["source"] not in our_sources
-    ]
+    need_create = SINGLE_SOURCE_NAME not in our_sources
     to_delete = [
         (name, iid)
         for name, iid in our_sources.items()
-        if name not in expected_obs_names
+        if name != SINGLE_SOURCE_NAME
     ]
-    return to_create, to_delete
+    placeholder = next(iter(media_map.values()), None) if media_map else None
+    return need_create, to_delete, placeholder
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  Preview (dry-run)
 # ─────────────────────────────────────────────────────────────────────────────
 
-def preview(mp4_files: list[Path]) -> None:
+def preview(media_files: list[Path]) -> None:
     songs   = _load_songs()
     deleted = _load_deleted()
-    mp4_map = {p.stem: p for p in mp4_files}
+    media_map = {p.stem: p for p in media_files}
 
-    to_remove, to_restore, to_add = _json_diff(mp4_files, songs, deleted)
+    to_remove, to_restore, to_add = _json_diff(media_files, songs, deleted)
 
     print("\n  ── Layer 1→2 : songs.json ──────────────────────────────────────")
     if not any([to_remove, to_restore, to_add]):
@@ -263,33 +255,24 @@ def preview(mp4_files: list[Path]) -> None:
     for p in to_add:
         print(f"  ADD      source='{p.stem}'  ←  {p.name}")
 
-    print("\n  ── Layer 2→3 : OBS sources ─────────────────────────────────────")
-    print(f"  (OBS source prefix: '{OBS_SOURCE_PREFIX}')")
+    print("\n  ── Layer 2→3 : OBS single source ───────────────────────────────")
+    print(f"  (Single source: '{SINGLE_SOURCE_NAME}')")
     req = _connect_obs()
     if req is None:
         return
     if not _ensure_scene(req):
         return
 
-    # Simulate what songs.json would look like after applying Layer 1→2
-    remove_sources = {s["source"] for s in to_remove}
-    sim  = [s for s in songs if s["source"] not in remove_sources]
-    sim += to_restore
-    sim += [
-        {"id": p.stem, "name": p.stem.replace("_", " ").title(), "source": p.stem, "aliases": []}
-        for p in to_add
-    ]
+    obs_sources = _get_obs_sources(req)
+    need_create, to_delete, placeholder = _obs_single_source_diff(obs_sources, media_map)
 
-    obs_sources          = _get_obs_sources(req)
-    to_create, to_delete = _obs_diff(sim, obs_sources, mp4_map)
-
-    if not any([to_create, to_delete]):
-        print("  ✅  OBS sources already match songs.json.")
+    if not need_create and not to_delete:
+        print(f"  ✅  '{SINGLE_SOURCE_NAME}' exists and no stale per-file sources found.")
     for name, _ in to_delete:
-        print(f"  DELETE   OBS source '{name}'")
-    for s in to_create:
-        obs_name = OBS_SOURCE_PREFIX + s["source"]
-        print(f"  CREATE   OBS source '{obs_name}'  (file: {s['source']}.mp4)")
+        print(f"  DELETE   stale per-file source '{name}'")
+    if need_create:
+        label = placeholder.name if placeholder else "(no files available)"
+        print(f"  CREATE   '{SINGLE_SOURCE_NAME}'  (placeholder: {label})")
 
     print("\n  Run with --apply to make these changes.")
 
@@ -298,12 +281,12 @@ def preview(mp4_files: list[Path]) -> None:
 #  Apply
 # ─────────────────────────────────────────────────────────────────────────────
 
-def apply(mp4_files: list[Path]) -> None:
+def apply(media_files: list[Path]) -> None:
     songs   = _load_songs()
     deleted = _load_deleted()
-    mp4_map = {p.stem: p for p in mp4_files}
+    media_map = {p.stem: p for p in media_files}
 
-    to_remove, to_restore, to_add = _json_diff(mp4_files, songs, deleted)
+    to_remove, to_restore, to_add = _json_diff(media_files, songs, deleted)
 
     print("\n  ── Layer 1→2 : songs.json ──────────────────────────────────────")
     changed = False
@@ -345,25 +328,25 @@ def apply(mp4_files: list[Path]) -> None:
     else:
         print("  Already in sync — no changes to songs.json.")
 
-    print("\n  ── Layer 2→3 : OBS sources ─────────────────────────────────────")
-    print(f"  (OBS source prefix: '{OBS_SOURCE_PREFIX}')")
+    print("\n  ── Layer 2→3 : OBS single source ───────────────────────────────")
+    print(f"  (Single source: '{SINGLE_SOURCE_NAME}')")
     req = _connect_obs()
     if req is None:
         return
     if not _ensure_scene(req):
         return
 
-    obs_sources          = _get_obs_sources(req)
-    to_create, to_delete = _obs_diff(songs, obs_sources, mp4_map)
+    obs_sources = _get_obs_sources(req)
+    need_create, to_delete, placeholder = _obs_single_source_diff(obs_sources, media_map)
 
-    if not any([to_create, to_delete]):
-        print("  Already in sync — no changes to OBS.")
+    if not need_create and not to_delete:
+        print(f"  Already in sync — '{SINGLE_SOURCE_NAME}' exists, no stale sources.")
         return
 
     deleted_ok = created_ok = failed = 0
 
     if to_delete:
-        print(f"\n  Deleting {len(to_delete)} stale OBS source(s)…")
+        print(f"\n  Removing {len(to_delete)} stale per-file source(s)…")
         for name, iid in to_delete:
             if _obs_delete(req, name, iid):
                 print(f"  Deleted  '{name}'")
@@ -371,22 +354,17 @@ def apply(mp4_files: list[Path]) -> None:
             else:
                 failed += 1
 
-    if to_create:
-        print(f"\n  Creating {len(to_create)} new OBS source(s)…")
-        for s in to_create:
-            mp4 = mp4_map.get(s["source"])
-            if mp4 is None:
-                print(f"  ⚠  No .mp4 found for source '{s['source']}' — skipping.")
-                continue
-            obs_name = OBS_SOURCE_PREFIX + s["source"]
-            if _obs_create(req, obs_name, mp4):
-                print(f"  Created  '{obs_name}'  (file: {s['source']}.mp4)")
-                created_ok += 1
-            else:
-                failed += 1
+    if need_create:
+        if placeholder is None:
+            print(f"  ⚠  No media files in assets dir — cannot create '{SINGLE_SOURCE_NAME}' yet.")
+        elif _obs_create(req, SINGLE_SOURCE_NAME, placeholder):
+            print(f"  Created  '{SINGLE_SOURCE_NAME}'  (placeholder: {placeholder.name})")
+            created_ok += 1
+        else:
+            failed += 1
 
     suffix = f", {failed} failed" if failed else ""
-    print(f"\n  OBS sync done — {deleted_ok} deleted, {created_ok} created{suffix}.")
+    print(f"\n  OBS sync done — {deleted_ok} stale deleted, {created_ok} single source created{suffix}.")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -410,13 +388,16 @@ def main() -> None:
         print("      Update ASSETS_DIR in config.py and try again.")
         return
 
-    mp4_files = sorted(ASSETS_DIR.glob("*.mp4"))
-    print(f"\n  Found {len(mp4_files)} .mp4 file(s) in assets dir.")
+    media_files = sorted(
+        p for p in ASSETS_DIR.iterdir()
+        if p.is_file() and p.suffix.lower() in _MEDIA_EXTS
+    )
+    print(f"\n  Found {len(media_files)} media file(s) in assets dir.")
 
     if do_apply:
-        apply(mp4_files)
+        apply(media_files)
     else:
-        preview(mp4_files)
+        preview(media_files)
         print()
 
 

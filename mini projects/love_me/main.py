@@ -30,9 +30,8 @@ import queue
 import threading
 import time
 
-from pynput import keyboard
-
 import obs
+from lib.global_hotkeys import key_char, subscribe_global_hotkeys, unsubscribe_global_hotkeys
 
 # ── Package-relative imports (always find THIS project's modules) ─────────────
 from .config import (
@@ -52,6 +51,7 @@ def run(
     input_queue: queue.Queue,
     stop_event:  threading.Event,
     done_queue:  queue.Queue = None,
+    startup_event: threading.Event | None = None,
 ) -> None:
     """Entry point called by the hub."""
 
@@ -66,6 +66,8 @@ def run(
     print(f"[love_me] Idle reset: {IDLE_RESET_SECONDS}s of inactivity resets to item 1")
     player.print_config()
     player.hide_all_sources()
+    if startup_event is not None:
+        startup_event.set()
 
     # Timestamp of the last trigger fire. None = never triggered / already reset.
     _last_trigger_time: list[float | None] = [None]
@@ -130,17 +132,13 @@ def run(
     # ── Keyboard listener (always on) ─────────────────────────────────────────
 
     def on_press(key):
-        try:
-            k = key.char
-        except AttributeError:
-            return
+        k = key_char(key)
         if k is None:
             return
         if trigger.register_key(k):
-            _handle_trigger()
+            threading.Thread(target=_handle_trigger, daemon=True).start()
 
-    kb_listener = keyboard.Listener(on_press=on_press)
-    kb_listener.start()
+    kb_token = subscribe_global_hotkeys(on_press)
     print("[love_me] Keyboard listener started.")
 
     # ── Main loop ─────────────────────────────────────────────────────────────
@@ -174,5 +172,5 @@ def run(
                 _reset_sequence("abort")
             threading.Thread(target=player.abort, daemon=True).start()
 
-    kb_listener.stop()
+    unsubscribe_global_hotkeys(kb_token)
     print("[love_me] Stopped.")

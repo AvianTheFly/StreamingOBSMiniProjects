@@ -5,9 +5,8 @@ Manages raw replay clips and produces permanent highlight reels.
 
 Directory layout
 ----------------
-  REPLAY_DIR/          <- OBS writes raw buffers here; trimmed clips land here too.
-                          Everything in this root is wiped on hub startup.
-                          Safe to nuke because finished reels live in edited/.
+  REPLAY_DIR/          <- OBS replay buffer writes here; trimmed clips land here too.
+                          Startup cleanup only removes app-managed temp clip files.
   REPLAY_DIR/edited/   <- Permanent highlight reels, one MKV per game session.
                           Never touched by the startup wipe.
 
@@ -19,7 +18,6 @@ Workflow (run_once / game-end merge)
      seamlessly by trimming the start of the later clip to the exact boundary.
   4. Merge all clips into one MKV in edited/ (singletons are copied, not skipped).
   5. Delete the *_ir_trimmed.mkv source clips from REPLAY_DIR.
-  6. Delete the original raw OBS .mkv/.mp4 files from REPLAY_DIR.
 
 Game numbering
 --------------
@@ -48,6 +46,11 @@ from .config import EDITED_DIR, REPLAY_DIR
 _TAG = "[instant_replay.cleanup]"
 _WINDOW_SECONDS = 600       # 10-minute fallback grouping window
 _MIN_OVERLAP_SECONDS = 1.5  # ignore overlaps smaller than this (timestamp imprecision)
+_MANAGED_ROOT_SUFFIXES = (
+    "_ir_trimmed.mkv",
+    ".overlap_trim.mkv",
+    ".concat.txt",
+)
 
 _SESSIONS_FILE = Path.home() / ".claude" / "game_sessions.json"
 _COUNTER_FILE  = Path.home() / ".claude" / "ir_game_counter.json"
@@ -58,9 +61,8 @@ _COUNTER_FILE  = Path.home() / ".claude" / "ir_game_counter.json"
 
 def wipe_raw_clips_on_startup() -> None:
     """
-    Delete every file in REPLAY_DIR root (raw OBS buffers + trimmed clips).
-    The edited/ subfolder is left completely untouched.
-    Called once when the hub starts, before OBS writes anything new.
+    Delete only app-managed temporary clip files from REPLAY_DIR root.
+    This intentionally leaves unrelated recordings alone.
     """
     raw_dir    = Path(REPLAY_DIR)
     edited_dir = Path(EDITED_DIR)
@@ -74,6 +76,8 @@ def wipe_raw_clips_on_startup() -> None:
     for f in raw_dir.iterdir():
         if f.is_dir():
             continue  # skip edited/ and any other subdirectory
+        if not _is_managed_root_file(f):
+            continue
         try:
             f.unlink()
             deleted += 1
@@ -133,6 +137,23 @@ def _find_trimmed() -> list[tuple[datetime, Path]]:
                 result.append((ts, f))
     result.sort(key=lambda x: x[0])
     return result
+
+
+def _is_managed_root_file(path: Path) -> bool:
+    """True when the file is a temp/generated replay artifact we own."""
+    return any(path.name.endswith(suffix) for suffix in _MANAGED_ROOT_SUFFIXES)
+
+
+def _safe_unlink(path: Path, *, missing_ok: bool = True) -> bool:
+    """Best-effort delete that never raises for locked or already-gone files."""
+    try:
+        path.unlink()
+        return True
+    except FileNotFoundError:
+        return bool(missing_ok)
+    except OSError as exc:
+        print(f"{_TAG} Could not delete {path.name}: {exc}")
+        return False
 
 
 def _get_clip_duration(path: Path) -> float | None:
@@ -251,20 +272,6 @@ def _merge_into(files: list[Path], output: Path) -> bool:
         list_path.unlink(missing_ok=True)
 
 
-def _delete_raw_obs_files(trimmed_files: list[Path]) -> None:
-    """Delete the original OBS .mkv/.mp4 each trimmed clip was derived from."""
-    for p in trimmed_files:
-        stem = p.name.removesuffix("_ir_trimmed.mkv")
-        for ext in (".mp4", ".mkv"):
-            original = p.parent / (stem + ext)
-            if original.exists() and original != p:
-                try:
-                    original.unlink()
-                    print(f"{_TAG} Deleted raw OBS file: {original.name}")
-                except OSError as exc:
-                    print(f"{_TAG} Could not delete {original.name}: {exc}")
-
-
 # ---------------------------------------------------------------------------
 #  Session grouping
 
@@ -377,7 +384,6 @@ def run_once(game_label: str | None = None) -> int:
       - Resolve overlaps.
       - Merge or copy into edited/<label>_reel.mkv.
       - Delete source trimmed clips.
-      - Delete original raw OBS files.
 
     game_label: if provided, treat all found clips as one group with that label
                 (used by run_for_game()).  If None, group automatically from sessions.
@@ -425,9 +431,8 @@ def run_once(game_label: str | None = None) -> int:
         if output.exists():
             print(f"{_TAG} Reel already exists — cleaning up source clips: {output.name}")
             for p in group:
-                p.unlink(missing_ok=True)
-                removed += 1
-            _delete_raw_obs_files(group)
+                if _safe_unlink(p):
+                    removed += 1
             continue
 
         processed, temps = _resolve_overlaps(group)
@@ -443,14 +448,13 @@ def run_once(game_label: str | None = None) -> int:
                 size_mb = output.stat().st_size / 1_048_576
                 print(f"{_TAG} Reel ready: {output.name}  ({size_mb:.1f} MB)")
                 for p in group:
-                    p.unlink(missing_ok=True)
-                    removed += 1
-                _delete_raw_obs_files(group)
+                    if _safe_unlink(p):
+                        removed += 1
             else:
                 print(f"{_TAG} Merge failed — source clips kept for retry.")
         finally:
             for t in temps:
-                t.unlink(missing_ok=True)
+                _safe_unlink(t)
 
     return removed
 

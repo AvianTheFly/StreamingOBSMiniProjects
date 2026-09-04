@@ -157,3 +157,55 @@ MASK_TYPE = "mask_color_filter.effect"
 # In OBS source: lock_aspect = !obs_data_get_bool(settings, SETTING_STRETCH)
 # So True here = stretch image checked = no aspect lock.
 MASK_STRETCH = True
+
+# ── Hotkey editor integration ──────────────────────────────────────────────────
+_HERE = Path(__file__).resolve().parent
+
+
+def discover_editor_projects() -> list[dict]:
+    """Register specific_song with the hub's hotkey editor."""
+    return [
+        {
+            "key":          "specific_song",
+            "name":         "Specific Song",
+            "asset_dir":    str(ASSETS_DIR),
+            "hotkeys_file": str(_HERE / "hotkeys.json"),
+            "phrases_file": str(_HERE / "phrases.json"),
+            "extensions":   [".mp4", ".mp3", ".wav", ".webm", ".m4a", ".flac"],
+            "features": {
+                "categories_enabled":      True,
+                "obs_layout_enabled":      False,
+                "audio_settings_enabled":  False,
+                "manual_hotkeys_enabled":  True,
+                "voice_commands_enabled":  True,
+                "random_commands_enabled": True,
+            },
+            "config_defaults": {
+                "scene":                SCENE,
+                "obs_source_prefix":    OBS_SOURCE_PREFIX,
+                "single_source_mode":   True,
+                "trigger_sequences":    " ".join(TRIGGER_SEQUENCE),
+                "trigger_max_interval": TRIGGER_MAX_INTERVAL,
+                "manual_trigger_window": MANUAL_TRIGGER_WINDOW,
+                "matching_strategy":    "hybrid",
+                "fuzzy_threshold":      int(MATCH_THRESHOLD * 100),
+                "manual_hotkeys_enabled":  True,
+                "voice_commands_enabled":  True,
+                "random_commands_enabled": True,
+                "categories_enabled":      True,
+                "obs_layout_enabled":      False,
+                "audio_settings_enabled":  False,
+                # Voice test panel uses specific_song's 55/45 coverage+difflib scorer.
+                "phrase_scorer": "coverage_difflib",
+                # Displayed read-only in the editor's Voice Commands section.
+                "voice_commands": {
+                    "abort":              ["abort", "cancel", "aborting"],
+                    "random":             ["random", "shuffle", "play random"],
+                    "random [category]":  ["random jazz", "shuffle upbeat", "random chill"],
+                    "next / skip":        ["next", "skip", "next song"],
+                    "stop":               ["stop", "stop it", "stop music"],
+                    "reload":             ["reload", "refresh"],
+                },
+            },
+        }
+    ]

@@ -17,10 +17,19 @@ venv/
 
 # Backups
 *.bak
+archive/
+
+# Local rebuild/debug scratch files
+tmp_obs_debug/
+REBUILD_BRIEF.md
+mini projects/media_profiles/
 
 # Large binary / model directories
 voice/vosk-model*/
+voice/models/
+models/
 *.zip
+*.ct2
 
 # IDE
 .vscode/

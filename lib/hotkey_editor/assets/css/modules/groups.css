@@ -1,0 +1,280 @@
+/* ── Keyboard row layout ─────────────────────────────────────────────────── */
+.key-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.45rem;
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  padding-top: 0.7rem;
+}
+.key-row::before {
+  content: 'Row ' attr(data-row);
+  position: absolute;
+  top: -0.4rem;
+  left: 0.4rem;
+  font-size: 0.65rem;
+  color: rgba(140,170,255,0.5);
+  background: var(--bg);
+  padding: 0 0.3rem;
+}
+.key-row::after {
+  content: '';
+  position: absolute;
+  top: 0.3rem;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed rgba(91,141,238,0.22);
+}
+.key-row:first-of-type { padding-top: 0; }
+.key-row:first-of-type::before { display: none; }
+
+.key-pair-stack {
+  flex: 0 1 clamp(170px, calc((100% - 1.35rem) / 4), 205px);
+  width: clamp(170px, calc((100% - 1.35rem) / 4), 205px);
+  min-width: 0;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.38rem;
+  padding-left: 0.3rem;
+  border-left: 2px solid rgba(91,141,238,0.16);
+}
+.key-pair-stack.paired { border-left-color: rgba(91,141,238,0.32); }
+.key-pair-stack .key-card { width: 100%; flex: none; }
+
+/* ── Key card ────────────────────────────────────────────────────────────── */
+.key-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  flex: 0 1 clamp(170px, calc((100% - 1.35rem) / 4), 205px);
+  width: clamp(170px, calc((100% - 1.35rem) / 4), 205px);
+  min-width: 0;
+  max-width: 100%;
+  align-self: flex-start;
+}
+.key-card.highlighted {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-gl);
+}
+.key-card.hover-linked {
+  border-color: var(--warn);
+  box-shadow: 0 0 0 3px rgba(224,160,64,0.16), 0 4px 20px rgba(224,160,64,0.12);
+}
+.key-card.drop-target {
+  border-color: var(--success);
+  box-shadow: 0 0 0 3px rgba(77,184,122,0.16);
+}
+
+/* ── Key card header ─────────────────────────────────────────────────────── */
+.key-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.58rem;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── Key badge (keyboard key visual) ────────────────────────────────────── */
+.kk {
+  width: 2.15rem; height: 2.15rem;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(170deg, var(--surface4) 0%, var(--surface3) 100%);
+  border: 1.5px solid var(--border-hi);
+  border-bottom: 3px solid var(--border-hi);
+  font-family: 'Cascadia Code', 'Consolas', monospace;
+  font-size: 1rem; font-weight: 700;
+  color: var(--text);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.3);
+  flex-shrink: 0;
+  transition: width 0.2s, height 0.2s, font-size 0.2s, border-color 0.12s, background 0.12s, box-shadow 0.12s;
+}
+.kk.kk-btn { cursor: pointer; }
+.kk.kk-btn:hover {
+  border-color: var(--accent);
+  background: linear-gradient(170deg, var(--surface4) 0%, var(--surface3) 100%);
+  box-shadow: 0 0 0 2px var(--accent-gl), inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.3);
+  color: var(--accent);
+}
+.kk.kk-md { width: 2.45rem; height: 2.45rem; font-size: 1.15rem; border-radius: 8px; }
+.kk.kk-lg { width: 2.75rem; height: 2.75rem; font-size: 1.35rem; border-radius: 8px; }
+
+/* ── Per-group undo button ───────────────────────────────────────────────── */
+.btn-group-undo {
+  width: 1.4rem; height: 1.4rem;
+  border-radius: 5px;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  flex-shrink: 0;
+}
+.btn-group-undo:hover:not(:disabled) {
+  background: rgba(91,141,238,0.12);
+  border-color: rgba(91,141,238,0.28);
+  color: var(--accent);
+}
+.btn-group-undo:disabled { opacity: 0.22; cursor: default; }
+
+/* ── Key card meta (name input + sub) ───────────────────────────────────── */
+.key-card-meta { flex: 1; min-width: 0; }
+.kcm-title-input {
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.16rem 0.35rem;
+  outline: none;
+}
+.kcm-title-input::placeholder { color: var(--text-dim); }
+.kcm-title-input:hover,
+.kcm-title-input:focus {
+  background: var(--surface3);
+  border-color: var(--border-hi);
+}
+.kcm-sub {
+  font-size: 0.7rem;
+  color: var(--text-mid);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.1rem;
+  padding-left: 0.35rem;
+}
+.rand-pill {
+  background: var(--accent-gl2);
+  color: var(--accent);
+  border-radius: 4px;
+  padding: 0.05rem 0.4rem;
+  font-size: 0.63rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+/* ── Key card body (chip grid) ───────────────────────────────────────────── */
+.key-card-body {
+  --chip-cols: 1;
+  padding: 0.42rem 0.55rem 0.48rem;
+  display: grid;
+  grid-template-columns: repeat(var(--chip-cols), minmax(0, 1fr));
+  gap: 0.34rem;
+  align-items: start;
+  justify-content: stretch;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* ── New group creation card ─────────────────────────────────────────────── */
+.new-group-section {
+  width: 100%;
+  padding-top: 0.15rem;
+}
+.new-group-label {
+  margin: 0 0 0.42rem 0.15rem;
+  color: var(--text-mid);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.new-group-card {
+  width: clamp(190px, calc((100% - 1.35rem) / 4), 240px);
+  background: rgba(91,141,238,0.045);
+  border: 1px dashed rgba(91,141,238,0.34);
+  border-radius: 8px;
+  padding: 0.58rem;
+  display: grid;
+  gap: 0.45rem;
+}
+.new-group-card:focus-within {
+  border-style: solid;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-gl);
+}
+.new-group-top {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.new-group-key {
+  width: 2.35rem;
+  height: 2.1rem;
+  text-align: center;
+  border-radius: 8px;
+  color: var(--text);
+  background: var(--surface3);
+  border: 1.5px solid var(--border-hi);
+  border-bottom-width: 3px;
+  font-family: 'Cascadia Code', 'Consolas', monospace;
+  font-size: 1rem;
+  font-weight: 800;
+  outline: none;
+}
+.new-group-name {
+  min-width: 0;
+  flex: 1;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--text);
+  font-size: 0.78rem;
+  padding: 0.35rem 0.45rem;
+  outline: none;
+}
+.new-group-key:focus,
+.new-group-name:focus { border-color: var(--accent); }
+.new-group-hint {
+  color: var(--text-dim);
+  font-size: 0.68rem;
+}
+
+/* ── Drop-armed state ────────────────────────────────────────────────────── */
+.key-groups.drop-armed {
+  outline: 2px dashed var(--border-hi);
+  outline-offset: -6px;
+  border-radius: var(--r);
+}
+.key-groups.drop-waiting {
+  outline-color: var(--success);
+  background: rgba(77,184,122,0.04);
+}
+
+/* ── Inline unbound section ──────────────────────────────────────────────── */
+.unbound-inline-section { width: 100%; }
+.unbound-inline-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0 0.35rem;
+  color: var(--text-mid);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.unbound-inline-badge {
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 0.05rem 0.45rem;
+  font-size: 0.62rem;
+  color: var(--text-dim);
+}
+.unbound-inline-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}

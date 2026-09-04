@@ -1,0 +1,11 @@
+faster-whisper
+numpy
+obsws-python
+psutil
+pydub
+pynput
+python-dotenv
+rapidfuzz
+requests
+sounddevice
+urllib3

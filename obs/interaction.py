@@ -20,6 +20,11 @@ from pathlib import Path
 from .client import get_obs
 
 
+
+def _is_unsupported_audio_error(exc: Exception) -> bool:
+    text = str(exc).lower()
+    return "returned code 604" in text or "does not support audio" in text
+
 # ─────────────────────────────────────────────────────────────────────────────
 #  Source visibility
 # ─────────────────────────────────────────────────────────────────────────────
@@ -402,6 +407,20 @@ def get_media_state(source: str) -> str | None:
         return None
 
 
+def get_media_status(source: str) -> dict:
+    """Return media state details for older callers."""
+    try:
+        result = get_obs().get_media_input_status(source)
+        return {
+            "state": getattr(result, "media_state", None),
+            "cursor_ms": getattr(result, "media_cursor", None),
+            "duration_ms": getattr(result, "media_duration", None),
+        }
+    except Exception as e:
+        print(f"[OBS] Could not get media status for '{source}': {e}")
+        return {}
+
+
 def stop_media(source: str) -> None:
     """Stop a media source."""
     try:
@@ -722,11 +741,105 @@ def get_source_transform(scene: str, source: str) -> dict:
 #  Audio routing / volume
 # ─────────────────────────────────────────────────────────────────────────────
 
+def get_canvas_size() -> dict[str, int]:
+    """Return OBS base/output canvas dimensions."""
+    resp = get_obs().get_video_settings()
+
+    def _read(*names: str, default: int) -> int:
+        for name in names:
+            if hasattr(resp, name):
+                return int(getattr(resp, name))
+        if isinstance(resp, dict):
+            for name in names:
+                if name in resp:
+                    return int(resp[name])
+        return default
+
+    return {
+        "baseWidth": _read("base_width", "baseWidth", default=1920),
+        "baseHeight": _read("base_height", "baseHeight", default=1080),
+        "outputWidth": _read("output_width", "outputWidth", default=1920),
+        "outputHeight": _read("output_height", "outputHeight", default=1080),
+    }
+
+
+def get_scene_source_transforms(scene: str, prefix: str | None = None) -> dict[str, dict]:
+    """Return current scene-item transforms keyed by source name."""
+    obs = get_obs()
+    try:
+        resp = obs.get_scene_item_list(scene)
+    except Exception as exc:
+        print(f"[OBS] Could not list scene item transforms for {scene!r}: {exc}")
+        return {}
+
+    result: dict[str, dict] = {}
+    for item in getattr(resp, "scene_items", []) or []:
+        if isinstance(item, dict):
+            source_name = item.get("sourceName") or item.get("source_name")
+            transform = item.get("sceneItemTransform") or item.get("scene_item_transform") or {}
+        else:
+            source_name = getattr(item, "sourceName", None) or getattr(item, "source_name", None)
+            transform = getattr(item, "sceneItemTransform", None) or getattr(item, "scene_item_transform", None) or {}
+        if not source_name:
+            continue
+        if prefix and not str(source_name).startswith(prefix):
+            continue
+        result[str(source_name)] = dict(transform)
+    return result
+
+
+def get_scene_sources(scene: str, prefix: str | None = None) -> list[dict]:
+    """Return scene-item metadata for every source in a scene."""
+    obs = get_obs()
+    resp = obs.get_scene_item_list(scene)
+    result: list[dict] = []
+    for item in getattr(resp, "scene_items", []) or []:
+        if isinstance(item, dict):
+            source_name = item.get("sourceName") or item.get("source_name")
+            item_id = item.get("sceneItemId") or item.get("scene_item_id")
+            enabled = item.get("sceneItemEnabled")
+            if enabled is None:
+                enabled = item.get("scene_item_enabled")
+            kind = item.get("sourceType") or item.get("source_type") or item.get("inputKind") or item.get("input_kind")
+        else:
+            source_name = getattr(item, "sourceName", None) or getattr(item, "source_name", None)
+            item_id = getattr(item, "sceneItemId", None) or getattr(item, "scene_item_id", None)
+            enabled = getattr(item, "sceneItemEnabled", None)
+            if enabled is None:
+                enabled = getattr(item, "scene_item_enabled", None)
+            kind = (
+                getattr(item, "sourceType", None)
+                or getattr(item, "source_type", None)
+                or getattr(item, "inputKind", None)
+                or getattr(item, "input_kind", None)
+            )
+        if not source_name:
+            continue
+        if prefix and not str(source_name).startswith(prefix):
+            continue
+        result.append({
+            "source": str(source_name),
+            "scene_item_id": int(item_id) if item_id is not None else None,
+            "visible": bool(enabled),
+            "kind": str(kind or ""),
+        })
+    return result
+
+
+def set_scene_source_visible(scene: str, source: str, visible: bool) -> None:
+    """Set a source's scene-item visibility by source name."""
+    obs = get_obs()
+    item_id = _get_scene_item_id(obs, scene, source)
+    obs.set_scene_item_enabled(scene, item_id, bool(visible))
+
+
 def get_input_audio_monitor_type(input_name: str):
     """Return the OBS audio monitor type for an input, or None on failure."""
     try:
         return get_obs().get_input_audio_monitor_type(input_name).monitor_type
     except Exception as e:
+        if _is_unsupported_audio_error(e):
+            return None
         print(f"[OBS] Could not get monitor type for '{input_name}': {e}")
         return None
 
@@ -739,7 +852,12 @@ def set_input_audio_monitor_type(input_name: str, monitor_type: str) -> None:
       - OBS_MONITORING_TYPE_MONITOR_ONLY
       - OBS_MONITORING_TYPE_MONITOR_AND_OUTPUT
     """
-    get_obs().set_input_audio_monitor_type(input_name, monitor_type)
+    try:
+        get_obs().set_input_audio_monitor_type(input_name, monitor_type)
+    except Exception as e:
+        if _is_unsupported_audio_error(e):
+            return
+        raise
 
 
 def get_input_volume(input_name: str):
@@ -751,6 +869,8 @@ def get_input_volume(input_name: str):
             "db": getattr(r, "input_volume_db", None),
         }
     except Exception as e:
+        if _is_unsupported_audio_error(e):
+            return None
         print(f"[OBS] Could not get volume for '{input_name}': {e}")
         return None
 
@@ -805,6 +925,8 @@ def set_input_mute(source: str, muted: bool) -> None:
     try:
         get_obs().set_input_mute(source, muted)
     except Exception as e:
+        if _is_unsupported_audio_error(e):
+            return
         print(f"[OBS] set_input_mute failed for '{source}' (muted={muted}): {e}")
 
 
@@ -814,6 +936,8 @@ def get_input_mute(source: str) -> bool | None:
         resp = get_obs().get_input_mute(source)
         return resp.input_muted
     except Exception as e:
+        if _is_unsupported_audio_error(e):
+            return None
         print(f"[OBS] get_input_mute failed for '{source}': {e}")
         return None
 
@@ -967,6 +1091,8 @@ def configure_media_source_properties(
     close_when_inactive: bool | None = None,
     looping: bool | None = None,
     hw_decode: bool | None = None,
+    clear_on_media_end: bool | None = None,
+    speed_percent: float | None = None,
 ) -> None:
     """
     Set behavioural properties on an ffmpeg_source input.  Only the keyword
@@ -976,6 +1102,8 @@ def configure_media_source_properties(
     close_when_inactive  — release the file handle when the source is hidden
     looping              — loop the media when it reaches the end
     hw_decode            — use hardware decoding when available
+    clear_on_media_end   — clear the frame when media playback finishes
+    speed_percent        — playback speed percentage for supported sources
     """
     settings: dict = {}
     if restart_on_activate is not None:
@@ -986,6 +1114,10 @@ def configure_media_source_properties(
         settings["looping"] = looping
     if hw_decode is not None:
         settings["hw_decode"] = hw_decode
+    if clear_on_media_end is not None:
+        settings["clear_on_media_end"] = clear_on_media_end
+    if speed_percent is not None:
+        settings["speed_percent"] = float(speed_percent)
     if settings:
         get_obs().set_input_settings(source, settings, overlay=True)
 

@@ -13,9 +13,15 @@ from ..config import (
     POLL_INTERVAL,
     DISCONNECTED_INTERVAL,
     REQUEST_TIMEOUT,
+    LEAGUE_KILL_AUDIO_DEFAULT_VOLUME_DB,
+    LEAGUE_KILL_AUDIO_DIR,
+    LEAGUE_KILL_AUDIO_MONITOR,
+    LEAGUE_KILL_AUDIO_PREFIX,
+    LEAGUE_KILL_AUDIO_SCENE,
 )
 from .league_events import LeagueEvents
 from .game_state_detector import GameStateDetector
+from ..kill_audio_player import LeagueKillAudioPlayer
 
 # ── Handlers ──────────────────────────────────────────────────────────────────
 from ..handlers.lifecycle import (
@@ -67,6 +73,18 @@ class LeagueAPIWatcher:
         self.stop_event = stop_event
 
         self.events = LeagueEvents()
+        self.kill_audio_player = LeagueKillAudioPlayer(
+            project_dir=Path(__file__).resolve().parents[1],
+            asset_dir=LEAGUE_KILL_AUDIO_DIR,
+            scene=LEAGUE_KILL_AUDIO_SCENE,
+            source_prefix=LEAGUE_KILL_AUDIO_PREFIX,
+            default_volume_db=LEAGUE_KILL_AUDIO_DEFAULT_VOLUME_DB,
+            monitor=LEAGUE_KILL_AUDIO_MONITOR,
+        )
+        try:
+            self.kill_audio_player.ensure_ready()
+        except Exception as exc:
+            print(f"[league] Could not initialize kill audio source: {exc}")
 
         # ── State-diff events ─────────────────────────────────────────────
         self.events.register("death",           make_death_handler())
@@ -86,7 +104,9 @@ class LeagueAPIWatcher:
         self.events.register("dragon_kill",      make_dragon_kill_handler())
         self.events.register("herald_kill",      make_herald_kill_handler())
         self.events.register("baron_kill",       make_baron_kill_handler())
-        _kill_handler, _assist_handler, _force_streak_reset = make_champion_kill_handler()
+        _kill_handler, _assist_handler, _force_streak_reset = make_champion_kill_handler(
+            self.kill_audio_player
+        )
         self.events.register("champion_kill",    _kill_handler)
         self.events.register("assist",           _assist_handler)
         self.multikill_handler = make_multikill_handler()
@@ -123,6 +143,7 @@ class LeagueAPIWatcher:
         calls shutdown() to guarantee the session is persisted.
         """
         self._force_streak_reset()
+        self.kill_audio_player.stop()
 
         if not (self.game_connected or self._pending_save):
             return
@@ -214,6 +235,7 @@ class LeagueAPIWatcher:
         self.game_connected = False
         self.detector.reset()
         self._force_streak_reset()
+        self.kill_audio_player.stop()
         end_iso = datetime.now(timezone(timedelta())).isoformat()
         start_iso = self._game_start_iso or end_iso
 

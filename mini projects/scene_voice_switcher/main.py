@@ -3,13 +3,14 @@ from __future__ import annotations
 import queue
 import re
 import threading
+import time
 from difflib import SequenceMatcher
 
-from pynput import keyboard
-
-import obs
 import events as hub_events
+import obs
+from lib.global_hotkeys import key_char, subscribe_global_hotkeys, unsubscribe_global_hotkeys
 from shared import VoicePTT
+
 from .config import GAME_SCENE, LOBBIES_SCENE, PTT_KEY, RECORD_TIMEOUT_SECONDS, SOURCE_ALIASES
 
 
@@ -30,11 +31,7 @@ def _similar(a: str, b: str) -> float:
 
 
 def _camel_split(name: str) -> list[str]:
-    """Split a CamelCase / PascalCase name into lowercase words.
-
-    "FutureLobby"  → ["future", "lobby"]
-    "TavernLobby2" → ["tavern", "lobby", "2"]
-    """
+    """Split a CamelCase / PascalCase name into lowercase words."""
     spaced = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", name)
     return [w.lower() for w in spaced.split() if w]
 
@@ -46,7 +43,7 @@ def _camel_split(name: str) -> list[str]:
 def _discover_lobbies() -> dict[str, list[str]]:
     """
     Query OBS for every source/group in LOBBIES_SCENE and build a voice-alias
-    map  {obs_source_name: [alias, alias, …]}.
+    map  {obs_source_name: [alias, alias, ...]}.
     """
     sources = obs.list_group_sources(LOBBIES_SCENE)
 
@@ -73,12 +70,12 @@ def _discover_lobbies() -> dict[str, list[str]]:
             result[name] = [a.lower() for a in extra_aliases]
             print(
                 f"[scene_voice_switcher] '{name}' is in SOURCE_ALIASES but "
-                f"not found in '{LOBBIES_SCENE}' — added from config only."
+                f"not found in '{LOBBIES_SCENE}' - added from config only."
             )
 
     print(f"[scene_voice_switcher] Discovered {len(result)} lobby source(s):")
     for src, aliases in result.items():
-        print(f"    • {src}  →  {aliases}")
+        print(f"    - {src} -> {aliases}")
 
     return result
 
@@ -117,26 +114,43 @@ def _hide_all_lobby_sources(lobbies: dict[str, list[str]]) -> None:
         _safe_hide_source(LOBBIES_SCENE, source)
 
 
+def _switch_to_lobby_and_show_default(source: str, attempts: int = 5, delay: float = 0.2) -> bool:
+    """Switch to the lobby scene and retry the default source briefly."""
+    if not _safe_switch_scene(LOBBIES_SCENE):
+        return False
+
+    for attempt in range(1, attempts + 1):
+        if _safe_show_source(LOBBIES_SCENE, source):
+            return True
+        if attempt < attempts:
+            time.sleep(delay)
+    return False
+
+
 # ---------------------------------------------------------------------------
 # Matching logic
 # ---------------------------------------------------------------------------
 
 def _match_lobbies_source(raw_text: str, lobbies: dict[str, list[str]]) -> str | None:
     normalized = _normalize(raw_text)
-    compact    = _compact(raw_text)
+    compact = _compact(raw_text)
 
     if not normalized:
         return None
 
     for source_name, aliases in lobbies.items():
         for alias in aliases:
-            alias_norm    = _normalize(alias)
+            alias_norm = _normalize(alias)
             alias_compact = _compact(alias)
 
-            if alias_norm    and alias_norm    in normalized: return source_name
-            if alias_compact and alias_compact in compact:    return source_name
-            if _similar(normalized, alias_norm)    >= 0.82:  return source_name
-            if _similar(compact,    alias_compact) >= 0.86:  return source_name
+            if alias_norm and alias_norm in normalized:
+                return source_name
+            if alias_compact and alias_compact in compact:
+                return source_name
+            if _similar(normalized, alias_norm) >= 0.82:
+                return source_name
+            if _similar(compact, alias_compact) >= 0.86:
+                return source_name
 
     return None
 
@@ -177,11 +191,11 @@ def _handle_command(
             if src != source_name:
                 _safe_hide_source(LOBBIES_SCENE, src)
 
-        if _safe_switch_scene(LOBBIES_SCENE):
-            if _safe_show_source(LOBBIES_SCENE, source_name):
-                with active_lock:
-                    active_source[0] = source_name
-                print(f"[scene_voice_switcher] Scene: '{LOBBIES_SCENE}' | Showing: '{source_name}'")
+        _safe_switch_scene(LOBBIES_SCENE)
+        if _safe_show_source(LOBBIES_SCENE, source_name):
+            with active_lock:
+                active_source[0] = source_name
+            print(f"[scene_voice_switcher] Scene: '{LOBBIES_SCENE}' | Showing: '{source_name}'")
         return
 
     print(f"[scene_voice_switcher] No match for: {text!r}")
@@ -192,7 +206,12 @@ def _handle_command(
 # Main run loop
 # ---------------------------------------------------------------------------
 
-def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
+def run(
+    input_queue: queue.Queue,
+    stop_event: threading.Event,
+    *,
+    startup_event: threading.Event | None = None,
+) -> None:
     lobbies = _discover_lobbies()
 
     active_source: list[str | None] = [None]
@@ -207,38 +226,40 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
 
     from .interface import _live
     _live["active_source"] = active_source
-    _live["hide_active"]   = _hide_active_source
+    _live["hide_active"] = _hide_active_source
 
-    # ── Subscribe to league game lifecycle events ─────────────────────────────
     # league emits these instead of switching scenes directly, so that this
-    # project — which owns the "Test" and "Lobbies" scenes — controls all
+    # project - which owns the "Test" and "Lobbies" scenes - controls all
     # scene transitions.
 
     def _on_game_connected(data: dict) -> None:
-        """League game detected → switch to game scene."""
+        """League game detected -> switch to game scene."""
         _hide_all_lobby_sources(lobbies)
         with active_lock:
             active_source[0] = None
         if _safe_switch_scene(GAME_SCENE):
-            print(f"[scene_voice_switcher] League game started → '{GAME_SCENE}'.")
+            print(f"[scene_voice_switcher] League game started -> '{GAME_SCENE}'.")
 
     DEFAULT_LOBBY_SOURCE = "TavernLobby"
 
     def _on_game_disconnected(data: dict) -> None:
-        """League game ended → return to lobby scene, show TavernLobby."""
+        """League game ended -> return to lobby scene, show TavernLobby."""
         for src in lobbies:
             if src != DEFAULT_LOBBY_SOURCE:
                 _safe_hide_source(LOBBIES_SCENE, src)
-        if _safe_switch_scene(LOBBIES_SCENE):
-            if _safe_show_source(LOBBIES_SCENE, DEFAULT_LOBBY_SOURCE):
-                with active_lock:
-                    active_source[0] = DEFAULT_LOBBY_SOURCE
-            print(f"[scene_voice_switcher] League game ended → '{LOBBIES_SCENE}' | '{DEFAULT_LOBBY_SOURCE}'.")
+        if _switch_to_lobby_and_show_default(DEFAULT_LOBBY_SOURCE):
+            with active_lock:
+                active_source[0] = DEFAULT_LOBBY_SOURCE
+        else:
+            print(
+                f"[scene_voice_switcher] Failed to restore default lobby "
+                f"'{DEFAULT_LOBBY_SOURCE}' after game end."
+            )
+        print(f"[scene_voice_switcher] League game ended -> '{LOBBIES_SCENE}' | '{DEFAULT_LOBBY_SOURCE}'.")
 
-    hub_events.subscribe("game.connected",    _on_game_connected)
+    hub_events.subscribe("game.connected", _on_game_connected)
     hub_events.subscribe("game.disconnected", _on_game_disconnected)
 
-    # ── Voice PTT ─────────────────────────────────────────────────────────────
     ptt = VoicePTT(
         timeout=RECORD_TIMEOUT_SECONDS,
         on_transcript=lambda text: input_queue.put(text.strip()) if text and text.strip() else None,
@@ -247,16 +268,16 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
 
     def on_press(key) -> None:
         try:
-            if key.char == PTT_KEY:
+            char = key_char(key)
+            if char == PTT_KEY:
                 ptt.on_trigger()
-        except AttributeError:
-            pass
         except Exception as exc:
             print(f"[scene_voice_switcher] Key error ({exc})")
 
-    kb = keyboard.Listener(on_press=on_press)
-    kb.start()
+    kb_token = subscribe_global_hotkeys(on_press)
     print(f"[scene_voice_switcher] Hotkey '{PTT_KEY}' armed.")
+    if startup_event is not None:
+        startup_event.set()
 
     try:
         while not stop_event.is_set():
@@ -280,9 +301,9 @@ def run(input_queue: queue.Queue, stop_event: threading.Event) -> None:
             except Exception as exc:
                 print(f"[scene_voice_switcher] ERROR in _handle_command: {exc}")
     finally:
-        hub_events.unsubscribe("game.connected",    _on_game_connected)
+        hub_events.unsubscribe("game.connected", _on_game_connected)
         hub_events.unsubscribe("game.disconnected", _on_game_disconnected)
-        kb.stop()
+        unsubscribe_global_hotkeys(kb_token)
         ptt.cancel("shutdown")
         with active_lock:
             src = active_source[0]

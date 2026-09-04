@@ -1,0 +1,93 @@
+<section class="panel-left" id="panel-left">
+  <div class="left-toolbar">
+    <div class="left-toolbar-top">
+      <div class="left-toolbar-titlewrap">
+        <div class="left-toolbar-title">Library</div>
+        <div class="left-toolbar-sub">Find files, spot what still needs organizing, then drag into hotkeys or categories.</div>
+      </div>
+      <div class="library-count-pill" id="library-count-pill">0 shown</div>
+    </div>
+
+    <div class="library-guide">
+      <div class="guide-step"><b>1</b><span>Click a file to preview.</span></div>
+      <div class="guide-step"><b>2</b><span>Drag it right into a key or category.</span></div>
+      <div class="guide-step"><b>3</b><span>Use Show and Sort when the list gets huge.</span></div>
+    </div>
+
+    <div class="library-controls">
+      <label class="library-field library-search">
+        <span>Find</span>
+        <input id="search" type="text" placeholder="File name, UI name, or category" autocomplete="off" />
+      </label>
+      <label class="library-field">
+        <span>Show</span>
+        <select id="library-show">
+          <option value="all">All files</option>
+          <option value="needs-work">Needs organizing</option>
+          <option value="no-hotkey">No hotkey</option>
+          <option value="has-hotkey">Has hotkey</option>
+          <option value="no-category">No category</option>
+          <option value="has-category">Has category</option>
+          <option value="selected-category">In selected category</option>
+        </select>
+      </label>
+      <label class="library-field">
+        <span>Category</span>
+        <select id="category-filter">
+          <option value="all">Any category</option>
+          <option value="uncategorized">Uncategorized</option>
+        </select>
+      </label>
+      <label class="library-field">
+        <span>Type</span>
+        <select id="media-type-filter">
+          <option value="all">Any type</option>
+          <option value="image">Images</option>
+          <option value="video">Videos</option>
+          <option value="audio">Audio</option>
+        </select>
+      </label>
+      <label class="library-field">
+        <span>Sort</span>
+        <select class="sort-sel" id="sort-sel">
+          <option value="recent-first">Recently added</option>
+          <option value="name-asc">Name A to Z</option>
+          <option value="name-desc">Name Z to A</option>
+          <option value="assigned-first">Hotkeys first</option>
+          <option value="unassigned-first">No hotkey first</option>
+          <option value="category">Category</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="library-quick-filters" id="library-quick-filters">
+      <button class="quick-filter active" type="button" data-show="all">Everything</button>
+      <button class="quick-filter" type="button" data-show="needs-work">Needs organizing</button>
+      <button class="quick-filter" type="button" data-show="no-hotkey">No hotkey</button>
+      <button class="quick-filter" type="button" data-show="no-category">No category</button>
+    </div>
+
+    <div class="library-category-strip" id="library-category-strip">
+      <button class="category-filter-chip active" type="button" data-category="all">Any category</button>
+      <button class="category-filter-chip" type="button" data-category="uncategorized">Uncategorized</button>
+    </div>
+
+    <div class="library-multi-toolbar" id="library-multi-toolbar">
+      <div class="library-multi-copy">
+        <strong id="library-multi-count">No files selected</strong>
+        <span id="library-multi-help">Ctrl/Cmd-click to add files. Shift-click selects a range. Drag the selected files into a hotkey group or category.</span>
+      </div>
+      <div class="library-multi-actions">
+        <button class="library-multi-btn" id="library-select-visible" type="button">Select Visible</button>
+        <button class="library-multi-btn" id="library-clear-selection" type="button">Clear</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="sound-grid-wrap" id="sound-grid-wrap">
+    <div class="sound-grid" id="sound-grid">
+      <div class="grid-empty">Loading...</div>
+    </div>
+  </div>
+</section>

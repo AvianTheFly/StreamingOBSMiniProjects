@@ -16,8 +16,10 @@ from __future__ import annotations
 
 import threading
 import time
+from pathlib import Path
 
 import obs  # root-level obs package — always on sys.path from hub
+from lib.shared_media.single_source_state import SingleSourceStateStore
 
 from .config import (
     SCENE,
@@ -26,7 +28,6 @@ from .config import (
     POLL_INTERVAL,
     MEDIA_START_TIMEOUT,
     MEDIA_TOTAL_TIMEOUT,
-    RESTART_MEDIA_ON_PLAY,
     BASS_ANIMATION_ENABLED,
     FULLSCREEN_POSITION_X,
     FULLSCREEN_POSITION_Y,
@@ -37,8 +38,12 @@ from .config import (
 from .obs_helpers import get_scene_item_transform, set_scene_item_transform
 from .bass_animator import BassAnimator
 
+# The one OBS source shared by all songs in the SpecificSongs scene.
+# Its local_file setting is swapped at play time via set_media_source_file().
+SINGLE_SOURCE_NAME = f"{OBS_SOURCE_PREFIX}player"
 
 _AUDIO_EXTENSIONS = (".mp4", ".mp3", ".m4a", ".wav", ".flac", ".ogg", ".aac", ".webm")
+_PROJECT_DIR = Path(__file__).resolve().parent
 
 
 def _resolve_audio_file(source_name: str):
@@ -55,6 +60,13 @@ _TAG = "[specific_song]"
 # OBS media state strings
 _STATE_PLAYING = "OBS_MEDIA_STATE_PLAYING"
 _STATES_ENDED  = {"OBS_MEDIA_STATE_STOPPED", "OBS_MEDIA_STATE_ENDED", "OBS_MEDIA_STATE_NONE"}
+_STATE_STARTING = {"OBS_MEDIA_STATE_OPENING", "OBS_MEDIA_STATE_BUFFERING", "OBS_MEDIA_STATE_RESTARTING"}
+_START_CONFIRM_POLLS = 3
+_START_GRACE_SECONDS = 0.4
+_END_CONFIRM_POLLS = 3
+_END_GRACE_SECONDS = 1.0
+_MIN_VALID_PLAY_SECONDS = 2.0
+_FILE_APPLY_TIMEOUT = 2.0
 
 
 class SongPlayer:
@@ -77,6 +89,14 @@ class SongPlayer:
         self._play_thread:   threading.Thread | None = None
         self._animator:      "BassAnimator | None"    = None
         self._stop_event     = threading.Event()
+        self._state_store    = SingleSourceStateStore(
+            project_dir=_PROJECT_DIR,
+            scene=SCENE,
+            source_name=SINGLE_SOURCE_NAME,
+            tag=_TAG,
+            include_transform=False,
+            include_audio_volume=False,
+        )
 
     def stop(self) -> None:
         """Shutdown the player (no-op watcher threads to join)."""
@@ -94,12 +114,65 @@ class SongPlayer:
         with self._lock:
             return self._current_source
 
+    @property
+    def current_stem(self) -> str | None:
+        with self._lock:
+            if not self._current_source:
+                return None
+            return self._current_source.removeprefix(OBS_SOURCE_PREFIX)
+
+    def _get_input_settings(self, source_name: str) -> dict:
+        client = obs.get_obs()
+        try:
+            resp = client.send("GetInputSettings", {"inputName": source_name}, raw=True)
+        except TypeError:
+            try:
+                resp = client.send("GetInputSettings", {"inputName": source_name})
+            except Exception:
+                return {}
+        except Exception:
+            return {}
+
+        if isinstance(resp, dict):
+            settings = resp.get("inputSettings") or resp.get("input_settings") or {}
+            return settings if isinstance(settings, dict) else {}
+        settings = getattr(resp, "input_settings", None) or getattr(resp, "inputSettings", None) or {}
+        return settings if isinstance(settings, dict) else {}
+
+    def _current_media_file(self, source_name: str) -> Path | None:
+        settings = self._get_input_settings(source_name)
+        local_file = str(settings.get("local_file") or "").strip()
+        return Path(local_file) if local_file else None
+
+    def _wait_for_media_file(self, source_name: str, expected_file: Path) -> bool:
+        try:
+            expected_norm = str(expected_file.resolve()).casefold()
+        except Exception:
+            expected_norm = str(expected_file).casefold()
+
+        deadline = time.time() + _FILE_APPLY_TIMEOUT
+        while time.time() < deadline:
+            current = self._current_media_file(source_name)
+            if current is not None:
+                try:
+                    current_norm = str(current.resolve()).casefold()
+                except Exception:
+                    current_norm = str(current).casefold()
+                if current_norm == expected_norm:
+                    return True
+            time.sleep(POLL_INTERVAL)
+        return False
+
     # ── Public API ────────────────────────────────────────────────────────────
 
     def play(self, source_name: str) -> None:
         """
-        Show `source_name` in the OBS scene, wait for its media to finish,
-        then hide it.  Blocking — call from a daemon thread.
+        Point the single OBS source at source_name's media file, show it,
+        wait for it to finish, then hide it.  Blocking — call from a daemon thread.
+
+        ``source_name`` is still the logical ``{prefix}{stem}`` identifier used
+        for logging and audio-file resolution; the actual OBS source used for
+        all WebSocket calls is always SINGLE_SOURCE_NAME (``{prefix}player``).
         """
         with self._lock:
             if self._is_busy:
@@ -110,37 +183,64 @@ class SongPlayer:
             self._paused         = False
             self._current_source = source_name
 
+        # Resolve the actual media file from the source stem.
+        audio_file = _resolve_audio_file(source_name)
+
         try:
             print(f"{_TAG} ▶  Playing: '{source_name}'")
-            self._hide_all_except(source_name)
 
-            # Pre-load audio while OBS is setting up the source.
-            # Doing this before show_source minimises the timing gap between
-            # the song starting in OBS and the visualizer beginning to analyse.
+            # Pre-load audio for the visualizer before touching OBS.
             if BASS_ANIMATION_ENABLED:
-                audio_file = _resolve_audio_file(source_name)
                 if audio_file:
                     print(f"{_TAG} 🎵  Preloading audio for visualizer: {audio_file.name}")
                 else:
                     print(f"{_TAG} ⚠  No audio file found for '{source_name}' — visualizer will be flat.")
-                self._animator = BassAnimator(source_name, audio_file=audio_file)
-                self._animator.preload()   # decode file into RAM
+                # specific_song plays through one shared OBS source now, so the
+                # visualizer has to target that shared source instead of the
+                # old per-song OBS source names.
+                self._animator = BassAnimator(
+                    SINGLE_SOURCE_NAME,
+                    audio_file=audio_file,
+                    label=source_name,
+                )
+                self._animator.preload()
 
-            if RESTART_MEDIA_ON_PLAY:
+            # Point the single source at this song's file before showing it.
+            if audio_file:
                 try:
-                    obs.restart_media(source_name)
+                    obs.stop_media(SINGLE_SOURCE_NAME)
+                except Exception:
+                    pass
+                try:
+                    obs.set_media_source_file(SINGLE_SOURCE_NAME, audio_file)
                 except Exception as exc:
-                    print(f"{_TAG} ⚠  Could not restart media for '{source_name}': {exc}")
+                    print(f"{_TAG} ⚠  Could not set media file for '{SINGLE_SOURCE_NAME}': {exc}")
+                else:
+                    if not self._wait_for_media_file(SINGLE_SOURCE_NAME, audio_file):
+                        current = self._current_media_file(SINGLE_SOURCE_NAME)
+                        current_name = current.name if current else "unknown"
+                        print(
+                            f"{_TAG} ⚠  OBS did not confirm file swap to '{audio_file.name}' "
+                            f"(current: '{current_name}')."
+                        )
+            else:
+                print(f"{_TAG} ⚠  No media file found for '{source_name}' — OBS source unchanged.")
 
-            obs.show_source(SCENE, source_name)
-            self._apply_fullscreen(source_name)
-            self._set_monitor_and_output(source_name)
+            obs.show_source(SCENE, SINGLE_SOURCE_NAME)
+            self._apply_fullscreen(SINGLE_SOURCE_NAME)
+            self._set_monitor_and_output(SINGLE_SOURCE_NAME)
+            self._state_store.apply_for_stem(source_name.removeprefix(OBS_SOURCE_PREFIX))
+
+            try:
+                obs.restart_media(SINGLE_SOURCE_NAME)
+            except Exception as exc:
+                print(f"{_TAG} ⚠  Could not restart media: {exc}")
 
             if BASS_ANIMATION_ENABLED and self._animator is not None:
-                self._animator.start()   # file already in RAM — starts immediately
+                self._animator.start()
 
-            ended_cleanly = self._poll_until_done(source_name)
-            self._safe_hide(source_name)
+            ended_cleanly = self._poll_until_done(SINGLE_SOURCE_NAME, expected_file=audio_file)
+            self._safe_hide(SINGLE_SOURCE_NAME)
 
             if self._abort_flag:
                 print(f"{_TAG} ⏹  Aborted: '{source_name}'")
@@ -151,9 +251,13 @@ class SongPlayer:
 
         except Exception as exc:
             print(f"{_TAG} ❌  Unexpected error in play(): {exc}")
-            self._safe_hide(source_name)
+            self._safe_hide(SINGLE_SOURCE_NAME)
 
         finally:
+            try:
+                self._state_store.capture_override_for_stem(source_name.removeprefix(OBS_SOURCE_PREFIX))
+            except Exception as exc:
+                print(f"{_TAG} ⚠  Could not save single-source override for '{source_name}': {exc}")
             if self._animator is not None:
                 self._animator.stop()
                 self._animator = None
@@ -185,13 +289,12 @@ class SongPlayer:
             if not self._is_busy or self._paused:
                 return
             self._paused = True
-            src = self._current_source
-        if src:
-            try:
-                obs.pause_media(src)
-            except Exception as exc:
-                print(f"{_TAG} ⚠  Could not pause media for '{src}': {exc}")
-            print(f"{_TAG} ⏸  Paused: '{src}'")
+            src = self._current_source  # logical name, for logging only
+        try:
+            obs.pause_media(SINGLE_SOURCE_NAME)
+        except Exception as exc:
+            print(f"{_TAG} ⚠  Could not pause media: {exc}")
+        print(f"{_TAG} ⏸  Paused: '{src}'")
 
     def resume(self) -> None:
         """Resume playback from the paused position."""
@@ -199,13 +302,12 @@ class SongPlayer:
             if not self._is_busy or not self._paused:
                 return
             self._paused = False
-            src = self._current_source
-        if src:
-            try:
-                obs.play_media(src)
-                print(f"{_TAG} ▶  Resumed: '{src}'")
-            except Exception as exc:
-                print(f"{_TAG} ⚠  Could not resume '{src}': {exc}")
+            src = self._current_source  # logical name, for logging only
+        try:
+            obs.play_media(SINGLE_SOURCE_NAME)
+            print(f"{_TAG} ▶  Resumed: '{src}'")
+        except Exception as exc:
+            print(f"{_TAG} ⚠  Could not resume: {exc}")
 
     def abort(self) -> None:
         """Signal the play loop to stop immediately and mark the player idle."""
@@ -214,9 +316,7 @@ class SongPlayer:
                 return
             self._abort_flag = True
             self._paused     = False
-            src = self._current_source
-        if src:
-            self._safe_hide(src)
+        self._safe_hide(SINGLE_SOURCE_NAME)
         print(f"{_TAG} ⏹  Abort requested.")
 
     # ── Internal helpers ──────────────────────────────────────────────────────
@@ -260,10 +360,14 @@ class SongPlayer:
         except Exception as exc:
             print(f"{_TAG} ⚠  Could not set audio tracks for '{source_name}': {exc}")
 
-    def _poll_until_done(self, source_name: str) -> bool:
+    def _poll_until_done(self, source_name: str, expected_file: Path | None = None) -> bool:
         """Block until the source's media ends, times out, or is aborted."""
         started = False
         t0      = time.time()
+        play_streak = 0
+        provisional_playing_since: float | None = None
+        playing_since: float | None = None
+        end_streak = 0
 
         while True:
             with self._lock:
@@ -278,11 +382,53 @@ class SongPlayer:
             state   = obs.get_media_state(source_name)
             elapsed = time.time() - t0
 
+            if expected_file is not None:
+                current_file = self._current_media_file(source_name)
+                if current_file is not None:
+                    try:
+                        expected_norm = str(expected_file.resolve()).casefold()
+                        current_norm = str(current_file.resolve()).casefold()
+                    except Exception:
+                        expected_norm = str(expected_file).casefold()
+                        current_norm = str(current_file).casefold()
+                    if current_norm != expected_norm:
+                        print(
+                            f"{_TAG} ⚠  Media source switched files mid-play "
+                            f"('{current_file.name}' != '{expected_file.name}')."
+                        )
+                        return False
+
             if state == _STATE_PLAYING:
-                started = True
+                play_streak += 1
+                if provisional_playing_since is None:
+                    provisional_playing_since = time.time()
+                if (
+                    not started
+                    and (
+                        play_streak >= _START_CONFIRM_POLLS
+                        or (time.time() - provisional_playing_since) >= _START_GRACE_SECONDS
+                    )
+                ):
+                    started = True
+                end_streak = 0
+                if playing_since is None:
+                    playing_since = time.time()
+            elif not started:
+                if state not in _STATE_STARTING:
+                    play_streak = 0
+                    provisional_playing_since = None
 
             if started and state in _STATES_ENDED:
-                return True
+                end_streak += 1
+                if playing_since is not None:
+                    played_for = time.time() - playing_since
+                    if played_for < max(_END_GRACE_SECONDS, _MIN_VALID_PLAY_SECONDS):
+                        time.sleep(POLL_INTERVAL)
+                        continue
+                if end_streak >= _END_CONFIRM_POLLS:
+                    return True
+            elif started:
+                end_streak = 0
 
             if not started and elapsed > MEDIA_START_TIMEOUT:
                 print(f"{_TAG} ⚠  '{source_name}' never reached PLAYING within {MEDIA_START_TIMEOUT}s")

@@ -1,0 +1,335 @@
+/* ── Project switcher ────────────────────────────────────────────────── */
+.project-sel-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-mid);
+  white-space: nowrap;
+}
+
+.project-sel {
+  background: var(--surface3);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--r-sm);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.3rem 0.6rem;
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+  max-width: 200px;
+  transition: border-color 0.12s, background 0.12s;
+}
+.project-sel:hover { background: var(--surface4); border-color: var(--accent); }
+.project-sel:focus { border-color: var(--accent); outline: 2px solid var(--accent-gl); outline-offset: 1px; }
+.project-sel option { background: var(--surface2); }
+.project-sel-wrap { display: flex; align-items: center; gap: 0.5rem; }
+.project-sel-wrap.single { display: none; }
+
+/* ── Profile bar ─────────────────────────────────────────────────────── */
+.profile-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0.35rem 1.25rem;
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-shrink: 0;
+}
+.profile-context,
+.profile-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.48rem;
+  min-width: 0;
+}
+.profile-actions {
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.025);
+  border-radius: 8px;
+  padding: 0.25rem;
+}
+.profile-actions-label {
+  color: var(--text-dim);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 0 0.22rem;
+}
+.pb-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  flex-shrink: 0;
+}
+.profile-sel {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text);
+  font-size: 0.78rem;
+  padding: 0.22rem 0.5rem;
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+  max-width: 160px;
+  transition: border-color 0.12s;
+}
+.profile-sel:focus { border-color: var(--accent); }
+.profile-sel option { background: var(--surface2); }
+
+.profile-trigger-field {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+  color: var(--text-dim);
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.profile-trigger-field input {
+  width: 7.5rem;
+  min-width: 0;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text);
+  font: inherit;
+  text-transform: none;
+  padding: 0.2rem 0.45rem;
+}
+.profile-trigger-field input:focus { border-color: var(--accent); outline: none; }
+
+.profile-volume-field {
+  display: flex;
+  align-items: center;
+  gap: 0.32rem;
+  min-width: 0;
+  color: var(--text-dim);
+  font-size: 0.64rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.profile-volume-field input {
+  width: 4.2rem;
+  min-width: 0;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text);
+  font: inherit;
+  text-transform: none;
+  padding: 0.2rem 0.38rem;
+}
+.profile-volume-field input:focus { border-color: var(--accent); outline: none; }
+
+.pb-live-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--success);
+  background: rgba(77,184,122,0.12);
+  border: 1px solid rgba(77,184,122,0.3);
+  border-radius: 999px;
+  padding: 0.14rem 0.5rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.pb-not-live {
+  font-size: 0.68rem;
+  color: var(--warn);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-pb {
+  background: var(--surface2);
+  color: var(--text-mid);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 0.2rem 0.55rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-pb:hover           { background: var(--surface3); color: var(--text); border-color: var(--border-hi); }
+.btn-pb.accent          { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-pb.accent:hover    { background: var(--accent-dk); }
+.btn-pb.danger:hover    { background: rgba(224,92,92,0.12); color: var(--danger); border-color: rgba(224,92,92,0.3); }
+
+.pb-spacer { margin-left: auto; }
+
+.project-settings-btn.active {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.hotkey-tester {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+.hotkey-tester .btn-pb.active {
+  color: #06120f;
+  background: #55d4b8;
+  border-color: #55d4b8;
+}
+.hotkey-tester-readout {
+  max-width: 15rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-dim);
+  background: rgba(255,255,255,0.035);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 0.18rem 0.45rem;
+  font-size: 0.66rem;
+  font-weight: 750;
+}
+.project-settings-panel {
+  flex-shrink: 0;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 0.85rem 1.25rem 1rem;
+}
+.media-profile-create-panel {
+  flex-shrink: 0;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 0.85rem 1.25rem 1rem;
+}
+.media-profile-create-panel[hidden] { display: none !important; }
+.media-profile-create-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+  gap: 0.62rem;
+  margin-top: 0.75rem;
+}
+.media-profile-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(120px, 1fr));
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+}
+.media-profile-feature-grid label {
+  display: flex;
+  align-items: center;
+  gap: 0.38rem;
+  color: var(--text-mid);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.42rem 0.52rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.project-settings-panel[hidden] { display: none !important; }
+.project-settings-head,
+.project-settings-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.project-settings-title {
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+.project-settings-sub,
+.project-settings-status {
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  margin-top: 0.12rem;
+}
+.project-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(150px, 1fr));
+  gap: 0.62rem;
+  margin-top: 0.75rem;
+}
+.project-settings-section {
+  grid-column: 1 / -1;
+  color: var(--text-mid);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding-top: 0.35rem;
+}
+.project-setting-field {
+  display: grid;
+  gap: 0.22rem;
+  min-width: 0;
+}
+.project-setting-label {
+  color: var(--text);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+.project-setting-field input,
+.project-setting-field textarea,
+.project-setting-field select {
+  width: 100%;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.36rem 0.5rem;
+  font-size: 0.75rem;
+  outline: none;
+}
+.project-setting-field input:focus,
+.project-setting-field textarea:focus,
+.project-setting-field select:focus {
+  border-color: var(--accent);
+}
+.project-setting-help,
+.project-setting-default {
+  color: var(--text-dim);
+  font-size: 0.64rem;
+  line-height: 1.25;
+}
+.project-setting-default {
+  color: var(--text-mid);
+}
+.project-setting-info {
+  grid-column: 1 / -1;
+  color: var(--text);
+  font-size: 0.72rem;
+}
+.project-setting-info-list {
+  list-style: none;
+  margin: 0.2rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+}
+.project-setting-info-list li {
+  background: var(--surface3, var(--surface));
+  border-radius: 4px;
+  padding: 0.18rem 0.45rem;
+  color: var(--text-dim);
+}
+.project-setting-info-list li strong {
+  color: var(--text);
+  font-weight: 700;
+}
+.project-settings-actions {
+  margin-top: 0.75rem;
+}

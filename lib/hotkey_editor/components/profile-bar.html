@@ -1,0 +1,103 @@
+<div class="profile-bar" id="profile-bar">
+  <div class="profile-context">
+    <span class="pb-label">Profile</span>
+    <select class="profile-sel" id="profile-sel" title="Switch viewed profile"></select>
+    <span class="pb-live-badge" id="pb-live-badge">LIVE</span>
+    <span class="pb-not-live" id="pb-not-live" style="display:none">Draft profile</span>
+    <button class="btn-pb accent" id="pb-set-live" style="display:none" title="Make this the active profile used by the mini-project">Use This Profile Live</button>
+    <label class="profile-trigger-field">
+      <span>Trigger</span>
+      <input id="profile-trigger-sequences" type="text" placeholder="/ *" title="Hotkey sequence that opens this profile. Separate alternatives with semicolons." />
+    </label>
+    <label class="profile-volume-field">
+      <span>Project dB</span>
+      <input id="profile-project-volume-db" type="number" step="0.5" min="-60" max="24" title="Mini-project volume layer. File offsets stay relative." />
+    </label>
+    <label class="profile-volume-field">
+      <span>Profile dB</span>
+      <input id="profile-volume-db" type="number" step="0.5" min="-60" max="24" title="Current editor profile volume layer. File offsets stay relative." />
+    </label>
+  </div>
+  <span class="pb-spacer"></span>
+  <div class="profile-actions" aria-label="Profile actions">
+    <span class="profile-actions-label">Profile Actions</span>
+    <button class="btn-pb" id="pb-duplicate" title="Duplicate the current profile">Duplicate Profile</button>
+    <button class="btn-pb" id="pb-rename" title="Rename current profile">Rename Profile</button>
+    <button class="btn-pb danger" id="pb-delete" title="Delete current profile">Delete Profile</button>
+  </div>
+  <button class="btn-pb" id="media-profile-create-toggle" type="button">New Media Profile</button>
+  <button class="btn-pb project-settings-btn" id="project-settings-toggle" type="button">Project Settings</button>
+  <div class="hotkey-tester" id="hotkey-tester">
+    <button class="btn-pb" id="hotkey-tester-toggle" type="button">Test Hotkeys</button>
+    <span class="hotkey-tester-readout" id="hotkey-tester-readout">Off</span>
+  </div>
+</div>
+
+<section class="media-profile-create-panel" id="media-profile-create-panel" hidden>
+  <div class="project-settings-head">
+    <div>
+      <div class="project-settings-title">New Media Profile</div>
+      <div class="project-settings-sub">Create another OBS media profile with its own folder, trigger, voice matching, hotkeys, and layout rules.</div>
+    </div>
+    <button class="btn-pb" id="media-profile-create-close" type="button">Close</button>
+  </div>
+  <div class="media-profile-create-grid">
+    <label class="project-setting-field">
+      <span class="project-setting-label">Name</span>
+      <input id="media-profile-name" type="text" placeholder="Meme Clips" autocomplete="off" />
+      <span class="project-setting-help">Shown in the Media Profile switcher.</span>
+    </label>
+    <label class="project-setting-field">
+      <span class="project-setting-label">Key</span>
+      <input id="media-profile-key" type="text" placeholder="meme_clips" autocomplete="off" />
+      <span class="project-setting-help">Folder/config key. Leave blank to derive from name.</span>
+    </label>
+    <label class="project-setting-field">
+      <span class="project-setting-label">Asset Folder</span>
+      <input id="media-profile-asset-dir" type="text" placeholder="F:\path\to\assets" autocomplete="off" />
+      <span class="project-setting-help">Where this profile scans media.</span>
+    </label>
+    <label class="project-setting-field">
+      <span class="project-setting-label">OBS Scene</span>
+      <input id="media-profile-scene" type="text" placeholder="Meme Clips" autocomplete="off" />
+      <span class="project-setting-help">Scene this profile owns.</span>
+    </label>
+    <label class="project-setting-field">
+      <span class="project-setting-label">Source Prefix</span>
+      <input id="media-profile-prefix" type="text" placeholder="mc__" autocomplete="off" />
+      <span class="project-setting-help">Keep stable after OBS sources are created.</span>
+    </label>
+    <label class="project-setting-field">
+      <span class="project-setting-label">Trigger Sequence</span>
+      <input id="media-profile-trigger" type="text" placeholder="+ +" autocomplete="off" />
+      <span class="project-setting-help">Use spaces for multi-key sequences. Separate alternatives with semicolons.</span>
+    </label>
+  </div>
+  <div class="media-profile-feature-grid">
+    <label><input type="checkbox" data-media-profile-feature="manual_hotkeys_enabled" checked /> Manual hotkeys</label>
+    <label><input type="checkbox" data-media-profile-feature="voice_commands_enabled" checked /> Voice commands</label>
+    <label><input type="checkbox" data-media-profile-feature="random_commands_enabled" /> Random and next commands</label>
+    <label><input type="checkbox" data-media-profile-feature="categories_enabled" checked /> Categories</label>
+    <label><input type="checkbox" data-media-profile-feature="obs_layout_enabled" checked /> OBS canvas rules</label>
+    <label><input type="checkbox" data-media-profile-feature="audio_settings_enabled" checked /> Audio settings</label>
+  </div>
+  <div class="project-settings-actions">
+    <span class="project-settings-status" id="media-profile-create-status"></span>
+    <button class="btn-pb accent" id="media-profile-create-save" type="button">Create Media Profile</button>
+  </div>
+</section>
+
+<section class="project-settings-panel" id="project-settings-panel" hidden>
+  <div class="project-settings-head">
+    <div>
+      <div class="project-settings-title">Project Settings</div>
+      <div class="project-settings-sub">Saved as editor overrides. Restart the mini project for runtime changes to apply.</div>
+    </div>
+    <button class="btn-pb" id="project-settings-close" type="button">Close</button>
+  </div>
+  <div class="project-settings-grid" id="project-settings-grid"></div>
+  <div class="project-settings-actions">
+    <span class="project-settings-status" id="project-settings-status"></span>
+    <button class="btn-pb accent" id="project-settings-save" type="button">Save Project Settings</button>
+  </div>
+</section>
