@@ -1,6 +1,6 @@
 {
-  "live_profile": "default",
-  "active_profile": "default",
+  "live_profile": "Copy of default",
+  "active_profile": "Copy of default",
   "profiles": {
     "default": {
       "hotkeys": {
@@ -8,8 +8,7 @@
           "disney-applause",
           "confetti-pop-sound",
           "anime-wow-sound-effect",
-          "roblox-old-winning-sound-effect",
-          "check-mark_oPG7Xo5"
+          "roblox-old-winning-sound-effect"
         ],
         "2": [
           "lizzard-1",
@@ -21,15 +20,50 @@
         "3": [
           "romanceeeeeeeeeeeeee",
           "rizz-sound-effect",
-          "the-weeknd-rizzz"
+          "the-weeknd-rizzz",
+          "i love you",
+          "love cat song",
+          "im falling in love"
         ],
-        "!": [
+        "5": [
+          "iphone-charge-sound",
           "apple-pay-sound",
-          "kaching-sound-fx",
           "ding-sound-effect_2",
-          "metal-gear-alert-sound-effect_XKoHReZ"
+          "kaching-sound-fx"
         ],
-        "Z": [
+        "6": "chill guy",
+        "7": "JOHN CENA",
+        "x": "zvuk-fotoapparata",
+        "%": [
+          "anime brainrot opening",
+          "heavenly-music-gaming-sound-effect-hd-mp3cut",
+          "hub-intro-sound"
+        ],
+        "t": [
+          "prowler",
+          "gangsta paradise"
+        ],
+        "X": [
+          "discord-leave-noise",
+          "loading-lost-connection-green-screen-with-sound-effect-2_K8HORkT",
+          "error-glitch"
+        ],
+        "T": [
+          "look-behind-you-gorilla-tag",
+          "among-us-role-reveal-sound",
+          "run",
+          "leave me alone"
+        ],
+        "a": [
+          "epic newt newt",
+          "who is she"
+        ],
+        "A": [
+          "dun-dun-dun-sound-effect-brass_8nFBccR",
+          "metal-gear-alert-sound-effect_XKoHReZ",
+          "check-mark_oPG7Xo5"
+        ],
+        "z": [
           "spongebob-fail",
           "sponge-bob-disgusting",
           "oh-hell-naw-man-wtf-man",
@@ -39,68 +73,442 @@
           "brother-ewwwwwww",
           "a-few-moments-later-sponge-bob-sfx-fun",
           "studio-audience-awwww-sound-fx",
-          "dry-fart"
+          "dry-fart",
+          "bone-crack",
+          "vine-boom",
+          "fuck"
         ],
-        "x": "zvuk-fotoapparata",
-        "z": [
-          "fahhhhhhhhhhhhhh",
-          "bone-crack"
+        "!": [
+          "dancing music",
+          "coffin dnace",
+          "celebrate",
+          "crab rave",
+          "die die die",
+          "fun celebration",
+          "JOHN CENA",
+          "rat dance",
+          "Pedro",
+          "Sigma Boy",
+          "Deja Vu",
+          "hype up music",
+          "meow meow"
         ],
-        "%": [
-          "heavenly-music-gaming-sound-effect-hd-mp3cut",
-          "iphone-charge-sound",
-          "hub-intro-sound"
+        "Z": [
+          "dang it",
+          "chill guy",
+          "im cooked",
+          "OH NO NO NO NO",
+          "I shouldve seen that coming",
+          "sad violin",
+          "woops",
+          "How could this happen to me"
         ],
-        "t": [
-          "prowler",
-          "thisissparta.swf"
-        ],
-        "X": [
-          "discord-leave-noise",
-          "loading-lost-connection-green-screen-with-sound-effect-2_K8HORkT"
-        ],
-        "T": [
-          "look-behind-you-gorilla-tag",
-          "among-us-role-reveal-sound"
-        ],
-        "a": "galaxy-meme",
-        "A": [
-          "dun-dun-dun-sound-effect-brass_8nFBccR",
-          "vine-boom"
-        ]
+        "@": "hooray",
+        "#": "mom frog",
+        "$": "oh no",
+        "^": "die die die",
+        "h": "you saved me",
+        "c": "that was smart",
+        "H": "what just happened"
       },
       "group_names": {
         "1": "celebration",
         "2": "spam",
         "3": "Rizz",
-        "Z": "Fail",
-        "%": "We're so back",
+        "5": "we're so back",
+        "6": "chill guy",
+        "%": "We're so back long",
         "t": "Attacking",
         "T": "hide hide hide",
-        "a": "smart",
-        "A": "Look at this"
+        "a": "that was epic",
+        "A": "ding ding ding",
+        "z": "Fail",
+        "#": "Fun Music",
+        "!": "Hype Celebration Music",
+        "Z": "Fail Longer",
+        "X": "im confused/lagging",
+        "@": "Hooray",
+        "$": "oh no",
+        "^": "^",
+        "h": "Hero",
+        "c": "SMART PLAY",
+        "H": "Huh"
       },
       "empty_groups": [],
-      "unbound_groups": [
-        {
-          "id": "u4",
-          "name": "fart",
-          "stems": []
-        },
-        {
-          "id": "u5",
-          "name": "",
-          "stems": []
-        },
-        {
-          "id": "u0",
-          "name": "Suprise",
-          "stems": []
-        }
-      ],
+      "unbound_groups": [],
       "display_names": {},
-      "categories": [],
-      "sound_categories": {}
+      "categories": [
+        "SFX Audio Only",
+        "SFX visuals",
+        "Song SFX"
+      ],
+      "sound_categories": {
+        "anime brainrot opening": [
+          "Song SFX"
+        ],
+        "celebrate": [
+          "Song SFX"
+        ],
+        "coffin dnace": [
+          "Song SFX"
+        ],
+        "dancing music": [
+          "Song SFX"
+        ],
+        "Deja Vu": [
+          "Song SFX"
+        ],
+        "dang it": [
+          "Song SFX"
+        ],
+        "crab rave": [
+          "Song SFX"
+        ],
+        "chill guy": [
+          "Song SFX"
+        ],
+        "die die die": [
+          "Song SFX"
+        ],
+        "Pedro": [
+          "Song SFX"
+        ],
+        "hype up music": [
+          "Song SFX"
+        ],
+        "i love you": [
+          "Song SFX"
+        ],
+        "I shouldve seen that coming": [
+          "Song SFX"
+        ],
+        "epic newt newt": [
+          "Song SFX"
+        ],
+        "sad violin": [
+          "Song SFX"
+        ],
+        "im cooked": [
+          "Song SFX"
+        ],
+        "im falling in love": [
+          "Song SFX"
+        ],
+        "JOHN CENA": [
+          "Song SFX"
+        ],
+        "love cat song": [
+          "Song SFX"
+        ],
+        "meow meow": [
+          "Song SFX"
+        ],
+        "mom frog": [
+          "SFX visuals"
+        ],
+        "OH NO NO NO NO": [
+          "Song SFX"
+        ],
+        "rat dance": [
+          "Song SFX"
+        ],
+        "hooray": [
+          "SFX visuals"
+        ],
+        "another-one_dPvHt2Z": [
+          "SFX Audio Only"
+        ],
+        "ding-sound-effect_1_CVUaI0C": [
+          "SFX Audio Only"
+        ],
+        "dont be suspicious": [
+          "SFX Audio Only"
+        ],
+        "error-glitch": [
+          "SFX Audio Only"
+        ],
+        "fuck": [
+          "SFX Audio Only"
+        ],
+        "Halo Respawn sound effect": [
+          "SFX Audio Only"
+        ],
+        "How could this happen to me": [
+          "SFX Audio Only"
+        ],
+        "leave me alone": [
+          "SFX Audio Only"
+        ],
+        "yee-haw": [
+          "SFX Audio Only"
+        ],
+        "a-few-moments-later-sponge-bob-sfx-fun": [
+          "SFX Audio Only"
+        ],
+        "among-us-role-reveal-sound": [
+          "SFX Audio Only"
+        ],
+        "anime-wow-sound-effect": [
+          "SFX Audio Only"
+        ],
+        "apple-pay-sound": [
+          "SFX Audio Only"
+        ],
+        "bone-crack": [
+          "SFX Audio Only"
+        ],
+        "bonk_7zPAD7C": [
+          "SFX Audio Only"
+        ],
+        "brother-ewwwwwww": [
+          "SFX Audio Only"
+        ],
+        "bruh-sound-effect_WstdzdM": [
+          "SFX Audio Only"
+        ],
+        "check-mark_oPG7Xo5": [
+          "SFX Audio Only"
+        ],
+        "confetti-pop-sound": [
+          "SFX Audio Only"
+        ],
+        "ding-sound-effect_2": [
+          "SFX Audio Only"
+        ],
+        "discord-leave-noise": [
+          "SFX Audio Only"
+        ],
+        "disney-applause": [
+          "SFX Audio Only"
+        ],
+        "downer_noise": [
+          "SFX Audio Only"
+        ],
+        "dry-fart": [
+          "SFX Audio Only"
+        ],
+        "dun-dun-dun-sound-effect-brass_8nFBccR": [
+          "SFX Audio Only"
+        ],
+        "fahhhhhhhhhhhhhh": [
+          "SFX Audio Only"
+        ],
+        "galaxy-meme": [
+          "SFX Audio Only"
+        ],
+        "gary_meow": [
+          "SFX Audio Only"
+        ],
+        "heavenly-music-gaming-sound-effect-hd-mp3cut": [
+          "SFX Audio Only"
+        ],
+        "hub-intro-sound": [
+          "SFX Audio Only"
+        ],
+        "iphone-charge-sound": [
+          "SFX Audio Only"
+        ],
+        "kaching-sound-fx": [
+          "SFX Audio Only"
+        ],
+        "lizzard-1": [
+          "SFX Audio Only"
+        ],
+        "loading-lost-connection-green-screen-with-sound-effect-2_K8HORkT": [
+          "SFX Audio Only"
+        ],
+        "look-behind-you-gorilla-tag": [
+          "SFX Audio Only"
+        ],
+        "mac-quack": [
+          "SFX Audio Only"
+        ],
+        "metal-gear-alert-sound-effect_XKoHReZ": [
+          "SFX Audio Only"
+        ],
+        "oh-hell-naw-man-wtf-man": [
+          "SFX Audio Only"
+        ],
+        "piuw": [
+          "SFX Audio Only"
+        ],
+        "prowler": [
+          "SFX Audio Only"
+        ],
+        "record-scratch-2": [
+          "SFX Audio Only"
+        ],
+        "rizz-sound-effect": [
+          "SFX Audio Only"
+        ],
+        "roblox-old-winning-sound-effect": [
+          "SFX Audio Only"
+        ],
+        "romanceeeeeeeeeeeeee": [
+          "SFX Audio Only"
+        ],
+        "sponge-bob-disgusting": [
+          "SFX Audio Only"
+        ],
+        "spongebob-fail": [
+          "SFX Audio Only"
+        ],
+        "studio-audience-awwww-sound-fx": [
+          "SFX Audio Only"
+        ],
+        "the-weeknd-rizzz": [
+          "SFX Audio Only"
+        ],
+        "thisissparta.swf": [
+          "SFX Audio Only"
+        ],
+        "vine-boom": [
+          "SFX Audio Only"
+        ],
+        "zvuk-fotoapparata": [
+          "SFX Audio Only"
+        ],
+        "fun celebration": [
+          "Song SFX"
+        ],
+        "gambling": [
+          "Song SFX"
+        ],
+        "gangsta paradise": [
+          "Song SFX"
+        ],
+        "run": [
+          "Song SFX"
+        ],
+        "Sigma Boy": [
+          "Song SFX"
+        ],
+        "that was smart": [
+          "Song SFX"
+        ],
+        "troll lol": [
+          "Song SFX"
+        ],
+        "what just happened": [
+          "Song SFX"
+        ],
+        "who is she": [
+          "Song SFX"
+        ],
+        "woops": [
+          "Song SFX"
+        ],
+        "you saved me": [
+          "Song SFX"
+        ]
+      },
+      "trigger_sequences": "",
+      "interface_hotkeys": {
+        "start_listen": "",
+        "stop_listen": "",
+        "abort_listen": "",
+        "pause": "",
+        "resume": "",
+        "stop": "",
+        "random": "",
+        "next": "",
+        "reload": ""
+      },
+      "project_volume_db": -5.5,
+      "profile_volume_db": 0.0,
+      "file_volume_offsets": {
+        "a-few-moments-later-sponge-bob-sfx-fun": -1.0,
+        "among-us-role-reveal-sound": -1.0,
+        "anime brainrot opening": -1.0,
+        "anime-wow-sound-effect": -1.0,
+        "another-one_dPvHt2Z": -1.0,
+        "apple-pay-sound": -1.0,
+        "bone-crack": -1.0,
+        "bonk_7zPAD7C": -1.0,
+        "brother-ewwwwwww": -1.0,
+        "bruh-sound-effect_WstdzdM": -1.0,
+        "celebrate": -1.0,
+        "check-mark_oPG7Xo5": -1.0,
+        "chill guy": -1.0,
+        "coffin dnace": -1.0,
+        "confetti-pop-sound": -1.0,
+        "crab rave": -1.0,
+        "dancing music": -1.0,
+        "dang it": -1.0,
+        "Deja Vu": -1.0,
+        "die die die": -1.0,
+        "ding-sound-effect_1_CVUaI0C": -1.0,
+        "ding-sound-effect_2": -1.0,
+        "discord-leave-noise": -1.0,
+        "disney-applause": -1.0,
+        "dont be suspicious": -1.0,
+        "downer_noise": -1.0,
+        "dry-fart": -1.0,
+        "dun-dun-dun-sound-effect-brass_8nFBccR": -1.0,
+        "epic newt newt": -1.0,
+        "error-glitch": -1.0,
+        "fahhhhhhhhhhhhhh": -1.0,
+        "fuck": -1.0,
+        "fun celebration": -1.0,
+        "galaxy-meme": -1.0,
+        "gambling": -1.0,
+        "gangsta paradise": -1.0,
+        "gary_meow": -1.0,
+        "Halo Respawn sound effect": -1.0,
+        "heavenly-music-gaming-sound-effect-hd-mp3cut": -1.0,
+        "hooray": -1.0,
+        "How could this happen to me": -1.0,
+        "hub-intro-sound": -1.0,
+        "hype up music": -1.0,
+        "i love you": -1.0,
+        "I shouldve seen that coming": -1.0,
+        "im cooked": -1.0,
+        "im falling in love": -1.0,
+        "iphone-charge-sound": -1.0,
+        "JOHN CENA": -1.0,
+        "kaching-sound-fx": -1.0,
+        "leave me alone": -1.0,
+        "lizzard-1": -1.0,
+        "loading-lost-connection-green-screen-with-sound-effect-2_K8HORkT": -1.0,
+        "look-behind-you-gorilla-tag": -1.0,
+        "love cat song": -1.0,
+        "mac-quack": -1.0,
+        "meow meow": -1.0,
+        "metal-gear-alert-sound-effect_XKoHReZ": -1.0,
+        "mom frog": -1.0,
+        "oh no": -1.0,
+        "OH NO NO NO NO": -1.0,
+        "oh-hell-naw-man-wtf-man": -1.0,
+        "Pedro": -1.0,
+        "piuw": -1.0,
+        "prowler": -1.0,
+        "rat dance": -1.0,
+        "record-scratch-2": -1.0,
+        "rizz-sound-effect": -1.0,
+        "roblox-old-winning-sound-effect": -1.0,
+        "romanceeeeeeeeeeeeee": -1.0,
+        "run": -1.0,
+        "sad violin": -1.0,
+        "Sigma Boy": -1.0,
+        "sponge-bob-disgusting": -1.0,
+        "spongebob-fail": -1.0,
+        "studio-audience-awwww-sound-fx": -1.0,
+        "that was smart": -1.0,
+        "the-weeknd-rizzz": -1.0,
+        "thisissparta.swf": -1.0,
+        "troll lol": -1.0,
+        "vine-boom": -1.0,
+        "what just happened": -1.0,
+        "who is she": -1.0,
+        "woops": -1.0,
+        "yee-haw": -1.0,
+        "you saved me": -1.0,
+        "zvuk-fotoapparata": -1.0,
+        "dayum-friday": 0.0,
+        "goofy running": 0.0,
+        "cant touch this": 0.0
+      },
+      "category_volume_db": {}
     },
     "test": {
       "hotkeys": {
@@ -200,7 +608,611 @@
       ],
       "display_names": {},
       "categories": [],
-      "sound_categories": {}
+      "sound_categories": {},
+      "trigger_sequences": "",
+      "interface_hotkeys": {},
+      "project_volume_db": -5.5,
+      "profile_volume_db": 0.0,
+      "file_volume_offsets": {
+        "Deja Vu": 0.0,
+        "Halo Respawn sound effect": 0.0,
+        "How could this happen to me": 0.0,
+        "I shouldve seen that coming": 0.0,
+        "JOHN CENA": 0.0,
+        "OH NO NO NO NO": 0.0,
+        "Pedro": 0.0,
+        "Sigma Boy": 0.0,
+        "a-few-moments-later-sponge-bob-sfx-fun": 0.0,
+        "among-us-role-reveal-sound": 0.0,
+        "anime brainrot opening": 0.0,
+        "anime-wow-sound-effect": 0.0,
+        "another-one_dPvHt2Z": 0.0,
+        "apple-pay-sound": 0.0,
+        "bone-crack": 0.0,
+        "bonk_7zPAD7C": 0.0,
+        "brother-ewwwwwww": 0.0,
+        "bruh-sound-effect_WstdzdM": 0.0,
+        "celebrate": 0.0,
+        "check-mark_oPG7Xo5": 0.0,
+        "chill guy": 0.0,
+        "coffin dnace": 0.0,
+        "confetti-pop-sound": 0.0,
+        "crab rave": 0.0,
+        "dancing music": 0.0,
+        "dang it": 0.0,
+        "die die die": 0.0,
+        "ding-sound-effect_1_CVUaI0C": 0.0,
+        "ding-sound-effect_2": 0.0,
+        "discord-leave-noise": 0.0,
+        "disney-applause": 0.0,
+        "dont be suspicious": 0.0,
+        "downer_noise": 0.0,
+        "dry-fart": 0.0,
+        "dun-dun-dun-sound-effect-brass_8nFBccR": 0.0,
+        "epic newt newt": 0.0,
+        "error-glitch": 0.0,
+        "fahhhhhhhhhhhhhh": 0.0,
+        "fuck": 0.0,
+        "fun celebration": 0.0,
+        "galaxy-meme": 0.0,
+        "gambling": 0.0,
+        "gangsta paradise": 0.0,
+        "gary_meow": 0.0,
+        "heavenly-music-gaming-sound-effect-hd-mp3cut": 0.0,
+        "hooray": 0.0,
+        "hub-intro-sound": 0.0,
+        "hype up music": 0.0,
+        "i love you": 0.0,
+        "im cooked": 0.0,
+        "im falling in love": 0.0,
+        "iphone-charge-sound": 0.0,
+        "kaching-sound-fx": 0.0,
+        "leave me alone": 0.0,
+        "lizzard-1": 0.0,
+        "loading-lost-connection-green-screen-with-sound-effect-2_K8HORkT": 0.0,
+        "look-behind-you-gorilla-tag": 0.0,
+        "love cat song": 0.0,
+        "mac-quack": 0.0,
+        "meow meow": 0.0,
+        "metal-gear-alert-sound-effect_XKoHReZ": 0.0,
+        "mom frog": 0.0,
+        "oh no": 0.0,
+        "oh-hell-naw-man-wtf-man": 0.0,
+        "piuw": 0.0,
+        "prowler": 0.0,
+        "rat dance": 0.0,
+        "record-scratch-2": 0.0,
+        "rizz-sound-effect": 0.0,
+        "roblox-old-winning-sound-effect": 0.0,
+        "romanceeeeeeeeeeeeee": 0.0,
+        "run": 0.0,
+        "sad violin": 0.0,
+        "sponge-bob-disgusting": 0.0,
+        "spongebob-fail": 0.0,
+        "studio-audience-awwww-sound-fx": 0.0,
+        "that was smart": 0.0,
+        "the-weeknd-rizzz": 0.0,
+        "thisissparta.swf": 0.0,
+        "troll lol": 0.0,
+        "vine-boom": 0.0,
+        "what just happened": 0.0,
+        "who is she": 0.0,
+        "woops": 0.0,
+        "yee-haw": 0.0,
+        "you saved me": 0.0,
+        "zvuk-fotoapparata": 0.0,
+        "dayum-friday": 0.0,
+        "goofy running": 0.0,
+        "cant touch this": 0.0
+      },
+      "category_volume_db": {}
+    },
+    "Copy of default": {
+      "hotkeys": {
+        "1": [
+          "anime-wow-sound-effect",
+          "roblox-old-winning-sound-effect",
+          "check-mark_oPG7Xo5"
+        ],
+        "2": [
+          "lizzard-1",
+          "gary_meow",
+          "mac-quack",
+          "bonk_7zPAD7C",
+          "piuw"
+        ],
+        "3": [
+          "romanceeeeeeeeeeeeee",
+          "rizz-sound-effect",
+          "the-weeknd-rizzz",
+          "i love you",
+          "love cat song",
+          "im falling in love"
+        ],
+        "5": "JOHN CENA",
+        "6": "chill guy",
+        "x": "zvuk-fotoapparata",
+        "%": "hub-intro-sound",
+        "t": "prowler",
+        "X": [
+          "discord-leave-noise",
+          "loading-lost-connection-green-screen-with-sound-effect-2_K8HORkT"
+        ],
+        "T": "leave me alone",
+        "z": [
+          "spongebob-fail",
+          "sponge-bob-disgusting",
+          "oh-hell-naw-man-wtf-man",
+          "record-scratch-2",
+          "downer_noise",
+          "bruh-sound-effect_WstdzdM",
+          "brother-ewwwwwww",
+          "studio-audience-awwww-sound-fx",
+          "dry-fart",
+          "bone-crack",
+          "vine-boom",
+          "fuck",
+          "a-few-moments-later-sponge-bob-sfx-fun"
+        ],
+        "!": [
+          "dancing music",
+          "coffin dnace",
+          "celebrate",
+          "crab rave",
+          "die die die",
+          "fun celebration",
+          "JOHN CENA",
+          "rat dance",
+          "Pedro",
+          "Sigma Boy",
+          "Deja Vu",
+          "hype up music",
+          "meow meow"
+        ],
+        "Z": [
+          "dang it",
+          "im cooked",
+          "OH NO NO NO NO",
+          "I shouldve seen that coming",
+          "sad violin",
+          "woops",
+          "How could this happen to me"
+        ],
+        "@": "hooray",
+        "#": "mom frog",
+        "$": "oh no",
+        "^": "die die die",
+        "h": "you saved me",
+        "c": "that was smart",
+        "H": "what just happened",
+        "j": "dun-dun-dun-sound-effect-brass_8nFBccR",
+        "C": "epic newt newt",
+        "J": "who is she",
+        ",": "goofy running",
+        "a": "metal-gear-alert-sound-effect_XKoHReZ"
+      },
+      "group_names": {
+        "1": "wow",
+        "2": "spam",
+        "3": "Rizz",
+        "5": "check mark",
+        "6": "chill guy",
+        "%": "We're so back long",
+        "t": "Attacking",
+        "T": "Leave me alone",
+        "a": "that was epic",
+        "A": "!!!",
+        "z": "Fail",
+        "#": "Fun Music",
+        "!": "Hype Celebration Music",
+        "Z": "Fail Longer",
+        "X": "im confused/lagging",
+        "@": "Hooray",
+        "$": "oh no",
+        "^": "^",
+        "h": "Hero",
+        "c": "SMART PLAY",
+        "H": "Huh",
+        "j": "realization",
+        "C": "A few moments later",
+        "J": "game recogznies game",
+        ",": "running"
+      },
+      "empty_groups": [
+        "7",
+        "A"
+      ],
+      "unbound_groups": [
+        {
+          "id": "u0",
+          "name": "we're so back",
+          "stems": [
+            "iphone-charge-sound",
+            "apple-pay-sound",
+            "ding-sound-effect_2",
+            "kaching-sound-fx"
+          ]
+        }
+      ],
+      "display_names": {},
+      "categories": [
+        "SFX Audio Only",
+        "SFX visuals",
+        "Song SFX"
+      ],
+      "sound_categories": {
+        "anime brainrot opening": [
+          "Song SFX"
+        ],
+        "celebrate": [
+          "Song SFX"
+        ],
+        "coffin dnace": [
+          "Song SFX"
+        ],
+        "dancing music": [
+          "Song SFX"
+        ],
+        "Deja Vu": [
+          "Song SFX"
+        ],
+        "dang it": [
+          "Song SFX"
+        ],
+        "crab rave": [
+          "Song SFX"
+        ],
+        "chill guy": [
+          "Song SFX"
+        ],
+        "die die die": [
+          "Song SFX"
+        ],
+        "Pedro": [
+          "Song SFX"
+        ],
+        "hype up music": [
+          "Song SFX"
+        ],
+        "i love you": [
+          "Song SFX"
+        ],
+        "I shouldve seen that coming": [
+          "Song SFX"
+        ],
+        "epic newt newt": [
+          "Song SFX"
+        ],
+        "sad violin": [
+          "Song SFX"
+        ],
+        "im cooked": [
+          "Song SFX"
+        ],
+        "im falling in love": [
+          "Song SFX"
+        ],
+        "JOHN CENA": [
+          "Song SFX"
+        ],
+        "love cat song": [
+          "Song SFX"
+        ],
+        "meow meow": [
+          "Song SFX"
+        ],
+        "mom frog": [
+          "SFX visuals"
+        ],
+        "OH NO NO NO NO": [
+          "Song SFX"
+        ],
+        "rat dance": [
+          "Song SFX"
+        ],
+        "hooray": [
+          "SFX visuals"
+        ],
+        "another-one_dPvHt2Z": [
+          "SFX Audio Only"
+        ],
+        "ding-sound-effect_1_CVUaI0C": [
+          "SFX Audio Only"
+        ],
+        "dont be suspicious": [
+          "SFX Audio Only"
+        ],
+        "error-glitch": [
+          "SFX Audio Only"
+        ],
+        "fuck": [
+          "SFX Audio Only"
+        ],
+        "Halo Respawn sound effect": [
+          "SFX Audio Only"
+        ],
+        "How could this happen to me": [
+          "SFX Audio Only"
+        ],
+        "leave me alone": [
+          "SFX Audio Only"
+        ],
+        "yee-haw": [
+          "SFX Audio Only"
+        ],
+        "a-few-moments-later-sponge-bob-sfx-fun": [
+          "SFX Audio Only"
+        ],
+        "among-us-role-reveal-sound": [
+          "SFX Audio Only"
+        ],
+        "anime-wow-sound-effect": [
+          "SFX Audio Only"
+        ],
+        "apple-pay-sound": [
+          "SFX Audio Only"
+        ],
+        "bone-crack": [
+          "SFX Audio Only"
+        ],
+        "bonk_7zPAD7C": [
+          "SFX Audio Only"
+        ],
+        "brother-ewwwwwww": [
+          "SFX Audio Only"
+        ],
+        "bruh-sound-effect_WstdzdM": [
+          "SFX Audio Only"
+        ],
+        "check-mark_oPG7Xo5": [
+          "SFX Audio Only"
+        ],
+        "confetti-pop-sound": [
+          "SFX Audio Only"
+        ],
+        "ding-sound-effect_2": [
+          "SFX Audio Only"
+        ],
+        "discord-leave-noise": [
+          "SFX Audio Only"
+        ],
+        "disney-applause": [
+          "SFX Audio Only"
+        ],
+        "downer_noise": [
+          "SFX Audio Only"
+        ],
+        "dry-fart": [
+          "SFX Audio Only"
+        ],
+        "dun-dun-dun-sound-effect-brass_8nFBccR": [
+          "SFX Audio Only"
+        ],
+        "fahhhhhhhhhhhhhh": [
+          "SFX Audio Only"
+        ],
+        "galaxy-meme": [
+          "SFX Audio Only"
+        ],
+        "gary_meow": [
+          "SFX Audio Only"
+        ],
+        "heavenly-music-gaming-sound-effect-hd-mp3cut": [
+          "SFX Audio Only"
+        ],
+        "hub-intro-sound": [
+          "SFX Audio Only"
+        ],
+        "iphone-charge-sound": [
+          "SFX Audio Only"
+        ],
+        "kaching-sound-fx": [
+          "SFX Audio Only"
+        ],
+        "lizzard-1": [
+          "SFX Audio Only"
+        ],
+        "loading-lost-connection-green-screen-with-sound-effect-2_K8HORkT": [
+          "SFX Audio Only"
+        ],
+        "look-behind-you-gorilla-tag": [
+          "SFX Audio Only"
+        ],
+        "mac-quack": [
+          "SFX Audio Only"
+        ],
+        "metal-gear-alert-sound-effect_XKoHReZ": [
+          "SFX Audio Only"
+        ],
+        "oh-hell-naw-man-wtf-man": [
+          "SFX Audio Only"
+        ],
+        "piuw": [
+          "SFX Audio Only"
+        ],
+        "prowler": [
+          "SFX Audio Only"
+        ],
+        "record-scratch-2": [
+          "SFX Audio Only"
+        ],
+        "rizz-sound-effect": [
+          "SFX Audio Only"
+        ],
+        "roblox-old-winning-sound-effect": [
+          "SFX Audio Only"
+        ],
+        "romanceeeeeeeeeeeeee": [
+          "SFX Audio Only"
+        ],
+        "sponge-bob-disgusting": [
+          "SFX Audio Only"
+        ],
+        "spongebob-fail": [
+          "SFX Audio Only"
+        ],
+        "studio-audience-awwww-sound-fx": [
+          "SFX Audio Only"
+        ],
+        "the-weeknd-rizzz": [
+          "SFX Audio Only"
+        ],
+        "thisissparta.swf": [
+          "SFX Audio Only"
+        ],
+        "vine-boom": [
+          "SFX Audio Only"
+        ],
+        "zvuk-fotoapparata": [
+          "SFX Audio Only"
+        ],
+        "fun celebration": [
+          "Song SFX"
+        ],
+        "gambling": [
+          "Song SFX"
+        ],
+        "gangsta paradise": [
+          "Song SFX"
+        ],
+        "run": [
+          "Song SFX"
+        ],
+        "Sigma Boy": [
+          "Song SFX"
+        ],
+        "that was smart": [
+          "Song SFX"
+        ],
+        "troll lol": [
+          "Song SFX"
+        ],
+        "what just happened": [
+          "Song SFX"
+        ],
+        "who is she": [
+          "Song SFX"
+        ],
+        "woops": [
+          "Song SFX"
+        ],
+        "you saved me": [
+          "Song SFX"
+        ]
+      },
+      "trigger_sequences": "",
+      "interface_hotkeys": {
+        "start_listen": "",
+        "stop_listen": "",
+        "abort_listen": "",
+        "pause": "",
+        "resume": "",
+        "stop": "",
+        "random": "",
+        "next": "",
+        "reload": ""
+      },
+      "project_volume_db": -5.5,
+      "profile_volume_db": 0.0,
+      "file_volume_offsets": {
+        "a-few-moments-later-sponge-bob-sfx-fun": -1.0,
+        "among-us-role-reveal-sound": -1.0,
+        "anime brainrot opening": -1.0,
+        "anime-wow-sound-effect": -1.0,
+        "another-one_dPvHt2Z": -1.0,
+        "apple-pay-sound": -1.0,
+        "bone-crack": -1.0,
+        "bonk_7zPAD7C": -1.0,
+        "brother-ewwwwwww": -1.0,
+        "bruh-sound-effect_WstdzdM": -1.0,
+        "celebrate": -1.0,
+        "check-mark_oPG7Xo5": -1.0,
+        "chill guy": -1.0,
+        "coffin dnace": -1.0,
+        "confetti-pop-sound": -1.0,
+        "crab rave": -1.0,
+        "dancing music": -1.0,
+        "dang it": -1.0,
+        "Deja Vu": -1.0,
+        "die die die": 7.92,
+        "ding-sound-effect_1_CVUaI0C": -1.0,
+        "ding-sound-effect_2": -1.0,
+        "discord-leave-noise": -1.0,
+        "disney-applause": -1.0,
+        "dont be suspicious": -1.0,
+        "downer_noise": -1.0,
+        "dry-fart": -1.0,
+        "dun-dun-dun-sound-effect-brass_8nFBccR": -1.0,
+        "epic newt newt": -1.0,
+        "error-glitch": -1.0,
+        "fahhhhhhhhhhhhhh": -1.0,
+        "fuck": -1.0,
+        "fun celebration": -1.0,
+        "galaxy-meme": -1.0,
+        "gambling": -1.0,
+        "gangsta paradise": -1.0,
+        "gary_meow": -1.0,
+        "Halo Respawn sound effect": -1.0,
+        "heavenly-music-gaming-sound-effect-hd-mp3cut": -1.0,
+        "hooray": -1.0,
+        "How could this happen to me": -1.0,
+        "hub-intro-sound": -1.0,
+        "hype up music": -1.0,
+        "i love you": -1.0,
+        "I shouldve seen that coming": -1.0,
+        "im cooked": -1.0,
+        "im falling in love": -1.0,
+        "iphone-charge-sound": -1.0,
+        "JOHN CENA": -1.0,
+        "kaching-sound-fx": -1.0,
+        "leave me alone": -1.0,
+        "lizzard-1": -1.0,
+        "loading-lost-connection-green-screen-with-sound-effect-2_K8HORkT": -1.0,
+        "look-behind-you-gorilla-tag": -1.0,
+        "love cat song": -1.0,
+        "mac-quack": -1.0,
+        "meow meow": -1.0,
+        "metal-gear-alert-sound-effect_XKoHReZ": -1.0,
+        "mom frog": -1.0,
+        "oh no": -1.0,
+        "OH NO NO NO NO": -1.0,
+        "oh-hell-naw-man-wtf-man": -1.0,
+        "Pedro": -1.0,
+        "piuw": -1.0,
+        "prowler": -1.0,
+        "rat dance": -1.0,
+        "record-scratch-2": -1.0,
+        "rizz-sound-effect": -1.0,
+        "roblox-old-winning-sound-effect": -1.0,
+        "romanceeeeeeeeeeeeee": -1.0,
+        "run": -1.0,
+        "sad violin": -1.0,
+        "Sigma Boy": -1.0,
+        "sponge-bob-disgusting": -1.0,
+        "spongebob-fail": -1.0,
+        "studio-audience-awwww-sound-fx": -1.0,
+        "that was smart": -8.76,
+        "the-weeknd-rizzz": -1.0,
+        "thisissparta.swf": -1.0,
+        "troll lol": -1.0,
+        "vine-boom": -1.0,
+        "what just happened": -1.0,
+        "who is she": -1.0,
+        "woops": -1.0,
+        "yee-haw": -1.0,
+        "you saved me": -1.0,
+        "zvuk-fotoapparata": -1.0,
+        "dayum-friday": 0.0,
+        "goofy running": 0.0,
+        "how could this happen to me": -1.0,
+        "john cena": 7.27,
+        "check-mark_opg7xo5": -1.0,
+        "deja vu": -1.0,
+        "cant touch this": 0.0,
+        "i shouldve seen that coming": -1.0,
+        "oh no no no no": -1.0
+      },
+      "category_volume_db": {}
     }
   }
 }

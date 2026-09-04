@@ -1,0 +1,950 @@
+{
+  "version": 1,
+  "baseline": {
+    "filters": [],
+    "transform": {
+      "alignment": 5,
+      "boundsAlignment": 0,
+      "boundsHeight": 1080.0,
+      "boundsType": "OBS_BOUNDS_NONE",
+      "boundsWidth": 1920.0,
+      "cropBottom": 0.0,
+      "cropLeft": 0.0,
+      "cropRight": 0.0,
+      "cropTop": 0.0,
+      "positionX": 0.0,
+      "positionY": 0.0,
+      "rotation": 0.0,
+      "scaleX": 1.5,
+      "scaleY": 1.5
+    },
+    "audio": {
+      "monitor_type": "OBS_MONITORING_TYPE_MONITOR_ONLY",
+      "muted": false,
+      "tracks": {
+        "1": true,
+        "2": true,
+        "3": true,
+        "4": true,
+        "5": true,
+        "6": true
+      }
+    },
+    "media_settings": {
+      "hw_decode": true,
+      "looping": false,
+      "restart_on_activate": false,
+      "close_when_inactive": true
+    }
+  },
+  "overrides": {
+    "hooray": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "mom frog": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 786.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 442.5,
+        "cropBottom": 417.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 411.0,
+        "positionX": 0.0,
+        "positionY": 381.0,
+        "rotation": 0.0,
+        "scaleX": 0.6144716739654541,
+        "scaleY": 0.6144716739654541
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "oh no": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 265.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 353.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 407.5,
+        "rotation": 0.0,
+        "scaleX": 0.36793050169944763,
+        "scaleY": 0.36793050169944763
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "i shouldve seen that coming": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "you saved me": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "john cena": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "oh no no no no": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "im cooked": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "die die die": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "chill guy": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "what just happened": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "who is she": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "hype up music": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "crab rave": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "rat dance": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "coffin dnace": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "deja vu": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "woops": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "dang it": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "sad violin": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "pedro": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "dancing music": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "sigma boy": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "roblox-old-winning-sound-effect": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "how could this happen to me": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "bruh-sound-effect_wstdzdm": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "sponge-bob-disgusting": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "lizzard-1": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "romanceeeeeeeeeeeeee": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "meow meow": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "celebrate": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "loading-lost-connection-green-screen-with-sound-effect-2_k8horkt": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "a-few-moments-later-sponge-bob-sfx-fun": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "bonk_7zpad7c": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "gary_meow": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "metal-gear-alert-sound-effect_xkohrez": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "fun celebration": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "studio-audience-awwww-sound-fx": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "prowler": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "downer_noise": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "zvuk-fotoapparata": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "that was smart": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "check-mark_opg7xo5": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "hub-intro-sound": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "leave me alone": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "anime-wow-sound-effect": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "dun-dun-dun-sound-effect-brass_8nfbccr": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "goofy running": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "fuck": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "rizz-sound-effect": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "mac-quack": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "spongebob-fail": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "love cat song": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "i love you": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "piuw": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "epic newt newt": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "the-weeknd-rizzz": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "im falling in love": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "record-scratch-2": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "cant touch this": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "dry-fart": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "brother-ewwwwwww": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "vine-boom": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "bone-crack": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "gambling": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 251.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 335.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 413.5,
+        "rotation": 0.0,
+        "scaleX": 0.348837673664093,
+        "scaleY": 0.348837673664093
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "oh-hell-naw-man-wtf-man": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "discord-leave-noise": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "run": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 20.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 35.5,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 0.0,
+        "rotation": 0.0,
+        "scaleX": 0.0555555559694767,
+        "scaleY": 0.0555555559694767
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "yee-haw": {
+      "audio": {},
+      "media_settings": {}
+    },
+    "anime brainrot opening": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 157.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 279.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 2.0,
+        "positionY": 454.5,
+        "rotation": 0.0,
+        "scaleX": 0.21799474954605103,
+        "scaleY": 0.21799474954605103
+      },
+      "audio": {},
+      "media_settings": {}
+    },
+    "dont be suspicious": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 190.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 337.5,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 451.5,
+        "rotation": 0.0,
+        "scaleX": 0.2637377977371216,
+        "scaleY": 0.2637377977371216
+      },
+      "audio": {},
+      "media_settings": {}
+    }
+  }
+}

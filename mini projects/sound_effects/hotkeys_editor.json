@@ -3,15 +3,6 @@
     "default": {
       "project_volume_db": -3.0,
       "profile_volume_db": 0.0,
-      "hotkeys": {
-        "!": "hooray",
-        "T": "leave me alone",
-        "@": "celebrate",
-        "#": "mom frog",
-        "$": "oh no",
-        "%": "",
-        "^": ""
-      },
       "file_volume_offsets": {
         "Deja Vu": 0.0,
         "Halo Respawn sound effect": 0.0,

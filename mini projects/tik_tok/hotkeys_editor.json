@@ -1,0 +1,79 @@
+{
+  "live_profile": "default",
+  "active_profile": "default",
+  "profiles": {
+    "default": {
+      "trigger_sequences": "",
+      "hotkeys": {
+        "1": "control ward edit",
+        "2": "Echoes back to full health",
+        "3": "i dont like this build"
+      },
+      "interface_hotkeys": {
+        "start_listen": "",
+        "stop_listen": "",
+        "abort_listen": "",
+        "pause": "",
+        "resume": "",
+        "stop": "",
+        "random": "",
+        "next": "",
+        "reload": ""
+      },
+      "project_volume_db": 6.5,
+      "profile_volume_db": 0.0,
+      "file_volume_offsets": {
+        "Alt T d by Urgot": -11.0,
+        "bull shit champion": -11.0,
+        "cc'd for so long": -11.0,
+        "control ward edit": -11.0,
+        "Echoes back to full health": -11.0,
+        "enemy team vs my team": -11.0,
+        "gamers don't know how to talk to girls": -11.0,
+        "girls only play the cute champions": -11.0,
+        "go to sleep": -11.0,
+        "hit the nexus not the vlad": -11.0,
+        "I am addicted to league of legends": -11.0,
+        "i dont like this build": -11.0,
+        "I know I can't beat you but he can": -11.0,
+        "jungler diff": -11.0,
+        "just walk away": -11.0,
+        "kayle farming": -11.0,
+        "level one chilling": -11.0,
+        "loading screen mastery": -11.0,
+        "miss the caitlyn ult": -11.0,
+        "Mom get the camera": -11.0,
+        "oops my girlfriend is sleeping": -11.0,
+        "rengar is so scary": -11.0,
+        "send it": -11.0,
+        "Support being the easiest role": -11.0,
+        "support vs tank": -11.0,
+        "tahm kench escaped me": -11.0,
+        "That was a terrible game I should not have queued up.": -11.0,
+        "The jungler telling you to play safe": -11.0,
+        "Trying to fight the top laner": -11.0,
+        "typing at the end of the game": -11.0,
+        "we win those": -11.0,
+        "welcome to league of legends": -11.0,
+        "why doesn't anyone play yuumi": -11.0,
+        "why would we ff": -11.0,
+        "Win Lane Lose Game": -11.0,
+        "you have no mana": -11.0,
+        "win lane lose game": 0.0,
+        "i know i can't beat you but he can": -11.0,
+        "support being the easiest role": -6.87,
+        "i am addicted to league of legends": -11.0
+      },
+      "group_names": {
+        "2": "e",
+        "3": "2"
+      },
+      "display_names": {},
+      "categories": [],
+      "sound_categories": {},
+      "empty_groups": [],
+      "unbound_groups": [],
+      "category_volume_db": {}
+    }
+  }
+}
