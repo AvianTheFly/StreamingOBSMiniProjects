@@ -55,11 +55,10 @@ Audio muting
   actually muted, so the crash handler never accidentally mutes/unmutes when
   nothing is playing.
 
-Game-end reset
---------------
-  When the League client disconnects (game ends), the in-memory clip registry
-  is cleared.  The trimmed files remain on disk for cleanup to merge into
-  a session overview video.
+Game-end organization
+---------------------
+  When the League client disconnects, clips stay as individual files and are
+  tagged with a persistent game/session label for library search and filtering.
 
 Integration
 -----------
@@ -88,6 +87,7 @@ from shared import VoicePTT, project_registry
 from obs import (
     save_replay_buffer_and_wait,
     set_media_source_file,
+    set_media_input_cursor,
     restart_media,
     switch_scene,
     wait_for_media_end,
@@ -116,10 +116,10 @@ from .config import (
 )
 from .kill_tracker import KillTracker
 from .cleanup import (
-    start_deferred, run_for_game,
     list_edited_reels,
     _read_next_game_num, _write_next_game_num,
 )
+from .clip_library import clip_settings, clip_settings_many, intro_clips, playback_range, update_clip_settings
 
 
 _REPLAY_MEDIA_EXTENSIONS = {".mkv", ".mp4", ".mov", ".webm"}
@@ -132,7 +132,9 @@ def _replay_files_on_disk() -> list[Path]:
     files = [
         path
         for path in root.rglob("*")
-        if path.is_file() and path.suffix.lower() in _REPLAY_MEDIA_EXTENSIONS
+        if path.is_file()
+        and path.suffix.lower() in _REPLAY_MEDIA_EXTENSIONS
+        and not any(part.startswith(".instant_replay_") for part in path.relative_to(root).parts)
     ]
     return sorted(files, key=lambda path: path.stat().st_mtime, reverse=True)
 
@@ -410,8 +412,8 @@ def run(
     tracker = KillTracker(stop_event)
     tracker.start()
 
-    # ── Auto-cleanup old replay clips (60 s delay so we don't clash with OBS)
-    start_deferred(stop_event)
+    # Individual clips are now a persistent, user-managed library. Do not
+    # auto-merge/delete them at startup; destructive trimming is explicit UI.
 
     # ── Shared state ──────────────────────────────────────────────────────────
     _lock = threading.Lock()
@@ -474,8 +476,10 @@ def run(
             previous = {str(Path(item["path"]).resolve()): dict(item) for item in _previous_game_clips}
 
         rows = []
+        disk_files = _replay_files_on_disk()
+        saved_settings = clip_settings_many(disk_files)
         edited_root = Path(EDITED_DIR).resolve()
-        for path in _replay_files_on_disk():
+        for path in disk_files:
             try:
                 resolved = path.resolve()
                 stat = path.stat()
@@ -496,6 +500,7 @@ def run(
                 "saved_at": float(metadata.get("saved_at") or stat.st_mtime),
                 "size_bytes": int(stat.st_size),
                 "scope": scope,
+                **saved_settings.get(str(resolved), {}),
             })
         return rows
 
@@ -705,6 +710,8 @@ def run(
                         "saved_at": time.time(),
                     })
 
+                update_clip_settings(clip, tags=[tag] if tag else [])
+
                 print(
                     f"[instant_replay] Clip ready ({tag or 'untagged'} #{idx}) — "
                     f"press '|' and say 'play'."
@@ -737,6 +744,16 @@ def run(
         During multi-clip playback, pressing '|' skips to the next clip.
         """
         spec_lower = spec.strip().lower()
+
+        if spec_lower and any(term in spec_lower for term in ("intro", "hype", "entry")):
+            clips = intro_clips()
+            if not clips:
+                print("[instant_replay] No clips are marked for the Intro Montage.")
+                return
+            random.shuffle(clips)
+            print(f"[instant_replay] Playing Intro Montage ({len(clips)} clips, random order).")
+            _play_all_clips_sequential(clips)
+            return
 
         if spec_lower in {"random", "random clip", "anything", "any", "surprise me"}:
             candidates = _replay_files_on_disk()
@@ -959,6 +976,7 @@ def run(
                     continue
                 label = f"Clip {i + 1}/{len(clips)}" if is_multi else ""
                 print(f"[instant_replay] ▶  Playing: {clip}{' — ' + label if label else ''}")
+                replay_start, replay_end = playback_range(clip_path)
 
                 # Cancel any ongoing replay/watcher before starting a new one.
                 _end_replay(cancelled=True)
@@ -1041,6 +1059,12 @@ def run(
                     _end_replay(cancelled=True)
                     return
 
+                if replay_start > 0.01:
+                    try:
+                        set_media_input_cursor(SOURCE_NAME, replay_start)
+                    except Exception as exc:
+                        print(f"[instant_replay] Could not seek replay range: {exc}")
+
                 # Wait for media to finish OR a skip/cancel signal.
                 # Poll in short intervals so we can react to _skip_clip quickly.
                 ended = False
@@ -1068,7 +1092,16 @@ def run(
                         continue
 
                     # Check if media naturally ended
-                    state = get_media_state(SOURCE_NAME)
+                    status = obs.get_media_status(SOURCE_NAME) or {}
+                    state = status.get("state")
+                    if replay_end is not None:
+                        try:
+                            if float(status.get("cursor_ms") or 0) >= replay_end * 1000:
+                                stop_media(SOURCE_NAME)
+                                ended = True
+                                break
+                        except (TypeError, ValueError):
+                            pass
                     if state in ("OBS_MEDIA_STATE_ENDED", "OBS_MEDIA_STATE_STOPPED",
                                  "OBS_MEDIA_STATE_NONE", "OBS_MEDIA_STATE_ERROR"):
                         ended = True
@@ -1210,19 +1243,24 @@ def run(
                 _write_next_game_num(game_num + 1)
                 _current_game_label[0] = game_label
 
+            # Keep each clip separate, but persist its game/session association.
+            for entry in _previous_game_clips:
+                try:
+                    existing = clip_settings(entry["path"])
+                    tags = list(existing.get("tags") or [])
+                    if entry.get("tag") and entry["tag"] != "untagged":
+                        tags.append(entry["tag"])
+                    update_clip_settings(entry["path"], tags=tags, game=game_label)
+                except Exception as exc:
+                    print(f"[instant_replay] Could not tag {entry.get('path')}: {exc}")
+
             print(
                 f"[instant_replay] Game ended — clip registry cleared "
                 f"({n} clip(s) flushed, files remain on disk)."
             )
             print(f"[instant_replay] This game will be labelled: {game_label}")
 
-            def _game_end_merge(_label: str = game_label) -> None:
-                time.sleep(30)
-                run_for_game(_label)
-
-            threading.Thread(
-                target=_game_end_merge, daemon=True, name="ir-game-end-merge"
-            ).start()
+            print("[instant_replay] Individual clips kept in the replay library.")
 
         _was_in_game[0] = now_in_game
 

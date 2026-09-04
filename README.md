@@ -49,6 +49,14 @@ asset: capture the outgoing file's complete filter chain before a swap and
 apply the incoming file's saved chain afterward. An asset with no saved filter
 state must load with no filters.
 
+## Instant Replay Library
+
+Replay clips stay as individual files; game-end cleanup must not merge or
+delete them. The library stores non-destructive playback ranges, user tags,
+game/session labels, and Intro Montage membership in `REPLAY_DIR`. Thumbnail
+and browser-preview caches also live there and are excluded from the clip list.
+Only the explicit **Trim actual file** action rewrites a clip.
+
 ## Configuration
 
 Copy `.env.example` to `.env` and fill in machine-specific paths and secrets.

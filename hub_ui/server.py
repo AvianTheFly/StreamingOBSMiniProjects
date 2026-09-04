@@ -833,6 +833,40 @@ class _Handler(http.server.BaseHTTPRequestHandler):
         except Exception:
             return {}
 
+    def _send_local_file(self, path: Path, content_type: str, *, allow_range: bool = False) -> None:
+        size = path.stat().st_size
+        start, end = 0, max(0, size - 1)
+        status = 200
+        if allow_range:
+            raw_range = str(self.headers.get("Range") or "")
+            match = re.match(r"bytes=(\d*)-(\d*)", raw_range)
+            if match:
+                if match.group(1):
+                    start = min(int(match.group(1)), end)
+                if match.group(2):
+                    end = min(int(match.group(2)), end)
+                if end < start:
+                    end = start
+                status = 206
+        length = max(0, end - start + 1)
+        self.send_response(status)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(length))
+        self.send_header("Accept-Ranges", "bytes")
+        if status == 206:
+            self.send_header("Content-Range", f"bytes {start}-{end}/{size}")
+        self.send_header("Cache-Control", "private, max-age=3600")
+        self.end_headers()
+        with path.open("rb") as handle:
+            handle.seek(start)
+            remaining = length
+            while remaining > 0:
+                chunk = handle.read(min(1024 * 1024, remaining))
+                if not chunk:
+                    break
+                self.wfile.write(chunk)
+                remaining -= len(chunk)
+
     # ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ routing ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
 
     def do_OPTIONS(self):
@@ -1244,6 +1278,24 @@ class _Handler(http.server.BaseHTTPRequestHandler):
                 self._json(200, {"clips": list_clips() if callable(list_clips) else []})
             except Exception as exc:
                 self._err(500, str(exc))
+        elif name == "instant_replay" and action in {"meta", "thumbnail", "media"}:
+            try:
+                from instant_replay.clip_library import (
+                    clip_settings, content_type, preview_for, thumbnail_for,
+                )
+                query = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+                clip_path = (query.get("path") or [""])[0]
+                if action == "meta":
+                    self._json(200, clip_settings(clip_path, include_duration=True))
+                elif action == "thumbnail":
+                    self._send_local_file(thumbnail_for(clip_path), "image/jpeg")
+                else:
+                    media_path = preview_for(clip_path)
+                    self._send_local_file(media_path, content_type(media_path), allow_range=True)
+            except ValueError as exc:
+                self._err(404, str(exc))
+            except Exception as exc:
+                self._err(500, str(exc))
         else:
             self._err(404, "Unknown action")
 
@@ -1402,6 +1454,52 @@ class _Handler(http.server.BaseHTTPRequestHandler):
                     args=(clip_path,),
                     daemon=True,
                     name="instant-replay-ui-play",
+                ).start()
+                self._json(200, {"ok": True})
+            except Exception as exc:
+                self._err(500, str(exc))
+        elif name == "instant_replay" and action == "clip-settings":
+            try:
+                from instant_replay.clip_library import update_clip_settings
+                result = update_clip_settings(
+                    str(body.get("path") or ""),
+                    replay_start=body.get("replay_start"),
+                    replay_end=body.get("replay_end"),
+                    intro=body.get("intro") if "intro" in body else None,
+                    tags=body.get("tags") if "tags" in body else None,
+                )
+                _broadcast("replay_library_updated", {})
+                self._json(200, {"ok": True, **result})
+            except ValueError as exc:
+                self._err(400, str(exc))
+            except Exception as exc:
+                self._err(500, str(exc))
+        elif name == "instant_replay" and action == "trim-file":
+            try:
+                from instant_replay.clip_library import trim_file
+                result = trim_file(
+                    str(body.get("path") or ""),
+                    float(body.get("start") or 0.0),
+                    float(body.get("end") or 0.0),
+                )
+                _broadcast("replay_library_updated", {})
+                self._json(200, {"ok": True, **result})
+            except ValueError as exc:
+                self._err(400, str(exc))
+            except Exception as exc:
+                self._err(500, str(exc))
+        elif name == "instant_replay" and action == "play-intro":
+            try:
+                from instant_replay.interface import _live
+                play_spec = _live.get("play_spec")
+                if not callable(play_spec):
+                    self._err(409, "Instant Replay is not ready")
+                    return
+                threading.Thread(
+                    target=play_spec,
+                    args=("intro montage",),
+                    daemon=True,
+                    name="instant-replay-ui-intro",
                 ).start()
                 self._json(200, {"ok": True})
             except Exception as exc:

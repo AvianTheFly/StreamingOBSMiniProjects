@@ -43,8 +43,8 @@ RECORD_TIMEOUT_SECONDS: float = 2.0
 import os as _os
 REPLAY_DIR = _os.environ["REPLAY_DIR"]
 
-# Subfolder where merged highlight reels are stored permanently.
-# Raw clips and originals in REPLAY_DIR are wiped on startup; this folder is kept.
+# Legacy subfolder for highlight reels created by older versions. New saves stay
+# as individual clips and receive searchable game/session metadata instead.
 EDITED_DIR = _os.path.join(REPLAY_DIR, "edited")
 
 # ── Audio muting during replay playback ──────────────────────────────────────

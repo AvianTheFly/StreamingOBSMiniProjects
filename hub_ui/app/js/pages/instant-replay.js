@@ -1,202 +1,54 @@
-// pages/instant-replay.js — Instant Replay project page
+import { api } from "../api.js";
+import { state } from "../state.js";
+import { toast } from "../toast.js";
+import { esc } from "../utils.js";
 
-import { api }     from "../api.js";
-import { state }   from "../state.js";
-import { toast }   from "../toast.js";
-import { esc }     from "../utils.js";
-
-let _unwatch = null;
-let _refreshTimer = null;
-let _clips = [];
-let _query = "";
-let _scope = "all";
+let unwatch, timer, clips = [], query = "", scope = "all", shown = 24, editor = null;
 
 export function mount(container) {
-  container.innerHTML = `
-    <div class="page-header">
-      <div>
-        <div class="page-title">Instant Replay</div>
-        <div class="page-subtitle">Automatic kill-highlight replay buffer with coordinated audio resume</div>
-      </div>
-      <div class="page-actions">
-        <button class="btn btn-primary btn-sm" id="irRandomBtn">Play Random</button>
-        <button class="btn btn-secondary btn-sm" id="irLatestBtn">Play Latest</button>
-        <button class="btn btn-secondary btn-sm" id="irPauseBtn">Pause</button>
-        <button class="btn btn-secondary btn-sm" id="irResumeBtn">Resume</button>
-        <button class="btn btn-secondary btn-sm" id="irRevertBtn">Revert</button>
-      </div>
-    </div>
-
-    <div class="state-banner" id="irBanner">
-      <span class="state-indicator state-indicator--idle" id="irIndicator"></span>
-      <span class="state-label" id="irLabel">Loading…</span>
-      <span class="state-detail" id="irDetail"></span>
-    </div>
-
-    <div class="command-strip mt-16">
-      <div><span class="command-label">Voice key</span><kbd>|</kbd></div>
-      <div><span class="command-label">Save</span><code>save [tag]</code></div>
-      <div><span class="command-label">Play</span><code>play last / random / highlights</code></div>
-      <div><span class="command-label">Pick one</span><code>play win 2</code></div>
-    </div>
-
-    <div class="card mt-16">
-      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
-        <span>Saved Clips</span>
-        <button class="btn btn-secondary btn-sm" id="irRefreshClipsBtn">Refresh</button>
-      </div>
-      <div class="clip-toolbar">
-        <input class="input" id="irClipSearch" type="search" placeholder="Search clip name, tag, or date">
-        <select class="select" id="irClipScope" aria-label="Filter clips">
-          <option value="all">All clips</option>
-          <option value="current game">Current game</option>
-          <option value="previous game">Previous game</option>
-          <option value="saved">Saved</option>
-          <option value="highlight reel">Highlight reels</option>
-        </select>
-      </div>
-      <div id="irClips" class="ir-copy ir-copy--small">Loading clips…</div>
-    </div>
-  `;
-
-  container.querySelector("#irPauseBtn").addEventListener("click", async () => {
-    try { await api.pauseProject("instant_replay"); toast.success("Replay paused"); }
-    catch(e) { toast.error(e.message); }
-  });
-
-  container.querySelector("#irResumeBtn").addEventListener("click", async () => {
-    try { await api.resumeProject("instant_replay"); toast.success("Replay resumed"); }
-    catch(e) { toast.error(e.message); }
-  });
-
-  container.querySelector("#irRevertBtn").addEventListener("click", async () => {
-    try { await api.revertProject("instant_replay"); toast.success("Reverted"); }
-    catch(e) { toast.error(e.message); }
-  });
-
-  container.querySelector("#irRandomBtn").addEventListener("click", () => _runReplayAction("play_random", "Playing a random clip"));
-  container.querySelector("#irLatestBtn").addEventListener("click", () => _runReplayAction("play_latest", "Playing the latest clip"));
-  container.querySelector("#irClipSearch").addEventListener("input", event => {
-    _query = event.target.value.trim().toLowerCase();
-    _renderClips();
-  });
-  container.querySelector("#irClipScope").addEventListener("change", event => {
-    _scope = event.target.value;
-    _renderClips();
-  });
-
-  container.querySelector("#irRefreshClipsBtn").addEventListener("click", _loadClips);
-  _loadClips();
-  _refreshTimer = setInterval(_loadClips, 5000);
-
-  _unwatch = state.watch("projects", _update);
-  _update(state.get("projects"));
+  container.innerHTML = `<div class="page-header"><div><div class="page-title">Instant Replay</div><div class="page-subtitle">Keep clips separate, trim them, tag games, and build an Intro Montage.</div></div><div class="page-actions"><button class="btn btn-primary btn-sm" id="irIntro">Play Intro Montage</button><button class="btn btn-secondary btn-sm" id="irRandom">Random</button><button class="btn btn-secondary btn-sm" id="irLatest">Latest</button><button class="btn btn-secondary btn-sm" id="irStop">Stop</button></div></div>
+  <div class="state-banner"><span class="state-indicator state-indicator--idle" id="irIndicator"></span><span class="state-label" id="irLabel">Loading…</span><span class="state-detail" id="irDetail"></span></div>
+  <div class="command-strip mt-16"><div><span class="command-label">Save clip</span><code>save / save win</code></div><div><span class="command-label">Play</span><code>play last / random</code></div><div><span class="command-label">Game</span><code>play highlights</code></div><div><span class="command-label">Montage</span><code>play intro montage / hype / entry</code></div></div>
+  <section class="card mt-16 ir-library"><div class="ir-library-head"><div><div class="card-title">Clip Library</div><div class="ir-library-note" id="irCount">Loading…</div></div><button class="btn btn-secondary btn-sm" id="irRefresh">Refresh</button></div>
+  <div class="clip-toolbar"><input class="input" id="irSearch" type="search" placeholder="Search names, tags, games, or dates"><select class="select" id="irScope"><option value="all">All clips</option><option value="intro">Intro Montage</option><option value="current game">Current game</option><option value="previous game">Previous game</option><option value="saved">Saved</option></select></div><div id="irClips" class="ir-empty">Loading clips…</div><button class="btn btn-secondary ir-load-more" id="irMore" hidden>Load more</button></section><div id="irEditorRoot"></div>`;
+  container.querySelector("#irIntro").onclick = () => act(api.playIntroMontage, "Playing Intro Montage");
+  container.querySelector("#irRandom").onclick = () => act(() => api.runProjectAction("instant_replay", "play_random"), "Playing random clip");
+  container.querySelector("#irLatest").onclick = () => act(() => api.runProjectAction("instant_replay", "play_latest"), "Playing latest clip");
+  container.querySelector("#irStop").onclick = () => act(() => api.revertProject("instant_replay"), "Replay stopped");
+  container.querySelector("#irRefresh").onclick = load;
+  container.querySelector("#irSearch").oninput = e => { query = e.target.value.trim().toLowerCase(); shown = 24; render(); };
+  container.querySelector("#irScope").onchange = e => { scope = e.target.value; shown = 24; render(); };
+  container.querySelector("#irMore").onclick = () => { shown += 24; render(); };
+  document.addEventListener("keydown", onKey); load(); timer = setInterval(() => { if (!editor) load(); }, 15000);
+  unwatch = state.watch("projects", updateStatus); updateStatus(state.get("projects"));
 }
+export function unmount() { if (unwatch) unwatch(); if (timer) clearInterval(timer); document.removeEventListener("keydown", onKey); editor = null; }
 
-export function unmount() {
-  if (_unwatch) { _unwatch(); _unwatch = null; }
-  if (_refreshTimer) { clearInterval(_refreshTimer); _refreshTimer = null; }
+async function load() { try { clips = (await api.getReplayClips()).clips || []; render(); } catch (e) { document.getElementById("irClips").textContent = e.message; } }
+function visibleClips() { return clips.filter(c => { if (scope === "intro" ? !c.intro : scope !== "all" && c.scope !== scope) return false; const haystack = `${c.name} ${c.tag || ""} ${(c.tags || []).join(" ")} ${c.game || ""} ${new Date((c.saved_at || 0)*1000).toLocaleString()}`.toLowerCase(); return !query || haystack.includes(query); }); }
+function render() {
+  const root = document.getElementById("irClips"), count = document.getElementById("irCount"), more = document.getElementById("irMore"); if (!root) return;
+  const matches = visibleClips(), visible = matches.slice(0, shown); count.textContent = `${matches.length} shown · ${clips.length} total · ${clips.filter(c => c.intro).length} in Intro Montage`; more.hidden = visible.length >= matches.length;
+  if (!visible.length) { root.className = "ir-empty"; root.textContent = clips.length ? "No clips match this view." : "No saved clips yet."; return; }
+  root.className = "ir-clip-grid"; root.innerHTML = visible.map(c => { const i = clips.indexOf(c), tags = [...new Set([c.game, ...(c.tags || []), c.tag !== "untagged" ? c.tag : ""].filter(Boolean))]; return `<article class="ir-clip-card${c.intro ? " is-intro" : ""}"><button class="ir-thumb" data-edit="${i}" aria-label="Edit clip"><img loading="lazy" src="${api.replayThumbnailUrl(c.path)}" alt=""><span class="ir-play-mark">▶</span>${c.intro ? '<span class="ir-intro-badge">INTRO</span>' : ""}</button><div class="ir-card-body"><div class="ir-card-title" title="${esc(c.name)}">${esc(c.name)}</div><div class="ir-card-meta">${esc(new Date((c.saved_at || 0)*1000).toLocaleString())} · ${bytes(c.size_bytes)}</div><div class="ir-tags">${tags.length ? tags.map(t => `<span>${esc(t)}</span>`).join("") : '<span class="is-muted">untagged</span>'}</div><div class="ir-card-actions"><button class="btn btn-secondary btn-sm" data-play="${i}">Play</button><button class="btn btn-secondary btn-sm" data-edit="${i}">Edit & Trim</button><button class="ir-star${c.intro ? " is-on" : ""}" data-intro="${i}" title="Toggle Intro Montage">★</button></div></div></article>`; }).join("");
+  root.querySelectorAll("[data-play]").forEach(b => b.onclick = () => act(() => api.playReplayClip(clips[+b.dataset.play].path), `Playing ${clips[+b.dataset.play].name}`));
+  root.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => openEditor(clips[+b.dataset.edit]));
+  root.querySelectorAll("[data-intro]").forEach(b => b.onclick = () => toggleIntro(clips[+b.dataset.intro]));
 }
-
-async function _loadClips() {
-  const target = document.getElementById("irClips");
-  if (!target) return;
-  try {
-    const data = await api.getReplayClips();
-    _clips = Array.isArray(data.clips) ? data.clips : [];
-    _renderClips();
-  } catch (error) {
-    target.textContent = `Could not load clips: ${error.message}`;
-  }
+async function toggleIntro(c) { const next = !c.intro; c.intro = next; render(); try { await api.saveReplayClipSettings({path:c.path,intro:next}); toast.success(next ? "Added to Intro Montage" : "Removed from Intro Montage"); } catch(e) { c.intro = !next; render(); toast.error(e.message); } }
+async function openEditor(clip) { try { const m = await api.getReplayClipMeta(clip.path), d = Number(m.duration || 0); editor = {clip,duration:d,start:Number(m.replay_start || 0),end:Number(m.replay_end ?? d),intro:!!m.intro,tags:[...(m.tags || [])]}; if (editor.end <= editor.start) editor.end = d; drawEditor(); } catch(e) { toast.error(e.message); } }
+function drawEditor() {
+  const r = document.getElementById("irEditorRoot"), e = editor; if (!r || !e) return;
+  r.innerHTML = `<div class="ir-editor-backdrop"><section class="ir-editor" role="dialog" aria-modal="true"><header><div><div class="ir-editor-kicker">CLIP EDITOR</div><h2>${esc(e.clip.name)}</h2></div><button class="ir-editor-close" id="irClose">×</button></header><div class="ir-editor-main"><video id="irVideo" controls preload="metadata" src="${api.replayMediaUrl(e.clip.path)}"></video><div class="ir-timeline"><div class="ir-timeline-track"></div><div class="ir-selection" id="irSelection"></div><div class="ir-playhead" id="irPlayhead"></div><input class="ir-range ir-range-start" id="irStart" type="range" min="0" max="${e.duration}" step=".05" value="${e.start}"><input class="ir-range ir-range-end" id="irEnd" type="range" min="0" max="${e.duration}" step=".05" value="${e.end}"></div><div class="ir-range-readout"><strong id="irRangeText"></strong><span>Highlighted range is what OBS plays.</span></div><div class="ir-editor-fields"><label>Tags<input class="input" id="irTags" value="${esc(e.tags.join(", "))}" placeholder="funny, clutch, fail"></label><label class="ir-check"><input type="checkbox" id="irIntroCheck" ${e.intro ? "checked" : ""}> Include in Intro Montage</label></div></div><footer><div><button class="btn btn-secondary btn-sm" id="irPreview">Preview selection</button><button class="btn btn-secondary btn-sm" id="irFull">Use full clip</button></div><div><button class="btn btn-secondary" id="irSaveRange">Save replay range</button><button class="btn btn-danger" id="irTrimFile">Trim actual file</button></div></footer><div class="ir-trim-note"><strong>Save replay range</strong> keeps the file. <strong>Trim actual file</strong> permanently removes the gray ends.</div></section></div>`;
+  const video = document.getElementById("irVideo"), a = document.getElementById("irStart"), b = document.getElementById("irEnd");
+  const sync = changed => { let x=+a.value,y=+b.value; if(y-x<.1){ if(changed===a)x=Math.max(0,y-.1); else y=Math.min(e.duration,x+.1); } a.value=x;b.value=y;e.start=x;e.end=y;drawRange(); }; a.oninput=()=>sync(a);b.oninput=()=>sync(b);video.ontimeupdate=()=>{document.getElementById("irPlayhead").style.left=`${Math.min(100,video.currentTime/(e.duration||1)*100)}%`;};
+  document.getElementById("irClose").onclick=closeEditor; document.querySelector(".ir-editor-backdrop").onclick=ev=>{if(ev.target.classList.contains("ir-editor-backdrop"))closeEditor();};
+  document.getElementById("irPreview").onclick=()=>{video.currentTime=e.start;video.play();const stop=()=>{if(video.currentTime>=e.end){video.pause();video.removeEventListener("timeupdate",stop);}};video.addEventListener("timeupdate",stop);};
+  document.getElementById("irFull").onclick=()=>{a.value=0;b.value=e.duration;sync();}; document.getElementById("irSaveRange").onclick=saveRange; document.getElementById("irTrimFile").onclick=trimFile; drawRange();
 }
-
-function _renderClips() {
-  const target = document.getElementById("irClips");
-  if (!target) return;
-  const visible = _clips.filter(clip => {
-    if (_scope !== "all" && clip.scope !== _scope) return false;
-    if (!_query) return true;
-    const saved = new Date((clip.saved_at || 0) * 1000).toLocaleString();
-    return `${clip.name || ""} ${clip.tag || ""} ${clip.scope || ""} ${saved}`.toLowerCase().includes(_query);
-  });
-  if (!visible.length) {
-    target.innerHTML = _clips.length ? "No clips match this filter." : "No saved replay clips found.";
-    return;
-  }
-  target.innerHTML = `
-      <div style="overflow:auto">
-        <table class="clip-table">
-          <thead><tr><th>Saved</th><th>Clip</th><th>Type</th><th class="align-right">Size</th><th></th></tr></thead>
-          <tbody>${visible.map(clip => {
-            const index = _clips.indexOf(clip);
-            return `
-            <tr>
-              <td class="clip-date">${esc(new Date((clip.saved_at || 0) * 1000).toLocaleString())}</td>
-              <td><strong>${esc(clip.name || "Unnamed")}</strong>${clip.tag ? `<br><span class="clip-tag">${esc(clip.tag)}</span>` : ""}</td>
-              <td><span class="clip-scope">${esc(clip.scope || "saved")}</span></td>
-              <td class="align-right clip-size">${_formatBytes(clip.size_bytes || 0)}</td>
-              <td class="align-right"><button class="btn btn-secondary btn-sm" data-play-clip="${index}">Play</button></td>
-            </tr>`;
-          }).join("")}</tbody>
-        </table>
-      </div>`;
-  target.querySelectorAll("[data-play-clip]").forEach(button => {
-    button.addEventListener("click", async () => {
-      const clip = _clips[Number(button.dataset.playClip)];
-      if (!clip) return;
-      try {
-        await api.playReplayClip(clip.path);
-        toast.success(`Playing ${clip.name}`);
-      } catch (error) {
-        toast.error(error.message);
-      }
-    });
-  });
-}
-
-async function _runReplayAction(action, message) {
-  try {
-    await api.runProjectAction("instant_replay", action);
-    toast.success(message);
-  } catch (error) {
-    toast.error(error.message);
-  }
-}
-
-function _formatBytes(value) {
-  const mb = Number(value || 0) / 1048576;
-  return mb >= 1024 ? `${(mb / 1024).toFixed(1)} GB` : `${mb.toFixed(1)} MB`;
-}
-
-function _update(projects) {
-  const p         = projects.find(p => p.name === "instant_replay");
-  const indicator = document.getElementById("irIndicator");
-  const label     = document.getElementById("irLabel");
-  const detail    = document.getElementById("irDetail");
-  const pauseBtn  = document.getElementById("irPauseBtn");
-  const resumeBtn = document.getElementById("irResumeBtn");
-  const revertBtn = document.getElementById("irRevertBtn");
-  if (!indicator) return;
-
-  if (!p) {
-    indicator.className = "state-indicator state-indicator--idle";
-    label.textContent = "Not running";
-    detail.textContent = "";
-    if (pauseBtn) pauseBtn.disabled = true;
-    if (resumeBtn) resumeBtn.disabled = true;
-    if (revertBtn) revertBtn.disabled = true;
-    return;
-  }
-
-  const activity = p.current_activity || "";
-  const isActive = !!p.is_active;
-  const isPaused = activity.toLowerCase().includes("paused");
-
-  indicator.className = `state-indicator ${isActive ? "state-indicator--active" : "state-indicator--idle"}`;
-  label.textContent = isPaused ? "Paused" : (isActive ? "Active" : "Idle");
-  detail.textContent = activity;
-
-  if (pauseBtn) pauseBtn.disabled = !isActive || isPaused;
-  if (resumeBtn) resumeBtn.disabled = !isPaused;
-  if (revertBtn) revertBtn.disabled = !isActive;
-}
+function drawRange(){const e=editor,d=e.duration||1,x=e.start/d*100,y=e.end/d*100,s=document.getElementById("irSelection");s.style.left=`${x}%`;s.style.width=`${y-x}%`;document.getElementById("irRangeText").textContent=`${clock(e.start)} – ${clock(e.end)} (${clock(e.end-e.start)})`;}
+async function saveRange(){const e=editor;e.tags=document.getElementById("irTags").value.split(",").map(x=>x.trim()).filter(Boolean);e.intro=document.getElementById("irIntroCheck").checked;try{await api.saveReplayClipSettings({path:e.clip.path,replay_start:e.start,replay_end:e.end,intro:e.intro,tags:e.tags});toast.success("Replay range and tags saved");closeEditor();await load();}catch(x){toast.error(x.message);}}
+async function trimFile(){const e=editor;if(!confirm(`Permanently cut this file to ${clock(e.start)} – ${clock(e.end)}? This cannot be undone.`))return;const b=document.getElementById("irTrimFile");b.disabled=true;b.textContent="Trimming…";try{const x=await api.trimReplayFile({path:e.clip.path,start:e.start,end:e.end});toast.success(`File trimmed: ${bytes(x.size_before)} → ${bytes(x.size_after)}`);closeEditor();await load();}catch(x){b.disabled=false;b.textContent="Trim actual file";toast.error(x.message);}}
+function closeEditor(){const r=document.getElementById("irEditorRoot");if(r)r.innerHTML="";editor=null;} function onKey(e){if(e.key==="Escape"&&editor)closeEditor();}
+async function act(fn,msg){try{await fn();toast.success(msg);}catch(e){toast.error(e.message);}} function clock(v){v=Math.max(0,+v||0);const m=Math.floor(v/60),s=v-m*60;return `${m}:${s.toFixed(s<10?1:0).padStart(s<10?4:2,"0")}`;} function bytes(v){const m=(+v||0)/1048576;return m>=1024?`${(m/1024).toFixed(1)} GB`:`${m.toFixed(1)} MB`;}
+function updateStatus(projects){const p=projects.find(x=>x.name==="instant_replay"),i=document.getElementById("irIndicator");if(!i)return;i.className=`state-indicator ${p?.is_active?"state-indicator--active":"state-indicator--idle"}`;document.getElementById("irLabel").textContent=p?.is_active?"Playing":"Ready";document.getElementById("irDetail").textContent=p?.current_activity||"Clips remain available between games";}

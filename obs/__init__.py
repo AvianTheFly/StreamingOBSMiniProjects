@@ -28,7 +28,7 @@ from .interaction import (
     set_source_transform, get_source_transform, get_canvas_size, get_scene_source_transforms, set_source_transform_by_id,
     configure_input_audio,
     set_input_audio_tracks,
-    save_replay_buffer_and_wait, set_media_source_file, configure_media_source_properties,
+    save_replay_buffer_and_wait, set_media_source_file, set_media_input_cursor, configure_media_source_properties,
     get_input_volume, set_input_volume_db, set_input_volume_mul,
     get_input_audio_monitor_type, set_input_audio_monitor_type,
     get_input_list, set_desktop_audio_volume,
@@ -54,7 +54,7 @@ __all__ = [
     "switch_scene", "get_current_scene", "list_scenes", "create_scene_if_missing",
     # Media playback
     "get_media_state", "get_media_status", "stop_media", "restart_media", "pause_media", "play_media",
-    "wait_for_media_end", "set_media_source_file",
+    "wait_for_media_end", "set_media_source_file", "set_media_input_cursor",
     # Source management
     "create_media_source", "delete_source", "list_sources", "list_group_sources",
     # Stream / record

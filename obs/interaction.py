@@ -1084,6 +1084,14 @@ def set_media_source_file(source: str, filepath: str | Path) -> None:
     )
 
 
+def set_media_input_cursor(source: str, seconds: float) -> None:
+    """Seek a media input to an absolute time in seconds."""
+    get_obs().send(
+        "SetMediaInputCursor",
+        {"inputName": source, "mediaCursor": max(0, int(float(seconds) * 1000))},
+    )
+
+
 def configure_media_source_properties(
     source: str,
     *,
