@@ -90,7 +90,16 @@ class SingleSourceStateStore:
         baseline = _normalize_snapshot(self._data.get("baseline"))
         override = _normalize_snapshot((self._data.get("overrides") or {}).get(stem))
         target = _merge_snapshots(baseline, override)
-        _apply_snapshot(self.scene, self.source_name, target)
+        _apply_snapshot(
+            self.scene,
+            self.source_name,
+            target,
+            apply_filters=self.include_filters,
+            apply_transform=self.include_transform,
+            apply_audio=self.include_audio,
+            apply_audio_volume=self.include_audio_volume,
+            apply_media_settings=self.include_media_settings,
+        )
 
     def capture_override_for_stem(self, stem: str) -> None:
         self.ensure_baseline()
@@ -275,25 +284,39 @@ def _get_input_audio_tracks(source_name: str) -> dict[str, bool]:
     return {key: bool(tracks.get(key, False)) for key in _TRACK_KEYS if key in tracks}
 
 
-def _apply_snapshot(scene: str, source_name: str, snapshot: dict[str, Any]) -> None:
+def _apply_snapshot(
+    scene: str,
+    source_name: str,
+    snapshot: dict[str, Any],
+    *,
+    apply_filters: bool = True,
+    apply_transform: bool = True,
+    apply_audio: bool = True,
+    apply_audio_volume: bool = True,
+    apply_media_settings: bool = True,
+) -> None:
     media_settings = snapshot.get("media_settings") or {}
-    if media_settings:
+    if apply_media_settings and media_settings:
         obs.get_obs().set_input_settings(source_name, media_settings, overlay=True)
 
     transform = snapshot.get("transform") or {}
-    if transform:
+    if apply_transform and transform:
         obs.set_source_transform(scene, source_name, transform)
 
-    _apply_filters(source_name, snapshot.get("filters") or [])
+    # A shared OBS source owns its filters. Projects that only need per-file
+    # layout/volume state must not remove and recreate that filter chain on
+    # every play; doing so both loses manual filters and causes a visible hitch.
+    if apply_filters:
+        _apply_filters(source_name, snapshot.get("filters") or [])
 
     audio = snapshot.get("audio") or {}
-    if "monitor_type" in audio:
+    if apply_audio and "monitor_type" in audio:
         obs.set_input_audio_monitor_type(source_name, str(audio["monitor_type"]))
-    if "volume_db" in audio:
+    if apply_audio and apply_audio_volume and "volume_db" in audio:
         obs.set_input_volume_db(source_name, float(audio["volume_db"]))
-    if "muted" in audio:
+    if apply_audio and "muted" in audio:
         obs.set_input_mute(source_name, bool(audio["muted"]))
-    if isinstance(audio.get("tracks"), dict) and audio["tracks"]:
+    if apply_audio and isinstance(audio.get("tracks"), dict) and audio["tracks"]:
         obs.set_input_audio_tracks(source_name, audio["tracks"])
 
 

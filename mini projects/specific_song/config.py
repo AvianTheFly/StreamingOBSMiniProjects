@@ -167,7 +167,7 @@ def discover_editor_projects() -> list[dict]:
     return [
         {
             "key":          "specific_song",
-            "name":         "Specific Song",
+            "name":         "Music",
             "asset_dir":    str(ASSETS_DIR),
             "hotkeys_file": str(_HERE / "hotkeys.json"),
             "phrases_file": str(_HERE / "phrases.json"),

@@ -59,7 +59,9 @@ CONFIG = MediaProjectConfig(
 
     media_start_timeout=float_override(OVERRIDES, "media_start_timeout", 5.0) or 5.0,
     media_total_timeout=float_override(OVERRIDES, "media_total_timeout", 300.0) or 300.0,
-    media_swap_settle_ms=175,
+    # File confirmation + one deliberate restart is enough. Keeping this short
+    # makes button-to-sound latency much less noticeable.
+    media_swap_settle_ms=50,
 
     verbose_matcher=bool_override(OVERRIDES, "verbose_matcher", True),
     default_volume_db=float_override(OVERRIDES, "default_volume_db", 0),

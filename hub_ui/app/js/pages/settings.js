@@ -5,7 +5,7 @@ import { toast } from "../toast.js";
 import { esc }   from "../utils.js";
 
 const TRIGGER_PROJECTS = [
-  { key: "specific_song", label: "Specific Song",  desc: "ili trigger" },
+  { key: "specific_song", label: "Music",          desc: "ili trigger" },
   { key: "tik_tok",       label: "TikTok",          desc: "media trigger" },
   { key: "soundboard",    label: "Soundboard",      desc: "media trigger" },
   { key: "sound_effects", label: "Sound Effects",   desc: "989 trigger" },

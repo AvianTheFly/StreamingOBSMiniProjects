@@ -11,7 +11,7 @@ The Hub intentionally loads only these stream modules:
 - `tik_tok`
 - `scene_voice_switcher`
 - `love_me`
-- `specific_song`
+- Music (internal module key: `specific_song`)
 - `instant_replay`
 
 It also loads `sound_effects` as a supporting audio module used by League.
@@ -35,8 +35,6 @@ reference but are disabled and are not discovered by the Hub.
 - `obs/`: the only supported OBS API boundary.
 - `voice/`: shared microphone and Whisper listener.
 - `tools/`: diagnostics and one-off maintenance commands.
-- `docs/`: project notes, structure docs, and AI handoff notes.
-- `archive/`: local backups kept out of runtime paths and Git.
 
 ## Design Rule
 
@@ -50,8 +48,3 @@ Do not commit `.env`.
 
 Voice model settings are environment-driven. `WHISPER_MODEL` can be a model name
 such as `large-v3` or a local folder outside the repo.
-
-## More Detail
-
-See `docs/PROJECT_STRUCTURE.md` for the current module map and data flow.
-See `docs/AI_HANDOFF.md` for notes meant for future AI/code assistants.

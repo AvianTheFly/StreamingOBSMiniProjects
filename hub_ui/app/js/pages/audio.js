@@ -27,9 +27,10 @@ export async function mount(container) {
     <div class="card mb-16 audio-help-card">
       <p class="audio-help-copy">
         Every slider shows the <strong>final output dB</strong> at that layer.
-        Moving <em>Mini Project</em> shifts every profile and file below it.
+        Moving <em>All files</em> shifts every profile and file by the same amount.
         Moving <em>Profile</em> shifts every file in that profile.
         File sliders set the final output while keeping their stored offset relative to the stack.
+        Moving the shared Music fader directly in OBS does the same thing as <em>All files</em> here.
       </p>
     </div>
     <div id="audioBody" class="audio-page-body"></div>
@@ -103,7 +104,7 @@ function _buildProjectCard(project) {
 
   const projectSlider = _buildSliderGroup({
     interactionKey: _interactionKey(project.key, "", "", "project"),
-    layerLabel: "Mini Project",
+    layerLabel: "All files",
     value: stateProject.project_volume_db,
     onInput: nextValue => {
       const previous = stateProject.project_volume_db;
@@ -141,12 +142,79 @@ function _buildProjectCard(project) {
     body.appendChild(liveRow);
   }
 
+  const batchControls = _buildBatchControls(project);
+  if (batchControls) body.appendChild(batchControls);
+
   project.profiles.forEach(profile => {
     body.appendChild(_buildProfileRow(project, profile));
   });
 
   card.append(header, body);
   return card;
+}
+
+function _buildBatchControls(project) {
+  const fileCount = project.profiles.reduce((count, profile) => count + (profile.files || []).length, 0);
+  if (!fileCount) return null;
+
+  const wrap = document.createElement("div");
+  wrap.className = "audio-batch-controls";
+  wrap.innerHTML = `
+    <div class="audio-batch-copy">
+      <strong>Change several assets</strong>
+      <span>${fileCount} file${fileCount === 1 ? "" : "s"} across ${project.profiles.length} profile${project.profiles.length === 1 ? "" : "s"}</span>
+    </div>
+    <div class="audio-batch-actions">
+      <button type="button" class="btn btn-secondary btn-sm" data-shift="-3">−3 dB</button>
+      <button type="button" class="btn btn-secondary btn-sm" data-shift="-1">−1 dB</button>
+      <button type="button" class="btn btn-secondary btn-sm" data-shift="1">+1 dB</button>
+      <button type="button" class="btn btn-secondary btn-sm" data-shift="3">+3 dB</button>
+      <label class="audio-batch-target">
+        <span>Set every file to</span>
+        <input type="number" min="${DB_MIN}" max="${DB_MAX}" step="0.5" value="-12" aria-label="Target volume in decibels">
+        <span>dB</span>
+      </label>
+      <button type="button" class="btn btn-primary btn-sm" data-set-all>Set all</button>
+      <button type="button" class="btn btn-secondary btn-sm" data-clear-offsets title="Make every file follow its profile level">Clear differences</button>
+    </div>
+  `;
+
+  wrap.querySelectorAll("[data-shift]").forEach(button => {
+    button.addEventListener("click", () => {
+      const stateProject = _state[project.key];
+      stateProject.project_volume_db = _clamp(stateProject.project_volume_db + Number(button.dataset.shift));
+      _scheduleSave(project.key);
+      _render();
+    });
+  });
+
+  wrap.querySelector("[data-set-all]").addEventListener("click", () => {
+    const target = _clamp(_num(wrap.querySelector("input").value));
+    const stateProject = _state[project.key];
+    project.profiles.forEach(profile => {
+      const stateProfile = stateProject.profiles[profile.name];
+      (profile.files || []).forEach(file => {
+        stateProfile.file_volume_offsets[file.stem] = _round(
+          target - stateProject.project_volume_db - stateProfile.profile_volume_db
+        );
+      });
+    });
+    _scheduleSave(project.key);
+    _render();
+    toast.success(`${project.name}: all files set to ${_fmt(target)}`);
+  });
+
+  wrap.querySelector("[data-clear-offsets]").addEventListener("click", () => {
+    const stateProject = _state[project.key];
+    Object.values(stateProject.profiles).forEach(profile => {
+      profile.file_volume_offsets = {};
+    });
+    _scheduleSave(project.key);
+    _render();
+    toast.info(`${project.name}: file differences cleared`);
+  });
+
+  return wrap;
 }
 
 function _buildProfileRow(project, profile) {

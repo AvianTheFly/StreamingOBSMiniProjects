@@ -49,6 +49,10 @@ _DEFAULT_WORKFLOWS: list[dict] = []
 
 _sse_clients: list[queue.Queue] = []
 _sse_lock = threading.Lock()
+# A Hub volume write updates disk and OBS a few milliseconds apart.  Ignore that
+# tiny echo window so the poller cannot mistake its own in-flight write for a
+# newer manual OBS fader move.
+_audio_sync_suppressed_until: dict[str, float] = {}
 
 
 def _broadcast(event_type: str, payload: dict) -> None:
@@ -438,13 +442,22 @@ def _sync_audio_memory_from_obs(project_key: str | None = None) -> set[str]:
     for key, project_info in projects.items():
         if project_key and key != project_key:
             continue
+        if time.monotonic() < _audio_sync_suppressed_until.get(key, 0.0):
+            continue
         runtime = runtime_bindings.get(key) or {}
         context = _project_audio_context(key, project_info, runtime=runtime)
         if context is None:
             continue
 
         state_file, state, profile_name, current_stem, source_name = context
-        if not _obs_source_matches_runtime_stem(source_name, current_stem):
+        if runtime.get("shared_volume"):
+            # Music keeps one shared OBS source loaded even while stopped.  Its
+            # fader remains a valid user edit in that idle state.
+            settings = _obs_input_settings(source_name)
+            loaded_file = str(settings.get("local_file") or "").strip()
+            if not loaded_file or Path(loaded_file).stem.casefold() != current_stem.casefold():
+                continue
+        elif not _obs_source_matches_runtime_stem(source_name, current_stem):
             continue
         volume = obs.get_input_volume(source_name) or {}
         live_db = volume.get("db")
@@ -459,6 +472,24 @@ def _sync_audio_memory_from_obs(project_key: str | None = None) -> set[str]:
         if not isinstance(offsets, dict):
             offsets = {}
             profile["file_volume_offsets"] = offsets
+
+        if runtime.get("shared_volume"):
+            # Music uses one OBS input for every song. A direct OBS fader move
+            # therefore means "shift Music by this amount", while file offsets
+            # remain relative. UI writes already update both JSON and OBS, so
+            # their observed delta is zero and they are never overwritten.
+            expected_db = project_db + profile_db + float(offsets.get(current_stem, 0.0) or 0.0)
+            delta = round(float(live_db) - expected_db, 2)
+            if abs(delta) <= 0.05:
+                continue
+            from lib.project_settings import shift_project_volume_db
+            if shift_project_volume_db(
+                project_info.path,
+                delta,
+                hotkeys_file=project_info.hotkeys_file,
+            ):
+                changed.add(key)
+            continue
 
         next_offset = round(float(live_db) - project_db - profile_db, 2)
         prev_offset = float(offsets.get(current_stem, 0.0) or 0.0)
@@ -756,6 +787,12 @@ def _all_statuses() -> list[dict]:
 def _poll_loop(stop: threading.Event) -> None:
     while not stop.is_set():
         try:
+            # Keep the shared Music fader and Hub settings in two-way sync even
+            # when the Audio page is not open. No timestamps or database are
+            # needed: a mismatch is simply the latest OBS-side edit.
+            changed = _sync_audio_memory_from_obs("specific_song")
+            for project in changed:
+                _broadcast("audio_updated", {"project": project})
             _broadcast("status_update", {"projects": _all_statuses()})
         except Exception:
             pass
@@ -1012,16 +1049,15 @@ class _Handler(http.server.BaseHTTPRequestHandler):
                     except (TypeError, ValueError):
                         pass
                 if isinstance(pchanges.get("file_volume_offsets"), dict):
-                    offsets = profile.setdefault("file_volume_offsets", {})
-                    if not isinstance(offsets, dict):
-                        offsets = {}
-                        profile["file_volume_offsets"] = offsets
+                    offsets: dict[str, float] = {}
                     for stem, val in pchanges["file_volume_offsets"].items():
                         try:
                             offsets[str(stem)] = float(val)
                         except (TypeError, ValueError):
                             pass
+                    profile["file_volume_offsets"] = offsets
 
+            _audio_sync_suppressed_until[project_key] = time.monotonic() + 1.0
             _write_json_object(state_file, state)
             try:
                 _apply_live_audio_to_obs(project_key)

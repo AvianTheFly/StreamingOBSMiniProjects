@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import json
+import threading
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
 
 HotkeyValue = str | list[str]
+_STATE_LOCKS: dict[str, threading.Lock] = {}
 
 
 @dataclass(frozen=True, slots=True)
@@ -154,6 +156,49 @@ def load_project_settings(
         file_volume_offsets=file_volume_offsets,
         sounds=sounds,
     )
+
+
+def shift_project_volume_db(
+    project_dir: Path,
+    delta_db: float,
+    *,
+    hotkeys_file: Path | None = None,
+) -> bool:
+    """Shift every profile by the same amount and persist it.
+
+    This is used when the user moves a shared source's fader directly in OBS.
+    Per-file offsets stay intact, so the OBS move behaves like the project-level
+    slider in the Hub.
+    """
+    delta = float(delta_db)
+    if abs(delta) <= 0.05:
+        return False
+
+    project_dir = Path(project_dir)
+    hotkeys_file = Path(hotkeys_file) if hotkeys_file else project_dir / "hotkeys.json"
+    state_file = hotkeys_file.parent / f"{hotkeys_file.stem}_editor.json"
+    lock = _STATE_LOCKS.setdefault(str(state_file), threading.Lock())
+    with lock:
+        state = _read_json_object(state_file)
+        profiles = state.get("profiles")
+        if not isinstance(profiles, dict) or not profiles:
+            profiles = {"default": {}}
+            state["profiles"] = profiles
+            state.setdefault("live_profile", "default")
+            state.setdefault("active_profile", "default")
+        for name, raw_profile in list(profiles.items()):
+            profile = raw_profile if isinstance(raw_profile, dict) else {}
+            try:
+                current = float(profile.get("project_volume_db") or 0.0)
+            except (TypeError, ValueError):
+                current = 0.0
+            profile["project_volume_db"] = round(current + delta, 2)
+            profiles[name] = profile
+        state_file.write_text(
+            json.dumps(state, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+    return True
 
 
 def load_project_profile_summaries(project_dir: Path, *, hotkeys_file: Path | None = None) -> list[dict[str, Any]]:

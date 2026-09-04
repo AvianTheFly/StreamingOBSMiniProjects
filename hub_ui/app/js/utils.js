@@ -2,6 +2,7 @@
 
 /** Human-friendly display name from snake_case key. */
 export function displayName(key) {
+  if (key === "specific_song") return "Music";
   return key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
 }
 

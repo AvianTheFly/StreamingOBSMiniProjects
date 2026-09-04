@@ -44,15 +44,14 @@ class SoundboardPlayer:
         self._current_stem: str | None = None
         self._current_file: Path | None = None
         self._play_thread: threading.Thread | None = None
-        # include_filters=True: any OBS filter the user adds to the shared
-        # soundboard source while a clip is playing is captured as a per-stem
-        # override at clip end and re-applied next time that stem plays.
+        # Filters belong to the one shared OBS source and should remain exactly
+        # as the user configured them. Only per-file transforms are stored.
         self._state_store = SingleSourceStateStore(
             project_dir=_PROJECT_DIR,
             scene=CONFIG.scene,
             source_name=SINGLE_SOURCE_NAME,
             tag=_TAG,
-            include_filters=True,
+            include_filters=False,
             include_audio=False,
             include_audio_volume=False,
             include_media_settings=False,
@@ -136,23 +135,31 @@ class SoundboardPlayer:
             print(f"{_TAG} Playing: '{SINGLE_SOURCE_NAME}'")
 
             self._stop_and_hide_source()
-            obs.set_media_source_file(SINGLE_SOURCE_NAME, filepath)
-            if not self._wait_for_media_file(filepath):
-                current = self._current_media_file()
-                current_name = current.name if current else "unknown"
-                raise RuntimeError(
-                    f"OBS did not confirm file swap to '{filepath.name}' (current: '{current_name}')."
-                )
+            current_file = self._current_media_file()
+            same_file = False
+            if current_file is not None:
+                try:
+                    same_file = current_file.resolve() == filepath.resolve()
+                except OSError:
+                    same_file = str(current_file).casefold() == str(filepath).casefold()
 
-            # Changing local_file can make OBS start decoding immediately. Stop
-            # that implicit start before the one intentional restart below, or
-            # short clips can be heard twice.
-            try:
-                obs.stop_media(SINGLE_SOURCE_NAME)
-            except Exception:
-                pass
+            # Replaying the same effect does not need another decoder/file swap.
+            if not same_file:
+                obs.set_media_source_file(SINGLE_SOURCE_NAME, filepath)
+                if not self._wait_for_media_file(filepath):
+                    current = self._current_media_file()
+                    current_name = current.name if current else "unknown"
+                    raise RuntimeError(
+                        f"OBS did not confirm file swap to '{filepath.name}' (current: '{current_name}')."
+                    )
 
-            self._apply_runtime_media_settings()
+                # Changing local_file can start decoding immediately. Stop that
+                # implicit start before the one intentional restart below.
+                try:
+                    obs.stop_media(SINGLE_SOURCE_NAME)
+                except Exception:
+                    pass
+
             self._state_store.apply_for_stem(stem)
             self._apply_layout_rule(stem, filepath, categories)
             self._apply_runtime_audio_settings(volume_db)
@@ -165,8 +172,6 @@ class SoundboardPlayer:
                 time.sleep(0.03)
 
             obs.restart_media(SINGLE_SOURCE_NAME)
-            self._apply_runtime_audio_settings(volume_db)
-
             started = self._poll_until_done(expected_file=filepath)
             if not started and not self._abort_flag:
                 raise RuntimeError(f"Playback did not start cleanly for '{filepath.name}'.")
@@ -277,7 +282,7 @@ class SoundboardPlayer:
             obs.configure_media_source_properties(
                 SINGLE_SOURCE_NAME,
                 restart_on_activate=False,
-                close_when_inactive=True,
+                close_when_inactive=False,
                 looping=False,
                 hw_decode=True,
                 clear_on_media_end=False,

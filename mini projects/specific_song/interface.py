@@ -70,8 +70,9 @@ class _SpecificSongInterface(ProjectInterface):
             return {"profile": "default"}
         return {
             "profile": "default",
-            "current_stem": player.current_stem,
-            "source_name": SINGLE_SOURCE_NAME if player.current_stem else None,
+            "current_stem": player.current_stem or player.loaded_stem,
+            "source_name": SINGLE_SOURCE_NAME,
+            "shared_volume": True,
         }
 
 

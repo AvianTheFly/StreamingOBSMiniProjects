@@ -1,4 +1,4 @@
-// pages/specific-song.js — Song Manager
+// pages/specific-song.js — Music Manager
 
 import { api }                        from "../api.js";
 import { state }                      from "../state.js";
@@ -144,6 +144,7 @@ function _bindTransport() {
     } catch(e) { toast.error(e.message); }
   });
   on("ss-reload-btn", async () => { await _load(); toast.info("Library reloaded"); });
+  on("ss-audio-btn", () => { window.location.hash = "#audio"; });
 }
 
 // ── Sidebar ───────────────────────────────────────────────────────────────────
@@ -546,6 +547,7 @@ function _shell() {
       </div>
       <span id="ss-rand-indicator" class="ss-rand-indicator">random off</span>
     </div>
+    <button class="btn btn-sm btn-secondary" id="ss-audio-btn" title="Open Music volume controls">Volume</button>
     <button class="btn btn-sm btn-secondary ss-reload-btn" id="ss-reload-btn" title="Reload library">↺</button>
   </div>
 

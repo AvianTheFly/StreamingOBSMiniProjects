@@ -19,7 +19,8 @@ import time
 from pathlib import Path
 
 import obs  # root-level obs package — always on sys.path from hub
-from lib.shared_media.single_source_state import SingleSourceStateStore
+from lib.project_settings import load_project_settings, shift_project_volume_db
+from lib.shared_media.controls import effective_volume_db
 
 from .config import (
     SCENE,
@@ -89,14 +90,17 @@ class SongPlayer:
         self._play_thread:   threading.Thread | None = None
         self._animator:      "BassAnimator | None"    = None
         self._stop_event     = threading.Event()
-        self._state_store    = SingleSourceStateStore(
-            project_dir=_PROJECT_DIR,
-            scene=SCENE,
-            source_name=SINGLE_SOURCE_NAME,
-            tag=_TAG,
-            include_transform=False,
-            include_audio_volume=False,
-        )
+        try:
+            obs.configure_media_source_properties(
+                SINGLE_SOURCE_NAME,
+                restart_on_activate=False,
+                close_when_inactive=False,
+                looping=False,
+                hw_decode=True,
+                clear_on_media_end=False,
+            )
+        except Exception as exc:
+            print(f"{_TAG} ⚠  Could not configure shared Music source: {exc}")
 
     def stop(self) -> None:
         """Shutdown the player (no-op watcher threads to join)."""
@@ -120,6 +124,50 @@ class SongPlayer:
             if not self._current_source:
                 return None
             return self._current_source.removeprefix(OBS_SOURCE_PREFIX)
+
+    @property
+    def loaded_stem(self) -> str | None:
+        current = self._current_media_file(SINGLE_SOURCE_NAME)
+        return current.stem if current else None
+
+    def volume_for_stem(self, stem: str) -> float:
+        settings = load_project_settings(
+            _PROJECT_DIR,
+            hotkeys_file=_PROJECT_DIR / "hotkeys.json",
+            asset_dir=ASSETS_DIR,
+            valid_extensions=set(_AUDIO_EXTENSIONS),
+        )
+        key = str(stem or "").strip().lower()
+        category_db = 0.0
+        categories = list(settings.sound_categories.get(key, ()))
+        if categories:
+            category_db = settings.category_volume_db.get(categories[0], 0.0)
+        return effective_volume_db(
+            project_volume_db=settings.project_volume_db,
+            profile_volume_db=settings.profile_volume_db,
+            category_offset_db=category_db,
+            file_offset_db=settings.file_volume_offsets.get(key, 0.0),
+        )
+
+    def remember_obs_volume(self, stem: str | None = None) -> bool:
+        """Persist a manual OBS fader move as a project-wide Music shift."""
+        stem = str(stem or self.loaded_stem or "").strip()
+        if not stem:
+            return False
+        live = obs.get_input_volume(SINGLE_SOURCE_NAME) or {}
+        live_db = live.get("db")
+        if live_db is None:
+            return False
+        expected_db = self.volume_for_stem(stem)
+        delta = round(float(live_db) - expected_db, 2)
+        changed = shift_project_volume_db(
+            _PROJECT_DIR,
+            delta,
+            hotkeys_file=_PROJECT_DIR / "hotkeys.json",
+        )
+        if changed:
+            print(f"{_TAG} OBS fader changed by {delta:+.1f} dB; saved as the Music level.")
+        return changed
 
     def _get_input_settings(self, source_name: str) -> dict:
         client = obs.get_obs()
@@ -185,9 +233,14 @@ class SongPlayer:
 
         # Resolve the actual media file from the source stem.
         audio_file = _resolve_audio_file(source_name)
+        stem = source_name.removeprefix(OBS_SOURCE_PREFIX)
 
         try:
             print(f"{_TAG} ▶  Playing: '{source_name}'")
+
+            # If the OBS fader was moved since the previous play, that was the
+            # latest user action. Save it before applying this song's offset.
+            self.remember_obs_volume()
 
             # Pre-load audio for the visualizer before touching OBS.
             if BASS_ANIMATION_ENABLED:
@@ -207,29 +260,40 @@ class SongPlayer:
 
             # Point the single source at this song's file before showing it.
             if audio_file:
+                current_file = self._current_media_file(SINGLE_SOURCE_NAME)
+                try:
+                    same_file = bool(current_file and current_file.resolve() == audio_file.resolve())
+                except OSError:
+                    same_file = bool(current_file and str(current_file).casefold() == str(audio_file).casefold())
                 try:
                     obs.stop_media(SINGLE_SOURCE_NAME)
                 except Exception:
                     pass
-                try:
-                    obs.set_media_source_file(SINGLE_SOURCE_NAME, audio_file)
-                except Exception as exc:
-                    print(f"{_TAG} ⚠  Could not set media file for '{SINGLE_SOURCE_NAME}': {exc}")
-                else:
-                    if not self._wait_for_media_file(SINGLE_SOURCE_NAME, audio_file):
-                        current = self._current_media_file(SINGLE_SOURCE_NAME)
-                        current_name = current.name if current else "unknown"
-                        print(
-                            f"{_TAG} ⚠  OBS did not confirm file swap to '{audio_file.name}' "
-                            f"(current: '{current_name}')."
-                        )
+                if not same_file:
+                    try:
+                        obs.set_media_source_file(SINGLE_SOURCE_NAME, audio_file)
+                    except Exception as exc:
+                        print(f"{_TAG} ⚠  Could not set media file for '{SINGLE_SOURCE_NAME}': {exc}")
+                    else:
+                        if not self._wait_for_media_file(SINGLE_SOURCE_NAME, audio_file):
+                            current = self._current_media_file(SINGLE_SOURCE_NAME)
+                            current_name = current.name if current else "unknown"
+                            print(
+                                f"{_TAG} ⚠  OBS did not confirm file swap to '{audio_file.name}' "
+                                f"(current: '{current_name}')."
+                            )
+                        # Cancel the implicit start caused by changing local_file.
+                        try:
+                            obs.stop_media(SINGLE_SOURCE_NAME)
+                        except Exception:
+                            pass
             else:
                 print(f"{_TAG} ⚠  No media file found for '{source_name}' — OBS source unchanged.")
 
             obs.show_source(SCENE, SINGLE_SOURCE_NAME)
             self._apply_fullscreen(SINGLE_SOURCE_NAME)
             self._set_monitor_and_output(SINGLE_SOURCE_NAME)
-            self._state_store.apply_for_stem(source_name.removeprefix(OBS_SOURCE_PREFIX))
+            obs.set_input_volume_db(SINGLE_SOURCE_NAME, self.volume_for_stem(stem))
 
             try:
                 obs.restart_media(SINGLE_SOURCE_NAME)
@@ -254,10 +318,13 @@ class SongPlayer:
             self._safe_hide(SINGLE_SOURCE_NAME)
 
         finally:
+            # A fader move made in OBS while this song was playing becomes the
+            # new project-wide Music level. UI changes already match the saved
+            # value, so this is a no-op for changes made in the Hub.
             try:
-                self._state_store.capture_override_for_stem(source_name.removeprefix(OBS_SOURCE_PREFIX))
+                self.remember_obs_volume(stem)
             except Exception as exc:
-                print(f"{_TAG} ⚠  Could not save single-source override for '{source_name}': {exc}")
+                print(f"{_TAG} ⚠  Could not remember OBS volume: {exc}")
             if self._animator is not None:
                 self._animator.stop()
                 self._animator = None

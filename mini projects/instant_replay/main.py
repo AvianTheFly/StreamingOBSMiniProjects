@@ -23,6 +23,7 @@ Voice Commands  (press "|" to start recording, press "|" again to transcribe)
                          (e.g. "play win").
   "play <tag> N"       — Play the Nth clip with that tag
                          (e.g. "play win 1", "play win 2").
+  "play random"        — Play any saved clip at random.
              If called within PLAY_AFTER_SAVE_WINDOW seconds of a save
              command, waits for the save/trim to finish then plays immediately.
 
@@ -72,6 +73,7 @@ import atexit
 import difflib
 import os
 import queue
+import random
 import re
 import signal
 import subprocess
@@ -736,6 +738,16 @@ def run(
         """
         spec_lower = spec.strip().lower()
 
+        if spec_lower in {"random", "random clip", "anything", "any", "surprise me"}:
+            candidates = _replay_files_on_disk()
+            if not candidates:
+                print("[instant_replay] No saved clips available for random playback.")
+                return
+            choice = random.choice(candidates)
+            print(f"[instant_replay] 🎲 Random clip: {choice.name}")
+            _play_all_clips_sequential([str(choice)])
+            return
+
         # ── "play game N" / "play game last" → edited reel ───────────────────
         # Matches: "game 2", "game two", "game last", "game latest"
         game_match = re.match(
@@ -1102,6 +1114,9 @@ def run(
         _play_all_clips_sequential([str(candidate)])
 
     _live["play_clip"] = _play_clip_path
+    _live["play_spec"] = _on_play
+    _live["save_clip"] = _on_save
+    _live["mark"] = _on_mark
 
     # ── Voice dispatch (called from background thread by voice.listener) ──────
 

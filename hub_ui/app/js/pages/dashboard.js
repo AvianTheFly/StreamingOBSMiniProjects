@@ -7,20 +7,42 @@ import { displayName, esc, timestamp } from "../utils.js";
 
 let _unwatch = null;
 let _logEl   = null;
+let _guideEl = null;
+let _profileProjects = [];
 const MAX_LOG = 80;
 
-export function mount(container) {
+const ACCESS_GUIDE = {
+  specific_song: { group: "Audio", label: "Music", hotkey: "ili", voice: "song name · random · next · stop", note: "One shared OBS source; volume follows the latest OBS or Hub change." },
+  soundboard: { group: "Audio + Visual", label: "Soundboard", hotkey: "/ *", voice: "effect name · random · next · stop", note: "Shared filters stay on the OBS source." },
+  sound_effects: { group: "Audio", label: "Sound Effects", hotkey: "voice / assigned keys", voice: "effect name", note: "Also receives automatic League cues." },
+  instant_replay: { group: "Replay", label: "Instant Replay", hotkey: "|", voice: "save [tag] · mark · play last/random/highlights", note: "Search and play individual clips from its page." },
+  scene_voice_switcher: { group: "Scenes", label: "Scene Voice Switcher", hotkey: "voice", voice: "lobby or scene name", note: "Shows the matching lobby or scene source." },
+  league: { group: "Automatic", label: "League", hotkey: "automatic", voice: "game events", note: "Watches the live League client and triggers overlays/audio." },
+  tik_tok: { group: "Audio + Visual", label: "TikTok", hotkey: "assigned keys", voice: "asset name · random · next · stop", note: "Short-form media playback." },
+  love_me: { group: "Sequence", label: "Love Me", hotkey: "987", voice: "—", note: "Runs the configured scene/audio sequence." },
+};
+
+export async function mount(container) {
   container.innerHTML = `
-    <div class="page-header">
+    <div class="page-header dashboard-hero">
       <div>
-        <div class="page-title">Dashboard</div>
-        <div class="page-subtitle">Live status of all running mini-projects</div>
+        <div class="dashboard-kicker">Personal stream controls</div>
+        <div class="page-title">Stream Control Hub</div>
+        <div class="page-subtitle">What you can trigger, what is running, and where to change it.</div>
       </div>
       <div class="page-actions">
+        <button class="btn btn-primary btn-sm" id="randomReplayBtn">Random replay</button>
+        <button class="btn btn-secondary btn-sm" id="openAudioBtn">Audio levels</button>
         <button class="btn btn-secondary btn-sm" id="revertAllBtn">Revert all</button>
       </div>
     </div>
 
+    <div id="commandGuide" class="command-guide"></div>
+
+    <div class="section-heading">
+      <div><div class="section-eyebrow">Live modules</div><div class="section-title">Current status</div></div>
+      <span class="section-note">Open a module for its full controls</span>
+    </div>
     <div id="projectGrid" class="project-grid"></div>
 
     <hr class="divider mt-24">
@@ -35,22 +57,44 @@ export function mount(container) {
   `;
 
   _logEl = container.querySelector("#eventLog");
+  _guideEl = container.querySelector("#commandGuide");
 
   container.querySelector("#revertAllBtn").addEventListener("click", _revertAll);
+  container.querySelector("#openAudioBtn").addEventListener("click", () => { window.location.hash = "#audio"; });
+  container.querySelector("#randomReplayBtn").addEventListener("click", async () => {
+    try {
+      await api.runProjectAction("instant_replay", "play_random");
+      toast.success("Playing a random replay");
+    } catch (error) {
+      toast.error(error.message);
+    }
+  });
   container.querySelector("#clearLogBtn").addEventListener("click", () => {
     if (_logEl) _logEl.innerHTML = "";
   });
 
   // Initial render
   _renderGrid(state.get("projects"));
+  _renderGuide(state.get("projects"));
+
+  try {
+    const data = await api.getEditorProfiles();
+    _profileProjects = Array.isArray(data.projects) ? data.projects : [];
+    _renderGuide(state.get("projects"));
+  } catch {}
 
   // Reactive updates
-  _unwatch = state.watch("projects", _renderGrid);
+  _unwatch = state.watch("projects", projects => {
+    _renderGrid(projects);
+    _renderGuide(projects);
+  });
 }
 
 export function unmount() {
   if (_unwatch) { _unwatch(); _unwatch = null; }
   _logEl = null;
+  _guideEl = null;
+  _profileProjects = [];
 }
 
 // Called from app.js for every SSE event (passed as wildcard listener)
@@ -70,6 +114,40 @@ function _renderGrid(projects) {
 
   grid.innerHTML = "";
   projects.forEach(p => grid.appendChild(_makeCard(p)));
+}
+
+function _renderGuide(projects) {
+  if (!_guideEl) return;
+  const ordered = [...projects].sort((a, b) => {
+    const ag = ACCESS_GUIDE[a.name]?.group || "Other";
+    const bg = ACCESS_GUIDE[b.name]?.group || "Other";
+    return ag.localeCompare(bg) || displayName(a.name).localeCompare(displayName(b.name));
+  });
+  _guideEl.innerHTML = ordered.map(project => {
+    const guide = ACCESS_GUIDE[project.name] || {
+      group: "Module",
+      label: displayName(project.name),
+      hotkey: "Open module",
+      voice: "See module settings",
+      note: "",
+    };
+    const profileProject = _profileProjects.find(item => item.key === project.name);
+    const liveProfile = profileProject?.profiles?.find(profile => profile.live) || profileProject?.profiles?.[0];
+    const configuredTrigger = String(liveProfile?.trigger_sequences || "").trim();
+    const hotkeyCount = Number(liveProfile?.hotkey_count || 0);
+    const trigger = configuredTrigger || guide.hotkey;
+    return `
+      <a class="command-card ${project.is_active ? "is-live" : ""}" href="#projects/${esc(project.name)}">
+        <div class="command-card-top">
+          <span class="command-group">${esc(guide.group)}</span>
+          <span class="command-state"><i></i>${project.is_active ? "active" : "ready"}</span>
+        </div>
+        <strong>${esc(guide.label)}</strong>
+        <div class="command-trigger"><span>Trigger</span><kbd>${esc(trigger)}</kbd>${hotkeyCount ? `<small>+ ${hotkeyCount} assigned</small>` : ""}</div>
+        <div class="command-voice"><span>Say</span>${esc(guide.voice)}</div>
+        <p>${esc(guide.note)}</p>
+      </a>`;
+  }).join("");
 }
 
 function _makeCard(p) {
