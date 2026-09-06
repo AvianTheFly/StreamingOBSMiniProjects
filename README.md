@@ -54,6 +54,14 @@ hidden; per-file players release it. Repeated playback of the same file should
 restart without rewriting `local_file`. Playback watchers must check request IDs
 so an older trigger cannot hide or save state for a newer asset on the same input.
 
+## League Respawn Audio
+
+The League respawn event uses `sfx__Halo Respawn sound effect`. OBS must keep a
+reference to that existing input enabled in `LeagueGameAssets`; the separate
+`Sound Effects` scene is not included in every gameplay scene. The older
+`HaloRespawnSfx` input is a duplicate and should stay disabled. The sound is
+explicitly restarted on respawn, with looping and restart-on-activation off.
+
 ## Instant Replay Library
 
 Replay clips stay as individual files; game-end cleanup must not merge or
