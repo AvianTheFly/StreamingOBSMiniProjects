@@ -681,9 +681,9 @@ def set_source_filter_settings(
     (which would reset unspecified fields like opacity back to defaults).
     """
     get_obs().set_source_filter_settings(
-        sourceName=source,
-        filterName=filter_name,
-        filterSettings=settings,
+        source_name=source,
+        filter_name=filter_name,
+        settings=settings,
         overlay=overlay,
     )
 
