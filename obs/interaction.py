@@ -458,6 +458,7 @@ def wait_for_media_end(
     poll_interval: float = 0.10,
     start_timeout: float = 5.0,
     total_timeout: float = 600.0,
+    cancelled=None,
 ) -> bool:
     """
     Block until a media source finishes playing.
@@ -470,6 +471,8 @@ def wait_for_media_end(
     t0 = time.time()
 
     while True:
+        if cancelled is not None and cancelled():
+            return False
         state   = get_media_state(source)
         elapsed = time.time() - t0
 

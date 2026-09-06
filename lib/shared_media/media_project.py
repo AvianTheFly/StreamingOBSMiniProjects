@@ -120,10 +120,13 @@ def _start_media_source_playback(
         pass
     time.sleep(0.03)
 
-    obs.set_media_source_file(source_name, filepath)
-    file_applied = _wait_for_media_source_file(source_name, filepath, timeout=min(2.0, max(0.5, start_timeout)))
-    if not file_applied:
-        return False
+    loaded_file = str(_get_obs_input_settings(source_name).get("local_file") or "")
+    same_file = bool(loaded_file) and Path(loaded_file).resolve() == filepath.resolve()
+    if not same_file:
+        obs.set_media_source_file(source_name, filepath)
+        file_applied = _wait_for_media_source_file(source_name, filepath, timeout=min(2.0, max(0.5, start_timeout)))
+        if not file_applied:
+            return False
     # A local_file change can itself start the OBS media input. Cancel that
     # implicit start so this helper has exactly one playback start below.
     try:
@@ -671,7 +674,6 @@ def run_media_project(
                     or current_source_name[0] != source_name
                 )
             if is_stale:
-                coordinator.announce_finished(cfg.project_name)
                 return
 
             print(f"[{cfg.project_name}] Playing: '{source_name}'")
@@ -729,33 +731,28 @@ def run_media_project(
                     source_name,
                     start_timeout=cfg.media_start_timeout,
                     total_timeout=cfg.media_total_timeout,
+                    cancelled=lambda: current_play_request_id[0] != request_id,
                 )
             except Exception as exc:
                 print(f"[{cfg.project_name}] Playback failed for '{source_name}': {exc}")
             finally:
-                if source_state_store is not None:
-                    try:
-                        source_state_store.capture_override_for_stem(name)
-                    except Exception as exc:
-                        print(f"[{cfg.project_name}] Could not save single-source override for '{name}': {exc}")
-
                 with play_lock:
-                    still_current = currently_playing[0] == name
-
-                if still_current:
-                    obs.hide_source(cfg.scene, source_name)
-                    with visible_lock:
-                        visible_sources.discard(source_name)
-
-                with play_lock:
-                    if currently_playing[0] == name:
+                    # A previous waiter must never hide or capture a newer
+                    # asset that now owns this same OBS source (even same name).
+                    still_current = current_play_request_id[0] == request_id
+                    if still_current:
+                        if source_state_store is not None:
+                            try:
+                                source_state_store.capture_override_for_stem(name)
+                            except Exception as exc:
+                                print(f"[{cfg.project_name}] Could not save single-source override for '{name}': {exc}")
+                        obs.hide_source(cfg.scene, source_name)
+                        with visible_lock:
+                            visible_sources.discard(source_name)
                         currently_playing[0] = None
-                    if current_source_name[0] == source_name:
                         current_source_name[0] = None
-
-                # Announce completion so the coordinator can resume any
-                # projects it paused on our behalf.
-                coordinator.announce_finished(cfg.project_name)
+                if still_current:
+                    coordinator.announce_finished(cfg.project_name)
 
         coordinator.request_to_play(cfg.project_name, on_ready=_do_play)
 
@@ -864,7 +861,9 @@ def run_media_project(
             obs.configure_media_source_properties(
                 source_name,
                 restart_on_activate=False,
-                close_when_inactive=True,
+                # Keep only the bounded shared player warm between hotkeys.
+                # Per-file sources still release resources while hidden.
+                close_when_inactive=not _single_source_mode,
                 looping=False,
                 hw_decode=True,
                 clear_on_media_end=False,

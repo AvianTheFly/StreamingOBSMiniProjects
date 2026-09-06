@@ -49,6 +49,11 @@ asset: capture the outgoing file's complete filter chain before a swap and
 apply the incoming file's saved chain afterward. An asset with no saved filter
 state must load with no filters.
 
+For responsive hotkeys, the bounded shared players keep their media loaded while
+hidden; per-file players release it. Repeated playback of the same file should
+restart without rewriting `local_file`. Playback watchers must check request IDs
+so an older trigger cannot hide or save state for a newer asset on the same input.
+
 ## Instant Replay Library
 
 Replay clips stay as individual files; game-end cleanup must not merge or
