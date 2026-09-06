@@ -52,6 +52,7 @@ class _InstantReplayInterface(ProjectInterface):
         return [
             {"key": "play_latest", "label": "Play Latest", "description": "Play the newest saved clip."},
             {"key": "play_random", "label": "Play Random", "description": "Play any saved clip at random."},
+            {"key": "play_intro", "label": "Play Intro Montage", "description": "Shuffle clips marked for the intro, using their saved replay ranges."},
             {"key": "play_highlights", "label": "Play Highlights", "description": "Play clips from the current or previous game."},
             {"key": "save", "label": "Save Replay", "description": "Save the current OBS replay buffer."},
             {"key": "mark", "label": "Mark Start", "description": "Mark the start point for the next saved clip."},
@@ -73,13 +74,14 @@ class _InstantReplayInterface(ProjectInterface):
             if handler:
                 handler()
                 return {"ok": True, "action": action}
-        elif action in {"play_latest", "play_random", "play_highlights"}:
+        elif action in {"play_latest", "play_random", "play_highlights", "play_intro"}:
             handler = _live.get("play_spec")
             if handler:
                 spec = {
                     "play_latest": "last",
                     "play_random": "random",
                     "play_highlights": "highlights",
+                    "play_intro": "intro montage",
                 }[action]
                 threading.Thread(
                     target=handler,

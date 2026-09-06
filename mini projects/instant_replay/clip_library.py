@@ -97,6 +97,7 @@ def clip_settings(path_value: str | Path, *, include_duration: bool = False) -> 
             changed = True
         if include_duration and entry.get("duration") is None:
             entry = state["clips"].setdefault(_key(path), entry)
+            entry["fingerprint"] = fingerprint
             entry["duration"] = round(probe_duration(path), 3)
             changed = True
         if changed:
@@ -141,11 +142,14 @@ def update_clip_settings(
     game: str | None = None,
 ) -> dict[str, Any]:
     path = resolve_clip(path_value)
-    duration = probe_duration(path)
+    changing_range = replay_start is not None or replay_end is not None
+    # Tag/star/game edits do not need to start ffprobe. Range edits use the
+    # duration cache, which is invalidated when the media file changes.
+    duration = clip_settings(path, include_duration=True)["duration"] if changing_range else None
     with _LOCK:
         state = _load()
         entry = state["clips"].setdefault(_key(path), {})
-        if replay_start is not None or replay_end is not None:
+        if changing_range:
             start = max(0.0, min(float(replay_start or 0.0), duration))
             end = duration if replay_end is None else max(0.0, min(float(replay_end), duration))
             if end - start < 0.1:
@@ -159,10 +163,14 @@ def update_clip_settings(
         if game is not None:
             entry["game"] = str(game).strip()
         stat = path.stat()
-        entry["fingerprint"] = f"{stat.st_size}:{stat.st_mtime_ns}"
-        entry["duration"] = round(duration, 3)
+        fingerprint = f"{stat.st_size}:{stat.st_mtime_ns}"
+        if entry.get("fingerprint") != fingerprint:
+            entry.pop("duration", None)
+        entry["fingerprint"] = fingerprint
+        if duration is not None:
+            entry["duration"] = round(duration, 3)
         _save(state)
-    return clip_settings(path, include_duration=True)
+    return clip_settings(path)
 
 
 def playback_range(path_value: str | Path) -> tuple[float, float | None]:
