@@ -60,7 +60,9 @@ The League respawn event uses `sfx__Halo Respawn sound effect`. OBS must keep a
 reference to that existing input enabled in `LeagueGameAssets`; the separate
 `Sound Effects` scene is not included in every gameplay scene. The older
 `HaloRespawnSfx` input is a duplicate and should stay disabled. The sound is
-explicitly restarted on respawn, with looping and restart-on-activation off.
+explicitly restarted before respawn, at `RESPAWN_SFX_LEAD_SECONDS` remaining
+(3.5 seconds for the 3.3-second clip), with looping and restart-on-activation off.
+The alive transition only restores overlays; it must not play the sound again.
 
 ## Instant Replay Library
 

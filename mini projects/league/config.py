@@ -23,6 +23,8 @@ REQUEST_TIMEOUT        = 2
 
 # ── Respawn SFX (Halo sound at 3 seconds) ─────────────────────────────────────
 RESPAWN_SFX_SOURCE = "Halo Respawn sound effect"
+# The clip is about 3.3 seconds long; allow for the 0.5-second API polling step.
+RESPAWN_SFX_LEAD_SECONDS = 3.5
 
 # ── Death / Respawn ───────────────────────────────────────────────────────────
 # Death border stays visible until respawn — no duration needed.

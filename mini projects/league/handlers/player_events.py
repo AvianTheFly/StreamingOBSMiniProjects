@@ -36,10 +36,7 @@ def make_death_handler():
 
 def make_respawn_handler():
     def handle_respawn(player_data):
-        print("[league] Respawned — playing respawn sound and restoring overlays.")
-        # Fire from the actual dead -> alive transition. The previous
-        # three-seconds-remaining timer could be skipped between API polls.
-        hub_events.emit("sfx.play", source=RESPAWN_SFX_SOURCE.lower(), concurrent=True)
+        print("[league] Respawned — restoring overlays.")
         try:
             obs.hide_source(DEATH_SCENE, DEATH_SOURCE)
         except Exception as e:
@@ -53,6 +50,13 @@ def make_respawn_handler():
         except Exception as e:
             print(f"[league] Respawn handler error (Udyr animation): {e}")
     return handle_respawn
+
+
+def make_respawn_sfx_handler():
+    def handle_respawn_sfx(player_data):
+        print("[league] Respawn countdown — playing Halo sound before revival.")
+        hub_events.emit("sfx.play", source=RESPAWN_SFX_SOURCE.lower(), concurrent=True)
+    return handle_respawn_sfx
 
 
 def make_recall_complete_handler():
