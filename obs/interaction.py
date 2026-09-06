@@ -671,6 +671,8 @@ def set_source_filter_settings(
     source: str,
     filter_name: str,
     settings: dict,
+    *,
+    overlay: bool = True,
 ) -> None:
     """
     Push new settings onto an existing filter.
@@ -682,7 +684,7 @@ def set_source_filter_settings(
         sourceName=source,
         filterName=filter_name,
         filterSettings=settings,
-        overlay=True,
+        overlay=overlay,
     )
 
 
@@ -1127,7 +1129,11 @@ def configure_media_source_properties(
     if speed_percent is not None:
         settings["speed_percent"] = float(speed_percent)
     if settings:
-        get_obs().set_input_settings(source, settings, overlay=True)
+        client = get_obs()
+        current = getattr(client.get_input_settings(source), "input_settings", {}) or {}
+        changes = {key: value for key, value in settings.items() if current.get(key) != value}
+        if changes:
+            client.set_input_settings(source, changes, overlay=True)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

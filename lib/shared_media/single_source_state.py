@@ -311,7 +311,11 @@ def _apply_snapshot(
 ) -> None:
     media_settings = snapshot.get("media_settings") or {}
     if apply_media_settings and media_settings:
-        obs.get_obs().set_input_settings(source_name, media_settings, overlay=True)
+        client = obs.get_obs()
+        current = getattr(client.get_input_settings(source_name), "input_settings", {}) or {}
+        changes = {key: value for key, value in media_settings.items() if current.get(key) != value}
+        if changes:
+            client.set_input_settings(source_name, changes, overlay=True)
 
     transform = snapshot.get("transform") or {}
     if apply_transform and transform:
@@ -336,6 +340,16 @@ def _apply_filters(source_name: str, desired_filters: list[dict[str, Any]]) -> N
     current = _snapshot_filters(source_name)
     if _filters_equal(current, desired_filters):
         return
+    # Reuse existing filter instances when names, kinds and order match.
+    # Recreating GPU filters can allocate textures/compile shaders on each swap.
+    identity = lambda chain: [(item.get("name"), item.get("kind")) for item in chain]
+    if identity(current) == identity(desired_filters):
+        for old, new in zip(current, desired_filters):
+            if old.get("settings", {}) != new.get("settings", {}):
+                obs.set_source_filter_settings(source_name, new["name"], new.get("settings") or {}, overlay=False)
+            if old.get("enabled", True) != new.get("enabled", True):
+                obs.set_source_filter_enabled(source_name, new["name"], bool(new.get("enabled", True)))
+        return
     for item in current:
         try:
             obs.remove_source_filter(source_name, item["name"])
@@ -350,8 +364,6 @@ def _apply_filters(source_name: str, desired_filters: list[dict[str, Any]]) -> N
         settings = item.get("settings") if isinstance(item.get("settings"), dict) else {}
         obs.create_source_filter(source_name, name, kind, settings)
         obs.set_source_filter_enabled(source_name, name, bool(item.get("enabled", True)))
-        if settings:
-            obs.set_source_filter_settings(source_name, name, settings)
 
 
 def _snapshot_diff(baseline: dict[str, Any], current: dict[str, Any]) -> dict[str, Any]:

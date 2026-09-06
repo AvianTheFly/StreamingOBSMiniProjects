@@ -20,7 +20,17 @@ STATE_FILE = ROOT / ".instant_replay_library.json"
 THUMBNAIL_DIR = ROOT / ".instant_replay_thumbnails"
 PREVIEW_DIR = ROOT / ".instant_replay_previews"
 _LOCK = threading.Lock()
-_FFMPEG = threading.Semaphore(2)
+_FFMPEG = threading.Semaphore(1)
+
+
+def _run_ffmpeg(command: list[str]) -> subprocess.CompletedProcess:
+    # Leave CPU headroom for OBS; codec/quality settings remain unchanged.
+    command = list(command)
+    input_index = command.index("-i")
+    command[input_index:input_index] = ["-threads", "2", "-filter_threads", "1", "-filter_complex_threads", "1"]
+    command[-1:-1] = ["-threads", "2"]
+    return subprocess.run(command, capture_output=True, text=True,
+                          creationflags=getattr(subprocess, "BELOW_NORMAL_PRIORITY_CLASS", 0))
 
 
 def resolve_clip(path_value: str | Path) -> Path:
@@ -190,13 +200,13 @@ def thumbnail_for(path_value: str | Path) -> Path:
     except Exception:
         seek = 0.0
     with _FFMPEG:
-        result = subprocess.run(
+        if output.is_file() and output.stat().st_size > 0:
+            return output
+        result = _run_ffmpeg(
             [
                 "ffmpeg", "-y", "-ss", f"{seek:.3f}", "-i", str(path),
                 "-frames:v", "1", "-vf", "scale=480:-2", "-q:v", "4", str(output),
             ],
-            capture_output=True,
-            text=True,
         )
     if result.returncode != 0 or not output.is_file():
         output.unlink(missing_ok=True)
@@ -222,9 +232,11 @@ def preview_for(path_value: str | Path) -> Path:
     ]
     last_error = ""
     with _FFMPEG:
+        if output.is_file() and output.stat().st_size > 0:
+            return output
         for command in commands:
             temp.unlink(missing_ok=True)
-            result = subprocess.run(command, capture_output=True, text=True)
+            result = _run_ffmpeg(command)
             if result.returncode == 0 and temp.is_file() and temp.stat().st_size > 0:
                 os.replace(temp, output)
                 return output
@@ -254,7 +266,8 @@ def trim_file(path_value: str | Path, start: float, end: float) -> dict[str, Any
     if path.suffix.lower() in {".mp4", ".mov"}:
         command += ["-movflags", "+faststart"]
     command.append(str(temp))
-    result = subprocess.run(command, capture_output=True, text=True)
+    with _FFMPEG:
+        result = _run_ffmpeg(command)
     if result.returncode != 0 or not temp.is_file() or temp.stat().st_size <= 0:
         temp.unlink(missing_ok=True)
         raise RuntimeError(result.stderr[-800:] or "ffmpeg could not trim the clip")
