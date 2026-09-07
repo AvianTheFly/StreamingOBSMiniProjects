@@ -19,7 +19,7 @@ import time
 from pathlib import Path
 
 import obs  # root-level obs package — always on sys.path from hub
-from lib.project_settings import load_project_settings, shift_project_volume_db
+from lib.project_settings import load_project_settings, shift_project_volume_db, audio_settings_transaction
 from lib.shared_media.controls import effective_volume_db
 
 from .config import (
@@ -149,6 +149,7 @@ class SongPlayer:
             file_offset_db=settings.file_volume_offsets.get(key, 0.0),
         )
 
+    @audio_settings_transaction
     def remember_obs_volume(self, stem: str | None = None) -> bool:
         """Persist a manual OBS fader move as a project-wide Music shift."""
         stem = str(stem or self.loaded_stem or "").strip()

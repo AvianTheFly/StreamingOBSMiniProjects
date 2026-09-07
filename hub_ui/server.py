@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import http.server
 import json
+import math
 import mimetypes
 import os
 import queue
@@ -26,6 +27,7 @@ import time
 import urllib.parse
 from pathlib import Path
 from typing import Any
+from lib.project_settings import audio_settings_transaction
 
 _HERE         = Path(__file__).resolve().parent
 _APP_DIR      = _HERE / "app"
@@ -349,6 +351,15 @@ def _project_audio_context(
     runtime = runtime or {}
     current_stem = str(runtime.get("current_stem") or "").strip()
     source_name = str(runtime.get("source_name") or "").strip()
+    if not current_stem and project_key in {'soundboard', 'tik_tok'}:
+        # Shared-source faders remain editable while stopped. Attribute the
+        # change to the file still loaded in OBS, rather than dropping it.
+        defaults = project_info.config_defaults or {}
+        prefix = defaults.get('obs_source_prefix')
+        if prefix:
+            source_name = f'{prefix}player'
+            loaded = str(_obs_input_settings(source_name).get('local_file') or '')
+            current_stem = Path(loaded).stem if loaded else ''
     if not current_stem or not source_name:
         return None
 
@@ -413,13 +424,6 @@ def _obs_source_matches_runtime_stem(source_name: str, stem: str) -> bool:
     if not stem:
         return False
 
-    try:
-        state = obs.get_media_state(source_name)
-    except Exception:
-        return False
-    if state not in _ACTIVE_MEDIA_STATES:
-        return False
-
     settings = _obs_input_settings(source_name)
     local_file = str(settings.get("local_file") or "").strip()
     if not local_file:
@@ -428,6 +432,19 @@ def _obs_source_matches_runtime_stem(source_name: str, stem: str) -> bool:
     return Path(local_file).stem.casefold() == stem.casefold()
 
 
+def _stem_value(mapping, stem, default=0.0):
+    return next((value for key, value in (mapping or {}).items()
+                 if str(key).casefold() == stem.casefold()), default)
+
+
+def _category_db(profile, stem):
+    categories = _stem_value(profile.get('sound_categories'), stem, [])
+    if isinstance(categories, str):
+        categories = [categories]
+    return float((profile.get('category_volume_db') or {}).get(categories[0], 0.0)) if categories else 0.0
+
+
+@audio_settings_transaction
 def _sync_audio_memory_from_obs(project_key: str | None = None) -> set[str]:
     changed: set[str] = set()
     try:
@@ -478,7 +495,7 @@ def _sync_audio_memory_from_obs(project_key: str | None = None) -> set[str]:
             # therefore means "shift Music by this amount", while file offsets
             # remain relative. UI writes already update both JSON and OBS, so
             # their observed delta is zero and they are never overwritten.
-            expected_db = project_db + profile_db + float(offsets.get(current_stem, 0.0) or 0.0)
+            expected_db = project_db + profile_db + _category_db(profile, current_stem) + float(_stem_value(offsets, current_stem))
             delta = round(float(live_db) - expected_db, 2)
             if abs(delta) <= 0.05:
                 continue
@@ -491,11 +508,14 @@ def _sync_audio_memory_from_obs(project_key: str | None = None) -> set[str]:
                 changed.add(key)
             continue
 
-        next_offset = round(float(live_db) - project_db - profile_db, 2)
-        prev_offset = float(offsets.get(current_stem, 0.0) or 0.0)
+        next_offset = round(float(live_db) - project_db - profile_db - _category_db(profile, current_stem), 2)
+        prev_offset = float(_stem_value(offsets, current_stem))
         if abs(prev_offset - next_offset) <= 0.05:
             continue
 
+        for old_key in list(offsets):
+            if old_key.casefold() == current_stem.casefold():
+                offsets.pop(old_key)
         if abs(next_offset) <= 0.05:
             offsets.pop(current_stem, None)
         else:
@@ -507,6 +527,7 @@ def _sync_audio_memory_from_obs(project_key: str | None = None) -> set[str]:
     return changed
 
 
+@audio_settings_transaction
 def _apply_live_audio_to_obs(project_key: str) -> bool:
     try:
         import obs
@@ -524,15 +545,19 @@ def _apply_live_audio_to_obs(project_key: str) -> bool:
         return False
 
     _state_file, state, profile_name, current_stem, source_name = context
-    if not _obs_source_matches_runtime_stem(source_name, current_stem):
+    if runtime.get('shared_volume'):
+        loaded = str(_obs_input_settings(source_name).get('local_file') or '')
+        if not loaded or Path(loaded).stem.casefold() != current_stem.casefold():
+            return False
+    elif not _obs_source_matches_runtime_stem(source_name, current_stem):
         return False
     profiles = state["profiles"]
     profile = profiles[profile_name]
     offsets = profile.get("file_volume_offsets") if isinstance(profile.get("file_volume_offsets"), dict) else {}
     project_db = float(profile.get("project_volume_db") or 0.0)
     profile_db = float(profile.get("profile_volume_db") or 0.0)
-    file_db = float(offsets.get(current_stem, 0.0) or 0.0)
-    effective_db = round(project_db + profile_db + file_db, 2)
+    file_db = float(_stem_value(offsets, current_stem))
+    effective_db = round(project_db + profile_db + _category_db(profile, current_stem) + file_db, 2)
     obs.set_input_volume_db(source_name, effective_db)
     return True
 
@@ -787,10 +812,9 @@ def _all_statuses() -> list[dict]:
 def _poll_loop(stop: threading.Event) -> None:
     while not stop.is_set():
         try:
-            # Keep the shared Music fader and Hub settings in two-way sync even
-            # when the Audio page is not open. No timestamps or database are
-            # needed: a mismatch is simply the latest OBS-side edit.
-            changed = _sync_audio_memory_from_obs("specific_song")
+            # Remember module fader edits even when the Audio page is closed.
+            # UI writes and this pass share the audio settings transaction lock.
+            changed = _sync_audio_memory_from_obs()
             for project in changed:
                 _broadcast("audio_updated", {"project": project})
             _broadcast("status_update", {"projects": _all_statuses()})
@@ -994,8 +1018,25 @@ class _Handler(http.server.BaseHTTPRequestHandler):
         except Exception as exc:
             self._err(500, str(exc))
 
+    @audio_settings_transaction
     def _post_audio(self):
         body = self._body()
+        def validate_numbers(value):
+            if not isinstance(value, dict):
+                return
+            for key, item in value.items():
+                if key in {'project_volume_db', 'profile_volume_db'}:
+                    if not math.isfinite(float(item)):
+                        raise ValueError('Volume must be a finite number')
+                elif key == 'file_volume_offsets' and isinstance(item, dict):
+                    if any(not math.isfinite(float(v)) for v in item.values()):
+                        raise ValueError('Volume offsets must be finite numbers')
+                elif isinstance(item, dict):
+                    validate_numbers(item)
+        try:
+            validate_numbers(body)
+        except (TypeError, ValueError):
+            return self._err(400, 'Volumes must be finite numbers')
         project_key = str(body.get("project") or "").strip()
         if not project_key:
             return self._err(400, "Missing 'project'")
@@ -1090,7 +1131,7 @@ class _Handler(http.server.BaseHTTPRequestHandler):
                 inputs.append({
                     "name": name,
                     "kind": str(kind or ""),
-                    "volume_db": round(vol.get("db") or -100.0, 1),
+                    "volume_db": round(vol["db"] if vol.get("db") is not None else -100.0, 1),
                     "volume_mul": round(vol.get("mul") or 0.0, 4),
                     "muted": bool(muted),
                     "monitor": monitor or "OBS_MONITORING_TYPE_NONE",

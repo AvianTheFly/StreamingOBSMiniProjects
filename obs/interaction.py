@@ -882,7 +882,10 @@ def set_input_volume_db(input_name: str, db: float) -> None:
       set_input_volume(inputName, inputVolumeMul, inputVolumeDb)
     Pass None for mul to leave it unset.
     """
-    get_obs().set_input_volume(input_name, None, float(db))
+    value = float(db)
+    if not math.isfinite(value):
+        raise ValueError('Volume must be a finite number')
+    get_obs().set_input_volume(input_name, None, value)
 
 
 def ensure_input_on_stream_track(input_name: str) -> int:

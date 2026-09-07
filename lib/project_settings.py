@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import threading
+from functools import wraps
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -9,6 +10,16 @@ from typing import Any
 
 HotkeyValue = str | list[str]
 _STATE_LOCKS: dict[str, threading.Lock] = {}
+_AUDIO_LOCK = threading.RLock()
+
+
+def audio_settings_transaction(fn):
+    """Serialize OBS volume read/modify/write with Hub volume writes."""
+    @wraps(fn)
+    def wrapped(*args, **kwargs):
+        with _AUDIO_LOCK:
+            return fn(*args, **kwargs)
+    return wrapped
 
 
 @dataclass(frozen=True, slots=True)
