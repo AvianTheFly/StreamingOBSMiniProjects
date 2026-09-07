@@ -125,6 +125,31 @@ from .cleanup import (
 _REPLAY_MEDIA_EXTENSIONS = {".mkv", ".mp4", ".mov", ".webm"}
 
 
+def wait_for_replay_start(source, cancelled, timeout=8.0):
+    """Require advancing PLAYING samples; stale ENDED cursors are not starts."""
+    if cancelled.wait(0.2):
+        return False
+    restart_media(source)
+    deadline = time.monotonic() + timeout
+    retry_at = time.monotonic() + 1.0
+    last_cursor = None
+    while time.monotonic() < deadline and not cancelled.is_set():
+        status = obs.get_media_status(source) or {}
+        state, cursor = status.get('state'), status.get('cursor_ms')
+        if state == 'OBS_MEDIA_STATE_PLAYING' and isinstance(cursor, (int, float)):
+            if last_cursor is not None and cursor > last_cursor:
+                return True
+            last_cursor = cursor
+        else:
+            last_cursor = None
+        if retry_at is not None and time.monotonic() >= retry_at and state in (
+                'OBS_MEDIA_STATE_STOPPED', 'OBS_MEDIA_STATE_ENDED', 'OBS_MEDIA_STATE_NONE'):
+            restart_media(source)
+            retry_at = None
+        cancelled.wait(0.1)
+    return False
+
+
 def _replay_files_on_disk() -> list[Path]:
     root = Path(REPLAY_DIR)
     if not root.is_dir():
@@ -145,12 +170,16 @@ def _replay_files_on_disk() -> list[Path]:
 # if the process is killed mid-replay.
 
 _is_muted: bool = False
+_desktop_was_muted = False
 
 
 def _mute_desktop() -> None:
     """Mute Desktop Audio for replay playback."""
-    global _is_muted
+    global _is_muted, _desktop_was_muted
+    if _is_muted:
+        return
     try:
+        _desktop_was_muted = bool(obs.get_input_mute(DESKTOP_AUDIO_INPUT))
         set_input_mute(DESKTOP_AUDIO_INPUT, True)
         print("[instant_replay] 🔇 Desktop audio muted.")
         _is_muted = True
@@ -164,7 +193,7 @@ def _unmute_desktop() -> None:
     if not _is_muted:
         return
     try:
-        set_input_mute(DESKTOP_AUDIO_INPUT, False)
+        set_input_mute(DESKTOP_AUDIO_INPUT, _desktop_was_muted)
         print("[instant_replay] 🔊 Desktop audio unmuted.")
         _is_muted = False
     except Exception as exc:
@@ -942,170 +971,79 @@ def run(
                 return "(none)"
             return ", ".join(f"{t}: {c}" for t, c in counts.items())
 
+    _playback_gate = threading.Lock()
+
     def _play_all_clips_sequential(clips: list[str]) -> None:
-        """
-        Play a list of clips one after another.
-        For a single clip, behaves identical to the old _do_play.
-
-        During multi-clip playback, pressing '|' skips to the next clip
-        (first press = skip; second consecutive press = cancel all).
-        """
-        is_multi = len(clips) > 1
-
-        with _lock:
-            _is_multi_clip_active[0] = is_multi
-        _skip_clip.clear()
-
+        """One owner controls OBS until the whole replay session finishes."""
+        if not _playback_gate.acquire(blocking=False):
+            print("[instant_replay] Replay already starting/playing; stop it before choosing another.")
+            return
         try:
+            _cancel_watcher.clear()
+            _skip_clip.clear()
+            with _lock:
+                _is_multi_clip_active[0] = len(clips) > 1
+                _replay_active[0] = True
+                _replay_paused[0] = False
             _pause_other_projects()
-            for i, clip in enumerate(clips):
+            for clip in clips:
+                if _cancel_watcher.is_set():
+                    break
                 clip_path = Path(clip)
                 if not clip_path.is_file() or clip_path.stat().st_size <= 0:
-                    print(f"[instant_replay] ❌ Clip is missing or empty: {clip}")
+                    print(f"[instant_replay] Missing or empty clip: {clip}")
                     continue
-                label = f"Clip {i + 1}/{len(clips)}" if is_multi else ""
-                print(f"[instant_replay] ▶  Playing: {clip}{' — ' + label if label else ''}")
-
-                # Cancel any ongoing replay/watcher before starting a new one.
-                _end_replay(cancelled=True)
-
-                old_watcher: threading.Thread | None
-                with _lock:
-                    old_watcher = _watcher_thread[0]
-                if old_watcher and old_watcher.is_alive():
-                    old_watcher.join(timeout=2)
-
-                _cancel_watcher.clear()
-                _skip_clip.clear()
-
-                try:
-                    switch_scene(SCENE)
-                    # Give OBS a moment to settle on the scene before starting playback.
-                    time.sleep(0.2)
-                    print(f"[instant_replay] 🎬 Switched to '{SCENE}'.")
-                except Exception as exc:
-                    print(f"[instant_replay] ❌ Could not switch to '{SCENE}': {exc}")
-                    return
-
-                # Small delay so OBS has time to settle on the scene switch
-                time.sleep(0.15)
-
-                # Animate the logo: flip up from bottom with a 3D circular spin
-                threading.Thread(
-                    target=_animate_replay_logo, daemon=True
-                ).start()
-
+                print(f"[instant_replay] Loading: {clip_path.name}")
+                obs.configure_media_source_properties(
+                    SOURCE_NAME, restart_on_activate=False,
+                    close_when_inactive=False, looping=False, clear_on_media_end=False)
+                # Select the new file before activating the scene. OBS may not
+                # decode an inactive scene, so activate it before waiting.
+                obs.hide_source(SCENE, SOURCE_NAME)
+                stop_media(SOURCE_NAME)
+                set_media_source_file(SOURCE_NAME, str(clip_path))
+                obs.show_source(SCENE, SOURCE_NAME)
                 _mute_desktop()
-
-                with _lock:
-                    _replay_active[0] = True
-
-                try:
-                    obs.configure_media_source_properties(
-                        SOURCE_NAME,
-                        restart_on_activate=False,
-                        close_when_inactive=False,
-                        looping=False,
-                        clear_on_media_end=True,
-                    )
-                    obs.stop_media(SOURCE_NAME)
-                    obs.show_source(SCENE, SOURCE_NAME)
-                    set_media_source_file(SOURCE_NAME, clip)
-                    # Setting local_file can start the source by itself. Stop
-                    # that implicit attempt, then perform exactly one restart.
-                    time.sleep(0.15)
-                    stop_media(SOURCE_NAME)
-                    restart_media(SOURCE_NAME)
-                except Exception as exc:
-                    print(f"[instant_replay] ❌ OBS playback error: {exc}")
-                    _end_replay(cancelled=True)
-                    return
-
-                # OBS often reports STOPPED/NONE briefly while a new file is
-                # opening. Wait for real playback before treating those states
-                # as an ended clip.
-                start_deadline = time.time() + 5.0
-                started = False
-                while time.time() < start_deadline:
-                    if _cancel_watcher.is_set():
-                        break
-                    status = obs.get_media_status(SOURCE_NAME) or {}
-                    state = status.get("state")
-                    cursor_ms = status.get("cursor_ms")
-                    try:
-                        has_progress = cursor_ms is not None and float(cursor_ms) > 0
-                    except (TypeError, ValueError):
-                        has_progress = False
-                    if state == "OBS_MEDIA_STATE_PLAYING" or has_progress:
-                        started = True
-                        break
-                    if state == "OBS_MEDIA_STATE_ERROR":
-                        break
-                    time.sleep(0.10)
-                if not started:
-                    print(f"[instant_replay] ❌ OBS never started: {clip_path.name}")
-                    _end_replay(cancelled=True)
-                    return
-
-                # Wait for media to finish OR a skip/cancel signal.
-                # Poll in short intervals so we can react to _skip_clip quickly.
-                ended = False
-                cancelled_early = False
-                while True:
-                    # Check for hard cancel (hotkey during single-clip or double-press)
-                    if _cancel_watcher.is_set():
-                        cancelled_early = True
-                        break
-
-                    # Check for skip-to-next-clip signal
-                    if is_multi and _skip_clip.is_set():
+                switch_scene(SCENE)
+                if not wait_for_replay_start(SOURCE_NAME, _cancel_watcher):
+                    if not _cancel_watcher.is_set():
+                        print(f"[instant_replay] Clip could not start: {clip_path.name}")
+                    continue
+                if _cancel_watcher.is_set():
+                    break
+                _animate_replay_logo()
+                ended_polls = 0
+                deadline = time.monotonic() + 7200
+                while not _cancel_watcher.is_set():
+                    if _skip_clip.is_set():
                         _skip_clip.clear()
-                        print(f"[instant_replay] ⏭  Skipping to next clip ({i + 2}/{len(clips)})…")
-                        try:
-                            stop_media(SOURCE_NAME)
-                        except Exception:
-                            pass
-                        break  # inner break → next iteration of for-loop
-
-                    with _lock:
-                        replay_paused = _replay_paused[0]
-                    if replay_paused:
-                        time.sleep(0.10)
-                        continue
-
-                    # Check if media naturally ended
-                    state = get_media_state(SOURCE_NAME)
-                    if state in ("OBS_MEDIA_STATE_ENDED", "OBS_MEDIA_STATE_STOPPED",
-                                 "OBS_MEDIA_STATE_NONE", "OBS_MEDIA_STATE_ERROR"):
-                        ended = True
                         break
-
-                    time.sleep(0.10)
-
-                if cancelled_early:
-                    _cancel_watcher.clear()
-                    _end_replay(cancelled=True)
-                    return
-
-                is_last_clip = (i == len(clips) - 1)
-
-                if is_last_clip:
-                    # Full teardown: unmute, switch back to RETURN_SCENE.
-                    _end_replay(cancelled=False)
-                else:
-                    # Between clips: unmute and reset state, but stay on the
-                    # replay scene so there's no flicker before the next clip loads.
                     with _lock:
-                        _replay_active[0] = False
-                        _replay_paused[0] = False
-                    _unmute_desktop()
-                    time.sleep(0.25)  # brief gap between clips
-
+                        paused = _replay_paused[0]
+                    if paused:
+                        deadline += 0.1
+                        time.sleep(0.1)
+                        continue
+                    state = get_media_state(SOURCE_NAME)
+                    ended_polls = ended_polls + 1 if state in (
+                        "OBS_MEDIA_STATE_ENDED", "OBS_MEDIA_STATE_STOPPED",
+                        "OBS_MEDIA_STATE_NONE", "OBS_MEDIA_STATE_ERROR") else 0
+                    if ended_polls >= 3 or time.monotonic() >= deadline:
+                        break
+                    time.sleep(0.1)
+        except Exception as exc:
+            print(f"[instant_replay] Playback failed: {exc}")
         finally:
-            with _lock:
-                _is_multi_clip_active[0] = False
-            _skip_clip.clear()
-            _resume_other_projects()
+            try:
+                stop_media(SOURCE_NAME)
+                obs.hide_source(SCENE, SOURCE_NAME)
+                _end_replay(cancelled=_cancel_watcher.is_set())
+            finally:
+                with _lock:
+                    _is_multi_clip_active[0] = False
+                _skip_clip.clear()
+                _resume_other_projects()
+                _playback_gate.release()
 
     def _play_clip_path(path_value: str) -> None:
         root = Path(REPLAY_DIR).resolve()
