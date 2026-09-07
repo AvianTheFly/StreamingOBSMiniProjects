@@ -169,6 +169,28 @@ def load_project_settings(
     )
 
 
+@audio_settings_transaction
+def shift_asset_volume_db(project_dir: Path, stem: str, delta_db: float) -> bool:
+    """Remember a fader adjustment only for the loaded asset in the live profile."""
+    import math
+    delta = float(delta_db)
+    if not math.isfinite(delta) or abs(delta) <= 0.05 or not stem:
+        return False
+    path = Path(project_dir) / 'hotkeys_editor.json'
+    state = _read_json_object(path)
+    profiles = state.get('profiles') or {}
+    selected = state.get('live_profile') or state.get('active_profile') or 'default'
+    if selected not in profiles:
+        return False
+    offsets = profiles[selected].setdefault('file_volume_offsets', {})
+    key = next((k for k in offsets if k.casefold() == stem.casefold()), stem)
+    offsets[key] = round(float(offsets.get(key, 0.0)) + delta, 2)
+    temporary = path.with_suffix('.json.tmp')
+    temporary.write_text(json.dumps(state, indent=2, ensure_ascii=False), encoding='utf-8')
+    temporary.replace(path)
+    return True
+
+
 def shift_project_volume_db(
     project_dir: Path,
     delta_db: float,

@@ -2,6 +2,8 @@ import sys
 from pathlib import Path
 from types import SimpleNamespace
 import unittest
+import tempfile
+import json
 from unittest.mock import Mock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -11,6 +13,32 @@ from hub_ui import server
 
 
 class AudioSettingsTests(unittest.TestCase):
+    def test_asset_fader_recalls_each_file_independently(self):
+        from lib.asset_fader import AssetFader
+        with tempfile.TemporaryDirectory() as folder:
+            fader = AssetFader('replay', Path(folder) / 'levels.json')
+            with patch.object(fader, 'loaded', return_value=str(Path('a.mkv').resolve()).casefold()), \
+                 patch('obs.get_input_volume', return_value={'db': -12}):
+                fader.capture()
+            with patch.object(fader, 'loaded', return_value=str(Path('b.mkv').resolve()).casefold()), \
+                 patch('obs.get_input_volume', return_value={'db': -6}):
+                fader.capture()
+            with patch.object(fader, 'loaded', return_value=str(Path('a.mkv').resolve()).casefold()), \
+                 patch('obs.set_input_volume_db') as write:
+                fader.apply('a.mkv')
+            write.assert_called_once_with('replay', -12)
+
+    def test_music_adjustment_does_not_change_other_songs(self):
+        from lib.project_settings import shift_asset_volume_db
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / 'hotkeys_editor.json'
+            path.write_text(json.dumps({'live_profile': 'default', 'profiles': {'default': {
+                'project_volume_db': -10, 'file_volume_offsets': {'A': -2, 'B': -7}}}}))
+            shift_asset_volume_db(Path(folder), 'a', 3)
+            saved = json.loads(path.read_text())['profiles']['default']
+            self.assertEqual(saved['project_volume_db'], -10)
+            self.assertEqual(saved['file_volume_offsets'], {'A': 1, 'B': -7})
+
     def test_idle_soundboard_uses_loaded_asset(self):
         project = SimpleNamespace(config_defaults={'obs_source_prefix': 'sb__'})
         state = {'live_profile': 'default', 'profiles': {'default': {}}}
@@ -33,15 +61,17 @@ class AudioSettingsTests(unittest.TestCase):
              patch.object(server, '_obs_input_settings', return_value={'local_file': 'cat rave.mp4'}), \
              patch('obs.set_input_volume_db') as write, \
              patch('obs.get_input_volume', return_value={'db': -19}), \
-             patch('lib.project_settings.shift_project_volume_db') as shift:
+             patch.object(server, '_write_json_object') as save:
             self.assertTrue(server._apply_live_audio_to_obs('specific_song'))
             write.assert_called_once_with('ss__player', -19)
             server._sync_audio_memory_from_obs('specific_song')
-            shift.assert_not_called()
+            save.assert_not_called()
             # A subsequent manual OBS move wins, without corrupting category gain.
             with patch('obs.get_input_volume', return_value={'db': -16}):
                 server._sync_audio_memory_from_obs('specific_song')
-            self.assertEqual(shift.call_args.args[1], 3)
+            self.assertEqual(profile['file_volume_offsets']['cat rave'], -1)
+            self.assertEqual(profile['project_volume_db'], -10)
+            save.assert_called_once()
 
     def test_zero_db_is_not_silence(self):
         handler = Mock()

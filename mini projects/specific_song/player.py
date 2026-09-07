@@ -19,7 +19,7 @@ import time
 from pathlib import Path
 
 import obs  # root-level obs package — always on sys.path from hub
-from lib.project_settings import load_project_settings, shift_project_volume_db, audio_settings_transaction
+from lib.project_settings import load_project_settings, shift_asset_volume_db, audio_settings_transaction
 from lib.shared_media.controls import effective_volume_db
 
 from .config import (
@@ -151,9 +151,11 @@ class SongPlayer:
 
     @audio_settings_transaction
     def remember_obs_volume(self, stem: str | None = None) -> bool:
-        """Persist a manual OBS fader move as a project-wide Music shift."""
+        """Persist the fader only for the actual asset loaded in OBS."""
         stem = str(stem or self.loaded_stem or "").strip()
         if not stem:
+            return False
+        if str(self.loaded_stem or '').casefold() != stem.casefold():
             return False
         live = obs.get_input_volume(SINGLE_SOURCE_NAME) or {}
         live_db = live.get("db")
@@ -161,13 +163,15 @@ class SongPlayer:
             return False
         expected_db = self.volume_for_stem(stem)
         delta = round(float(live_db) - expected_db, 2)
-        changed = shift_project_volume_db(
+        if str(self.loaded_stem or '').casefold() != stem.casefold():
+            return False
+        changed = shift_asset_volume_db(
             _PROJECT_DIR,
+            stem,
             delta,
-            hotkeys_file=_PROJECT_DIR / "hotkeys.json",
         )
         if changed:
-            print(f"{_TAG} OBS fader changed by {delta:+.1f} dB; saved as the Music level.")
+            print(f"{_TAG} Saved OBS volume for '{stem}': {float(live_db):.1f} dB.")
         return changed
 
     def _get_input_settings(self, source_name: str) -> dict:

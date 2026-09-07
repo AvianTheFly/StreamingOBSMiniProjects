@@ -972,6 +972,8 @@ def run(
             return ", ".join(f"{t}: {c}" for t, c in counts.items())
 
     _playback_gate = threading.Lock()
+    from lib.asset_fader import AssetFader
+    replay_fader = AssetFader(SOURCE_NAME, Path(__file__).parent / 'asset_volumes.json')
 
     def _play_all_clips_sequential(clips: list[str]) -> None:
         """One owner controls OBS until the whole replay session finishes."""
@@ -1001,7 +1003,9 @@ def run(
                 # decode an inactive scene, so activate it before waiting.
                 obs.hide_source(SCENE, SOURCE_NAME)
                 stop_media(SOURCE_NAME)
+                replay_fader.capture()
                 set_media_source_file(SOURCE_NAME, str(clip_path))
+                replay_fader.apply(clip_path)
                 obs.show_source(SCENE, SOURCE_NAME)
                 _mute_desktop()
                 switch_scene(SCENE)
@@ -1024,6 +1028,7 @@ def run(
                         deadline += 0.1
                         time.sleep(0.1)
                         continue
+                    replay_fader.capture()
                     state = get_media_state(SOURCE_NAME)
                     ended_polls = ended_polls + 1 if state in (
                         "OBS_MEDIA_STATE_ENDED", "OBS_MEDIA_STATE_STOPPED",
@@ -1035,6 +1040,7 @@ def run(
             print(f"[instant_replay] Playback failed: {exc}")
         finally:
             try:
+                replay_fader.capture()
                 stop_media(SOURCE_NAME)
                 obs.hide_source(SCENE, SOURCE_NAME)
                 _end_replay(cancelled=_cancel_watcher.is_set())

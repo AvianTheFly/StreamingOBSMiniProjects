@@ -490,24 +490,10 @@ def _sync_audio_memory_from_obs(project_key: str | None = None) -> set[str]:
             offsets = {}
             profile["file_volume_offsets"] = offsets
 
-        if runtime.get("shared_volume"):
-            # Music uses one OBS input for every song. A direct OBS fader move
-            # therefore means "shift Music by this amount", while file offsets
-            # remain relative. UI writes already update both JSON and OBS, so
-            # their observed delta is zero and they are never overwritten.
-            expected_db = project_db + profile_db + _category_db(profile, current_stem) + float(_stem_value(offsets, current_stem))
-            delta = round(float(live_db) - expected_db, 2)
-            if abs(delta) <= 0.05:
-                continue
-            from lib.project_settings import shift_project_volume_db
-            if shift_project_volume_db(
-                project_info.path,
-                delta,
-                hotkeys_file=project_info.hotkeys_file,
-            ):
-                changed.add(key)
+        # The source is shared, but its fader belongs to the currently loaded
+        # asset. Never turn an asset edit into a project-wide volume shift.
+        if not _obs_source_matches_runtime_stem(source_name, current_stem):
             continue
-
         next_offset = round(float(live_db) - project_db - profile_db - _category_db(profile, current_stem), 2)
         prev_offset = float(_stem_value(offsets, current_stem))
         if abs(prev_offset - next_offset) <= 0.05:

@@ -13,6 +13,9 @@
   under LOCALAPPDATA/StreamingHub/settings-history; never delete it during cleanup.
 - Honor the most recently set volume. Do not restore an older snapshot's master
   volume merely because other settings from that snapshot are needed.
+- A shared-source OBS fader edit belongs to the actual loaded asset, not every
+  asset in the module. Preserve asset-specific levels across file swaps. Only an
+  explicit project/master UI adjustment should change the whole module.
 - Per-asset placement takes precedence over generic dimension layout rules.
 - After code changes requiring a restart, restart the correct Hub for the user.
   Identify its process and keyboard child, avoid duplicate listeners, use a hidden
