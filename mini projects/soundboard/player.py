@@ -44,14 +44,13 @@ class SoundboardPlayer:
         self._current_stem: str | None = None
         self._current_file: Path | None = None
         self._play_thread: threading.Thread | None = None
-        # Filters belong to the one shared OBS source and should remain exactly
-        # as the user configured them. Only per-file transforms are stored.
+        # Keep each asset's OBS filters and placement across shared-source swaps.
         self._state_store = SingleSourceStateStore(
             project_dir=_PROJECT_DIR,
             scene=CONFIG.scene,
             source_name=SINGLE_SOURCE_NAME,
             tag=_TAG,
-            include_filters=False,
+            include_filters=True,
             include_audio=False,
             include_audio_volume=False,
             include_media_settings=False,
@@ -161,7 +160,8 @@ class SoundboardPlayer:
                     pass
 
             self._state_store.apply_for_stem(stem)
-            self._apply_layout_rule(stem, filepath, categories)
+            if not self._state_store.has_transform_override(stem):
+                self._apply_layout_rule(stem, filepath, categories)
             self._apply_runtime_audio_settings(volume_db)
 
             obs.show_source(CONFIG.scene, SINGLE_SOURCE_NAME)

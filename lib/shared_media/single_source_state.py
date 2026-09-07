@@ -101,6 +101,12 @@ class SingleSourceStateStore:
             apply_media_settings=self.include_media_settings,
         )
 
+    def has_transform_override(self, stem: str) -> bool:
+        """Explicit per-asset placement wins over generic resolution rules."""
+        with self._lock:
+            self._data = self._load()
+            return bool((self._data.get("overrides", {}).get(stem) or {}).get("transform"))
+
     def capture_override_for_stem(self, stem: str) -> None:
         self.ensure_baseline()
         current = self.snapshot_current_state()

@@ -11,8 +11,30 @@ from league.core.game_state_detector import GameStateDetector
 from obs.interaction import ensure_input_on_stream_track
 from specific_song.player import SongPlayer
 import threading
+import tempfile
+import json
+from lib.shared_media.single_source_state import SingleSourceStateStore
 
 class RegressionTests(unittest.TestCase):
+    def test_asset_filters_and_transform_survive_reload(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder)
+            transform = {'positionX': 0, 'positionY': 0, 'scaleX': 1.5, 'scaleY': 1.5}
+            filters = [{'name': 'Color Key', 'kind': 'color_key_filter_v2', 'enabled': True,
+                        'settings': {'similarity': 117, 'smoothness': 542}}]
+            (path / 'single_source_state.json').write_text(json.dumps({
+                'baseline': {'transform': {'scaleX': .2}, 'filters': []},
+                'overrides': {'hooray': {'transform': transform, 'filters': filters}}}), encoding='utf-8')
+            store = SingleSourceStateStore(project_dir=path, scene='soundboard', source_name='sb__player',
+                tag='test', include_audio=False, include_media_settings=False)
+            self.assertTrue(store.has_transform_override('hooray'))
+            self.assertFalse(store.has_transform_override('other'))
+            with patch('lib.shared_media.single_source_state._apply_snapshot') as apply:
+                store.apply_for_stem('hooray')
+            self.assertEqual(apply.call_args.args[2]['filters'], filters)
+            self.assertEqual(apply.call_args.args[2]['transform'], transform)
+            self.assertTrue(apply.call_args.kwargs['apply_filters'])
+
     def test_pending_stop_retries_start_once_but_not_song_end(self):
         player = SongPlayer.__new__(SongPlayer)
         player._lock = threading.Lock()
