@@ -328,7 +328,9 @@ def _parse_command(text: str) -> tuple[str | None, str, float, bool]:
     For 'play':
       spec — the play spec string ('all', 'highlights', 'win', …) or "".
     """
-    lowered = text.lower()
+    lowered = " ".join(text.lower().strip().rstrip(".,!?;:").split())
+    if lowered in {"random", "random replay", "random clip", "surprise me", "play random replay", "play a random replay", "play a random clip"}:
+        return ("play", "random", 0, False)
     tokens = lowered.split()
 
     # Detect command
@@ -724,6 +726,8 @@ def run(
         "last game", "game", "recap", "montage", "all",
     ])
 
+    last_random_clip = [None]
+
     def _on_play(spec: str = "") -> None:
         """
         Route based on the play spec:
@@ -743,7 +747,9 @@ def run(
             if not candidates:
                 print("[instant_replay] No saved clips available for random playback.")
                 return
-            choice = random.choice(candidates)
+            pool = [p for p in candidates if p != last_random_clip[0]] or candidates
+            choice = random.choice(pool)
+            last_random_clip[0] = choice
             print(f"[instant_replay] 🎲 Random clip: {choice.name}")
             _play_all_clips_sequential([str(choice)])
             return
@@ -1136,7 +1142,7 @@ def run(
         else:
             print(
                 f"[instant_replay] ⚠  Didn't recognise a command in {text!r}. "
-                "Expected 'save <tag>', 'mark', or 'play <spec>'."
+                "Say 'random', 'play last', 'save', or 'mark'. See Instant Replay in the Hub for all commands."
             )
 
     ptt = VoicePTT(

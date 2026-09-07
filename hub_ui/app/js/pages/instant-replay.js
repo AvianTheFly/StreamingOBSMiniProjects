@@ -23,7 +23,7 @@ export function mount(container) {
         <button class="btn btn-secondary btn-sm" id="irLatestBtn">Play Latest</button>
         <button class="btn btn-secondary btn-sm" id="irPauseBtn">Pause</button>
         <button class="btn btn-secondary btn-sm" id="irResumeBtn">Resume</button>
-        <button class="btn btn-secondary btn-sm" id="irRevertBtn">Revert</button>
+        <button class="btn btn-secondary btn-sm" id="irRevertBtn">Stop Replay</button>
       </div>
     </div>
 
@@ -36,8 +36,28 @@ export function mount(container) {
     <div class="command-strip mt-16">
       <div><span class="command-label">Voice key</span><kbd>|</kbd></div>
       <div><span class="command-label">Save</span><code>save [tag]</code></div>
-      <div><span class="command-label">Play</span><code>play last / random / highlights</code></div>
+      <div><span class="command-label">Random replay</span><code>random</code></div>
       <div><span class="command-label">Pick one</span><code>play win 2</code></div>
+    </div>
+
+    <div class="card mt-16">
+      <div class="card-title">Live shortcut: press |, then say “random”</div>
+      <p>Plays one saved replay. Wait two seconds for voice input to send, or press <kbd>C</kbd> to send sooner. Press <kbd>|</kbd> during that replay to stop it.</p>
+      <p>Random avoids the previous random selection when another replay is available. It uses the saved replay library, independent of the search filter below.</p>
+      <details>
+        <summary>All voice commands</summary>
+        <dl>
+          <dt><code>random</code> / <code>play random</code></dt><dd>Play one random saved replay.</dd>
+          <dt><code>play</code> / <code>play last</code></dt><dd>Play the most recent saved clip.</dd>
+          <dt><code>play all</code> / <code>play highlights</code></dt><dd>Play the current game's clips, with previous-game fallback.</dd>
+          <dt><code>play game 3</code> / <code>play game last</code></dt><dd>Play a compiled game reel.</dd>
+          <dt><code>play win</code> / <code>play win 2</code></dt><dd>Play a tagged clip, optionally by number.</dd>
+          <dt><code>save</code> / <code>save win</code> / <code>save fail</code> / <code>save escape</code></dt><dd>Save a clip, optionally with a tag.</dd>
+          <dt><code>save 30</code> / <code>save full</code></dt><dd>Save the last 30 seconds or the full replay buffer.</dd>
+          <dt><code>mark</code></dt><dd>Mark the starting point for your next save.</dd>
+        </dl>
+        <p>During a sequence, <kbd>|</kbd> skips the current clip. Use Stop Replay above to stop the entire sequence. Pause and Resume are also available above.</p>
+      </details>
     </div>
 
     <div class="card mt-16">
@@ -70,7 +90,7 @@ export function mount(container) {
   });
 
   container.querySelector("#irRevertBtn").addEventListener("click", async () => {
-    try { await api.revertProject("instant_replay"); toast.success("Reverted"); }
+    try { await api.revertProject("instant_replay"); toast.success("Replay stopped"); }
     catch(e) { toast.error(e.message); }
   });
 
