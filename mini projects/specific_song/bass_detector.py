@@ -37,35 +37,39 @@ _OOMPH_MIN_RMS: float = 0.014
 _PRESENCE_WEIGHTS = (0.16, 0.22, 0.30, 0.22, 0.10)  # sub, bass, motion, melody, air
 
 
+_AUDIO_CACHE = {}
+_AUDIO_CACHE_LOCK = threading.Lock()
+_AUDIO_CACHE_LIMIT = 64 * 1024 * 1024
+
+
 def _load_audio_file(path: Path, target_sr: int = 44100) -> tuple[np.ndarray, int]:
-    """
-    Decode any audio/video file to float32 mono at target_sr using pydub/ffmpeg.
-    Returns (samples, sample_rate).
-    """
-    if not _PYDUB_OK:
-        raise RuntimeError(
-            "pydub is required for file-based audio analysis.\n"
-            "  pip install pydub\n"
-            "(ffmpeg must also be on PATH or installed with pydub)"
-        )
+    """Decode mono float PCM in ffmpeg, with a bounded cache for repeat plays."""
+    import subprocess
+    stat = path.stat()
+    key = (str(path.resolve()), stat.st_mtime_ns, stat.st_size, target_sr)
+    with _AUDIO_CACHE_LOCK:
+        cached = _AUDIO_CACHE.pop(key, None)
+        if cached is not None:
+            _AUDIO_CACHE[key] = cached
+            return cached, target_sr
+    # Conversion runs in ffmpeg, avoiding full stereo PCM copies and Python
+    # resampling while the user is triggering playback.
     print(f"[BassDetector] Decoding '{path.name}' …")
-    audio = _AudioSegment.from_file(str(path))
-    audio = audio.set_channels(1).set_frame_rate(target_sr)
-
-    raw = np.array(audio.get_array_of_samples(), dtype=np.float32)
-
-    # Normalise integer PCM to [-1, 1]
-    if audio.sample_width == 1:
-        raw = (raw - 128.0) / 128.0
-    elif audio.sample_width == 2:
-        raw /= 32768.0
-    elif audio.sample_width == 4:
-        raw /= 2147483648.0
-
-    print(
-        f"[BassDetector] Loaded {len(raw) / target_sr:.1f}s "
-        f"({len(raw)} samples @ {target_sr} Hz)"
-    )
+    result = subprocess.run(
+        ["ffmpeg", "-v", "error", "-threads", "1", "-i", str(path),
+         "-vn", "-ac", "1", "-ar", str(target_sr), "-f", "f32le", "pipe:1"],
+        capture_output=True, timeout=120,
+        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+    if result.returncode:
+        raise RuntimeError(result.stderr.decode(errors="replace")[-500:])
+    raw = np.frombuffer(result.stdout, dtype="<f4")
+    raw.flags.writeable = False
+    with _AUDIO_CACHE_LOCK:
+        if raw.nbytes <= _AUDIO_CACHE_LIMIT:
+            while _AUDIO_CACHE and sum(v.nbytes for v in _AUDIO_CACHE.values()) + raw.nbytes > _AUDIO_CACHE_LIMIT:
+                _AUDIO_CACHE.pop(next(iter(_AUDIO_CACHE)))
+            _AUDIO_CACHE[key] = raw
+    print(f"[BassDetector] Loaded {len(raw) / target_sr:.1f}s @ {target_sr} Hz")
     return raw, target_sr
 
 

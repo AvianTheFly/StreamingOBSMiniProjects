@@ -27,4 +27,45 @@ function showAudio(v){$('#master').disabled=false;$('#mute').disabled=false;$('#
 async function pollAudio(){if(!audioBusy){try{const v=await req('/volume');if(!audioBusy){audioState=v;showAudio(v)}}catch(e){$('#audioStatus').textContent=e.message;$('#master').disabled=true;$('#mute').disabled=true}}setTimeout(pollAudio,1200)}
 async function poll(){try{const d=await req('/state');$('#connection').textContent=d.paused?'Automatic alerts paused':d.status;$('#activeCount').textContent=d.alerts.length+' / '+(settings?.config.max_alerts||3)+' active';$('#pause').textContent=d.paused?'Resume automatic alerts':'Pause automatic alerts';$('#history').className='';$('#history').innerHTML=d.history.slice().reverse().map(a=>`<div class="entry"><span>${a.time?new Date(a.time*1000).toLocaleTimeString():''}</span><div><strong>${esc(a.title||a.key)}</strong><br><span class="muted">${esc(a.detail)}</span></div><span>${esc(a.result||'Detected')}</span></div>`).join('')||'<p>No recent detections. Use a preview or start a game.</p>';$('#metrics').textContent=JSON.stringify({game:d.metrics,errors:d.media_errors},null,2);if(settings&&d.revision!==settings.config.revision&&!settingsStale){settingsStale=true;if(!dirty)await load();else notice('Settings changed in another window. Reload saved settings before saving.',true)}}catch{$('#connection').textContent='Alert service offline'}setTimeout(poll,700)}
 window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});
+function assetDropEditor(){
+  const upload=$('#upload');if(!upload)return;
+  const zone=document.createElement('div');zone.className='asset-drop';zone.tabIndex=0;
+  zone.textContent='Drop a media file here to assign & save · or drag a library tile below';
+  upload.before(zone);
+  const gallery=document.createElement('div');gallery.className='asset-gallery';zone.after(gallery);
+  for(const asset of settings.library){
+    const tile=document.createElement('button');tile.type='button';tile.className='asset-tile';tile.draggable=true;
+    const ext=asset.path.split('.').pop().toLowerCase();
+    if(['png','jpg','jpeg','gif','webp'].includes(ext)){
+      const img=document.createElement('img');img.loading='lazy';img.alt='';img.src='/asset?path='+encodeURIComponent(asset.path);tile.append(img);
+    }else{const icon=document.createElement('span');icon.className='asset-icon';icon.textContent=['mp3','wav','ogg','m4a'].includes(ext)?'♫':'▶';tile.append(icon)}
+    const label=document.createElement('span');label.textContent=asset.name;tile.append(label);
+    tile.ondragstart=e=>e.dataTransfer.setData('application/x-league-asset',asset.path);
+    tile.onclick=()=>{$('#media').value=asset.path;markDirty();mediaPreview();notice('Preview selected. Save to assign, or drag the tile onto the drop zone to assign & save.')};
+    gallery.append(tile);
+  }
+  zone.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();upload.click()}};
+  zone.ondragover=e=>{e.preventDefault();zone.classList.add('drag-over')};
+  zone.ondragleave=()=>zone.classList.remove('drag-over');
+  zone.ondrop=async e=>{
+    e.preventDefault();zone.classList.remove('drag-over');const eventKey=selected;
+    try{
+      let path=e.dataTransfer.getData('application/x-league-asset');
+      if(!path){
+        if(e.dataTransfer.files.length!==1)throw Error('Drop one file per event.');
+        const file=e.dataTransfer.files[0];if(file.size>256*1024*1024)throw Error('File exceeds 256 MB');
+        notice('Uploading '+file.name+'…');
+        const response=await fetch('/upload?name='+encodeURIComponent(file.name),{method:'POST',headers:{'Content-Type':'application/octet-stream'},body:file});
+        const data=await response.json();if(!response.ok)throw Error(data.error||'Upload failed');
+        settings.library=data.library;path=data.path;
+      }
+      if(selected!==eventKey){notice('File added to the library. Select the intended event to assign it.');return}
+      if(!settings.library.some(a=>a.path===path))throw Error('Choose a file from this media library.');
+      $('#media').innerHTML='<option value="">Hello World placeholder</option>'+options(settings.library.map(a=>[a.path,a.name]),path);
+      markDirty();mediaPreview();await $('#save').onclick();
+    }catch(error){notice(error.message,true)}
+  };
+}
+const editWithoutDrop=edit;
+edit=function(...args){editWithoutDrop(...args);assetDropEditor()};
 load().then(()=>{edit(Object.keys(settings.config.events)[0]);poll();pollAudio()}).catch(e=>notice(e.message,true));

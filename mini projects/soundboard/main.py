@@ -482,7 +482,9 @@ def run(
         if not stem:
             print(f"{_TAG} trigger+{char} is not configured.")
             return
-        play_asset(stem)
+        # Keep OBS/coordinator waits off the shared hotkey dispatch thread.
+        threading.Thread(target=play_asset, args=(stem,), daemon=True,
+                         name="soundboard-manual-play").start()
 
     def on_press(key) -> None:
         char = key_token(key)
