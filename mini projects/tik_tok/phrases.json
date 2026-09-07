@@ -1,3 +1,24 @@
 {
-  "_comment": "Keys are canonical asset file stems (no extension). Values are alternate phrases that should trigger that asset."
+  "_comment": "Keys are canonical asset file stems without extensions. Values are alternate phrases that should trigger that asset.",
+  "I am addicted to league of legends": [
+    "I cannot stop playing league of legends"
+  ],
+  "Support being the easiest role": [
+    "support is easy to play"
+  ],
+  "That was a terrible game I should not have queued up.": [
+    "I just got destroyed that game"
+  ],
+  "The jungler telling you to play safe": [
+    "Telling someone to play safe"
+  ],
+  "control ward edit": [
+    "Ctrl-Word-Edit"
+  ],
+  "miss the caitlyn ult": [
+    "didnt block the caitlyn ult"
+  ],
+  "we win those": [
+    "we windows"
+  ]
 }

@@ -560,7 +560,7 @@ def run_media_project(
                 scene=cfg.scene,
                 source_name=_shared_source,
                 tag=f"[{cfg.project_name}]",
-                include_filters=False,
+                include_filters=cfg.project_name == "tik_tok",
                 include_audio=False,
                 include_audio_volume=False,
                 include_media_settings=False,
@@ -699,7 +699,7 @@ def run_media_project(
                         path=filepath,
                         categories=cats,
                     )
-                    if rule:
+                    if rule and not (source_state_store and source_state_store.has_transform_override(name)):
                         try:
                             obs.set_source_transform(cfg.scene, source_name, obs_transform_from_rule(rule))
                         except Exception as _exc:
@@ -786,7 +786,7 @@ def run_media_project(
                     path=filepath,
                     categories=cats,
                 )
-                if rule:
+                if rule and not (source_state_store and source_state_store.has_transform_override(name)):
                     try:
                         obs.set_source_transform(cfg.scene, source_name, obs_transform_from_rule(rule))
                     except Exception as _exc:

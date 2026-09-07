@@ -188,6 +188,9 @@ def run_hub(
     if debug:
         os.environ["LOG_LEVEL"] = "DEBUG"
 
+    from lib.settings_backups import start_settings_backups
+    start_settings_backups(stop_event)
+
     if not _check_obs_connection():
         return []
 
@@ -216,6 +219,9 @@ def main() -> None:
     print("  OBS Hub")
     print("=" * 62)
 
+    stop_event = threading.Event()
+    from lib.settings_backups import start_settings_backups
+    start_settings_backups(stop_event)
     if not _check_obs_connection():
         return
 
@@ -236,7 +242,6 @@ def main() -> None:
     _print_project_table(projects)
     _print_runtime_options(only_names, skip_names, debug=ARGS.debug)
 
-    stop_event = threading.Event()
     _start_voice(stop_event)
     _start_projects(projects, stop_event)
     _wait_for_shutdown(stop_event)

@@ -44,6 +44,21 @@ Mini projects should stay thin. If two projects need the same behavior, put it i
 
 ## Configuration
 
+Personalized settings live in each supported module's folder. The old
+`media_profiles` folder is not the active settings source. When migrating a
+module, carry its profiles, phrases, layout rules, per-asset state and volume
+offsets together.
+
+The Hub saves changed JSON settings every two seconds to versioned history under
+`%LOCALAPPDATA%/StreamingHub/settings-history/` (one directory per checkout).
+OBS scene collection JSON files are also backed up there under `_obs_scenes`.
+Missing module settings are recovered from the latest backup on startup.
+Existing files are never automatically rolled back: valid UI changes and new
+volume settings remain authoritative. Earlier versions are retained for recovery
+after accidental replacement; backups are local, outside Git. Changes made and
+undone between polls may not be captured, and OBS changes are backed up after OBS
+writes its scene collection to disk.
+
 Copy `.env.example` to `.env` and fill in machine-specific paths and secrets.
 Do not commit `.env`.
 
