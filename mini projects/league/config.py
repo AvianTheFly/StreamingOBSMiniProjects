@@ -23,6 +23,7 @@ REQUEST_TIMEOUT        = 2
 
 # ── Respawn SFX (Halo sound at 3 seconds) ─────────────────────────────────────
 RESPAWN_SFX_SOURCE = "Halo Respawn sound effect"
+RESPAWN_SFX_LEAD_SECONDS = 3.0
 
 # ── Death / Respawn ───────────────────────────────────────────────────────────
 # Death border stays visible until respawn — no duration needed.

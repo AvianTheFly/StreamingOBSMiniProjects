@@ -885,6 +885,22 @@ def set_input_volume_db(input_name: str, db: float) -> None:
     get_obs().set_input_volume(input_name, None, float(db))
 
 
+def ensure_input_on_stream_track(input_name: str) -> int:
+    """Include the active program audio track without resetting other tracks."""
+    client = get_obs()
+    mode = client.get_profile_parameter("Output", "Mode").parameter_value
+    track = 1
+    if str(mode).lower() == "advanced":
+        track = int(client.get_profile_parameter("AdvOut", "TrackIndex").parameter_value)
+    if track not in range(1, 7):
+        raise ValueError(f"Invalid OBS streaming audio track: {track}")
+    tracks = dict(client.get_input_audio_tracks(input_name).input_audio_tracks)
+    if not tracks.get(str(track), False):
+        tracks[str(track)] = True
+        client.set_input_audio_tracks(input_name, tracks)
+    return track
+
+
 def set_input_volume_mul(input_name: str, mul: float) -> None:
     """Set an input's volume as a multiplier.
 

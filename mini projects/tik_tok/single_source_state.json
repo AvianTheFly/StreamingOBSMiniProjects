@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "baseline": {
+    "filters": [],
+    "transform": {
+      "alignment": 5,
+      "boundsAlignment": 0,
+      "boundsHeight": 537.0,
+      "boundsType": "OBS_BOUNDS_SCALE_INNER",
+      "boundsWidth": 302.0,
+      "cropBottom": 0.0,
+      "cropLeft": 0.0,
+      "cropRight": 0.0,
+      "cropTop": 0.0,
+      "positionX": 0.0,
+      "positionY": 330.0,
+      "rotation": 0.0,
+      "scaleX": 0.449153333902359,
+      "scaleY": 0.449153333902359
+    },
+    "audio": {},
+    "media_settings": {}
+  },
+  "overrides": {}
+}

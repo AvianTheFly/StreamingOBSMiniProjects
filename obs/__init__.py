@@ -13,6 +13,7 @@
 # those are implementation details that may change.
 
 from .client import get_obs, reset_obs
+from .interaction import ensure_input_on_stream_track
 from .interaction import (
     show_source, hide_source, toggle_source, hide_sources,
     show_source_animated, show_logo_animated,
@@ -45,6 +46,7 @@ from lib.sync import (
 )
 
 __all__ = [
+    "ensure_input_on_stream_track",
     # Connection
     "get_obs", "reset_obs",
     # Source visibility

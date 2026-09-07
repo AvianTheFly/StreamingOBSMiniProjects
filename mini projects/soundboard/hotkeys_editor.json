@@ -100,7 +100,13 @@
       ],
       "display_names": {},
       "categories": [],
-      "sound_categories": {}
+      "sound_categories": {},
+      "trigger_sequences": "",
+      "interface_hotkeys": {},
+      "project_volume_db": 0.0,
+      "profile_volume_db": 0.0,
+      "category_volume_db": {},
+      "file_volume_offsets": {}
     },
     "test": {
       "hotkeys": {
@@ -200,7 +206,13 @@
       ],
       "display_names": {},
       "categories": [],
-      "sound_categories": {}
+      "sound_categories": {},
+      "trigger_sequences": "",
+      "interface_hotkeys": {},
+      "project_volume_db": 0.0,
+      "profile_volume_db": 0.0,
+      "category_volume_db": {},
+      "file_volume_offsets": {}
     }
   }
 }

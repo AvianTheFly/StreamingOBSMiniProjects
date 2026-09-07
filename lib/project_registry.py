@@ -25,6 +25,7 @@ SKIP_PROJECT_DIRS = {
 SUPPORTED_RUNTIME_PROJECTS = {
     "instant_replay",
     "league",
+    "league_api",
     "love_me",
     "scene_voice_switcher",
     "sound_effects",

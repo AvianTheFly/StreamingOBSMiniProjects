@@ -41,7 +41,7 @@ function _renderProjectNav(projects, navigate) {
   if (!container) return;
   container.innerHTML = "";
 
-  projects.forEach(p => {
+  projects.filter(p => p.name !== "league_api").forEach(p => {
     const a = document.createElement("a");
     a.className = "nav-item";
     a.href = `#projects/${p.name}`;

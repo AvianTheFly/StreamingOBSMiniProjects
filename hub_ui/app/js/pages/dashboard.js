@@ -12,6 +12,7 @@ let _profileProjects = [];
 const MAX_LOG = 80;
 
 const ACCESS_GUIDE = {
+  league_api: { group: "Automatic", label: "League API Alerts", hotkey: "automatic / preview", voice: "event and snapshot rules", note: "Edit detection rules, upload media, preview alerts and adjust the OBS fader." },
   specific_song: { group: "Audio", label: "Music", hotkey: "ili", voice: "song name · random · next · stop", note: "One shared OBS source; volume follows the latest OBS or Hub change." },
   soundboard: { group: "Audio + Visual", label: "Soundboard", hotkey: "/ *", voice: "effect name · random · next · stop", note: "Shared filters stay on the OBS source." },
   sound_effects: { group: "Audio", label: "Sound Effects", hotkey: "voice / assigned keys", voice: "effect name", note: "Also receives automatic League cues." },

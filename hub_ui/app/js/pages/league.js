@@ -15,6 +15,7 @@ export function mount(container) {
         <div class="page-subtitle">Live game overlay automation via Riot Live Client API</div>
       </div>
       <div class="page-actions">
+        <a class="btn btn-primary btn-sm" href="#projects/league_api">Edit League API Alerts</a>
         <button class="btn btn-secondary btn-sm" id="leagueRevertBtn">Revert overlays</button>
       </div>
     </div>

@@ -1,0 +1,489 @@
+{
+  "poll_seconds": 0.5,
+  "max_alerts": 3,
+  "events": {
+    "game_start": {
+      "enabled": true,
+      "priority": 45,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "minions_spawning": {
+      "enabled": true,
+      "priority": 25,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "first_blood": {
+      "enabled": true,
+      "priority": 85,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "ace": {
+      "enabled": true,
+      "priority": 88,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "turret_destroyed": {
+      "enabled": true,
+      "priority": 55,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "first_turret": {
+      "enabled": true,
+      "priority": 70,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "inhibitor_destroyed": {
+      "enabled": true,
+      "priority": 65,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "inhibitor_respawning_soon": {
+      "enabled": true,
+      "priority": 30,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "inhibitor_respawned": {
+      "enabled": true,
+      "priority": 35,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "void_grub": {
+      "enabled": true,
+      "priority": 48,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "herald": {
+      "enabled": true,
+      "priority": 65,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "baron": {
+      "enabled": true,
+      "priority": 90,
+      "duration": 9,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "atakhan_legacy": {
+      "enabled": false,
+      "priority": 65,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "kill": {
+      "enabled": true,
+      "priority": 70,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "death": {
+      "enabled": true,
+      "priority": 72,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "assist": {
+      "enabled": true,
+      "priority": 50,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "double_kill": {
+      "enabled": true,
+      "priority": 82,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "triple_kill": {
+      "enabled": true,
+      "priority": 88,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "quadra_kill": {
+      "enabled": true,
+      "priority": 94,
+      "duration": 9,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "pentakill": {
+      "enabled": true,
+      "priority": 100,
+      "duration": 9,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "dragon": {
+      "enabled": true,
+      "priority": 68,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "dragon_air": {
+      "enabled": true,
+      "priority": 68,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "dragon_earth": {
+      "enabled": true,
+      "priority": 68,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "dragon_fire": {
+      "enabled": true,
+      "priority": 68,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "dragon_water": {
+      "enabled": true,
+      "priority": 68,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "dragon_hextech": {
+      "enabled": true,
+      "priority": 68,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "dragon_chemtech": {
+      "enabled": true,
+      "priority": 68,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "dragon_elder": {
+      "enabled": true,
+      "priority": 92,
+      "duration": 9,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "victory": {
+      "enabled": true,
+      "priority": 99,
+      "duration": 9,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "defeat": {
+      "enabled": true,
+      "priority": 99,
+      "duration": 9,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "game_end": {
+      "enabled": true,
+      "priority": 99,
+      "duration": 9,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "objective_steal": {
+      "enabled": true,
+      "priority": 96,
+      "duration": 9,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "level_up": {
+      "enabled": true,
+      "priority": 35,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "ultimate_learned": {
+      "enabled": true,
+      "priority": 60,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "ability_rank_up": {
+      "enabled": false,
+      "priority": 25,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "respawn": {
+      "enabled": true,
+      "priority": 40,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "inventory_added": {
+      "enabled": true,
+      "priority": 30,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "inventory_removed": {
+      "enabled": false,
+      "priority": 20,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "possible_purchase": {
+      "enabled": true,
+      "priority": 40,
+      "duration": 6,
+      "cooldown": 20,
+      "media": "",
+      "volume": 0.7
+    },
+    "possible_item_upgrade": {
+      "enabled": true,
+      "priority": 50,
+      "duration": 6,
+      "cooldown": 20,
+      "media": "",
+      "volume": 0.7
+    },
+    "possible_consumable_use": {
+      "enabled": false,
+      "priority": 20,
+      "duration": 6,
+      "cooldown": 20,
+      "media": "",
+      "volume": 0.7
+    },
+    "possible_base_visit": {
+      "enabled": true,
+      "priority": 58,
+      "duration": 6,
+      "cooldown": 20,
+      "media": "",
+      "volume": 0.7
+    },
+    "low_health": {
+      "enabled": true,
+      "priority": 60,
+      "duration": 6,
+      "cooldown": 20,
+      "media": "",
+      "volume": 0.7
+    },
+    "heavy_health_loss": {
+      "enabled": true,
+      "priority": 55,
+      "duration": 6,
+      "cooldown": 20,
+      "media": "",
+      "volume": 0.7
+    },
+    "large_heal": {
+      "enabled": true,
+      "priority": 35,
+      "duration": 6,
+      "cooldown": 20,
+      "media": "",
+      "volume": 0.7
+    },
+    "resource_spent": {
+      "enabled": false,
+      "priority": 15,
+      "duration": 6,
+      "cooldown": 20,
+      "media": "",
+      "volume": 0.7
+    },
+    "possible_combat": {
+      "enabled": true,
+      "priority": 40,
+      "duration": 6,
+      "cooldown": 20,
+      "media": "",
+      "volume": 0.7
+    },
+    "low_hp_kill": {
+      "enabled": true,
+      "priority": 91,
+      "duration": 9,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "low_hp_multikill": {
+      "enabled": true,
+      "priority": 97,
+      "duration": 9,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "possible_low_hp_escape": {
+      "enabled": true,
+      "priority": 85,
+      "duration": 6,
+      "cooldown": 20,
+      "media": "",
+      "volume": 0.7
+    },
+    "possible_teamfight": {
+      "enabled": true,
+      "priority": 75,
+      "duration": 6,
+      "cooldown": 20,
+      "media": "",
+      "volume": 0.7
+    },
+    "possible_objective_fight": {
+      "enabled": true,
+      "priority": 80,
+      "duration": 6,
+      "cooldown": 20,
+      "media": "",
+      "volume": 0.7
+    },
+    "possible_power_spike": {
+      "enabled": true,
+      "priority": 55,
+      "duration": 6,
+      "cooldown": 20,
+      "media": "",
+      "volume": 0.7
+    },
+    "cs_milestone": {
+      "enabled": true,
+      "priority": 30,
+      "duration": 6,
+      "cooldown": 0,
+      "media": "",
+      "volume": 0.7
+    },
+    "vision_activity": {
+      "enabled": false,
+      "priority": 20,
+      "duration": 6,
+      "cooldown": 20,
+      "media": "",
+      "volume": 0.7
+    },
+    "manpower_advantage": {
+      "enabled": true,
+      "priority": 45,
+      "duration": 6,
+      "cooldown": 20,
+      "media": "",
+      "volume": 0.7
+    },
+    "possible_roam": {
+      "enabled": false,
+      "priority": 30,
+      "duration": 6,
+      "cooldown": 20,
+      "media": "",
+      "volume": 0.7
+    },
+    "possible_jungle_activity": {
+      "enabled": false,
+      "priority": 20,
+      "duration": 6,
+      "cooldown": 20,
+      "media": "",
+      "volume": 0.7
+    },
+    "custom_e8bf37104ae1": {
+      "enabled": false,
+      "priority": 50.0,
+      "duration": 6.0,
+      "cooldown": 10.0,
+      "volume": 0.7,
+      "media": "",
+      "title": "Example · Health below 15%",
+      "start_time": 0.0,
+      "loop": false,
+      "trigger": {
+        "type": "snapshot",
+        "field": "health_percent",
+        "operator": "crosses_below",
+        "value": 15.0
+      }
+    }
+  },
+  "revision": 1,
+  "paused": false
+}

@@ -234,6 +234,7 @@ class SongPlayer:
         # Resolve the actual media file from the source stem.
         audio_file = _resolve_audio_file(source_name)
         stem = source_name.removeprefix(OBS_SOURCE_PREFIX)
+        volume_applied = False
 
         try:
             print(f"{_TAG} ▶  Playing: '{source_name}'")
@@ -257,6 +258,9 @@ class SongPlayer:
                     label=source_name,
                 )
                 self._animator.preload()
+
+            if self._abort_flag:
+                return
 
             # Point the single source at this song's file before showing it.
             if audio_file:
@@ -294,6 +298,7 @@ class SongPlayer:
             self._apply_fullscreen(SINGLE_SOURCE_NAME)
             self._set_monitor_and_output(SINGLE_SOURCE_NAME)
             obs.set_input_volume_db(SINGLE_SOURCE_NAME, self.volume_for_stem(stem))
+            volume_applied = True
 
             try:
                 obs.restart_media(SINGLE_SOURCE_NAME)
@@ -322,7 +327,8 @@ class SongPlayer:
             # new project-wide Music level. UI changes already match the saved
             # value, so this is a no-op for changes made in the Hub.
             try:
-                self.remember_obs_volume(stem)
+                if volume_applied:
+                    self.remember_obs_volume(stem)
             except Exception as exc:
                 print(f"{_TAG} ⚠  Could not remember OBS volume: {exc}")
             if self._animator is not None:
@@ -409,7 +415,7 @@ class SongPlayer:
             print(f"{_TAG} ⚠  Could not apply fullscreen transform: {exc}")
 
     def _set_monitor_and_output(self, source_name: str) -> None:
-        """Set audio monitoring to Monitor and Output, routed to tracks 2-6 only."""
+        """Monitor music and include OBS's configured streaming audio track."""
         try:
             obs.configure_input_audio(
                 source_name,
@@ -419,11 +425,8 @@ class SongPlayer:
             print(f"{_TAG} ⚠  Could not set audio monitoring for '{source_name}': {exc}")
 
         try:
-            obs.set_input_audio_tracks(source_name, {
-                "1": False,
-                "2": True, "3": True, "4": True, "5": True, "6": True,
-            })
-            print(f"{_TAG} 🎚  Audio tracks set: off=1, on=2-6 for '{source_name}'")
+            track = obs.ensure_input_on_stream_track(source_name)
+            print(f"{_TAG} 🎚  Streaming track {track} enabled for '{source_name}'; other tracks preserved")
         except Exception as exc:
             print(f"{_TAG} ⚠  Could not set audio tracks for '{source_name}': {exc}")
 
@@ -435,6 +438,7 @@ class SongPlayer:
         provisional_playing_since: float | None = None
         playing_since: float | None = None
         end_streak = 0
+        startup_retried = False
 
         while True:
             with self._lock:
@@ -484,6 +488,14 @@ class SongPlayer:
                 if state not in _STATE_STARTING:
                     play_streak = 0
                     provisional_playing_since = None
+                # OBS acknowledges STOP/file changes before the decoder has
+                # finished processing them. A pending stop can swallow the
+                # initial restart. Retry once after it settles, only before
+                # any playback was observed, never after a song has ended.
+                if (not startup_retried and playing_since is None
+                        and state in _STATES_ENDED and elapsed >= 1.0):
+                    obs.restart_media(source_name)
+                    startup_retried = True
 
             if started and state in _STATES_ENDED:
                 end_streak += 1

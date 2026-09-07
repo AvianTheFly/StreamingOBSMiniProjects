@@ -17,6 +17,7 @@ import * as sceneSwPage      from "./pages/scene-switcher.js";
 import * as soundboardPage   from "./pages/soundboard.js";
 import * as soundFxPage      from "./pages/sound-effects.js";
 import * as leaguePage       from "./pages/league.js";
+import * as leagueAlertsPage from "./pages/league-alerts.js";
 import * as instantRepPage   from "./pages/instant-replay.js";
 import * as mixerPage        from "./pages/mixer.js";
 import * as audioPage        from "./pages/audio.js";
@@ -37,6 +38,7 @@ const PAGES = {
   "projects/tik_tok":              { mount: (c) => soundboardPage.mount(c, "tik_tok"), unmount: () => soundboardPage.unmount() },
   "projects/sound_effects":        soundFxPage,
   "projects/league":               leaguePage,
+  "projects/league_api":           leagueAlertsPage,
   "projects/instant_replay":       instantRepPage,
 };
 

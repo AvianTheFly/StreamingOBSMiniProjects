@@ -1,0 +1,25 @@
+<!doctype html><meta charset="utf-8"><title>League API Alerts</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent;font-family:Segoe UI,Arial,sans-serif;color:#fff}
+#slots{position:absolute;right:3vw;top:8vh;width:29vw;display:flex;flex-direction:column;gap:2vh}
+.slot{height:23vh;position:relative;animation:enter .25s ease-out;overflow:hidden;border-radius:18px}
+.placeholder{height:100%;padding:22px 26px;background:linear-gradient(115deg,rgba(9,18,32,.96),rgba(17,47,62,.94));border:1px solid #60cfbf;border-left:5px solid #71e6c3;display:flex;flex-direction:column;justify-content:center;box-shadow:0 8px 30px #0005}
+.tag{font-size:12px;letter-spacing:3px;color:#83e5d2;text-transform:uppercase}.title{font-weight:750;font-size:clamp(18px,1.8vw,38px);margin:10px 0}.detail{font-size:clamp(12px,1vw,19px);color:#c7d6e1}.hello{font-size:12px;color:#7f99aa;margin-top:12px}
+video,img{width:100%;height:100%;object-fit:contain}audio{display:none}.bar{position:absolute;bottom:0;left:0;height:3px;background:#7cf0cc;animation:drain linear forwards;width:100%}
+@keyframes enter{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}@keyframes drain{to{width:0}}
+#stage{width:1920px;height:1080px;position:absolute;transform-origin:top left}#slots{right:58px;top:86px;width:557px;gap:22px}.slot{height:248px}.title{font-size:34px}.detail{font-size:19px}
+</style><div id="stage"><main id="slots"></main></div>
+<script>
+const slots=document.querySelector('#slots');const nodes=new Map();
+const monitor=new URLSearchParams(location.search).has('monitor');
+function resize(){document.querySelector('#stage').style.transform=`scale(${Math.min(innerWidth/1920,innerHeight/1080)})`}addEventListener('resize',resize);resize();
+function text(tag,cls,value){const e=document.createElement(tag);e.className=cls;e.textContent=value;return e}
+function placeholder(a){const p=text('div','placeholder','');p.append(text('div','tag',a.confidence==='possible'?'Possible · correlation':a.confidence==='preview'?'Preview':'League API'),text('div','title',a.title),text('div','detail',a.detail||''),text('div','hello','Hello World · '+a.key));return p}
+function remove(id){const n=nodes.get(id);for(const m of n.querySelectorAll('video,audio')){m.pause();m.removeAttribute('src');m.load()}n.remove();nodes.delete(id)}
+function render(alerts){const ids=new Set(alerts.map(a=>a.id));for(const id of nodes.keys())if(!ids.has(id))remove(id);
+for(const [index,a] of alerts.entries()){let n=nodes.get(a.id);if(!n){n=text('section','slot','');nodes.set(a.id,n);n.dataset.deadline=Date.now()+a.remaining*1000;
+if(a.media){const m=document.createElement(a.media_kind==='image'?'img':a.media_kind==='audio'?'audio':'video');m.src=a.media;m.autoplay=true;m.playsInline=true;m.muted=monitor;m.volume=Math.max(0,Math.min(1,a.volume??.7));m.onloadedmetadata=()=>{m.currentTime=Math.min(a.start_time||0,Math.max(0,m.duration-.01))};m.onended=()=>{if(a.loop){m.currentTime=Math.min(a.start_time||0,Math.max(0,m.duration-.01));m.play().catch(()=>{})}};m.onerror=()=>{m.remove();if(!n.querySelector('.placeholder'))n.append(placeholder(a));if(!monitor)fetch('/media-error',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:a.key})}).catch(()=>{})};n.append(m);if(a.media_kind==='audio')n.append(placeholder(a));if(m.play)m.play().catch(()=>{m.onerror()})}
+else n.append(placeholder(a));const bar=text('div','bar','');bar.style.animationDuration=a.remaining+'s';n.append(bar)}for(const m of n.querySelectorAll('video,audio'))m.volume=Math.max(0,Math.min(1,a.volume??.7));if(slots.children[index]!==n)slots.insertBefore(n,slots.children[index]||null)}}
+async function poll(){try{const response=await fetch('/state',{cache:'no-store'});if(!response.ok)throw Error();render((await response.json()).alerts.slice(0,3))}catch{for(const id of [...nodes.keys()])remove(id)}finally{setTimeout(poll,200)}}
+setInterval(()=>{for(const [id,n]of nodes)if(Date.now()>Number(n.dataset.deadline))remove(id)},100);poll();
+</script>

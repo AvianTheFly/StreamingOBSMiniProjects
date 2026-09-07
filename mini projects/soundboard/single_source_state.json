@@ -1,0 +1,170 @@
+{
+  "version": 1,
+  "baseline": {
+    "filters": [],
+    "transform": {
+      "alignment": 5,
+      "boundsAlignment": 0,
+      "boundsHeight": 157.0,
+      "boundsType": "OBS_BOUNDS_NONE",
+      "boundsWidth": 279.0,
+      "cropBottom": 0.0,
+      "cropLeft": 0.0,
+      "cropRight": 0.0,
+      "cropTop": 0.0,
+      "positionX": 2.0,
+      "positionY": 454.5,
+      "rotation": 0.0,
+      "scaleX": 0.21799474954605103,
+      "scaleY": 0.21799474954605103
+    },
+    "audio": {},
+    "media_settings": {}
+  },
+  "overrides": {
+    "im cooked": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 570.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 1014.0,
+        "cropBottom": 86.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 199.0,
+        "positionX": 0.0,
+        "positionY": 547.5,
+        "rotation": 0.0,
+        "scaleX": 0.7922967076301575,
+        "scaleY": 0.7922967076301575
+      }
+    },
+    "i love you": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 570.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 1014.0,
+        "cropBottom": 86.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 199.0,
+        "positionX": 0.0,
+        "positionY": 547.5,
+        "rotation": 0.0,
+        "scaleX": 0.7922967076301575,
+        "scaleY": 0.7922967076301575
+      }
+    },
+    "john cena": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 570.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 1014.0,
+        "cropBottom": 86.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 199.0,
+        "positionX": 0.0,
+        "positionY": 547.5,
+        "rotation": 0.0,
+        "scaleX": 0.7922967076301575,
+        "scaleY": 0.7922967076301575
+      }
+    },
+    "who is she": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 570.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 1014.0,
+        "cropBottom": 86.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 199.0,
+        "positionX": 0.0,
+        "positionY": 547.5,
+        "rotation": 0.0,
+        "scaleX": 0.7922967076301575,
+        "scaleY": 0.7922967076301575
+      }
+    },
+    "crab rave": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 570.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 1014.0,
+        "cropBottom": 86.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 199.0,
+        "positionX": 0.0,
+        "positionY": 547.5,
+        "rotation": 0.0,
+        "scaleX": 0.7922967076301575,
+        "scaleY": 0.7922967076301575
+      }
+    },
+    "mom frog": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 1280.0,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 720.0,
+        "cropBottom": 0.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 0.0,
+        "positionX": 0.0,
+        "positionY": 0.0,
+        "rotation": 0.0,
+        "scaleX": 1.0,
+        "scaleY": 1.0
+      }
+    },
+    "chill guy": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 570.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 1014.0,
+        "cropBottom": 86.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 199.0,
+        "positionX": 0.0,
+        "positionY": 547.5,
+        "rotation": 0.0,
+        "scaleX": 0.7922967076301575,
+        "scaleY": 0.7922967076301575
+      }
+    },
+    "hooray": {
+      "transform": {
+        "alignment": 5,
+        "boundsAlignment": 0,
+        "boundsHeight": 570.5,
+        "boundsType": "OBS_BOUNDS_NONE",
+        "boundsWidth": 1014.0,
+        "cropBottom": 86.0,
+        "cropLeft": 0.0,
+        "cropRight": 0.0,
+        "cropTop": 199.0,
+        "positionX": 0.0,
+        "positionY": 547.5,
+        "rotation": 0.0,
+        "scaleX": 0.7922967076301575,
+        "scaleY": 0.7922967076301575
+      }
+    }
+  }
+}

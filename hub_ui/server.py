@@ -860,7 +860,7 @@ class _Handler(http.server.BaseHTTPRequestHandler):
 
     def do_POST(self):
         path = urllib.parse.urlparse(self.path).path.rstrip("/")
-        if   path == "/api/rules":                  self._post_rules()
+        if path == "/api/rules":                  self._post_rules()
         elif path == "/api/settings":               self._post_settings()
         elif path.startswith("/api/hub-actions/"):  self._post_hub_action(path)
         elif path.startswith("/api/project-actions/"): self._post_project_action(path)

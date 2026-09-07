@@ -12,7 +12,7 @@
 
 import time
 
-from ..config import RECALL_MIN_WAIT, RECALL_WATCH_WINDOW
+from ..config import RECALL_MIN_WAIT, RECALL_WATCH_WINDOW, RESPAWN_SFX_LEAD_SECONDS
 
 
 class GameStateDetector:
@@ -24,6 +24,7 @@ class GameStateDetector:
         # ── State-diff trackers ───────────────────────────────────────────
         self.last_is_dead      = None
         self.last_level        = None
+        self._respawn_sfx_fired = False
 
         # ── Event-feed tracker ────────────────────────────────────────────
         # Tracks the highest EventID seen so we never fire the same event twice.
@@ -80,14 +81,23 @@ class GameStateDetector:
         is_dead = me.get("isDead", False)
         if self.last_is_dead is None:
             self.last_is_dead = is_dead
-            return
 
         if not self.last_is_dead and is_dead:
             # Just died — set up respawn-timer baseline
             self.events.emit("death", me)
             self._recall_watching = False
+            self._respawn_sfx_fired = False
         elif self.last_is_dead and not is_dead:
             self.events.emit("respawn", me)
+            self._respawn_sfx_fired = False
+        # Fire once while still dead, including a skipped exact threshold or
+        # reconnect during the final seconds. Never play a late cue after revival.
+        timer = me.get("respawnTimer")
+        if (is_dead and not self._respawn_sfx_fired
+                and isinstance(timer, (int, float))
+                and 0 < timer <= RESPAWN_SFX_LEAD_SECONDS):
+            self._respawn_sfx_fired = True
+            self.events.emit("respawn_3s", me)
         self.last_is_dead = is_dead
 
     def _detect_level_change(self, me) -> None:

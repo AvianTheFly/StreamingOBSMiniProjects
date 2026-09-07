@@ -1,0 +1,64 @@
+# Media checklist
+
+All 58 alert mappings currently use named Hello World placeholders. Reuse the same media for multiple mappings if you like.
+
+| Event key | Enabled | Priority | Suggested file |
+| --- | --- | --- | --- |
+| game_start | True | 45 | media/game_start.webm |
+| minions_spawning | True | 25 | media/minions_spawning.webm |
+| first_blood | True | 85 | media/first_blood.webm |
+| ace | True | 88 | media/ace.webm |
+| turret_destroyed | True | 55 | media/turret_destroyed.webm |
+| first_turret | True | 70 | media/first_turret.webm |
+| inhibitor_destroyed | True | 65 | media/inhibitor_destroyed.webm |
+| inhibitor_respawning_soon | True | 30 | media/inhibitor_respawning_soon.webm |
+| inhibitor_respawned | True | 35 | media/inhibitor_respawned.webm |
+| void_grub | True | 48 | media/void_grub.webm |
+| herald | True | 65 | media/herald.webm |
+| baron | True | 90 | media/baron.webm |
+| atakhan_legacy | False | 65 | media/atakhan_legacy.webm |
+| kill | True | 70 | media/kill.webm |
+| death | True | 72 | media/death.webm |
+| assist | True | 50 | media/assist.webm |
+| double_kill | True | 82 | media/double_kill.webm |
+| triple_kill | True | 88 | media/triple_kill.webm |
+| quadra_kill | True | 94 | media/quadra_kill.webm |
+| pentakill | True | 100 | media/pentakill.webm |
+| dragon | True | 68 | media/dragon.webm |
+| dragon_air | True | 68 | media/dragon_air.webm |
+| dragon_earth | True | 68 | media/dragon_earth.webm |
+| dragon_fire | True | 68 | media/dragon_fire.webm |
+| dragon_water | True | 68 | media/dragon_water.webm |
+| dragon_hextech | True | 68 | media/dragon_hextech.webm |
+| dragon_chemtech | True | 68 | media/dragon_chemtech.webm |
+| dragon_elder | True | 92 | media/dragon_elder.webm |
+| victory | True | 99 | media/victory.webm |
+| defeat | True | 99 | media/defeat.webm |
+| game_end | True | 99 | media/game_end.webm |
+| objective_steal | True | 96 | media/objective_steal.webm |
+| level_up | True | 35 | media/level_up.webm |
+| ultimate_learned | True | 60 | media/ultimate_learned.webm |
+| ability_rank_up | False | 25 | media/ability_rank_up.webm |
+| respawn | True | 40 | media/respawn.webm |
+| inventory_added | True | 30 | media/inventory_added.webm |
+| inventory_removed | False | 20 | media/inventory_removed.webm |
+| possible_purchase | True | 40 | media/possible_purchase.webm |
+| possible_item_upgrade | True | 50 | media/possible_item_upgrade.webm |
+| possible_consumable_use | False | 20 | media/possible_consumable_use.webm |
+| possible_base_visit | True | 58 | media/possible_base_visit.webm |
+| low_health | True | 60 | media/low_health.webm |
+| heavy_health_loss | True | 55 | media/heavy_health_loss.webm |
+| large_heal | True | 35 | media/large_heal.webm |
+| resource_spent | False | 15 | media/resource_spent.webm |
+| possible_combat | True | 40 | media/possible_combat.webm |
+| low_hp_kill | True | 91 | media/low_hp_kill.webm |
+| low_hp_multikill | True | 97 | media/low_hp_multikill.webm |
+| possible_low_hp_escape | True | 85 | media/possible_low_hp_escape.webm |
+| possible_teamfight | True | 75 | media/possible_teamfight.webm |
+| possible_objective_fight | True | 80 | media/possible_objective_fight.webm |
+| possible_power_spike | True | 55 | media/possible_power_spike.webm |
+| cs_milestone | True | 30 | media/cs_milestone.webm |
+| vision_activity | False | 20 | media/vision_activity.webm |
+| manpower_advantage | True | 45 | media/manpower_advantage.webm |
+| possible_roam | False | 30 | media/possible_roam.webm |
+| possible_jungle_activity | False | 20 | media/possible_jungle_activity.webm |
