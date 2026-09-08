@@ -42,6 +42,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 from .config import EDITED_DIR, REPLAY_DIR
+from . import library
 
 _TAG = "[instant_replay.cleanup]"
 _WINDOW_SECONDS = 600       # 10-minute fallback grouping window
@@ -85,6 +86,7 @@ def _parse_timestamp(filename: str) -> datetime | None:
 def _find_trimmed() -> list[tuple[datetime, Path]]:
     """Return (timestamp, path) for every *_ir_trimmed.mkv in REPLAY_DIR root."""
     result: list[tuple[datetime, Path]] = []
+    curated = library.read()["clips"]
     raw_dir = Path(REPLAY_DIR)
     if not raw_dir.exists():
         return result
@@ -92,6 +94,8 @@ def _find_trimmed() -> list[tuple[datetime, Path]]:
         if f.is_dir():
             continue
         if f.name.endswith("_ir_trimmed.mkv"):
+            if curated.get(library.clip_id(f), {}).get("merged"):
+                continue
             ts = _parse_timestamp(f.name)
             if ts:
                 result.append((ts, f))
@@ -102,7 +106,10 @@ def _find_trimmed() -> list[tuple[datetime, Path]]:
 def _safe_unlink(path: Path, *, missing_ok: bool = True) -> bool:
     """Best-effort delete that never raises for locked or already-gone files."""
     try:
-        path.unlink()
+        with library.LOCK:
+            if library.retain_after_merge(path):
+                return False
+            path.unlink()
         return True
     except FileNotFoundError:
         return bool(missing_ok)

@@ -25,10 +25,14 @@ class _InstantReplayInterface(ProjectInterface):
         replay_paused = _live.get("replay_paused", [False])
         is_active     = bool(replay_active[0])
         is_paused     = bool(replay_paused[0]) if is_active else False
+        detail = _live.get("playback_detail", {})
+        activity = "paused replay" if is_paused else "playing replay"
+        if is_active and detail:
+            activity += f" · {detail['index']}/{detail['total']} · {detail['name']}"
         return ProjectStatus(
             name             = self.name,
             is_active        = is_active,
-            current_activity = "paused replay" if is_paused else ("playing replay" if is_active else None),
+            current_activity = activity if is_active else None,
             controlled_scenes= self.controlled_scenes,
             can_revert       = True,
         )

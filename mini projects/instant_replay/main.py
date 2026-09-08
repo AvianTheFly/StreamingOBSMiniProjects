@@ -358,6 +358,9 @@ def _parse_command(text: str) -> tuple[str | None, str, float, bool]:
       spec — the play spec string ('all', 'highlights', 'win', …) or "".
     """
     lowered = " ".join(text.lower().strip().rstrip(".,!?;:").split())
+    # Group names may contain command words (e.g. "save the day").
+    if lowered.startswith("play intro ") or lowered.startswith("play group "):
+        return ("play", lowered[5:], 0, False)
     if lowered in {"random", "random replay", "random clip", "surprise me", "play random replay", "play a random replay", "play a random clip"}:
         return ("play", "random", 0, False)
     tokens = lowered.split()
@@ -563,6 +566,7 @@ def run(
     _live["replay_paused"] = _replay_paused
     _live["end_replay"]    = _end_replay
     _live["list_clips"]     = _list_clips
+    _live["playback_detail"] = {}
 
     def _pause_other_projects() -> None:
         with _lock:
@@ -770,6 +774,15 @@ def run(
         During multi-clip playback, pressing '|' skips to the next clip.
         """
         spec_lower = spec.strip().lower()
+
+        if spec_lower.startswith(("intro ", "group ")):
+            from . import library
+            try:
+                clips = library.group_paths(spec_lower.split(" ", 1)[1], REPLAY_DIR, by_name=True)
+                _play_all_clips_sequential(clips)
+            except ValueError as exc:
+                print(f"[instant_replay] {exc}")
+            return
 
         if spec_lower in {"random", "random clip", "anything", "any", "surprise me"}:
             candidates = _replay_files_on_disk()
@@ -988,10 +1001,16 @@ def run(
                 _replay_active[0] = True
                 _replay_paused[0] = False
             _pause_other_projects()
-            for clip in clips:
+            from . import library
+            labels = library.read()["clips"]
+            for index, clip in enumerate(clips):
                 if _cancel_watcher.is_set():
                     break
                 clip_path = Path(clip)
+                _live["playback_detail"] = {
+                    "name": labels.get(library.clip_id(clip), {}).get("title") or clip_path.name,
+                    "index": index + 1, "total": len(clips),
+                }
                 if not clip_path.is_file() or clip_path.stat().st_size <= 0:
                     print(f"[instant_replay] Missing or empty clip: {clip}")
                     continue
@@ -1047,6 +1066,7 @@ def run(
             finally:
                 with _lock:
                     _is_multi_clip_active[0] = False
+                _live["playback_detail"] = {}
                 _skip_clip.clear()
                 _resume_other_projects()
                 _playback_gate.release()
@@ -1064,6 +1084,9 @@ def run(
         _play_all_clips_sequential([str(candidate)])
 
     _live["play_clip"] = _play_clip_path
+    _live["play_sequence"] = _play_all_clips_sequential
+    _live["playback_busy"] = _playback_gate.locked
+    _live["skip_clip"] = _skip_clip.set
     _live["play_spec"] = _on_play
     _live["save_clip"] = _on_save
     _live["mark"] = _on_mark

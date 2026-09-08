@@ -1267,10 +1267,28 @@ class _Handler(http.server.BaseHTTPRequestHandler):
         elif name == "instant_replay" and action == "clips":
             try:
                 from instant_replay.interface import _live
+                from instant_replay.library import decorate, disk_rows
+                from instant_replay.config import REPLAY_DIR
                 list_clips = _live.get("list_clips")
-                self._json(200, {"clips": list_clips() if callable(list_clips) else []})
+                data = decorate(list_clips() if callable(list_clips) else disk_rows(REPLAY_DIR))
+                data["ready"] = callable(_live.get("play_sequence"))
+                self._json(200, data)
             except Exception as exc:
                 self._err(500, str(exc))
+        elif name == "instant_replay" and action in {"preview", "preview-media"}:
+            try:
+                from instant_replay.library import resolve
+                from instant_replay.config import REPLAY_DIR
+                from hub_ui.replay_media import preview, serve_file
+                query = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+                source = resolve(query.get("path", [""])[0], REPLAY_DIR)
+                status, media = preview(source)
+                if action == "preview-media" and media:
+                    serve_file(self, media)
+                else:
+                    self._json(200, status)
+            except (ValueError, OSError) as exc:
+                self._err(400, str(exc))
         else:
             self._err(404, "Unknown action")
 
@@ -1416,21 +1434,46 @@ class _Handler(http.server.BaseHTTPRequestHandler):
             self._svs_post(action, body)
         elif name == "sound_effects":
             self._sfx_post(action, body)
+        elif name == "instant_replay" and action == "library":
+            from instant_replay import library
+            from instant_replay.config import REPLAY_DIR
+            try:
+                self._json(200, library.mutate(body, REPLAY_DIR))
+            except library.Conflict as exc:
+                self._err(409, str(exc))
+            except (ValueError, OSError) as exc:
+                self._err(400, str(exc))
+        elif name == "instant_replay" and action == "skip":
+            from instant_replay.interface import _live
+            handler = _live.get("skip_clip")
+            if handler and _live.get("replay_active", [False])[0]:
+                handler()
+                self._json(200, {"ok": True})
+            else:
+                self._err(409, "No replay is playing.")
         elif name == "instant_replay" and action == "play":
             try:
                 from instant_replay.interface import _live
-                play_clip = _live.get("play_clip")
-                if not callable(play_clip):
+                from instant_replay.library import group_paths, resolve
+                from instant_replay.config import REPLAY_DIR
+                play_sequence = _live.get("play_sequence")
+                if not callable(play_sequence):
                     self._err(409, "Instant Replay is not ready")
                     return
-                clip_path = str(body.get("path") or "")
+                if _live.get("playback_busy", lambda: False)():
+                    self._err(409, "A replay is already playing. Stop it before starting another.")
+                    return
+                paths = group_paths(str(body["group_id"]), REPLAY_DIR) if body.get("group_id") else [
+                    str(resolve(str(body.get("path") or ""), REPLAY_DIR))]
                 threading.Thread(
-                    target=play_clip,
-                    args=(clip_path,),
+                    target=play_sequence,
+                    args=(paths,),
                     daemon=True,
                     name="instant-replay-ui-play",
                 ).start()
                 self._json(200, {"ok": True})
+            except ValueError as exc:
+                self._err(400, str(exc))
             except Exception as exc:
                 self._err(500, str(exc))
         else:

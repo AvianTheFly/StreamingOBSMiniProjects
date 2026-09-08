@@ -49,6 +49,10 @@ const _pageEl  = document.getElementById("page");
 
 function navigate(page) {
   page = (page || "dashboard").replace(/^#/, "");
+  if (_curModule?.beforeLeave && !_curModule.beforeLeave()) {
+    history.replaceState(null, "", `#${_curPage}`);
+    return;
+  }
 
   // Unmount previous page
   if (_curModule?.unmount) {

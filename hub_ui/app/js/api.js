@@ -43,6 +43,10 @@ export const api = {
   // ── Instant replay ────────────────────────────────────────────────────
   getReplayClips: () => _req("GET", "/api/projects/instant_replay/clips"),
   playReplayClip: (path) => _req("POST", "/api/projects/instant_replay/play", { path }),
+  playReplayGroup: (group_id) => _req("POST", "/api/projects/instant_replay/play", { group_id }),
+  saveReplayLibrary: (data) => _req("POST", "/api/projects/instant_replay/library", data),
+  skipReplayClip: () => _req("POST", "/api/projects/instant_replay/skip", {}),
+  replayPreview: (path) => _req("GET", `/api/projects/instant_replay/preview?path=${encodeURIComponent(path)}`),
 
   // ── Specific song ─────────────────────────────────────────────────────
   getSongLibrary:    ()       => _req("GET",  "/api/projects/specific_song/library"),
