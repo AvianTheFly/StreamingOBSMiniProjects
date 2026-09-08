@@ -1,0 +1,21 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const vm=require('node:vm');
+const source=fs.readFileSync(__dirname+'/control.js','utf8');
+const requestCode=source.slice(source.indexOf('let settingsWrite='),source.indexOf('\nfunction act'));
+(async()=>{
+  const regions=[{inert:false},{inert:false}];let finish;
+  const context=vm.createContext({document:{querySelectorAll:()=>regions},fetch:()=>new Promise(r=>finish=r),Error});
+  vm.runInContext(requestCode,context);
+  const save=context.req('/event',{key:'kill'});
+  assert(regions.every(r=>r.inert));
+  await assert.rejects(context.req('/options',{}),/already in progress/);
+  finish({ok:true,json:async()=>({saved:true})});
+  await save;assert(regions.every(r=>!r.inert));
+  const failure=context.req('/event',{});
+  finish({ok:false,json:async()=>({error:'Conflict'})});
+  await assert.rejects(failure,/Conflict/);assert(regions.every(r=>!r.inert));
+  const retry=context.req('/options',{});
+  finish({ok:true,json:async()=>({})});await retry;
+  console.log('Save serialization, error recovery and retry checks passed.');
+})().catch(e=>{console.error(e);process.exitCode=1});
