@@ -56,3 +56,13 @@ class PresentationTests(unittest.TestCase):
                 service.save_edit('/event',{'revision':1,'key':'kill','rule':{'audio':'missing.wav'}})
             service.save_edit('/event',{'revision':1,'key':'kill','rule':{'audio':''}})
             self.assertEqual(service.engine.config['events']['kill']['audio'],'')
+
+    def test_new_rule_media_does_not_leak_between_setups(self):
+        c=defaults(); initialize(c,capture(c))
+        c['events']['custom_new']={**c['events']['kill'],'media':'my-test.mp4','audio':'my-test.wav'}
+        switch(c,'personal')
+        self.assertEqual(c['events']['custom_new']['media'],'')
+        self.assertEqual(c['events']['custom_new']['audio'],'')
+        switch(c,'memes')
+        self.assertEqual(c['events']['custom_new']['media'],'my-test.mp4')
+        self.assertEqual(c['events']['custom_new']['audio'],'my-test.wav')

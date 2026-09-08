@@ -26,8 +26,9 @@ def switch(config, target):
         return
     config['presentations'][current]=capture(config)
     saved=config['presentations'][target]
-    for key, rule in saved['events'].items():
-        if key in config['events']:
-            config['events'][key].update({f:rule.get(f,d) for f,d in FIELDS.items()})
+    for key, event in config['events'].items():
+        # Rules added in one setup should not carry its media into another.
+        rule=saved['events'].get(key,{})
+        event.update({f:rule.get(f,d) for f,d in FIELDS.items()})
     config['layout']=copy.deepcopy(saved.get('layout', LAYOUT))
     config['presentation']=target

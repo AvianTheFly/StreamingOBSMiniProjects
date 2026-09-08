@@ -75,3 +75,5 @@ Open the League event editor from the Hub.
 - Select an event to disable it individually, replace its visual, or upload/select an **Optional companion sound**. Save event applies it. Companion sound uses the event clip volume and ends with the alert. Choose No companion sound to remove it.
 
 Settings history remains outside the repository. Switching media setups never restores an older OBS master volume or changes other modules. The League editor is available when OBS is closed; the remaining modules wait for OBS to connect.
+
+Media selection is always a draft: choose a library tile, upload, or drop a visual/audio file, preview it, then Save event. Reload saved settings discards the draft. Uploads that finish after you leave the event stay in the library without assigning themselves elsewhere. Size edits have a separate Save/Discard status; arrow keys move the focused box or resize its handle (Shift moves by 10 pixels).
