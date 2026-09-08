@@ -14,9 +14,10 @@ import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.request import build_opener, HTTPSHandler, ProxyHandler
-from urllib.parse import urlparse, unquote, parse_qs
+from urllib.parse import urlparse, unquote, parse_qs, quote
 
 from .engine import Engine, defaults
+from .presentation import initialize, switch, LAYOUT
 from .editor import SettingsStore, validate_rule, number, describe, FIELDS, EVENT_NAMES
 
 ROOT=Path(__file__).resolve().parent
@@ -24,7 +25,10 @@ PORT=7431
 LIVE_URL='https://127.0.0.1:2999/liveclientdata/allgamedata'
 
 def load_config():
-    return SettingsStore(ROOT/'alerts.json').load()
+    config=SettingsStore(ROOT/'alerts.json').load()
+    personal=ROOT/'personal_presentation.json'
+    initialize(config,json.loads(personal.read_text(encoding='utf-8')) if personal.exists() else {'events':{}})
+    return config
 
 class Service:
     def __init__(self, stop_event):
@@ -49,6 +53,15 @@ class Service:
             config=copy.deepcopy(self.engine.config)
             if body.get('revision')!=config.get('revision',0): raise ValueError('Settings changed in another window. Reload before saving.')
             if path=='/options':
+                if 'overlay_enabled' in body:
+                    if not isinstance(body['overlay_enabled'],bool): raise ValueError('Invalid enabled flag')
+                    config['overlay_enabled']=body['overlay_enabled']
+                if 'layout' in body:
+                    layout=body['layout']
+                    if not isinstance(layout,dict) or set(layout)!=set(LAYOUT): raise ValueError('Invalid layout')
+                    config['layout']={k:number(layout[k],0 if k in {'x','y'} else 32,1920 if k in {'x','width'} else 1080,k) for k in LAYOUT}
+                    if config['layout']['x']+config['layout']['width']>1920 or config['layout']['y']+config['layout']['height']>1080: raise ValueError('Keep the alert inside the canvas')
+                if 'presentation' in body: switch(config,body['presentation'])
                 if 'max_alerts' in body: config['max_alerts']=int(number(body['max_alerts'],1,3,'Slots'))
                 if 'poll_seconds' in body: config['poll_seconds']=number(body['poll_seconds'],.25,5,'Poll interval')
                 if 'paused' in body:
@@ -62,14 +75,19 @@ class Service:
                 key=body.get('key') if path=='/event' else 'custom_'+uuid.uuid4().hex[:12]
                 if path=='/event' and key not in config['events']: raise ValueError('Unknown event')
                 old=config['events'].get(key,{'enabled':True,'priority':50,'duration':6,'cooldown':10,'volume':.7,'media':''})
-                allowed={'enabled','priority','duration','cooldown','volume','media','title','start_time','loop','trigger'}
+                allowed={'enabled','priority','duration','cooldown','volume','media','title','start_time','loop','trigger','audio'}
                 patch=body.get('rule',{})
                 if not isinstance(patch,dict) or set(patch)-allowed: raise ValueError('Unknown event setting')
                 rule=validate_rule({**old,**patch},custom=key.startswith('custom_'))
                 if rule['media'] and rule['media']!=old.get('media') and not self.media_path(rule['media']): raise ValueError('Choose an existing supported media file')
+                if rule.get('audio') and rule['audio']!=old.get('audio'):
+                    audio=self.media_path(rule['audio'])
+                    if not audio or audio.suffix.lower() not in {'.mp3','.wav','.ogg','.m4a'}: raise ValueError('Choose an existing audio file')
                 config['events'][key]=rule
+            from lib.settings_backups import SettingsBackups
+            SettingsBackups().snapshot()
             self.engine.config=self.store.save(config)
-            if config.get('paused'): self.engine.clear()
+            if config.get('paused') or not config.get('overlay_enabled',True) or 'presentation' in body: self.engine.clear()
             # Apply volume changes to currently playing clips without restarting them.
             for a in self.engine.slots:
                 if a['key'] in config['events']: a['volume']=config['events'][a['key']]['volume']
@@ -97,7 +115,9 @@ class Service:
                     alert['media']='/media/'+alert['key']+'?alert='+str(alert['id'])
                     alert['media_kind']=('image' if path.suffix.lower() in {'.png','.jpg','.jpeg','.gif','.webp'} else 'audio' if path.suffix.lower() in {'.mp3','.wav','.ogg','.m4a'} else 'video')
                 else: alert['media']=''
-            return {'status':self.status,'alerts':alerts,'metrics':self.engine.metrics,
+                audio=self.media_path(alert.get('audio',''))
+                alert['audio']='/asset?path='+quote(alert['audio']) if audio else ''
+            return {'overlay_enabled':self.engine.config.get('overlay_enabled',True),'layout':self.engine.config.get('layout',LAYOUT),'status':self.status,'alerts':alerts,'metrics':self.engine.metrics,
                     'history':self.engine.history[-20:],'error':self.error,'media_errors':self.media_errors[-10:],
                     'paused':self.engine.config.get('paused',False),'revision':self.engine.config.get('revision',0)}
 
@@ -155,7 +175,7 @@ class Service:
                     try: self.send_bytes(json.dumps(service.volume()).encode())
                     except Exception: self.send_bytes(b'{"error":"OBS audio is unavailable. Start OBS with WebSocket enabled."}',status=503)
                     return
-                if path in {'/control.js','/control.css'}:
+                if path in {'/control.js','/control.css','/presentation.js'}:
                     self.send_bytes((ROOT/path[1:]).read_bytes(),'text/javascript' if path.endswith('.js') else 'text/css'); return
                 if path=='/state':
                     self.send_bytes(json.dumps(service.snapshot()).encode()); return
@@ -167,7 +187,7 @@ class Service:
                     with service.lock:
                         if path=='/asset':
                             value=parse_qs(urlparse(self.path).query).get('path',[''])[0]
-                            permitted={a['path'] for a in service.library()}|{r.get('media','') for r in service.engine.config['events'].values()}
+                            permitted={a['path'] for a in service.library()}|{r.get(f,'') for r in service.engine.config['events'].values() for f in ('media','audio')}
                             target=service.media_path(value) if value in permitted else None
                         else:
                             rule=service.engine.config['events'].get(path[7:],{})
@@ -210,7 +230,15 @@ class Service:
                         name=Path(name.replace('\\','/')).name
                         import re
                         name=re.sub(r'[^\w. -]','_',name)[:150]
-                        if Path(name).suffix.lower() not in {'.png','.jpg','.jpeg','.webp','.gif','.mp4','.webm','.mov','.mp3','.wav','.ogg','.m4a'}: raise ValueError('Unsupported media format')
+                        if Path(name).suffix.lower() not in {'.png','.jpg','.jpeg','.webp','.gif','.mp4','.webm','.mov','.mp3','.wav','.ogg','.m4a'}:
+                            # Consume the bounded request before closing; unread bytes
+                            # can reset the Windows socket and hide the error response.
+                            remaining=size
+                            while remaining:
+                                chunk=self.rfile.read(min(65536,remaining))
+                                if not chunk: break
+                                remaining-=len(chunk)
+                            raise ValueError('Unsupported media format')
                         folder=ROOT/'media'; folder.mkdir(exist_ok=True)
                         dest=folder/(uuid.uuid4().hex[:8]+'_'+name)
                         remaining=size
@@ -241,6 +269,7 @@ class Service:
                         self.send_bytes(json.dumps(result).encode()); return
                     with service.lock:
                         if self.path=='/preview':
+                            if not service.engine.config.get('overlay_enabled',True): raise ValueError('League alerts are off. Turn them on before previewing in OBS.')
                             keys=body.get('keys',[])
                             if not isinstance(keys,list) or any(k not in service.engine.config['events'] for k in keys): raise ValueError('Unknown alert')
                             # Preview is explicit and bypasses enabled/cooldown flags only.

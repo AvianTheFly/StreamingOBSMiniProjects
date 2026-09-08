@@ -11,7 +11,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": true,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "minions_spawning": {
       "enabled": true,
@@ -22,7 +23,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": true,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "first_blood": {
       "enabled": true,
@@ -33,7 +35,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "ace": {
       "enabled": true,
@@ -44,7 +47,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "turret_destroyed": {
       "enabled": true,
@@ -55,7 +59,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "first_turret": {
       "enabled": true,
@@ -66,7 +71,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "inhibitor_destroyed": {
       "enabled": true,
@@ -77,7 +83,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "inhibitor_respawning_soon": {
       "enabled": true,
@@ -88,7 +95,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "inhibitor_respawned": {
       "enabled": true,
@@ -99,7 +107,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "void_grub": {
       "enabled": true,
@@ -110,7 +119,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "herald": {
       "enabled": true,
@@ -121,7 +131,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "baron": {
       "enabled": true,
@@ -132,7 +143,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "atakhan_legacy": {
       "enabled": false,
@@ -143,7 +155,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "kill": {
       "enabled": true,
@@ -154,7 +167,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "death": {
       "enabled": true,
@@ -165,7 +179,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "assist": {
       "enabled": true,
@@ -176,7 +191,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "double_kill": {
       "enabled": true,
@@ -187,7 +203,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "triple_kill": {
       "enabled": true,
@@ -198,7 +215,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "quadra_kill": {
       "enabled": true,
@@ -209,7 +227,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "pentakill": {
       "enabled": true,
@@ -220,7 +239,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "dragon": {
       "enabled": true,
@@ -231,7 +251,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "dragon_air": {
       "enabled": true,
@@ -242,7 +263,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "dragon_earth": {
       "enabled": true,
@@ -253,7 +275,8 @@
       "volume": 0.7,
       "start_time": 1.3,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "dragon_fire": {
       "enabled": true,
@@ -264,7 +287,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": true,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "dragon_water": {
       "enabled": true,
@@ -275,7 +299,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": true,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "dragon_hextech": {
       "enabled": true,
@@ -286,7 +311,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "dragon_chemtech": {
       "enabled": true,
@@ -297,7 +323,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "dragon_elder": {
       "enabled": true,
@@ -308,7 +335,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "victory": {
       "enabled": true,
@@ -319,7 +347,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "defeat": {
       "enabled": true,
@@ -330,7 +359,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "game_end": {
       "enabled": true,
@@ -341,7 +371,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "objective_steal": {
       "enabled": true,
@@ -352,7 +383,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "level_up": {
       "enabled": true,
@@ -363,7 +395,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": true,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "ultimate_learned": {
       "enabled": true,
@@ -374,7 +407,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "ability_rank_up": {
       "enabled": false,
@@ -385,7 +419,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": true,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "respawn": {
       "enabled": true,
@@ -396,7 +431,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "inventory_added": {
       "enabled": true,
@@ -407,7 +443,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "inventory_removed": {
       "enabled": false,
@@ -418,7 +455,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "possible_purchase": {
       "enabled": true,
@@ -429,7 +467,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "possible_item_upgrade": {
       "enabled": true,
@@ -440,7 +479,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "possible_consumable_use": {
       "enabled": false,
@@ -451,7 +491,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "possible_base_visit": {
       "enabled": true,
@@ -462,7 +503,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "low_health": {
       "enabled": true,
@@ -473,7 +515,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "heavy_health_loss": {
       "enabled": true,
@@ -484,7 +527,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "large_heal": {
       "enabled": true,
@@ -495,7 +539,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": true,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "resource_spent": {
       "enabled": false,
@@ -506,7 +551,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "possible_combat": {
       "enabled": true,
@@ -517,7 +563,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": true,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "low_hp_kill": {
       "enabled": true,
@@ -528,7 +575,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": true,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "low_hp_multikill": {
       "enabled": true,
@@ -539,7 +587,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": true,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "possible_low_hp_escape": {
       "enabled": true,
@@ -550,7 +599,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "possible_teamfight": {
       "enabled": true,
@@ -561,7 +611,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": true,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "possible_objective_fight": {
       "enabled": true,
@@ -572,7 +623,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": true,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "possible_power_spike": {
       "enabled": true,
@@ -583,7 +635,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": true,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "cs_milestone": {
       "enabled": true,
@@ -594,7 +647,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": true,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "vision_activity": {
       "enabled": false,
@@ -605,7 +659,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": true,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "manpower_advantage": {
       "enabled": true,
@@ -616,7 +671,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": true,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "possible_roam": {
       "enabled": false,
@@ -627,7 +683,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "possible_jungle_activity": {
       "enabled": false,
@@ -638,7 +695,8 @@
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
-      "title": ""
+      "title": "",
+      "audio": ""
     },
     "custom_e8bf37104ae1": {
       "enabled": false,
@@ -655,9 +713,866 @@
         "field": "health_percent",
         "operator": "crosses_below",
         "value": 15.0
-      }
+      },
+      "audio": ""
     }
   },
-  "revision": 59,
-  "paused": false
+  "revision": 63,
+  "paused": false,
+  "presentation": "memes",
+  "overlay_enabled": true,
+  "layout": {
+    "x": 1305,
+    "y": 86,
+    "width": 557,
+    "height": 248
+  },
+  "presentations": {
+    "memes": {
+      "events": {
+        "game_start": {
+          "media": "media/meme-minions-dance.mp4",
+          "audio": "",
+          "duration": 1.5,
+          "start_time": 0.0,
+          "loop": true
+        },
+        "minions_spawning": {
+          "media": "media/meme-minions-dance.mp4",
+          "audio": "",
+          "duration": 1.5,
+          "start_time": 0.0,
+          "loop": true
+        },
+        "first_blood": {
+          "media": "media/meme-squidward-dab.mp4",
+          "audio": "",
+          "duration": 1.6,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "ace": {
+          "media": "media/meme-thanos-snap.mp4",
+          "audio": "",
+          "duration": 1.6,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "turret_destroyed": {
+          "media": "media/meme-ralph-wreck.mp4",
+          "audio": "",
+          "duration": 1.54,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "first_turret": {
+          "media": "media/meme-ralph-wreck.mp4",
+          "audio": "",
+          "duration": 1.54,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "inhibitor_destroyed": {
+          "media": "media/meme-ralph-wreck.mp4",
+          "audio": "",
+          "duration": 1.54,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "inhibitor_respawning_soon": {
+          "media": "media/meme-terminator-back.mp4",
+          "audio": "",
+          "duration": 2.7,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "inhibitor_respawned": {
+          "media": "media/meme-terminator-back.mp4",
+          "audio": "",
+          "duration": 2.7,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "void_grub": {
+          "media": "media/meme-simba-grub.mp4",
+          "audio": "",
+          "duration": 2.7,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "herald": {
+          "media": "media/meme-ralph-wreck.mp4",
+          "audio": "",
+          "duration": 1.54,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "baron": {
+          "media": "media/meme-avengers.mp4",
+          "audio": "",
+          "duration": 2.85,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "atakhan_legacy": {
+          "media": "media/meme-avengers.mp4",
+          "audio": "",
+          "duration": 2.85,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "kill": {
+          "media": "media/meme-squidward-dab.mp4",
+          "audio": "",
+          "duration": 1.6,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "death": {
+          "media": "media/meme-michael-no.mp4",
+          "audio": "",
+          "duration": 1.8,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "assist": {
+          "media": "media/meme-baymax-bump.mp4",
+          "audio": "",
+          "duration": 3.4,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "double_kill": {
+          "media": "media/meme-tobey-dance.mp4",
+          "audio": "",
+          "duration": 3.5,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "triple_kill": {
+          "media": "media/meme-tobey-dance.mp4",
+          "audio": "",
+          "duration": 3.5,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "quadra_kill": {
+          "media": "media/meme-tobey-dance.mp4",
+          "audio": "",
+          "duration": 3.5,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "pentakill": {
+          "media": "media/meme-thanos-snap.mp4",
+          "audio": "",
+          "duration": 1.6,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "dragon": {
+          "media": "media/meme-avengers.mp4",
+          "audio": "",
+          "duration": 2.85,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "dragon_air": {
+          "media": "media/meme-mcqueen-speed.mp4",
+          "audio": "",
+          "duration": 3.5,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "dragon_earth": {
+          "media": "media/meme-toph-armor.mp4",
+          "audio": "",
+          "duration": 3.5,
+          "start_time": 1.3,
+          "loop": false
+        },
+        "dragon_fire": {
+          "media": "media/meme-zuko-fire.mp4",
+          "audio": "",
+          "duration": 1.5,
+          "start_time": 0.0,
+          "loop": true
+        },
+        "dragon_water": {
+          "media": "media/meme-katara-water.mp4",
+          "audio": "",
+          "duration": 1.5,
+          "start_time": 0.0,
+          "loop": true
+        },
+        "dragon_hextech": {
+          "media": "media/meme-palpatine-power.mp4",
+          "audio": "",
+          "duration": 3.5,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "dragon_chemtech": {
+          "media": "media/meme-jesse-science.mp4",
+          "audio": "",
+          "duration": 1.9,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "dragon_elder": {
+          "media": "media/meme-palpatine-power.mp4",
+          "audio": "",
+          "duration": 3.5,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "victory": {
+          "media": "media/meme-tobey-dance.mp4",
+          "audio": "",
+          "duration": 3.5,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "defeat": {
+          "media": "media/meme-michael-no.mp4",
+          "audio": "",
+          "duration": 1.8,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "game_end": {
+          "media": "media/meme-avengers.mp4",
+          "audio": "",
+          "duration": 2.85,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "objective_steal": {
+          "media": "media/meme-swiper-steal.mp4",
+          "audio": "",
+          "duration": 3.4,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "level_up": {
+          "media": "media/meme-goku-power.mp4",
+          "audio": "",
+          "duration": 1.5,
+          "start_time": 0.0,
+          "loop": true
+        },
+        "ultimate_learned": {
+          "media": "media/meme-palpatine-power.mp4",
+          "audio": "",
+          "duration": 3.5,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "ability_rank_up": {
+          "media": "media/meme-goku-power.mp4",
+          "audio": "",
+          "duration": 1.5,
+          "start_time": 0.0,
+          "loop": true
+        },
+        "respawn": {
+          "media": "media/meme-terminator-back.mp4",
+          "audio": "",
+          "duration": 2.7,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "inventory_added": {
+          "media": "media/meme-fry-money.mp4",
+          "audio": "",
+          "duration": 1.71,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "inventory_removed": {
+          "media": "media/meme-fry-money.mp4",
+          "audio": "",
+          "duration": 1.71,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "possible_purchase": {
+          "media": "media/meme-fry-money.mp4",
+          "audio": "",
+          "duration": 1.71,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "possible_item_upgrade": {
+          "media": "media/meme-jesse-science.mp4",
+          "audio": "",
+          "duration": 1.9,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "possible_consumable_use": {
+          "media": "media/meme-this-is-fine.mp4",
+          "audio": "",
+          "duration": 2.12,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "possible_base_visit": {
+          "media": "media/meme-homer-bush.mp4",
+          "audio": "",
+          "duration": 2.9,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "low_health": {
+          "media": "media/meme-this-is-fine.mp4",
+          "audio": "",
+          "duration": 2.12,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "heavy_health_loss": {
+          "media": "media/meme-emotional-damage.mp4",
+          "audio": "",
+          "duration": 3.2,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "large_heal": {
+          "media": "media/meme-katara-water.mp4",
+          "audio": "",
+          "duration": 1.5,
+          "start_time": 0.0,
+          "loop": true
+        },
+        "resource_spent": {
+          "media": "media/meme-this-is-fine.mp4",
+          "audio": "",
+          "duration": 2.12,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "possible_combat": {
+          "media": "media/meme-elmo-fire.mp4",
+          "audio": "",
+          "duration": 1.5,
+          "start_time": 0.0,
+          "loop": true
+        },
+        "low_hp_kill": {
+          "media": "media/meme-goku-power.mp4",
+          "audio": "",
+          "duration": 1.5,
+          "start_time": 0.0,
+          "loop": true
+        },
+        "low_hp_multikill": {
+          "media": "media/meme-goku-power.mp4",
+          "audio": "",
+          "duration": 1.5,
+          "start_time": 0.0,
+          "loop": true
+        },
+        "possible_low_hp_escape": {
+          "media": "media/meme-homer-bush.mp4",
+          "audio": "",
+          "duration": 2.9,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "possible_teamfight": {
+          "media": "media/meme-elmo-fire.mp4",
+          "audio": "",
+          "duration": 1.5,
+          "start_time": 0.0,
+          "loop": true
+        },
+        "possible_objective_fight": {
+          "media": "media/meme-elmo-fire.mp4",
+          "audio": "",
+          "duration": 1.5,
+          "start_time": 0.0,
+          "loop": true
+        },
+        "possible_power_spike": {
+          "media": "media/meme-goku-power.mp4",
+          "audio": "",
+          "duration": 1.5,
+          "start_time": 0.0,
+          "loop": true
+        },
+        "cs_milestone": {
+          "media": "media/meme-stonks.mp4",
+          "audio": "",
+          "duration": 1.5,
+          "start_time": 0.0,
+          "loop": true
+        },
+        "vision_activity": {
+          "media": "media/meme-rock-eyebrow.mp4",
+          "audio": "",
+          "duration": 1.5,
+          "start_time": 0.0,
+          "loop": true
+        },
+        "manpower_advantage": {
+          "media": "media/meme-stonks.mp4",
+          "audio": "",
+          "duration": 1.5,
+          "start_time": 0.0,
+          "loop": true
+        },
+        "possible_roam": {
+          "media": "media/meme-mcqueen-speed.mp4",
+          "audio": "",
+          "duration": 3.5,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "possible_jungle_activity": {
+          "media": "media/meme-simba-grub.mp4",
+          "audio": "",
+          "duration": 2.7,
+          "start_time": 0.0,
+          "loop": false
+        },
+        "custom_e8bf37104ae1": {
+          "media": "",
+          "audio": "",
+          "duration": 6.0,
+          "start_time": 0.0,
+          "loop": false
+        }
+      },
+      "layout": {
+        "x": 1305,
+        "y": 86,
+        "width": 557,
+        "height": 248
+      }
+    },
+    "personal": {
+      "events": {
+        "game_start": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "minions_spawning": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "first_blood": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "ace": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "turret_destroyed": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "first_turret": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "inhibitor_destroyed": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "inhibitor_respawning_soon": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "inhibitor_respawned": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "void_grub": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "herald": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "baron": {
+          "media": "",
+          "audio": "",
+          "duration": 9,
+          "start_time": 0,
+          "loop": false
+        },
+        "atakhan_legacy": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "kill": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "death": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "assist": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "double_kill": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "triple_kill": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "quadra_kill": {
+          "media": "",
+          "audio": "",
+          "duration": 9,
+          "start_time": 0,
+          "loop": false
+        },
+        "pentakill": {
+          "media": "",
+          "audio": "",
+          "duration": 9,
+          "start_time": 0,
+          "loop": false
+        },
+        "dragon": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "dragon_air": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "dragon_earth": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "dragon_fire": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "dragon_water": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "dragon_hextech": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "dragon_chemtech": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "dragon_elder": {
+          "media": "",
+          "audio": "",
+          "duration": 9,
+          "start_time": 0,
+          "loop": false
+        },
+        "victory": {
+          "media": "",
+          "audio": "",
+          "duration": 9,
+          "start_time": 0,
+          "loop": false
+        },
+        "defeat": {
+          "media": "",
+          "audio": "",
+          "duration": 9,
+          "start_time": 0,
+          "loop": false
+        },
+        "game_end": {
+          "media": "",
+          "audio": "",
+          "duration": 9,
+          "start_time": 0,
+          "loop": false
+        },
+        "objective_steal": {
+          "media": "",
+          "audio": "",
+          "duration": 9,
+          "start_time": 0,
+          "loop": false
+        },
+        "level_up": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "ultimate_learned": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "ability_rank_up": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "respawn": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "inventory_added": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "inventory_removed": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "possible_purchase": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "possible_item_upgrade": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "possible_consumable_use": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "possible_base_visit": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "low_health": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "heavy_health_loss": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "large_heal": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "resource_spent": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "possible_combat": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "low_hp_kill": {
+          "media": "",
+          "audio": "",
+          "duration": 9,
+          "start_time": 0,
+          "loop": false
+        },
+        "low_hp_multikill": {
+          "media": "",
+          "audio": "",
+          "duration": 9,
+          "start_time": 0,
+          "loop": false
+        },
+        "possible_low_hp_escape": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "possible_teamfight": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "possible_objective_fight": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "possible_power_spike": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "cs_milestone": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "vision_activity": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "manpower_advantage": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "possible_roam": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "possible_jungle_activity": {
+          "media": "",
+          "audio": "",
+          "duration": 6,
+          "start_time": 0,
+          "loop": false
+        },
+        "custom_e8bf37104ae1": {
+          "media": "",
+          "audio": "",
+          "duration": 6.0,
+          "start_time": 0.0,
+          "loop": false
+        }
+      },
+      "layout": {
+        "x": 1305,
+        "y": 86,
+        "width": 557,
+        "height": 248
+      }
+    }
+  }
 }

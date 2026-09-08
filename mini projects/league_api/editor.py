@@ -101,6 +101,8 @@ def validate_rule(rule, custom=False):
         if not isinstance(r.get(k,False),bool): raise ValueError(k+' must be true or false')
         r[k]=r.get(k,False)
     r['title']=str(r.get('title',''))[:100]
+    r['audio']=str(r.get('audio',''))
+    if len(r['audio'])>2048: raise ValueError('Audio path too long')
     r['media']=str(r.get('media',''))
     if len(r['media'])>2048: raise ValueError('Media path too long')
     if custom:

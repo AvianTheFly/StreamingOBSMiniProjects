@@ -1,0 +1,417 @@
+{
+  "events": {
+    "game_start": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "minions_spawning": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "first_blood": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "ace": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "turret_destroyed": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "first_turret": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "inhibitor_destroyed": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "inhibitor_respawning_soon": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "inhibitor_respawned": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "void_grub": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "herald": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "baron": {
+      "media": "",
+      "audio": "",
+      "duration": 9,
+      "start_time": 0,
+      "loop": false
+    },
+    "atakhan_legacy": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "kill": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "death": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "assist": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "double_kill": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "triple_kill": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "quadra_kill": {
+      "media": "",
+      "audio": "",
+      "duration": 9,
+      "start_time": 0,
+      "loop": false
+    },
+    "pentakill": {
+      "media": "",
+      "audio": "",
+      "duration": 9,
+      "start_time": 0,
+      "loop": false
+    },
+    "dragon": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "dragon_air": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "dragon_earth": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "dragon_fire": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "dragon_water": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "dragon_hextech": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "dragon_chemtech": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "dragon_elder": {
+      "media": "",
+      "audio": "",
+      "duration": 9,
+      "start_time": 0,
+      "loop": false
+    },
+    "victory": {
+      "media": "",
+      "audio": "",
+      "duration": 9,
+      "start_time": 0,
+      "loop": false
+    },
+    "defeat": {
+      "media": "",
+      "audio": "",
+      "duration": 9,
+      "start_time": 0,
+      "loop": false
+    },
+    "game_end": {
+      "media": "",
+      "audio": "",
+      "duration": 9,
+      "start_time": 0,
+      "loop": false
+    },
+    "objective_steal": {
+      "media": "",
+      "audio": "",
+      "duration": 9,
+      "start_time": 0,
+      "loop": false
+    },
+    "level_up": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "ultimate_learned": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "ability_rank_up": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "respawn": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "inventory_added": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "inventory_removed": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "possible_purchase": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "possible_item_upgrade": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "possible_consumable_use": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "possible_base_visit": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "low_health": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "heavy_health_loss": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "large_heal": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "resource_spent": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "possible_combat": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "low_hp_kill": {
+      "media": "",
+      "audio": "",
+      "duration": 9,
+      "start_time": 0,
+      "loop": false
+    },
+    "low_hp_multikill": {
+      "media": "",
+      "audio": "",
+      "duration": 9,
+      "start_time": 0,
+      "loop": false
+    },
+    "possible_low_hp_escape": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "possible_teamfight": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "possible_objective_fight": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "possible_power_spike": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "cs_milestone": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "vision_activity": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "manpower_advantage": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "possible_roam": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "possible_jungle_activity": {
+      "media": "",
+      "audio": "",
+      "duration": 6,
+      "start_time": 0,
+      "loop": false
+    },
+    "custom_e8bf37104ae1": {
+      "media": "",
+      "audio": "",
+      "duration": 6.0,
+      "start_time": 0.0,
+      "loop": false
+    }
+  }
+}

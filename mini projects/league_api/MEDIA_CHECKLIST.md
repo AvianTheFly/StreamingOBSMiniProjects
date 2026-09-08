@@ -64,3 +64,14 @@ Open http://127.0.0.1:7431/memes for the visual gallery or use the normal event 
 | dragon | Avengers · assemble | 2.85 s | [Tenor](https://tenor.com/view/captain-america-avengers-assemble-gif-22306281) |
 | atakhan_legacy | Avengers · assemble | 2.85 s | [Tenor](https://tenor.com/view/captain-america-avengers-assemble-gif-22306281) |
 | game_end | Avengers · assemble | 2.85 s | [Tenor](https://tenor.com/view/captain-america-avengers-assemble-gif-22306281) |
+
+## Manage or undo the meme pack
+
+Open the League event editor from the Hub.
+
+- **League alerts ON / OFF** stops all League overlay visuals and audio, including previews. It persists across restarts.
+- **Media setup → My setup** restores the presentation from before the meme installation (originally placeholders). Switch back to **Meme pack** any time. Each keeps your media, companion audio, timing, and layout edits separately. Enabled events, detection rules, and current volumes are shared and are not rolled back.
+- **Size & position** has a draggable box with a resize corner, exact pixel fields, and Full canvas. Save applies the layout inside the existing OBS source; its OBS transform is untouched. Up to three simultaneous alerts fit vertically in the remaining space.
+- Select an event to disable it individually, replace its visual, or upload/select an **Optional companion sound**. Save event applies it. Companion sound uses the event clip volume and ends with the alert. Choose No companion sound to remove it.
+
+Settings history remains outside the repository. Switching media setups never restores an older OBS master volume or changes other modules. The League editor is available when OBS is closed; the remaining modules wait for OBS to connect.

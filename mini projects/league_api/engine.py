@@ -60,6 +60,8 @@ class Engine:
         return copy.deepcopy(self.slots)
 
     def submit(self, candidates):
+        if not self.config.get('overlay_enabled',True):
+            self.clear(); return []
         now=self.clock(); self.active()
         for candidate in sorted(candidates,key=lambda a:self.config['events'].get(a['key'],{}).get('priority',0),reverse=True):
             rule=self.config['events'].get(candidate['key'],{})
@@ -79,7 +81,7 @@ class Engine:
             alert=dict(candidate,id=self.serial,family=family,priority=rule['priority'],
                        expires=now+max(1,min(60,rule.get('duration',6))),
                        remaining=max(1,min(60,rule.get('duration',6))),media=rule.get('media',''),volume=rule.get('volume',0.7),
-                       start_time=rule.get('start_time',0),loop=rule.get('loop',False))
+                       start_time=rule.get('start_time',0),loop=rule.get('loop',False),audio=rule.get('audio',''))
             alert['title']=rule.get('title') or candidate.get('title') or key.replace('_',' ').title()
             self.slots.append(alert)
             self.slots.sort(key=lambda a:(a['priority'],a['id']),reverse=True)
