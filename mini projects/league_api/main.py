@@ -2,6 +2,7 @@
 from __future__ import annotations
 import argparse
 import json
+import re
 import copy
 import uuid
 import mimetypes
@@ -140,6 +141,16 @@ class Service:
             def do_GET(self):
                 path=unquote(urlparse(self.path).path)
                 if path=='/settings': self.send_bytes(json.dumps(service.settings()).encode()); return
+                if path in {'/memes','/meme-pack.json'}:
+                    file=ROOT/('meme_gallery.html' if path=='/memes' else 'meme_pack.json')
+                    if not file.is_file(): self.send_error(404); return
+                    self.send_bytes(file.read_bytes(),'text/html; charset=utf-8' if path=='/memes' else 'application/json'); return
+                if path.startswith('/meme-thumbnails/'):
+                    name=path.removeprefix('/meme-thumbnails/')
+                    if not re.fullmatch(r'[a-z0-9-]+\.jpg',name): self.send_error(404); return
+                    file=ROOT/'meme_thumbnails'/name
+                    if not file.is_file(): self.send_error(404); return
+                    self.send_bytes(file.read_bytes(),'image/jpeg'); return
                 if path=='/volume':
                     try: self.send_bytes(json.dumps(service.volume()).encode())
                     except Exception: self.send_bytes(b'{"error":"OBS audio is unavailable. Start OBS with WebSocket enabled."}',status=503)

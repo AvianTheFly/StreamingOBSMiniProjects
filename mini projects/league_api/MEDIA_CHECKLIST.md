@@ -1,64 +1,66 @@
-# Media checklist
+# League meme starter pack
 
-All 58 alert mappings currently use named Hello World placeholders. Reuse the same media for multiple mappings if you like.
+58 built-in mappings use 25 locally saved, silent animations. Existing enabled states, priorities, cooldowns and volumes were preserved. The disabled example custom rule was left alone.
 
-| Event key | Enabled | Priority | Suggested file |
+Open http://127.0.0.1:7431/memes for the visual gallery or use the normal event editor to replace any asset.
+
+| Event | Animation | Alert length | Source |
 | --- | --- | --- | --- |
-| game_start | True | 45 | media/game_start.webm |
-| minions_spawning | True | 25 | media/minions_spawning.webm |
-| first_blood | True | 85 | media/first_blood.webm |
-| ace | True | 88 | media/ace.webm |
-| turret_destroyed | True | 55 | media/turret_destroyed.webm |
-| first_turret | True | 70 | media/first_turret.webm |
-| inhibitor_destroyed | True | 65 | media/inhibitor_destroyed.webm |
-| inhibitor_respawning_soon | True | 30 | media/inhibitor_respawning_soon.webm |
-| inhibitor_respawned | True | 35 | media/inhibitor_respawned.webm |
-| void_grub | True | 48 | media/void_grub.webm |
-| herald | True | 65 | media/herald.webm |
-| baron | True | 90 | media/baron.webm |
-| atakhan_legacy | False | 65 | media/atakhan_legacy.webm |
-| kill | True | 70 | media/kill.webm |
-| death | True | 72 | media/death.webm |
-| assist | True | 50 | media/assist.webm |
-| double_kill | True | 82 | media/double_kill.webm |
-| triple_kill | True | 88 | media/triple_kill.webm |
-| quadra_kill | True | 94 | media/quadra_kill.webm |
-| pentakill | True | 100 | media/pentakill.webm |
-| dragon | True | 68 | media/dragon.webm |
-| dragon_air | True | 68 | media/dragon_air.webm |
-| dragon_earth | True | 68 | media/dragon_earth.webm |
-| dragon_fire | True | 68 | media/dragon_fire.webm |
-| dragon_water | True | 68 | media/dragon_water.webm |
-| dragon_hextech | True | 68 | media/dragon_hextech.webm |
-| dragon_chemtech | True | 68 | media/dragon_chemtech.webm |
-| dragon_elder | True | 92 | media/dragon_elder.webm |
-| victory | True | 99 | media/victory.webm |
-| defeat | True | 99 | media/defeat.webm |
-| game_end | True | 99 | media/game_end.webm |
-| objective_steal | True | 96 | media/objective_steal.webm |
-| level_up | True | 35 | media/level_up.webm |
-| ultimate_learned | True | 60 | media/ultimate_learned.webm |
-| ability_rank_up | False | 25 | media/ability_rank_up.webm |
-| respawn | True | 40 | media/respawn.webm |
-| inventory_added | True | 30 | media/inventory_added.webm |
-| inventory_removed | False | 20 | media/inventory_removed.webm |
-| possible_purchase | True | 40 | media/possible_purchase.webm |
-| possible_item_upgrade | True | 50 | media/possible_item_upgrade.webm |
-| possible_consumable_use | False | 20 | media/possible_consumable_use.webm |
-| possible_base_visit | True | 58 | media/possible_base_visit.webm |
-| low_health | True | 60 | media/low_health.webm |
-| heavy_health_loss | True | 55 | media/heavy_health_loss.webm |
-| large_heal | True | 35 | media/large_heal.webm |
-| resource_spent | False | 15 | media/resource_spent.webm |
-| possible_combat | True | 40 | media/possible_combat.webm |
-| low_hp_kill | True | 91 | media/low_hp_kill.webm |
-| low_hp_multikill | True | 97 | media/low_hp_multikill.webm |
-| possible_low_hp_escape | True | 85 | media/possible_low_hp_escape.webm |
-| possible_teamfight | True | 75 | media/possible_teamfight.webm |
-| possible_objective_fight | True | 80 | media/possible_objective_fight.webm |
-| possible_power_spike | True | 55 | media/possible_power_spike.webm |
-| cs_milestone | True | 30 | media/cs_milestone.webm |
-| vision_activity | False | 20 | media/vision_activity.webm |
-| manpower_advantage | True | 45 | media/manpower_advantage.webm |
-| possible_roam | False | 30 | media/possible_roam.webm |
-| possible_jungle_activity | False | 20 | media/possible_jungle_activity.webm |
+| dragon_earth | Toph · metal armor | 3.5 s | [Tenor](https://tenor.com/view/toph-earth-gif-19798404) |
+| dragon_water | Katara · waterbending | 1.5 s | [Tenor](https://tenor.com/view/waterbending-katara-avatar-the-last-airbender-launching-an-attack-avatar-the-last-airbender-gif-6056691136052577982) |
+| large_heal | Katara · waterbending | 1.5 s | [Tenor](https://tenor.com/view/waterbending-katara-avatar-the-last-airbender-launching-an-attack-avatar-the-last-airbender-gif-6056691136052577982) |
+| dragon_fire | Zuko · firebending | 1.5 s | [Tenor](https://tenor.com/view/avatar-zuko-agni-kai-gif-25749112) |
+| dragon_air | Lightning McQueen · I am speed | 3.5 s | [Tenor](https://tenor.com/view/speed-i-am-speed-lightning-mcqueen-cars-meme-gif-14031708) |
+| possible_roam | Lightning McQueen · I am speed | 3.5 s | [Tenor](https://tenor.com/view/speed-i-am-speed-lightning-mcqueen-cars-meme-gif-14031708) |
+| dragon_hextech | Palpatine · unlimited power | 3.5 s | [Tenor](https://tenor.com/view/unlimited-power-palpatine-star-wars-gif-17950416) |
+| dragon_elder | Palpatine · unlimited power | 3.5 s | [Tenor](https://tenor.com/view/unlimited-power-palpatine-star-wars-gif-17950416) |
+| ultimate_learned | Palpatine · unlimited power | 3.5 s | [Tenor](https://tenor.com/view/unlimited-power-palpatine-star-wars-gif-17950416) |
+| dragon_chemtech | Jesse Pinkman · science | 1.9 s | [Tenor](https://tenor.com/view/breakingbad-science-yeah-science-gif-5954775) |
+| possible_item_upgrade | Jesse Pinkman · science | 1.9 s | [Tenor](https://tenor.com/view/breakingbad-science-yeah-science-gif-5954775) |
+| ace | Thanos · snap | 1.6 s | [Tenor](https://tenor.com/view/thanos-thanos-snap-gif-8045987460909459081) |
+| pentakill | Thanos · snap | 1.6 s | [Tenor](https://tenor.com/view/thanos-thanos-snap-gif-8045987460909459081) |
+| victory | Tobey Maguire · victory dance | 3.5 s | [Tenor](https://tenor.com/view/spiderman-tobey-maguire-dance-dancing-swag-gif-4628441) |
+| double_kill | Tobey Maguire · victory dance | 3.5 s | [Tenor](https://tenor.com/view/spiderman-tobey-maguire-dance-dancing-swag-gif-4628441) |
+| triple_kill | Tobey Maguire · victory dance | 3.5 s | [Tenor](https://tenor.com/view/spiderman-tobey-maguire-dance-dancing-swag-gif-4628441) |
+| quadra_kill | Tobey Maguire · victory dance | 3.5 s | [Tenor](https://tenor.com/view/spiderman-tobey-maguire-dance-dancing-swag-gif-4628441) |
+| death | Michael Scott · no! | 1.8 s | [Tenor](https://tenor.com/view/no-god-please-no-no-please-no-no-god-no-yelling-gif-26334008) |
+| defeat | Michael Scott · no! | 1.8 s | [Tenor](https://tenor.com/view/no-god-please-no-no-please-no-no-god-no-yelling-gif-26334008) |
+| objective_steal | Swiper · stealing | 3.4 s | [Tenor](https://tenor.com/view/stealing-sneaky-dora-swiper-got-em-gif-18068456) |
+| level_up | Goku · Super Saiyan | 1.5 s | [Tenor](https://tenor.com/view/dragon-ball-super-saiyan-goku-gif-5009523) |
+| ability_rank_up | Goku · Super Saiyan | 1.5 s | [Tenor](https://tenor.com/view/dragon-ball-super-saiyan-goku-gif-5009523) |
+| possible_power_spike | Goku · Super Saiyan | 1.5 s | [Tenor](https://tenor.com/view/dragon-ball-super-saiyan-goku-gif-5009523) |
+| low_hp_kill | Goku · Super Saiyan | 1.5 s | [Tenor](https://tenor.com/view/dragon-ball-super-saiyan-goku-gif-5009523) |
+| low_hp_multikill | Goku · Super Saiyan | 1.5 s | [Tenor](https://tenor.com/view/dragon-ball-super-saiyan-goku-gif-5009523) |
+| possible_purchase | Fry · take my money | 1.71 s | [Tenor](https://tenor.com/view/shut-up-and-take-my-money-gif-13250127) |
+| inventory_added | Fry · take my money | 1.71 s | [Tenor](https://tenor.com/view/shut-up-and-take-my-money-gif-13250127) |
+| inventory_removed | Fry · take my money | 1.71 s | [Tenor](https://tenor.com/view/shut-up-and-take-my-money-gif-13250127) |
+| possible_teamfight | Elmo · chaos | 1.5 s | [Tenor](https://tenor.com/view/excited-fuego-gif-26833875) |
+| possible_objective_fight | Elmo · chaos | 1.5 s | [Tenor](https://tenor.com/view/excited-fuego-gif-26833875) |
+| possible_combat | Elmo · chaos | 1.5 s | [Tenor](https://tenor.com/view/excited-fuego-gif-26833875) |
+| heavy_health_loss | Steven He · emotional damage | 3.2 s | [Tenor](https://tenor.com/view/steven-he-emotional-damage-steven-he-emotional-damage-gif-23428142) |
+| assist | Baymax · fist bump | 3.4 s | [Tenor](https://tenor.com/view/fist-bump-big-hero-six-baymax-balalalala-bye-gif-16204318) |
+| game_start | Minions · reporting for duty | 1.5 s | [Tenor](https://tenor.com/view/dancing-minion-gif-24225602) |
+| minions_spawning | Minions · reporting for duty | 1.5 s | [Tenor](https://tenor.com/view/dancing-minion-gif-24225602) |
+| turret_destroyed | Ralph · wreck it | 1.54 s | [Tenor](https://tenor.com/view/wreckitralph-wreck-ralph-imgonnawreckit-gif-4788892) |
+| first_turret | Ralph · wreck it | 1.54 s | [Tenor](https://tenor.com/view/wreckitralph-wreck-ralph-imgonnawreckit-gif-4788892) |
+| inhibitor_destroyed | Ralph · wreck it | 1.54 s | [Tenor](https://tenor.com/view/wreckitralph-wreck-ralph-imgonnawreckit-gif-4788892) |
+| herald | Ralph · wreck it | 1.54 s | [Tenor](https://tenor.com/view/wreckitralph-wreck-ralph-imgonnawreckit-gif-4788892) |
+| void_grub | Simba · slimy yet satisfying | 2.7 s | [Tenor](https://tenor.com/view/simba-thelionking-slimy-satisfying-gif-5416128) |
+| possible_jungle_activity | Simba · slimy yet satisfying | 2.7 s | [Tenor](https://tenor.com/view/simba-thelionking-slimy-satisfying-gif-5416128) |
+| respawn | Terminator · I will be back | 2.7 s | [Tenor](https://tenor.com/view/ill-be-back-sunglasses-terminator-arnold-schwarzenegger-gif-15916083) |
+| inhibitor_respawning_soon | Terminator · I will be back | 2.7 s | [Tenor](https://tenor.com/view/ill-be-back-sunglasses-terminator-arnold-schwarzenegger-gif-15916083) |
+| inhibitor_respawned | Terminator · I will be back | 2.7 s | [Tenor](https://tenor.com/view/ill-be-back-sunglasses-terminator-arnold-schwarzenegger-gif-15916083) |
+| cs_milestone | Stonks | 1.5 s | [Tenor](https://tenor.com/view/stonks-up-stongs-meme-stocks-gif-15715298) |
+| manpower_advantage | Stonks | 1.5 s | [Tenor](https://tenor.com/view/stonks-up-stongs-meme-stocks-gif-15715298) |
+| vision_activity | The Rock · eyebrow | 1.5 s | [Tenor](https://tenor.com/view/rock-one-eyebrow-raised-rock-staring-the-rock-gif-22113367) |
+| possible_low_hp_escape | Homer · disappearing into the hedge | 2.9 s | [Tenor](https://tenor.com/view/the-s-impsons-bush-homer-simpsons-homer-hiding-gif-4325800) |
+| possible_base_visit | Homer · disappearing into the hedge | 2.9 s | [Tenor](https://tenor.com/view/the-s-impsons-bush-homer-simpsons-homer-hiding-gif-4325800) |
+| low_health | This is fine | 2.12 s | [Tenor](https://tenor.com/view/this-is-fine-gif-24177057) |
+| resource_spent | This is fine | 2.12 s | [Tenor](https://tenor.com/view/this-is-fine-gif-24177057) |
+| possible_consumable_use | This is fine | 2.12 s | [Tenor](https://tenor.com/view/this-is-fine-gif-24177057) |
+| kill | Squidward · dab | 1.6 s | [Tenor](https://tenor.com/view/squidward-dab-dabbing-gif-13749351) |
+| first_blood | Squidward · dab | 1.6 s | [Tenor](https://tenor.com/view/squidward-dab-dabbing-gif-13749351) |
+| baron | Avengers · assemble | 2.85 s | [Tenor](https://tenor.com/view/captain-america-avengers-assemble-gif-22306281) |
+| dragon | Avengers · assemble | 2.85 s | [Tenor](https://tenor.com/view/captain-america-avengers-assemble-gif-22306281) |
+| atakhan_legacy | Avengers · assemble | 2.85 s | [Tenor](https://tenor.com/view/captain-america-avengers-assemble-gif-22306281) |
+| game_end | Avengers · assemble | 2.85 s | [Tenor](https://tenor.com/view/captain-america-avengers-assemble-gif-22306281) |

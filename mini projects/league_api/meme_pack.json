@@ -1,0 +1,414 @@
+{
+  "name": "League meme starter pack",
+  "silent": true,
+  "assets": [
+    {
+      "id": "toph-armor",
+      "title": "Toph · metal armor",
+      "joke": "Earthbender armor for Mountain Dragon.",
+      "source": "https://tenor.com/view/toph-earth-gif-19798404",
+      "download": "https://media.tenor.com/p4H0Cr8LZUsAAAPo/toph-earth.mp4",
+      "media": "media/meme-toph-armor.mp4",
+      "duration": 6.6,
+      "start_time": 1.3,
+      "display_seconds": 3.5,
+      "events": [
+        "dragon_earth"
+      ],
+      "bytes": 625537
+    },
+    {
+      "id": "katara-water",
+      "title": "Katara · waterbending",
+      "joke": "Ocean Dragon comes with a waterbending lesson.",
+      "source": "https://tenor.com/view/waterbending-katara-avatar-the-last-airbender-launching-an-attack-avatar-the-last-airbender-gif-6056691136052577982",
+      "download": "https://media.tenor.com/VA2wf56rxr4AAAPo/waterbending-katara.mp4",
+      "media": "media/meme-katara-water.mp4",
+      "duration": 1.32,
+      "start_time": 0,
+      "display_seconds": 1.5,
+      "events": [
+        "dragon_water",
+        "large_heal"
+      ],
+      "bytes": 109436
+    },
+    {
+      "id": "zuko-fire",
+      "title": "Zuko · firebending",
+      "joke": "Infernal Dragon: Fire Nation privileges.",
+      "source": "https://tenor.com/view/avatar-zuko-agni-kai-gif-25749112",
+      "download": "https://media.tenor.com/6P0wpbRmJu4AAAPo/avatar-zuko.mp4",
+      "media": "media/meme-zuko-fire.mp4",
+      "duration": 0.9,
+      "start_time": 0,
+      "display_seconds": 1.5,
+      "events": [
+        "dragon_fire"
+      ],
+      "bytes": 161191
+    },
+    {
+      "id": "mcqueen-speed",
+      "title": "Lightning McQueen · I am speed",
+      "joke": "Cloud Dragon means speed. Also a roaming joke.",
+      "source": "https://tenor.com/view/speed-i-am-speed-lightning-mcqueen-cars-meme-gif-14031708",
+      "download": "https://media.tenor.com/l6CJxGWdYAoAAAPo/speed-i-am-speed.mp4",
+      "media": "media/meme-mcqueen-speed.mp4",
+      "duration": 3.8,
+      "start_time": 0,
+      "display_seconds": 3.5,
+      "events": [
+        "dragon_air",
+        "possible_roam"
+      ],
+      "bytes": 459471
+    },
+    {
+      "id": "palpatine-power",
+      "title": "Palpatine · unlimited power",
+      "joke": "Lightning for Hextech; absurd power for Elder.",
+      "source": "https://tenor.com/view/unlimited-power-palpatine-star-wars-gif-17950416",
+      "download": "https://media.tenor.com/2FV32IbG_KUAAAPo/unlimited-power-palpatine.mp4",
+      "media": "media/meme-palpatine-power.mp4",
+      "duration": 4.84,
+      "start_time": 0,
+      "display_seconds": 3.5,
+      "events": [
+        "dragon_hextech",
+        "dragon_elder",
+        "ultimate_learned"
+      ],
+      "bytes": 963380
+    },
+    {
+      "id": "jesse-science",
+      "title": "Jesse Pinkman · science",
+      "joke": "Chemtech is a chemistry experiment.",
+      "source": "https://tenor.com/view/breakingbad-science-yeah-science-gif-5954775",
+      "download": "https://media.tenor.com/CughyuQS8XIAAAPo/breakingbad-science.mp4",
+      "media": "media/meme-jesse-science.mp4",
+      "duration": 1.9,
+      "start_time": 0,
+      "display_seconds": 1.9,
+      "events": [
+        "dragon_chemtech",
+        "possible_item_upgrade"
+      ],
+      "bytes": 91975
+    },
+    {
+      "id": "thanos-snap",
+      "title": "Thanos · snap",
+      "joke": "The enemy team has left the chat.",
+      "source": "https://tenor.com/view/thanos-thanos-snap-gif-8045987460909459081",
+      "download": "https://media.tenor.com/b6kW91rBZokAAAPo/thanos-thanos-snap.mp4",
+      "media": "media/meme-thanos-snap.mp4",
+      "duration": 1.6,
+      "start_time": 0,
+      "display_seconds": 1.6,
+      "events": [
+        "ace",
+        "pentakill"
+      ],
+      "bytes": 141475
+    },
+    {
+      "id": "tobey-dance",
+      "title": "Tobey Maguire · victory dance",
+      "joke": "A little victory lap after a win or a multikill.",
+      "source": "https://tenor.com/view/spiderman-tobey-maguire-dance-dancing-swag-gif-4628441",
+      "download": "https://media.tenor.com/7PpiVBTIBXQAAAPo/spiderman-tobey-maguire.mp4",
+      "media": "media/meme-tobey-dance.mp4",
+      "duration": 5.8,
+      "start_time": 0,
+      "display_seconds": 3.5,
+      "events": [
+        "victory",
+        "double_kill",
+        "triple_kill",
+        "quadra_kill"
+      ],
+      "bytes": 163943
+    },
+    {
+      "id": "michael-no",
+      "title": "Michael Scott · no!",
+      "joke": "An appropriately dramatic reaction to dying or losing.",
+      "source": "https://tenor.com/view/no-god-please-no-no-please-no-no-god-no-yelling-gif-26334008",
+      "download": "https://media.tenor.com/ylEjkilSyXwAAAPo/no-god-please-no-no.mp4",
+      "media": "media/meme-michael-no.mp4",
+      "duration": 1.8,
+      "start_time": 0,
+      "display_seconds": 1.8,
+      "events": [
+        "death",
+        "defeat"
+      ],
+      "bytes": 159719
+    },
+    {
+      "id": "swiper-steal",
+      "title": "Swiper · stealing",
+      "joke": "The objective was borrowed without permission.",
+      "source": "https://tenor.com/view/stealing-sneaky-dora-swiper-got-em-gif-18068456",
+      "download": "https://media.tenor.com/kFl01e4iCfQAAAPo/stealing-sneaky.mp4",
+      "media": "media/meme-swiper-steal.mp4",
+      "duration": 3.4,
+      "start_time": 0,
+      "display_seconds": 3.4,
+      "events": [
+        "objective_steal"
+      ],
+      "bytes": 543819
+    },
+    {
+      "id": "goku-power",
+      "title": "Goku · Super Saiyan",
+      "joke": "Level-ups, power spikes, and unlikely low-health wins.",
+      "source": "https://tenor.com/view/dragon-ball-super-saiyan-goku-gif-5009523",
+      "download": "https://media.tenor.com/bWkE0Y8JaBgAAAPo/dragon-ball-super-saiyan.mp4",
+      "media": "media/meme-goku-power.mp4",
+      "duration": 1.4,
+      "start_time": 0,
+      "display_seconds": 1.5,
+      "events": [
+        "level_up",
+        "ability_rank_up",
+        "possible_power_spike",
+        "low_hp_kill",
+        "low_hp_multikill"
+      ],
+      "bytes": 301356
+    },
+    {
+      "id": "fry-money",
+      "title": "Fry · take my money",
+      "joke": "Shopping trip detected. Financial decisions were made.",
+      "source": "https://tenor.com/view/shut-up-and-take-my-money-gif-13250127",
+      "download": "https://media.tenor.com/dXkKnk4UuV8AAAPo/shut-up-and-take-my-money.mp4",
+      "media": "media/meme-fry-money.mp4",
+      "duration": 1.71,
+      "start_time": 0,
+      "display_seconds": 1.71,
+      "events": [
+        "possible_purchase",
+        "inventory_added",
+        "inventory_removed"
+      ],
+      "bytes": 72235
+    },
+    {
+      "id": "elmo-fire",
+      "title": "Elmo · chaos",
+      "joke": "A teamfight, or several unrelated disasters close together.",
+      "source": "https://tenor.com/view/excited-fuego-gif-26833875",
+      "download": "https://media.tenor.com/lcehRTIw1_8AAAPo/excited-fuego.mp4",
+      "media": "media/meme-elmo-fire.mp4",
+      "duration": 0.9,
+      "start_time": 0,
+      "display_seconds": 1.5,
+      "events": [
+        "possible_teamfight",
+        "possible_objective_fight",
+        "possible_combat"
+      ],
+      "bytes": 161758
+    },
+    {
+      "id": "emotional-damage",
+      "title": "Steven He · emotional damage",
+      "joke": "A large chunk of your health just disappeared.",
+      "source": "https://tenor.com/view/steven-he-emotional-damage-steven-he-emotional-damage-gif-23428142",
+      "download": "https://media.tenor.com/DJzXAnJQHm8AAAPo/steven-he-emotional-damage-steven-he.mp4",
+      "media": "media/meme-emotional-damage.mp4",
+      "duration": 3.2,
+      "start_time": 0,
+      "display_seconds": 3.2,
+      "events": [
+        "heavy_health_loss"
+      ],
+      "bytes": 718827
+    },
+    {
+      "id": "baymax-bump",
+      "title": "Baymax · fist bump",
+      "joke": "Support-player appreciation.",
+      "source": "https://tenor.com/view/fist-bump-big-hero-six-baymax-balalalala-bye-gif-16204318",
+      "download": "https://media.tenor.com/RVL9MMi9gi8AAAPo/fist-bump-big-hero-six.mp4",
+      "media": "media/meme-baymax-bump.mp4",
+      "duration": 3.4,
+      "start_time": 0,
+      "display_seconds": 3.4,
+      "events": [
+        "assist"
+      ],
+      "bytes": 1267889
+    },
+    {
+      "id": "minions-dance",
+      "title": "Minions · reporting for duty",
+      "joke": "Literal minions arriving for their shift.",
+      "source": "https://tenor.com/view/dancing-minion-gif-24225602",
+      "download": "https://media.tenor.com/u6r8fswiki4AAAPo/dancing-minion.mp4",
+      "media": "media/meme-minions-dance.mp4",
+      "duration": 1.12,
+      "start_time": 0,
+      "display_seconds": 1.5,
+      "events": [
+        "game_start",
+        "minions_spawning"
+      ],
+      "bytes": 486160
+    },
+    {
+      "id": "ralph-wreck",
+      "title": "Ralph · wreck it",
+      "joke": "Tower demolition and Herald doing Herald things.",
+      "source": "https://tenor.com/view/wreckitralph-wreck-ralph-imgonnawreckit-gif-4788892",
+      "download": "https://media.tenor.com/U8kLQrvqvL4AAAPo/wreckitralph-wreck.mp4",
+      "media": "media/meme-ralph-wreck.mp4",
+      "duration": 1.54,
+      "start_time": 0,
+      "display_seconds": 1.54,
+      "events": [
+        "turret_destroyed",
+        "first_turret",
+        "inhibitor_destroyed",
+        "herald"
+      ],
+      "bytes": 21551
+    },
+    {
+      "id": "simba-grub",
+      "title": "Simba · slimy yet satisfying",
+      "joke": "Void Grubs: the forbidden snack.",
+      "source": "https://tenor.com/view/simba-thelionking-slimy-satisfying-gif-5416128",
+      "download": "https://media.tenor.com/xZNkcStLNtkAAAPo/simba-thelionking.mp4",
+      "media": "media/meme-simba-grub.mp4",
+      "duration": 2.7,
+      "start_time": 0,
+      "display_seconds": 2.7,
+      "events": [
+        "void_grub",
+        "possible_jungle_activity"
+      ],
+      "bytes": 151350
+    },
+    {
+      "id": "terminator-back",
+      "title": "Terminator · I will be back",
+      "joke": "Respawns and structures returning from the dead.",
+      "source": "https://tenor.com/view/ill-be-back-sunglasses-terminator-arnold-schwarzenegger-gif-15916083",
+      "download": "https://media.tenor.com/jIBAZnwaM4EAAAPo/ill-be-back-sunglasses.mp4",
+      "media": "media/meme-terminator-back.mp4",
+      "duration": 2.7,
+      "start_time": 0,
+      "display_seconds": 2.7,
+      "events": [
+        "respawn",
+        "inhibitor_respawning_soon",
+        "inhibitor_respawned"
+      ],
+      "bytes": 582252
+    },
+    {
+      "id": "stonks",
+      "title": "Stonks",
+      "joke": "Farming milestones and numerical advantages.",
+      "source": "https://tenor.com/view/stonks-up-stongs-meme-stocks-gif-15715298",
+      "download": "https://media.tenor.com/wjS2sXen8iMAAAPo/stonks-up-stongs.mp4",
+      "media": "media/meme-stonks.mp4",
+      "duration": 1.08,
+      "start_time": 0,
+      "display_seconds": 1.5,
+      "events": [
+        "cs_milestone",
+        "manpower_advantage"
+      ],
+      "bytes": 276657
+    },
+    {
+      "id": "rock-eyebrow",
+      "title": "The Rock · eyebrow",
+      "joke": "Vision detected. Someone is being watched.",
+      "source": "https://tenor.com/view/rock-one-eyebrow-raised-rock-staring-the-rock-gif-22113367",
+      "download": "https://media.tenor.com/kHcmsxlKHEAAAAPo/rock-one-eyebrow-raised-rock-staring.mp4",
+      "media": "media/meme-rock-eyebrow.mp4",
+      "duration": 1.3,
+      "start_time": 0,
+      "display_seconds": 1.5,
+      "events": [
+        "vision_activity"
+      ],
+      "bytes": 260664
+    },
+    {
+      "id": "homer-bush",
+      "title": "Homer · disappearing into the hedge",
+      "joke": "Survived on a sliver of health. Quietly leave.",
+      "source": "https://tenor.com/view/the-s-impsons-bush-homer-simpsons-homer-hiding-gif-4325800",
+      "download": "https://media.tenor.com/pXe-GokoyA0AAAPo/the-s-impsons-bush.mp4",
+      "media": "media/meme-homer-bush.mp4",
+      "duration": 2.9,
+      "start_time": 0,
+      "display_seconds": 2.9,
+      "events": [
+        "possible_low_hp_escape",
+        "possible_base_visit"
+      ],
+      "bytes": 259897
+    },
+    {
+      "id": "this-is-fine",
+      "title": "This is fine",
+      "joke": "Low health, no resources, and impeccable composure.",
+      "source": "https://tenor.com/view/this-is-fine-gif-24177057",
+      "download": "https://media.tenor.com/MYZgsN2TDJAAAAPo/this-is.mp4",
+      "media": "media/meme-this-is-fine.mp4",
+      "duration": 2.121547,
+      "start_time": 0,
+      "display_seconds": 2.12,
+      "events": [
+        "low_health",
+        "resource_spent",
+        "possible_consumable_use"
+      ],
+      "bytes": 738070
+    },
+    {
+      "id": "squidward-dab",
+      "title": "Squidward · dab",
+      "joke": "A short, undeservedly confident celebration.",
+      "source": "https://tenor.com/view/squidward-dab-dabbing-gif-13749351",
+      "download": "https://media.tenor.com/sS7DgiGlryUAAAPo/squidward-dab.mp4",
+      "media": "media/meme-squidward-dab.mp4",
+      "duration": 1.6,
+      "start_time": 0,
+      "display_seconds": 1.6,
+      "events": [
+        "kill",
+        "first_blood"
+      ],
+      "bytes": 59808
+    },
+    {
+      "id": "avengers",
+      "title": "Avengers · assemble",
+      "joke": "Big-monster objectives require the whole squad.",
+      "source": "https://tenor.com/view/captain-america-avengers-assemble-gif-22306281",
+      "download": "https://media.tenor.com/ooc8rKAkdlwAAAPo/captain-america-avengers.mp4",
+      "media": "media/meme-avengers.mp4",
+      "duration": 2.85,
+      "start_time": 0,
+      "display_seconds": 2.85,
+      "events": [
+        "baron",
+        "dragon",
+        "atakhan_legacy",
+        "game_end"
+      ],
+      "bytes": 2003022
+    }
+  ]
+}
