@@ -50,7 +50,8 @@ Start with the layer that owns the change; these files are shared by the running
 | Shared asset/hotkey editor | `lib/hotkey_editor/`; `hotkey_editor.py` is its launcher |
 | Hotkey-editor labels, field types and visibility | `lib/hotkey_editor/schema.py` |
 | Playback arbitration between modules | `coordinator.py`, `hub_rules.py` |
-| Module interfaces and event bus | `shared.py`, `events.py` |
+| Live module interfaces and registry | `lib/project_runtime.py` (also exported by `shared.py`) |
+| Shared hotkey/voice helpers and event bus | `shared.py`, `events.py` |
 | OBS operations | `obs/` |
 | Shared-source per-asset volume tracking | `lib/asset_fader.py` |
 | Settings transactions and recovery | `lib/project_settings.py`, `lib/settings_backups.py` |
