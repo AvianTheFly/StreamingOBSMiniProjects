@@ -13,6 +13,7 @@ from lib.shared_media.layout_rules import (
 )
 from lib.shared_media.single_source_state import SingleSourceStateStore
 from lib.shared_media.playback_worker import PlaybackWorker
+from lib.shared_media.media_startup import media_startup
 
 from .config import CONFIG
 
@@ -128,37 +129,29 @@ class SoundboardPlayer:
                 return
             print(f"{_TAG} Playing: '{SINGLE_SOURCE_NAME}'")
 
-            self._stop_and_hide_source()
-            if self._cancelled():
-                return
-            self._state_store.apply_for_stem(stem)
-            state_applied = True
-            if not self._state_store.has_transform_override(stem):
-                self._apply_layout_rule(stem, filepath, categories)
-            self._apply_runtime_audio_settings(volume_db)
-
-            if self._cancelled():
-                return
-            # Finish presentation/audio setup BEFORE the file change; OBS
-            # starts a changed file automatically, including hidden sources.
-            changed = obs.set_media_source_file(SINGLE_SOURCE_NAME, filepath, managed_decode=True)
-            same_file = not changed
-            if changed:
-                if not self._wait_for_media_file(filepath):
+            with media_startup(SINGLE_SOURCE_NAME, cancelled=self._cancelled, timeout=CONFIG.media_start_timeout):
+                self._stop_and_hide_source()
+                self._state_store.apply_for_stem(stem)
+                state_applied = True
+                if not self._state_store.has_transform_override(stem):
+                    self._apply_layout_rule(stem, filepath, categories)
+                self._apply_runtime_audio_settings(volume_db)
+                if self._cancelled():
+                    return
+                # Prepare presentation BEFORE the file change's implicit start.
+                changed = obs.set_media_source_file(SINGLE_SOURCE_NAME, filepath, managed_decode=True)
+                if changed and not self._wait_for_media_file(filepath):
                     raise RuntimeError(f"OBS did not confirm file swap to '{filepath.name}'.")
-            if self._cancelled():
-                return
-            obs.show_source(CONFIG.scene, SINGLE_SOURCE_NAME)
-            settle = max(0.0, float(getattr(CONFIG, "media_swap_settle_ms", 0) or 0) / 1000.0)
-            if settle > 0:
-                time.sleep(settle)
-            else:
-                time.sleep(0.03)
-
-            if self._cancelled():
-                return
-            if same_file:
-                obs.restart_media(SINGLE_SOURCE_NAME)
+                if self._cancelled():
+                    return
+                obs.show_source(CONFIG.scene, SINGLE_SOURCE_NAME)
+                settle = max(0.0, float(getattr(CONFIG, 'media_swap_settle_ms', 0) or 0) / 1000.0)
+                if settle:
+                    time.sleep(settle)
+                if self._cancelled():
+                    return
+                if not changed:
+                    obs.restart_media(SINGLE_SOURCE_NAME)
             started = self._poll_until_done(expected_file=filepath)
             if not started and not self._abort_flag:
                 raise RuntimeError(f"Playback did not start cleanly for '{filepath.name}'.")

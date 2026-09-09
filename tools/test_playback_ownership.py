@@ -2,6 +2,7 @@
 import sys
 import threading
 import unittest
+from contextlib import nullcontext
 from pathlib import Path
 from unittest.mock import Mock, patch
 
@@ -57,6 +58,14 @@ class WorkerTests(unittest.TestCase):
 
 
 class DirectPlaybackTests(unittest.TestCase):
+    def setUp(self):
+        # Player tests isolate OBS startup; the shared gate has separate
+        # threaded tests that exercise real ownership and cancellation.
+        for module in ('soundboard.player', 'specific_song.player', 'lib.shared_media.media_project'):
+            mock = patch(module + '.media_startup', return_value=nullcontext())
+            mock.start()
+            self.addCleanup(mock.stop)
+
     def test_soundboard_changed_file_has_no_redundant_restart(self):
         for same in (False, True):
             with self.subTest(same=same), patch('soundboard.player.obs') as obs, \

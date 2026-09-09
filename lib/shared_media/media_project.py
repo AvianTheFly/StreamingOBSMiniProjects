@@ -44,6 +44,7 @@ from .controls import (
     parse_sequences,
 )
 from .single_source_state import SingleSourceStateStore
+from .media_startup import media_startup
 
 
 def _feature_enabled(cfg: MediaProjectConfig, key: str, default: bool) -> bool:
@@ -103,6 +104,19 @@ _MEDIA_STATE_TERMINAL = {
 
 
 def _start_media_source_playback(
+    *, scene: str, source_name: str, filepath: Path, start_timeout: float,
+    swap_settle_ms: int = 0, cancelled=lambda: False,
+) -> bool:
+    with media_startup(source_name, cancelled=cancelled, timeout=start_timeout):
+        if not _start_media_source_uncoordinated(
+            scene=scene, source_name=source_name, filepath=filepath,
+            start_timeout=start_timeout, swap_settle_ms=swap_settle_ms,
+        ):
+            raise RuntimeError(f"OBS did not start '{source_name}'")
+    return True
+
+
+def _start_media_source_uncoordinated(
     *,
     scene: str,
     source_name: str,
@@ -708,6 +722,7 @@ def run_media_project(
                         filepath=filepath,
                         start_timeout=cfg.media_start_timeout,
                         swap_settle_ms=max(0, int(getattr(cfg, "media_swap_settle_ms", 0) or 0)),
+                        cancelled=lambda: current_play_request_id[0] != request_id,
                     )
                     if started_ok:
                         apply_runtime_audio_settings(source_name, name)
@@ -715,11 +730,11 @@ def run_media_project(
                         print(f"[{cfg.project_name}] Playback may not have started cleanly for '{filepath.name}'.")
                         raise RuntimeError(f"Shared source '{source_name}' did not start playback cleanly.")
                 else:
-                    obs.stop_media(source_name)
-                    changed = obs.set_media_source_file(source_name, filepath, managed_decode=True)
-                    obs.show_source(cfg.scene, source_name)
-                    if not changed:
-                        obs.restart_media(source_name)
+                    _start_media_source_playback(
+                        scene=cfg.scene, source_name=source_name, filepath=filepath,
+                        start_timeout=cfg.media_start_timeout,
+                        cancelled=lambda: current_play_request_id[0] != request_id,
+                    )
                 obs.wait_for_media_end(
                     source_name,
                     start_timeout=cfg.media_start_timeout,
@@ -803,11 +818,10 @@ def run_media_project(
                     print(f"[{cfg.project_name}] Concurrent playback may not have started cleanly for '{filepath.name}'.")
                     raise RuntimeError(f"Shared source '{source_name}' did not start playback cleanly.")
             else:
-                obs.stop_media(source_name)
-                changed = obs.set_media_source_file(source_name, filepath, managed_decode=True)
-                obs.show_source(cfg.scene, source_name)
-                if not changed:
-                    obs.restart_media(source_name)
+                _start_media_source_playback(
+                    scene=cfg.scene, source_name=source_name, filepath=filepath,
+                    start_timeout=cfg.media_start_timeout,
+                )
             obs.wait_for_media_end(
                 source_name,
                 start_timeout=cfg.media_start_timeout,

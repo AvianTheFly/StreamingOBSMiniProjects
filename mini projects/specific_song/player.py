@@ -22,6 +22,7 @@ import obs  # root-level obs package — always on sys.path from hub
 from lib.project_settings import load_project_settings, shift_asset_volume_db, audio_settings_transaction
 from lib.shared_media.controls import effective_volume_db
 from lib.shared_media.playback_worker import PlaybackWorker
+from lib.shared_media.media_startup import media_startup
 
 from .config import (
     SCENE,
@@ -278,32 +279,24 @@ class SongPlayer:
             if self._cancelled():
                 return
 
-            # Set the new asset's level before changing local_file: OBS starts
-            # the new decoder as part of that update, even while hidden.
-            self._set_monitor_and_output(SINGLE_SOURCE_NAME)
-            obs.set_input_volume_db(SINGLE_SOURCE_NAME, self.volume_for_stem(stem))
-            volume_applied = True
-
-            # Point the single source at this song's file before showing it.
-            obs.stop_media(SINGLE_SOURCE_NAME)
-            obs.hide_source(SCENE, SINGLE_SOURCE_NAME)
-            same_file = not obs.set_media_source_file(SINGLE_SOURCE_NAME, audio_file, managed_decode=True)
-            if not self._wait_for_media_file(SINGLE_SOURCE_NAME, audio_file):
-                raise RuntimeError(f"OBS did not confirm file swap to '{audio_file.name}'.")
-
-            if self._cancelled():
-                return
-            obs.show_source(SCENE, SINGLE_SOURCE_NAME)
+            with media_startup(SINGLE_SOURCE_NAME, cancelled=self._cancelled, timeout=MEDIA_START_TIMEOUT):
+                obs.stop_media(SINGLE_SOURCE_NAME)
+                obs.hide_source(SCENE, SINGLE_SOURCE_NAME)
+                self._set_monitor_and_output(SINGLE_SOURCE_NAME)
+                obs.set_input_volume_db(SINGLE_SOURCE_NAME, self.volume_for_stem(stem))
+                volume_applied = True
+                same_file = not obs.set_media_source_file(SINGLE_SOURCE_NAME, audio_file, managed_decode=True)
+                if not self._wait_for_media_file(SINGLE_SOURCE_NAME, audio_file):
+                    raise RuntimeError(f"OBS did not confirm file swap to '{audio_file.name}'.")
+                if self._cancelled():
+                    return
+                obs.show_source(SCENE, SINGLE_SOURCE_NAME)
+                if same_file:
+                    obs.restart_media(SINGLE_SOURCE_NAME)
+            # Decoder dimensions are now ready, rather than the previous file's.
             self._apply_fullscreen(SINGLE_SOURCE_NAME)
             if self._cancelled():
                 return
-            try:
-                # A changed file already starts in OBS's deferred update.
-                # Only replaying the same file needs an explicit restart.
-                if same_file:
-                    obs.restart_media(SINGLE_SOURCE_NAME)
-            except Exception as exc:
-                print(f"{_TAG} ⚠  Could not restart media: {exc}")
 
             if BASS_ANIMATION_ENABLED and self._animator is not None:
                 self._animator.start()
