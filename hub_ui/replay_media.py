@@ -17,11 +17,15 @@ def _convert(source, output):
     temporary = output.with_suffix(".partial.mp4")
     try:
         result = subprocess.run([
-            "ffmpeg", "-v", "error", "-y", "-threads", "1", "-i", str(source),
+            "ffmpeg", "-nostdin", "-v", "error", "-y", "-threads", "1",
+            "-filter_threads", "1", "-i", str(source),
             "-map", "0:v:0", "-map", "0:a:0?", "-vf", "scale=-2:480,fps=24",
             "-c:v", "libx264", "-preset", "ultrafast", "-crf", "29", "-threads", "1",
             "-c:a", "aac", "-ac", "2", "-b:a", "96k", "-movflags", "+faststart", str(temporary)
-        ], capture_output=True, timeout=300, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        ], capture_output=True, timeout=300, creationflags=(
+            getattr(subprocess, "CREATE_NO_WINDOW", 0)
+            | getattr(subprocess, "BELOW_NORMAL_PRIORITY_CLASS", 0)
+        ))
         if result.returncode:
             raise ValueError("This clip could not be decoded for browser preview.")
         temporary.replace(output)

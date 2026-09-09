@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+from functools import lru_cache
 from pathlib import Path
 
 import obs
@@ -33,28 +34,33 @@ def probe_dimension_key(path: Path) -> str:
     if path.suffix.lower() not in VIDEO_EXTS:
         return ""
     try:
-        proc = subprocess.run(
-            [
-                "ffprobe",
-                "-v", "error",
-                "-select_streams", "v:0",
-                "-show_entries", "stream=width,height",
-                "-of", "json",
-                str(path),
-            ],
-            capture_output=True,
-            text=True,
-            timeout=5,
-        )
-        if proc.returncode != 0:
-            return ""
-        raw = json.loads(proc.stdout or "{}")
-        stream = (raw.get("streams") or [{}])[0]
-        width = int(stream.get("width") or 0)
-        height = int(stream.get("height") or 0)
-        return f"{width}x{height}" if width and height else ""
+        stat = path.stat()
+        return _probe_dimension_key(str(path.resolve()), stat.st_mtime_ns, stat.st_size)
     except Exception:
+        # Failed/missing files are retried on the next request, not cached.
         return ""
+
+
+@lru_cache(maxsize=512)
+def _probe_dimension_key(path: str, modified_ns: int, size: int) -> str:
+    """Bounded metadata cache; replacing/editing a file invalidates its entry."""
+    proc = subprocess.run(
+        [
+            "ffprobe", "-v", "error", "-select_streams", "v:0",
+            "-show_entries", "stream=width,height", "-of", "json", path,
+        ],
+        capture_output=True,
+        text=True,
+        timeout=5,
+        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+    )
+    if proc.returncode != 0:
+        raise ValueError("Media probe failed")
+    raw = json.loads(proc.stdout or "{}")
+    stream = (raw.get("streams") or [{}])[0]
+    width = int(stream.get("width") or 0)
+    height = int(stream.get("height") or 0)
+    return f"{width}x{height}" if width and height else ""
 
 
 def safe_transform(raw: dict) -> dict:

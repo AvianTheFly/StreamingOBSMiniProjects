@@ -328,6 +328,10 @@ def _apply_snapshot(
 
 def _apply_filters(source_name: str, desired_filters: list[dict[str, Any]]) -> None:
     current = _snapshot_filters(source_name)
+    # Read OBS each time so manual edits are visible, but avoid tearing down
+    # and rebuilding an identical GPU filter chain on every asset playback.
+    if _filters_equal(current, desired_filters):
+        return
     for item in current:
         try:
             obs.remove_source_filter(source_name, item["name"])
