@@ -89,7 +89,7 @@
     "inhibitor_respawning_soon": {
       "enabled": true,
       "priority": 30.0,
-      "duration": 2.7,
+      "duration": 2.5,
       "cooldown": 0.0,
       "media": "media/meme-terminator-back.mp4",
       "volume": 0.7,
@@ -101,7 +101,7 @@
     "inhibitor_respawned": {
       "enabled": true,
       "priority": 35.0,
-      "duration": 2.7,
+      "duration": 2.5,
       "cooldown": 0.0,
       "media": "media/meme-terminator-back.mp4",
       "volume": 0.7,
@@ -113,7 +113,7 @@
     "void_grub": {
       "enabled": true,
       "priority": 48.0,
-      "duration": 2.7,
+      "duration": 2.5,
       "cooldown": 0.0,
       "media": "media/meme-simba-grub.mp4",
       "volume": 0.7,
@@ -137,7 +137,7 @@
     "baron": {
       "enabled": true,
       "priority": 90.0,
-      "duration": 2.85,
+      "duration": 2.5,
       "cooldown": 0.0,
       "media": "media/meme-avengers.mp4",
       "volume": 0.7,
@@ -149,7 +149,7 @@
     "atakhan_legacy": {
       "enabled": false,
       "priority": 65.0,
-      "duration": 2.85,
+      "duration": 2.5,
       "cooldown": 0.0,
       "media": "media/meme-avengers.mp4",
       "volume": 0.7,
@@ -185,7 +185,7 @@
     "assist": {
       "enabled": true,
       "priority": 50.0,
-      "duration": 3.4,
+      "duration": 2.5,
       "cooldown": 0.0,
       "media": "media/meme-baymax-bump.mp4",
       "volume": 0.7,
@@ -197,7 +197,7 @@
     "double_kill": {
       "enabled": true,
       "priority": 82.0,
-      "duration": 3.5,
+      "duration": 2.5,
       "cooldown": 0.0,
       "media": "media/meme-tobey-dance.mp4",
       "volume": 0.7,
@@ -209,7 +209,7 @@
     "triple_kill": {
       "enabled": true,
       "priority": 88.0,
-      "duration": 3.5,
+      "duration": 2.5,
       "cooldown": 0.0,
       "media": "media/meme-tobey-dance.mp4",
       "volume": 0.7,
@@ -221,7 +221,7 @@
     "quadra_kill": {
       "enabled": true,
       "priority": 94.0,
-      "duration": 3.5,
+      "duration": 2.5,
       "cooldown": 0.0,
       "media": "media/meme-tobey-dance.mp4",
       "volume": 0.7,
@@ -245,7 +245,7 @@
     "dragon": {
       "enabled": true,
       "priority": 68.0,
-      "duration": 2.85,
+      "duration": 2.5,
       "cooldown": 0.0,
       "media": "media/meme-avengers.mp4",
       "volume": 0.7,
@@ -257,7 +257,7 @@
     "dragon_air": {
       "enabled": true,
       "priority": 68.0,
-      "duration": 3.5,
+      "duration": 2.5,
       "cooldown": 0.0,
       "media": "media/meme-mcqueen-speed.mp4",
       "volume": 0.7,
@@ -269,7 +269,7 @@
     "dragon_earth": {
       "enabled": true,
       "priority": 68.0,
-      "duration": 3.5,
+      "duration": 2.5,
       "cooldown": 0.0,
       "media": "media/meme-toph-armor.mp4",
       "volume": 0.7,
@@ -305,7 +305,7 @@
     "dragon_hextech": {
       "enabled": true,
       "priority": 68.0,
-      "duration": 3.5,
+      "duration": 2.5,
       "cooldown": 0.0,
       "media": "media/meme-palpatine-power.mp4",
       "volume": 0.7,
@@ -329,7 +329,7 @@
     "dragon_elder": {
       "enabled": true,
       "priority": 92.0,
-      "duration": 3.5,
+      "duration": 2.5,
       "cooldown": 0.0,
       "media": "media/meme-palpatine-power.mp4",
       "volume": 0.7,
@@ -341,7 +341,7 @@
     "victory": {
       "enabled": true,
       "priority": 99.0,
-      "duration": 3.5,
+      "duration": 2.5,
       "cooldown": 0.0,
       "media": "media/meme-tobey-dance.mp4",
       "volume": 0.7,
@@ -365,7 +365,7 @@
     "game_end": {
       "enabled": true,
       "priority": 99.0,
-      "duration": 2.85,
+      "duration": 2.5,
       "cooldown": 0.0,
       "media": "media/meme-avengers.mp4",
       "volume": 0.7,
@@ -377,7 +377,7 @@
     "objective_steal": {
       "enabled": true,
       "priority": 96.0,
-      "duration": 3.4,
+      "duration": 2.5,
       "cooldown": 0.0,
       "media": "media/meme-swiper-steal.mp4",
       "volume": 0.7,
@@ -401,7 +401,7 @@
     "ultimate_learned": {
       "enabled": true,
       "priority": 60.0,
-      "duration": 3.5,
+      "duration": 2.5,
       "cooldown": 0.0,
       "media": "media/meme-palpatine-power.mp4",
       "volume": 0.7,
@@ -425,7 +425,7 @@
     "respawn": {
       "enabled": true,
       "priority": 40.0,
-      "duration": 2.7,
+      "duration": 2.5,
       "cooldown": 0.0,
       "media": "media/meme-terminator-back.mp4",
       "volume": 0.7,
@@ -497,7 +497,7 @@
     "possible_base_visit": {
       "enabled": true,
       "priority": 58.0,
-      "duration": 2.9,
+      "duration": 2.5,
       "cooldown": 20.0,
       "media": "media/meme-homer-bush.mp4",
       "volume": 0.7,
@@ -521,7 +521,7 @@
     "heavy_health_loss": {
       "enabled": true,
       "priority": 55.0,
-      "duration": 3.2,
+      "duration": 2.5,
       "cooldown": 20.0,
       "media": "media/meme-emotional-damage.mp4",
       "volume": 0.7,
@@ -593,7 +593,7 @@
     "possible_low_hp_escape": {
       "enabled": true,
       "priority": 85.0,
-      "duration": 2.9,
+      "duration": 2.5,
       "cooldown": 20.0,
       "media": "media/meme-homer-bush.mp4",
       "volume": 0.7,
@@ -677,7 +677,7 @@
     "possible_roam": {
       "enabled": false,
       "priority": 30.0,
-      "duration": 3.5,
+      "duration": 2.5,
       "cooldown": 20.0,
       "media": "media/meme-mcqueen-speed.mp4",
       "volume": 0.7,
@@ -689,7 +689,7 @@
     "possible_jungle_activity": {
       "enabled": false,
       "priority": 20.0,
-      "duration": 2.7,
+      "duration": 2.5,
       "cooldown": 20.0,
       "media": "media/meme-simba-grub.mp4",
       "volume": 0.7,
@@ -717,15 +717,15 @@
       "audio": ""
     }
   },
-  "revision": 63,
+  "revision": 64,
   "paused": false,
   "presentation": "memes",
   "overlay_enabled": true,
   "layout": {
-    "x": 1305,
-    "y": 86,
-    "width": 557,
-    "height": 248
+    "x": 24,
+    "y": 440,
+    "width": 280,
+    "height": 158
   },
   "presentations": {
     "memes": {
@@ -782,21 +782,21 @@
         "inhibitor_respawning_soon": {
           "media": "media/meme-terminator-back.mp4",
           "audio": "",
-          "duration": 2.7,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
         "inhibitor_respawned": {
           "media": "media/meme-terminator-back.mp4",
           "audio": "",
-          "duration": 2.7,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
         "void_grub": {
           "media": "media/meme-simba-grub.mp4",
           "audio": "",
-          "duration": 2.7,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
@@ -810,14 +810,14 @@
         "baron": {
           "media": "media/meme-avengers.mp4",
           "audio": "",
-          "duration": 2.85,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
         "atakhan_legacy": {
           "media": "media/meme-avengers.mp4",
           "audio": "",
-          "duration": 2.85,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
@@ -838,28 +838,28 @@
         "assist": {
           "media": "media/meme-baymax-bump.mp4",
           "audio": "",
-          "duration": 3.4,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
         "double_kill": {
           "media": "media/meme-tobey-dance.mp4",
           "audio": "",
-          "duration": 3.5,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
         "triple_kill": {
           "media": "media/meme-tobey-dance.mp4",
           "audio": "",
-          "duration": 3.5,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
         "quadra_kill": {
           "media": "media/meme-tobey-dance.mp4",
           "audio": "",
-          "duration": 3.5,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
@@ -873,21 +873,21 @@
         "dragon": {
           "media": "media/meme-avengers.mp4",
           "audio": "",
-          "duration": 2.85,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
         "dragon_air": {
           "media": "media/meme-mcqueen-speed.mp4",
           "audio": "",
-          "duration": 3.5,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
         "dragon_earth": {
           "media": "media/meme-toph-armor.mp4",
           "audio": "",
-          "duration": 3.5,
+          "duration": 2.5,
           "start_time": 1.3,
           "loop": false
         },
@@ -908,7 +908,7 @@
         "dragon_hextech": {
           "media": "media/meme-palpatine-power.mp4",
           "audio": "",
-          "duration": 3.5,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
@@ -922,14 +922,14 @@
         "dragon_elder": {
           "media": "media/meme-palpatine-power.mp4",
           "audio": "",
-          "duration": 3.5,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
         "victory": {
           "media": "media/meme-tobey-dance.mp4",
           "audio": "",
-          "duration": 3.5,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
@@ -943,14 +943,14 @@
         "game_end": {
           "media": "media/meme-avengers.mp4",
           "audio": "",
-          "duration": 2.85,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
         "objective_steal": {
           "media": "media/meme-swiper-steal.mp4",
           "audio": "",
-          "duration": 3.4,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
@@ -964,7 +964,7 @@
         "ultimate_learned": {
           "media": "media/meme-palpatine-power.mp4",
           "audio": "",
-          "duration": 3.5,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
@@ -978,7 +978,7 @@
         "respawn": {
           "media": "media/meme-terminator-back.mp4",
           "audio": "",
-          "duration": 2.7,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
@@ -1020,7 +1020,7 @@
         "possible_base_visit": {
           "media": "media/meme-homer-bush.mp4",
           "audio": "",
-          "duration": 2.9,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
@@ -1034,7 +1034,7 @@
         "heavy_health_loss": {
           "media": "media/meme-emotional-damage.mp4",
           "audio": "",
-          "duration": 3.2,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
@@ -1076,7 +1076,7 @@
         "possible_low_hp_escape": {
           "media": "media/meme-homer-bush.mp4",
           "audio": "",
-          "duration": 2.9,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
@@ -1125,14 +1125,14 @@
         "possible_roam": {
           "media": "media/meme-mcqueen-speed.mp4",
           "audio": "",
-          "duration": 3.5,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
         "possible_jungle_activity": {
           "media": "media/meme-simba-grub.mp4",
           "audio": "",
-          "duration": 2.7,
+          "duration": 2.5,
           "start_time": 0.0,
           "loop": false
         },
@@ -1145,10 +1145,10 @@
         }
       },
       "layout": {
-        "x": 1305,
-        "y": 86,
-        "width": 557,
-        "height": 248
+        "x": 24,
+        "y": 440,
+        "width": 280,
+        "height": 158
       }
     },
     "personal": {
