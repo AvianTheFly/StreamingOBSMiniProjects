@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import threading
 import time
+import subprocess
 from collections import deque
 from pathlib import Path
 
@@ -154,6 +155,8 @@ class BassDetector:
         self._audio_data: np.ndarray | None = None
         self._running = False
         self._file_thread: threading.Thread | None = None
+        self._decoder = None
+        self._decoder_lock = threading.Lock()
 
     # ── Pre-loading ───────────────────────────────────────────────────────────
 
@@ -186,21 +189,18 @@ class BassDetector:
         self._running = True
 
         if self._audio_file is not None:
-            # Lazy-load if preload() wasn't called
-            if self._audio_data is None:
-                self.preload()
-            if self._audio_data is not None:
-                self._file_thread = threading.Thread(
-                    target=self._file_loop, daemon=True, name="bass_det:file"
-                )
-                self._file_thread.start()
-            else:
-                print("[BassDetector] No audio data — visualizer signals will be flat.")
+            self._file_thread = threading.Thread(
+                target=self._stream_file_loop, daemon=True, name="bass_det:file"
+            )
+            self._file_thread.start()
         else:
             print("[BassDetector] No audio file configured — signals will be flat.")
 
     def stop(self) -> None:
         self._running = False
+        with self._decoder_lock:
+            if self._decoder is not None and self._decoder.poll() is None:
+                self._decoder.terminate()
         if self._file_thread is not None:
             self._file_thread.join(timeout=2)
             self._file_thread = None
@@ -246,6 +246,52 @@ class BassDetector:
             return False
 
     # ── File-based real-time loop ─────────────────────────────────────────────
+
+    def _stream_file_loop(self) -> None:
+        """Bounded, paced CPU decoding. No full-song allocation or catch-up FFTs."""
+        decoder = None
+        try:
+            with self._decoder_lock:
+                if not self._running:
+                    return
+                decoder = subprocess.Popen(
+                    ['ffmpeg', '-nostdin', '-v', 'error', '-threads', '1',
+                     '-re', '-i', str(self._audio_file), '-map', '0:a:0', '-vn',
+                     '-threads', '1', '-filter_threads', '1', '-ac', '1',
+                     '-ar', str(self.sample_rate), '-f', 'f32le', 'pipe:1'],
+                    stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                    creationflags=(getattr(subprocess, 'CREATE_NO_WINDOW', 0) |
+                                   getattr(subprocess, 'BELOW_NORMAL_PRIORITY_CLASS', 0)))
+                self._decoder = decoder
+            size = self.block_size * 4
+            next_frame = time.monotonic()
+            while self._running:
+                raw = decoder.stdout.read(size)
+                if not raw or not self._running:
+                    break
+                chunk = np.frombuffer(raw[:len(raw)//4*4], dtype='<f4')
+                if len(chunk) < self.block_size:
+                    chunk = np.pad(chunk, (0, self.block_size-len(chunk)))
+                self._process_frame(chunk, time.monotonic())
+                # Backpressure prevents burst analysis after a desktop stall.
+                now = time.monotonic()
+                next_frame = max(next_frame + self.block_size / self.sample_rate, now)
+                if next_frame > now:
+                    time.sleep(next_frame - now)
+        except Exception as exc:
+            print(f'[BassDetector] Streaming analysis stopped: {exc}')
+        finally:
+            if decoder is not None:
+                if decoder.poll() is None:
+                    decoder.terminate()
+                try:
+                    decoder.wait(timeout=1)
+                except subprocess.TimeoutExpired:
+                    decoder.kill(); decoder.wait()
+                decoder.stdout.close()
+            with self._decoder_lock:
+                if self._decoder is decoder:
+                    self._decoder = None
 
     def _file_loop(self) -> None:
         data = self._audio_data

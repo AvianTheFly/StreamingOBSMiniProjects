@@ -248,10 +248,10 @@ class SongPlayer:
             # latest user action. Save it before applying this song's offset.
             self.remember_obs_volume()
 
-            # Pre-load audio for the visualizer before touching OBS.
+            # Prepare the visualizer object; audio decoding starts with playback.
             if BASS_ANIMATION_ENABLED:
                 if audio_file:
-                    print(f"{_TAG} 🎵  Preloading audio for visualizer: {audio_file.name}")
+                    print(f"{_TAG} 🎵  Streaming visualizer audio: {audio_file.name}")
                 else:
                     print(f"{_TAG} ⚠  No audio file found for '{source_name}' — visualizer will be flat.")
                 # specific_song plays through one shared OBS source now, so the
@@ -262,7 +262,8 @@ class SongPlayer:
                     audio_file=audio_file,
                     label=source_name,
                 )
-                self._animator.preload()
+                # Analysis starts incrementally after playback; never decode a
+                # whole song on the hotkey-to-playback path.
 
             if self._abort_flag:
                 return

@@ -1,5 +1,4 @@
-"""Raise the hub process priority on Windows so the audio callback and
-keyboard dispatcher get scheduled promptly.
+"""Keep the Hub at normal priority so background work cannot starve the desktop.
 
 Uses psutil if available, falls back to ctypes SetPriorityClass on Windows.
 Best-effort: any failure is logged and ignored.
@@ -24,11 +23,11 @@ def _try_psutil() -> bool:
         return False
     try:
         proc = psutil.Process()
-        target = getattr(psutil, "HIGH_PRIORITY_CLASS", None)
+        target = getattr(psutil, "NORMAL_PRIORITY_CLASS", None)
         if target is None:
-            target = -10
+            target = 0
         proc.nice(target)
-        print("[priority] Hub set to HIGH priority class.")
+        print("[priority] Hub set to NORMAL priority class.")
         return True
     except Exception as exc:
         print(f"[priority] psutil priority bump failed: {exc}")
@@ -39,12 +38,12 @@ def _try_ctypes_windows() -> None:
     try:
         import ctypes
 
-        HIGH_PRIORITY_CLASS = 0x00000080
+        NORMAL_PRIORITY_CLASS = 0x00000020
         handle = ctypes.windll.kernel32.GetCurrentProcess()
-        if not ctypes.windll.kernel32.SetPriorityClass(handle, HIGH_PRIORITY_CLASS):
+        if not ctypes.windll.kernel32.SetPriorityClass(handle, NORMAL_PRIORITY_CLASS):
             err = ctypes.windll.kernel32.GetLastError()
             print(f"[priority] SetPriorityClass failed (err {err}).")
             return
-        print("[priority] Hub set to HIGH priority class (ctypes).")
+        print("[priority] Hub set to NORMAL priority class (ctypes).")
     except Exception as exc:
         print(f"[priority] ctypes priority bump failed: {exc}")
