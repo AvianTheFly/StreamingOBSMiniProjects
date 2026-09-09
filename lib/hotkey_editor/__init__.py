@@ -15,6 +15,14 @@
 #           project_name     = "My Project",
 #       )
 
-from .server import run_editor
+def __getattr__(name):
+    # Importing form metadata must not pull in OBS, media or HTTP dependencies.
+    # Existing `from lib.hotkey_editor import run_editor` callers keep the same API.
+    if name == "run_editor":
+        from .server import run_editor
+        globals()[name] = run_editor
+        return run_editor
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
 
 __all__ = ["run_editor"]

@@ -48,6 +48,7 @@ Start with the layer that owns the change; these files are shared by the running
 | Module config to editor field defaults | `lib/editor_config.py` |
 | Browser UI and its API | `hub_ui/app/`, `hub_ui/server.py` |
 | Shared asset/hotkey editor | `lib/hotkey_editor/`; `hotkey_editor.py` is its launcher |
+| Hotkey-editor labels, field types and visibility | `lib/hotkey_editor/schema.py` |
 | Playback arbitration between modules | `coordinator.py`, `hub_rules.py` |
 | Module interfaces and event bus | `shared.py`, `events.py` |
 | OBS operations | `obs/` |
