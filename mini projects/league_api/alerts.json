@@ -5,26 +5,50 @@
     "game_start": {
       "enabled": true,
       "priority": 45.0,
-      "duration": 1.5,
+      "duration": 1.8,
       "cooldown": 0.0,
-      "media": "media/meme-minions-dance.mp4",
+      "media": "media/meme-spongebob-ready.mp4",
       "volume": 0.7,
       "start_time": 0.0,
-      "loop": true,
+      "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-minions-dance.mp4",
+          "duration": 1.1,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-avengers.mp4",
+          "duration": 1.4,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "minions_spawning": {
       "enabled": true,
       "priority": 25.0,
-      "duration": 1.5,
+      "duration": 1.1,
       "cooldown": 0.0,
       "media": "media/meme-minions-dance.mp4",
       "volume": 0.7,
       "start_time": 0.0,
-      "loop": true,
+      "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-simba-grub.mp4",
+          "duration": 1.2,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "first_blood": {
       "enabled": true,
@@ -36,7 +60,22 @@
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-thanos-myself.mp4",
+          "duration": 2.0,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-tobey-dance.mp4",
+          "duration": 1.8,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "ace": {
       "enabled": true,
@@ -48,91 +87,175 @@
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-avengers.mp4",
+          "duration": 2.0,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "turret_destroyed": {
       "enabled": true,
       "priority": 55.0,
-      "duration": 1.54,
+      "duration": 1.5,
       "cooldown": 0.0,
       "media": "media/meme-ralph-wreck.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-elmo-fire.mp4",
+          "duration": 1.0,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "first_turret": {
       "enabled": true,
       "priority": 70.0,
-      "duration": 1.54,
+      "duration": 1.5,
       "cooldown": 0.0,
       "media": "media/meme-ralph-wreck.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-thanos-myself.mp4",
+          "duration": 2.0,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "inhibitor_destroyed": {
       "enabled": true,
       "priority": 65.0,
-      "duration": 1.54,
+      "duration": 1.5,
       "cooldown": 0.0,
       "media": "media/meme-ralph-wreck.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-elmo-fire.mp4",
+          "duration": 1.0,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-thanos-snap.mp4",
+          "duration": 1.6,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "inhibitor_respawning_soon": {
       "enabled": true,
       "priority": 30.0,
-      "duration": 2.5,
+      "duration": 1.4,
       "cooldown": 0.0,
       "media": "media/meme-terminator-back.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-strange-bargain.mp4",
+          "duration": 1.2,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "inhibitor_respawned": {
       "enabled": true,
       "priority": 35.0,
-      "duration": 2.5,
+      "duration": 1.8,
       "cooldown": 0.0,
-      "media": "media/meme-terminator-back.mp4",
+      "media": "media/meme-gandalf-pass.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-terminator-back.mp4",
+          "duration": 1.6,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-spongebob-ready.mp4",
+          "duration": 1.4,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "void_grub": {
       "enabled": true,
       "priority": 48.0,
-      "duration": 2.5,
+      "duration": 1.8,
       "cooldown": 0.0,
       "media": "media/meme-simba-grub.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-minions-dance.mp4",
+          "duration": 1.1,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "herald": {
       "enabled": true,
       "priority": 65.0,
-      "duration": 1.54,
+      "duration": 1.5,
       "cooldown": 0.0,
       "media": "media/meme-ralph-wreck.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-thanos-myself.mp4",
+          "duration": 2.0,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "baron": {
       "enabled": true,
@@ -144,19 +267,43 @@
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-goku-power.mp4",
+          "duration": 1.4,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "atakhan_legacy": {
       "enabled": false,
       "priority": 65.0,
-      "duration": 2.5,
+      "duration": 2.2,
       "cooldown": 0.0,
       "media": "media/meme-avengers.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-thanos-snap.mp4",
+          "duration": 1.6,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-palpatine-power.mp4",
+          "duration": 1.8,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "kill": {
       "enabled": true,
@@ -168,7 +315,22 @@
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-tobey-dance.mp4",
+          "duration": 2.0,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-thanos-myself.mp4",
+          "duration": 1.8,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "death": {
       "enabled": true,
@@ -180,43 +342,85 @@
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-emotional-damage.mp4",
+          "duration": 2.0,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "assist": {
       "enabled": true,
       "priority": 50.0,
-      "duration": 2.5,
+      "duration": 1.8,
       "cooldown": 0.0,
-      "media": "media/meme-baymax-bump.mp4",
+      "media": "media/meme-gru-answer.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-baymax-bump.mp4",
+          "duration": 1.6,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "double_kill": {
       "enabled": true,
       "priority": 82.0,
-      "duration": 2.5,
+      "duration": 2.2,
       "cooldown": 0.0,
       "media": "media/meme-tobey-dance.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-squidward-dab.mp4",
+          "duration": 1.6,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-goku-power.mp4",
+          "duration": 1.4,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "triple_kill": {
       "enabled": true,
       "priority": 88.0,
-      "duration": 2.5,
+      "duration": 2.2,
       "cooldown": 0.0,
       "media": "media/meme-tobey-dance.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-palpatine-power.mp4",
+          "duration": 2.0,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "quadra_kill": {
       "enabled": true,
@@ -228,7 +432,22 @@
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-thanos-myself.mp4",
+          "duration": 2.1,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-avengers.mp4",
+          "duration": 2.1,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "pentakill": {
       "enabled": true,
@@ -240,79 +459,172 @@
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-palpatine-power.mp4",
+          "duration": 2.3,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "dragon": {
       "enabled": true,
       "priority": 68.0,
-      "duration": 2.5,
+      "duration": 2.2,
       "cooldown": 0.0,
       "media": "media/meme-avengers.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-goku-power.mp4",
+          "duration": 1.4,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "dragon_air": {
       "enabled": true,
       "priority": 68.0,
-      "duration": 2.5,
+      "duration": 2.2,
       "cooldown": 0.0,
       "media": "media/meme-mcqueen-speed.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-cena-invisible.mp4",
+          "duration": 2.0,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-homer-bush.mp4",
+          "duration": 1.8,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "dragon_earth": {
       "enabled": true,
       "priority": 68.0,
-      "duration": 2.5,
+      "duration": 2.2,
       "cooldown": 0.0,
       "media": "media/meme-toph-armor.mp4",
       "volume": 0.7,
       "start_time": 1.3,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-gandalf-pass.mp4",
+          "duration": 2.0,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-ralph-wreck.mp4",
+          "duration": 1.5,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "dragon_fire": {
       "enabled": true,
       "priority": 68.0,
-      "duration": 1.5,
+      "duration": 1.0,
       "cooldown": 0.0,
       "media": "media/meme-zuko-fire.mp4",
       "volume": 0.7,
       "start_time": 0.0,
-      "loop": true,
+      "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-elmo-fire.mp4",
+          "duration": 1.0,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-this-is-fine.mp4",
+          "duration": 1.8,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "dragon_water": {
       "enabled": true,
       "priority": 68.0,
-      "duration": 1.5,
+      "duration": 1.3,
       "cooldown": 0.0,
       "media": "media/meme-katara-water.mp4",
       "volume": 0.7,
       "start_time": 0.0,
-      "loop": true,
+      "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-baymax-bump.mp4",
+          "duration": 2.0,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-strange-bargain.mp4",
+          "duration": 1.8,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "dragon_hextech": {
       "enabled": true,
       "priority": 68.0,
-      "duration": 2.5,
+      "duration": 2.2,
       "cooldown": 0.0,
       "media": "media/meme-palpatine-power.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-jesse-science.mp4",
+          "duration": 1.9,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-goku-power.mp4",
+          "duration": 1.4,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "dragon_chemtech": {
       "enabled": true,
@@ -324,7 +636,22 @@
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-gru-answer.mp4",
+          "duration": 1.9,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-this-is-fine.mp4",
+          "duration": 1.8,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "dragon_elder": {
       "enabled": true,
@@ -336,7 +663,16 @@
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-thanos-snap.mp4",
+          "duration": 1.6,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "victory": {
       "enabled": true,
@@ -348,7 +684,16 @@
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-minions-dance.mp4",
+          "duration": 1.1,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "defeat": {
       "enabled": true,
@@ -360,7 +705,16 @@
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-emotional-damage.mp4",
+          "duration": 2.3,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "game_end": {
       "enabled": true,
@@ -372,7 +726,22 @@
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-spongebob-ready.mp4",
+          "duration": 2.3,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-terminator-back.mp4",
+          "duration": 2.1,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "objective_steal": {
       "enabled": true,
@@ -384,319 +753,622 @@
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-cena-invisible.mp4",
+          "duration": 2.0,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-thanos-myself.mp4",
+          "duration": 2.1,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "level_up": {
       "enabled": true,
       "priority": 35.0,
-      "duration": 1.5,
+      "duration": 1.4,
       "cooldown": 0.0,
       "media": "media/meme-goku-power.mp4",
       "volume": 0.7,
       "start_time": 0.0,
-      "loop": true,
+      "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-spongebob-ready.mp4",
+          "duration": 1.6,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-gru-answer.mp4",
+          "duration": 1.4,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "ultimate_learned": {
       "enabled": true,
       "priority": 60.0,
-      "duration": 2.5,
+      "duration": 1.8,
       "cooldown": 0.0,
       "media": "media/meme-palpatine-power.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-goku-power.mp4",
+          "duration": 1.4,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "ability_rank_up": {
       "enabled": false,
       "priority": 25.0,
-      "duration": 1.5,
+      "duration": 1.4,
       "cooldown": 0.0,
       "media": "media/meme-goku-power.mp4",
       "volume": 0.7,
       "start_time": 0.0,
-      "loop": true,
+      "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-jesse-science.mp4",
+          "duration": 1.2,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-gru-answer.mp4",
+          "duration": 1.0,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "respawn": {
       "enabled": true,
       "priority": 40.0,
-      "duration": 2.5,
+      "duration": 1.8,
       "cooldown": 0.0,
-      "media": "media/meme-terminator-back.mp4",
+      "media": "media/meme-strange-bargain.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-terminator-back.mp4",
+          "duration": 1.6,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-spongebob-ready.mp4",
+          "duration": 1.4,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "inventory_added": {
       "enabled": true,
       "priority": 30.0,
-      "duration": 1.71,
+      "duration": 1.4,
       "cooldown": 0.0,
-      "media": "media/meme-fry-money.mp4",
+      "media": "media/meme-krabs-money.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-fry-money.mp4",
+          "duration": 1.2,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "inventory_removed": {
       "enabled": false,
       "priority": 20.0,
-      "duration": 1.71,
+      "duration": 1.0,
       "cooldown": 0.0,
-      "media": "media/meme-fry-money.mp4",
+      "media": "media/meme-patrick-money.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-fry-money.mp4",
+          "duration": 1.2,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-michael-no.mp4",
+          "duration": 1.0,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "possible_purchase": {
       "enabled": true,
       "priority": 40.0,
-      "duration": 1.71,
+      "duration": 1.7,
       "cooldown": 20.0,
       "media": "media/meme-fry-money.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-krabs-money.mp4",
+          "duration": 1.5,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-patrick-money.mp4",
+          "duration": 1.0,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "possible_item_upgrade": {
       "enabled": true,
       "priority": 50.0,
-      "duration": 1.9,
+      "duration": 1.8,
       "cooldown": 20.0,
       "media": "media/meme-jesse-science.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-goku-power.mp4",
+          "duration": 1.4,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "possible_consumable_use": {
       "enabled": false,
       "priority": 20.0,
-      "duration": 2.12,
+      "duration": 1.4,
       "cooldown": 20.0,
       "media": "media/meme-this-is-fine.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-baymax-bump.mp4",
+          "duration": 1.2,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-simba-grub.mp4",
+          "duration": 1.0,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "possible_base_visit": {
       "enabled": true,
       "priority": 58.0,
-      "duration": 2.5,
+      "duration": 1.8,
       "cooldown": 20.0,
       "media": "media/meme-homer-bush.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-strange-bargain.mp4",
+          "duration": 1.6,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "low_health": {
       "enabled": true,
       "priority": 60.0,
-      "duration": 2.12,
+      "duration": 1.8,
       "cooldown": 20.0,
       "media": "media/meme-this-is-fine.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-michael-no.mp4",
+          "duration": 1.6,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "heavy_health_loss": {
       "enabled": true,
       "priority": 55.0,
-      "duration": 2.5,
+      "duration": 1.8,
       "cooldown": 20.0,
       "media": "media/meme-emotional-damage.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-michael-no.mp4",
+          "duration": 1.6,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "large_heal": {
       "enabled": true,
       "priority": 35.0,
-      "duration": 1.5,
+      "duration": 1.3,
       "cooldown": 20.0,
       "media": "media/meme-katara-water.mp4",
       "volume": 0.7,
       "start_time": 0.0,
-      "loop": true,
+      "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-baymax-bump.mp4",
+          "duration": 1.6,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "resource_spent": {
       "enabled": false,
       "priority": 15.0,
-      "duration": 2.12,
+      "duration": 1.4,
       "cooldown": 20.0,
       "media": "media/meme-this-is-fine.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-patrick-money.mp4",
+          "duration": 1.0,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "possible_combat": {
       "enabled": true,
       "priority": 40.0,
-      "duration": 1.5,
+      "duration": 1.0,
       "cooldown": 20.0,
       "media": "media/meme-elmo-fire.mp4",
       "volume": 0.7,
       "start_time": 0.0,
-      "loop": true,
+      "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-thanos-myself.mp4",
+          "duration": 1.6,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "low_hp_kill": {
       "enabled": true,
       "priority": 91.0,
-      "duration": 1.5,
+      "duration": 1.4,
       "cooldown": 0.0,
       "media": "media/meme-goku-power.mp4",
       "volume": 0.7,
       "start_time": 0.0,
-      "loop": true,
+      "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-thanos-myself.mp4",
+          "duration": 2.1,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-squidward-dab.mp4",
+          "duration": 1.6,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "low_hp_multikill": {
       "enabled": true,
       "priority": 97.0,
-      "duration": 1.5,
+      "duration": 1.4,
       "cooldown": 0.0,
       "media": "media/meme-goku-power.mp4",
       "volume": 0.7,
       "start_time": 0.0,
-      "loop": true,
+      "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-thanos-snap.mp4",
+          "duration": 1.6,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "possible_low_hp_escape": {
       "enabled": true,
       "priority": 85.0,
-      "duration": 2.5,
+      "duration": 2.2,
       "cooldown": 20.0,
       "media": "media/meme-homer-bush.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-cena-invisible.mp4",
+          "duration": 2.0,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "possible_teamfight": {
       "enabled": true,
       "priority": 75.0,
-      "duration": 1.5,
+      "duration": 1.0,
       "cooldown": 20.0,
       "media": "media/meme-elmo-fire.mp4",
       "volume": 0.7,
       "start_time": 0.0,
-      "loop": true,
+      "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-avengers.mp4",
+          "duration": 2.0,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "possible_objective_fight": {
       "enabled": true,
       "priority": 80.0,
-      "duration": 1.5,
+      "duration": 1.0,
       "cooldown": 20.0,
       "media": "media/meme-elmo-fire.mp4",
       "volume": 0.7,
       "start_time": 0.0,
-      "loop": true,
+      "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-gandalf-pass.mp4",
+          "duration": 2.0,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-ralph-wreck.mp4",
+          "duration": 1.5,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "possible_power_spike": {
       "enabled": true,
       "priority": 55.0,
-      "duration": 1.5,
+      "duration": 1.4,
       "cooldown": 20.0,
       "media": "media/meme-goku-power.mp4",
       "volume": 0.7,
       "start_time": 0.0,
-      "loop": true,
+      "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-gru-answer.mp4",
+          "duration": 1.6,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "cs_milestone": {
       "enabled": true,
       "priority": 30.0,
-      "duration": 1.5,
+      "duration": 1.1,
       "cooldown": 0.0,
       "media": "media/meme-stonks.mp4",
       "volume": 0.7,
       "start_time": 0.0,
-      "loop": true,
+      "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-patrick-money.mp4",
+          "duration": 1.0,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "vision_activity": {
       "enabled": false,
       "priority": 20.0,
-      "duration": 1.5,
+      "duration": 1.4,
       "cooldown": 20.0,
-      "media": "media/meme-rock-eyebrow.mp4",
+      "media": "media/meme-cena-invisible.mp4",
       "volume": 0.7,
       "start_time": 0.0,
-      "loop": true,
+      "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-rock-eyebrow.mp4",
+          "duration": 1.2,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "manpower_advantage": {
       "enabled": true,
       "priority": 45.0,
-      "duration": 1.5,
+      "duration": 1.8,
       "cooldown": 20.0,
-      "media": "media/meme-stonks.mp4",
+      "media": "media/meme-thanos-myself.mp4",
       "volume": 0.7,
       "start_time": 0.0,
-      "loop": true,
+      "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-stonks.mp4",
+          "duration": 1.1,
+          "start_time": 0.0,
+          "loop": false
+        },
+        {
+          "media": "media/meme-avengers.mp4",
+          "duration": 1.4,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "possible_roam": {
       "enabled": false,
       "priority": 30.0,
-      "duration": 2.5,
+      "duration": 1.4,
       "cooldown": 20.0,
       "media": "media/meme-mcqueen-speed.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-cena-invisible.mp4",
+          "duration": 1.2,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "possible_jungle_activity": {
       "enabled": false,
       "priority": 20.0,
-      "duration": 2.5,
+      "duration": 1.4,
       "cooldown": 20.0,
       "media": "media/meme-simba-grub.mp4",
       "volume": 0.7,
       "start_time": 0.0,
       "loop": false,
       "title": "",
-      "audio": ""
+      "audio": "",
+      "media_pool": [
+        {
+          "media": "media/meme-homer-bush.mp4",
+          "duration": 1.2,
+          "start_time": 0.0,
+          "loop": false
+        }
+      ],
+      "pool_enabled": true
     },
     "custom_e8bf37104ae1": {
       "enabled": false,
@@ -714,10 +1386,11 @@
         "operator": "crosses_below",
         "value": 15.0
       },
-      "audio": ""
+      "audio": "",
+      "media_pool": []
     }
   },
-  "revision": 64,
+  "revision": 66,
   "paused": false,
   "presentation": "memes",
   "overlay_enabled": true,
@@ -731,417 +1404,1091 @@
     "memes": {
       "events": {
         "game_start": {
-          "media": "media/meme-minions-dance.mp4",
+          "media": "media/meme-spongebob-ready.mp4",
           "audio": "",
-          "duration": 1.5,
+          "duration": 1.8,
           "start_time": 0.0,
-          "loop": true
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-minions-dance.mp4",
+              "duration": 1.1,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-avengers.mp4",
+              "duration": 1.4,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "minions_spawning": {
           "media": "media/meme-minions-dance.mp4",
           "audio": "",
-          "duration": 1.5,
+          "duration": 1.1,
           "start_time": 0.0,
-          "loop": true
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-simba-grub.mp4",
+              "duration": 1.2,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "first_blood": {
           "media": "media/meme-squidward-dab.mp4",
           "audio": "",
           "duration": 1.6,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-thanos-myself.mp4",
+              "duration": 2.0,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-tobey-dance.mp4",
+              "duration": 1.8,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "ace": {
           "media": "media/meme-thanos-snap.mp4",
           "audio": "",
           "duration": 1.6,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-avengers.mp4",
+              "duration": 2.0,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "turret_destroyed": {
           "media": "media/meme-ralph-wreck.mp4",
           "audio": "",
-          "duration": 1.54,
+          "duration": 1.5,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-elmo-fire.mp4",
+              "duration": 1.0,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "first_turret": {
           "media": "media/meme-ralph-wreck.mp4",
           "audio": "",
-          "duration": 1.54,
+          "duration": 1.5,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-thanos-myself.mp4",
+              "duration": 2.0,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "inhibitor_destroyed": {
           "media": "media/meme-ralph-wreck.mp4",
           "audio": "",
-          "duration": 1.54,
+          "duration": 1.5,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-elmo-fire.mp4",
+              "duration": 1.0,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-thanos-snap.mp4",
+              "duration": 1.6,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "inhibitor_respawning_soon": {
           "media": "media/meme-terminator-back.mp4",
           "audio": "",
-          "duration": 2.5,
+          "duration": 1.4,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-strange-bargain.mp4",
+              "duration": 1.2,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "inhibitor_respawned": {
-          "media": "media/meme-terminator-back.mp4",
+          "media": "media/meme-gandalf-pass.mp4",
           "audio": "",
-          "duration": 2.5,
+          "duration": 1.8,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-terminator-back.mp4",
+              "duration": 1.6,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-spongebob-ready.mp4",
+              "duration": 1.4,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "void_grub": {
           "media": "media/meme-simba-grub.mp4",
           "audio": "",
-          "duration": 2.5,
+          "duration": 1.8,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-minions-dance.mp4",
+              "duration": 1.1,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "herald": {
           "media": "media/meme-ralph-wreck.mp4",
           "audio": "",
-          "duration": 1.54,
+          "duration": 1.5,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-thanos-myself.mp4",
+              "duration": 2.0,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "baron": {
           "media": "media/meme-avengers.mp4",
           "audio": "",
           "duration": 2.5,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-goku-power.mp4",
+              "duration": 1.4,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "atakhan_legacy": {
           "media": "media/meme-avengers.mp4",
           "audio": "",
-          "duration": 2.5,
+          "duration": 2.2,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-thanos-snap.mp4",
+              "duration": 1.6,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-palpatine-power.mp4",
+              "duration": 1.8,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "kill": {
           "media": "media/meme-squidward-dab.mp4",
           "audio": "",
           "duration": 1.6,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-tobey-dance.mp4",
+              "duration": 2.0,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-thanos-myself.mp4",
+              "duration": 1.8,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "death": {
           "media": "media/meme-michael-no.mp4",
           "audio": "",
           "duration": 1.8,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-emotional-damage.mp4",
+              "duration": 2.0,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "assist": {
-          "media": "media/meme-baymax-bump.mp4",
+          "media": "media/meme-gru-answer.mp4",
           "audio": "",
-          "duration": 2.5,
+          "duration": 1.8,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-baymax-bump.mp4",
+              "duration": 1.6,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "double_kill": {
           "media": "media/meme-tobey-dance.mp4",
           "audio": "",
-          "duration": 2.5,
+          "duration": 2.2,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-squidward-dab.mp4",
+              "duration": 1.6,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-goku-power.mp4",
+              "duration": 1.4,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "triple_kill": {
           "media": "media/meme-tobey-dance.mp4",
           "audio": "",
-          "duration": 2.5,
+          "duration": 2.2,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-palpatine-power.mp4",
+              "duration": 2.0,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "quadra_kill": {
           "media": "media/meme-tobey-dance.mp4",
           "audio": "",
           "duration": 2.5,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-thanos-myself.mp4",
+              "duration": 2.1,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-avengers.mp4",
+              "duration": 2.1,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "pentakill": {
           "media": "media/meme-thanos-snap.mp4",
           "audio": "",
           "duration": 1.6,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-palpatine-power.mp4",
+              "duration": 2.3,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "dragon": {
           "media": "media/meme-avengers.mp4",
           "audio": "",
-          "duration": 2.5,
+          "duration": 2.2,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-goku-power.mp4",
+              "duration": 1.4,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "dragon_air": {
           "media": "media/meme-mcqueen-speed.mp4",
           "audio": "",
-          "duration": 2.5,
+          "duration": 2.2,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-cena-invisible.mp4",
+              "duration": 2.0,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-homer-bush.mp4",
+              "duration": 1.8,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "dragon_earth": {
           "media": "media/meme-toph-armor.mp4",
           "audio": "",
-          "duration": 2.5,
+          "duration": 2.2,
           "start_time": 1.3,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-gandalf-pass.mp4",
+              "duration": 2.0,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-ralph-wreck.mp4",
+              "duration": 1.5,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "dragon_fire": {
           "media": "media/meme-zuko-fire.mp4",
           "audio": "",
-          "duration": 1.5,
+          "duration": 1.0,
           "start_time": 0.0,
-          "loop": true
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-elmo-fire.mp4",
+              "duration": 1.0,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-this-is-fine.mp4",
+              "duration": 1.8,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "dragon_water": {
           "media": "media/meme-katara-water.mp4",
           "audio": "",
-          "duration": 1.5,
+          "duration": 1.3,
           "start_time": 0.0,
-          "loop": true
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-baymax-bump.mp4",
+              "duration": 2.0,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-strange-bargain.mp4",
+              "duration": 1.8,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "dragon_hextech": {
           "media": "media/meme-palpatine-power.mp4",
           "audio": "",
-          "duration": 2.5,
+          "duration": 2.2,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-jesse-science.mp4",
+              "duration": 1.9,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-goku-power.mp4",
+              "duration": 1.4,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "dragon_chemtech": {
           "media": "media/meme-jesse-science.mp4",
           "audio": "",
           "duration": 1.9,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-gru-answer.mp4",
+              "duration": 1.9,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-this-is-fine.mp4",
+              "duration": 1.8,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "dragon_elder": {
           "media": "media/meme-palpatine-power.mp4",
           "audio": "",
           "duration": 2.5,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-thanos-snap.mp4",
+              "duration": 1.6,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "victory": {
           "media": "media/meme-tobey-dance.mp4",
           "audio": "",
           "duration": 2.5,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-minions-dance.mp4",
+              "duration": 1.1,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "defeat": {
           "media": "media/meme-michael-no.mp4",
           "audio": "",
           "duration": 1.8,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-emotional-damage.mp4",
+              "duration": 2.3,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "game_end": {
           "media": "media/meme-avengers.mp4",
           "audio": "",
           "duration": 2.5,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-spongebob-ready.mp4",
+              "duration": 2.3,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-terminator-back.mp4",
+              "duration": 2.1,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "objective_steal": {
           "media": "media/meme-swiper-steal.mp4",
           "audio": "",
           "duration": 2.5,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-cena-invisible.mp4",
+              "duration": 2.0,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-thanos-myself.mp4",
+              "duration": 2.1,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "level_up": {
           "media": "media/meme-goku-power.mp4",
           "audio": "",
-          "duration": 1.5,
+          "duration": 1.4,
           "start_time": 0.0,
-          "loop": true
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-spongebob-ready.mp4",
+              "duration": 1.6,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-gru-answer.mp4",
+              "duration": 1.4,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "ultimate_learned": {
           "media": "media/meme-palpatine-power.mp4",
           "audio": "",
-          "duration": 2.5,
+          "duration": 1.8,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-goku-power.mp4",
+              "duration": 1.4,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "ability_rank_up": {
           "media": "media/meme-goku-power.mp4",
           "audio": "",
-          "duration": 1.5,
+          "duration": 1.4,
           "start_time": 0.0,
-          "loop": true
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-jesse-science.mp4",
+              "duration": 1.2,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-gru-answer.mp4",
+              "duration": 1.0,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "respawn": {
-          "media": "media/meme-terminator-back.mp4",
+          "media": "media/meme-strange-bargain.mp4",
           "audio": "",
-          "duration": 2.5,
+          "duration": 1.8,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-terminator-back.mp4",
+              "duration": 1.6,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-spongebob-ready.mp4",
+              "duration": 1.4,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "inventory_added": {
-          "media": "media/meme-fry-money.mp4",
+          "media": "media/meme-krabs-money.mp4",
           "audio": "",
-          "duration": 1.71,
+          "duration": 1.4,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-fry-money.mp4",
+              "duration": 1.2,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "inventory_removed": {
-          "media": "media/meme-fry-money.mp4",
+          "media": "media/meme-patrick-money.mp4",
           "audio": "",
-          "duration": 1.71,
+          "duration": 1.0,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-fry-money.mp4",
+              "duration": 1.2,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-michael-no.mp4",
+              "duration": 1.0,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "possible_purchase": {
           "media": "media/meme-fry-money.mp4",
           "audio": "",
-          "duration": 1.71,
+          "duration": 1.7,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-krabs-money.mp4",
+              "duration": 1.5,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-patrick-money.mp4",
+              "duration": 1.0,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "possible_item_upgrade": {
           "media": "media/meme-jesse-science.mp4",
           "audio": "",
-          "duration": 1.9,
+          "duration": 1.8,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-goku-power.mp4",
+              "duration": 1.4,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "possible_consumable_use": {
           "media": "media/meme-this-is-fine.mp4",
           "audio": "",
-          "duration": 2.12,
+          "duration": 1.4,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-baymax-bump.mp4",
+              "duration": 1.2,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-simba-grub.mp4",
+              "duration": 1.0,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "possible_base_visit": {
           "media": "media/meme-homer-bush.mp4",
           "audio": "",
-          "duration": 2.5,
+          "duration": 1.8,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-strange-bargain.mp4",
+              "duration": 1.6,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "low_health": {
           "media": "media/meme-this-is-fine.mp4",
           "audio": "",
-          "duration": 2.12,
+          "duration": 1.8,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-michael-no.mp4",
+              "duration": 1.6,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "heavy_health_loss": {
           "media": "media/meme-emotional-damage.mp4",
           "audio": "",
-          "duration": 2.5,
+          "duration": 1.8,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-michael-no.mp4",
+              "duration": 1.6,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "large_heal": {
           "media": "media/meme-katara-water.mp4",
           "audio": "",
-          "duration": 1.5,
+          "duration": 1.3,
           "start_time": 0.0,
-          "loop": true
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-baymax-bump.mp4",
+              "duration": 1.6,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "resource_spent": {
           "media": "media/meme-this-is-fine.mp4",
           "audio": "",
-          "duration": 2.12,
+          "duration": 1.4,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-patrick-money.mp4",
+              "duration": 1.0,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "possible_combat": {
           "media": "media/meme-elmo-fire.mp4",
           "audio": "",
-          "duration": 1.5,
+          "duration": 1.0,
           "start_time": 0.0,
-          "loop": true
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-thanos-myself.mp4",
+              "duration": 1.6,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "low_hp_kill": {
           "media": "media/meme-goku-power.mp4",
           "audio": "",
-          "duration": 1.5,
+          "duration": 1.4,
           "start_time": 0.0,
-          "loop": true
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-thanos-myself.mp4",
+              "duration": 2.1,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-squidward-dab.mp4",
+              "duration": 1.6,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "low_hp_multikill": {
           "media": "media/meme-goku-power.mp4",
           "audio": "",
-          "duration": 1.5,
+          "duration": 1.4,
           "start_time": 0.0,
-          "loop": true
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-thanos-snap.mp4",
+              "duration": 1.6,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "possible_low_hp_escape": {
           "media": "media/meme-homer-bush.mp4",
           "audio": "",
-          "duration": 2.5,
+          "duration": 2.2,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-cena-invisible.mp4",
+              "duration": 2.0,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "possible_teamfight": {
           "media": "media/meme-elmo-fire.mp4",
           "audio": "",
-          "duration": 1.5,
+          "duration": 1.0,
           "start_time": 0.0,
-          "loop": true
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-avengers.mp4",
+              "duration": 2.0,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "possible_objective_fight": {
           "media": "media/meme-elmo-fire.mp4",
           "audio": "",
-          "duration": 1.5,
+          "duration": 1.0,
           "start_time": 0.0,
-          "loop": true
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-gandalf-pass.mp4",
+              "duration": 2.0,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-ralph-wreck.mp4",
+              "duration": 1.5,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "possible_power_spike": {
           "media": "media/meme-goku-power.mp4",
           "audio": "",
-          "duration": 1.5,
+          "duration": 1.4,
           "start_time": 0.0,
-          "loop": true
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-gru-answer.mp4",
+              "duration": 1.6,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "cs_milestone": {
           "media": "media/meme-stonks.mp4",
           "audio": "",
-          "duration": 1.5,
+          "duration": 1.1,
           "start_time": 0.0,
-          "loop": true
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-patrick-money.mp4",
+              "duration": 1.0,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "vision_activity": {
-          "media": "media/meme-rock-eyebrow.mp4",
+          "media": "media/meme-cena-invisible.mp4",
           "audio": "",
-          "duration": 1.5,
+          "duration": 1.4,
           "start_time": 0.0,
-          "loop": true
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-rock-eyebrow.mp4",
+              "duration": 1.2,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "manpower_advantage": {
-          "media": "media/meme-stonks.mp4",
+          "media": "media/meme-thanos-myself.mp4",
           "audio": "",
-          "duration": 1.5,
+          "duration": 1.8,
           "start_time": 0.0,
-          "loop": true
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-stonks.mp4",
+              "duration": 1.1,
+              "start_time": 0.0,
+              "loop": false
+            },
+            {
+              "media": "media/meme-avengers.mp4",
+              "duration": 1.4,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "possible_roam": {
           "media": "media/meme-mcqueen-speed.mp4",
           "audio": "",
-          "duration": 2.5,
+          "duration": 1.4,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-cena-invisible.mp4",
+              "duration": 1.2,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "possible_jungle_activity": {
           "media": "media/meme-simba-grub.mp4",
           "audio": "",
-          "duration": 2.5,
+          "duration": 1.4,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [
+            {
+              "media": "media/meme-homer-bush.mp4",
+              "duration": 1.2,
+              "start_time": 0.0,
+              "loop": false
+            }
+          ],
+          "pool_enabled": true
         },
         "custom_e8bf37104ae1": {
           "media": "",
           "audio": "",
           "duration": 6.0,
           "start_time": 0.0,
-          "loop": false
+          "loop": false,
+          "media_pool": [],
+          "pool_enabled": true
         }
       },
       "layout": {
@@ -1574,5 +2921,6 @@
         "height": 248
       }
     }
-  }
+  },
+  "variety_pack_version": 1
 }

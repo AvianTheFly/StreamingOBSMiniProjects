@@ -409,6 +409,133 @@
         "game_end"
       ],
       "bytes": 2003022
+    },
+    {
+      "id": "krabs-money",
+      "title": "Mr Krabs · money",
+      "joke": "Shopping priorities.",
+      "source": "https://tenor.com/view/money-mr-krabs-gif-18326632",
+      "download": "https://media.tenor.com/sqOZZnRhjMsAAAPo/money-mr.mp4",
+      "media": "media/meme-krabs-money.mp4",
+      "duration": 1.5,
+      "start_time": 0,
+      "display_seconds": 1.5,
+      "events": [
+        "inventory_added",
+        "possible_purchase"
+      ],
+      "bytes": 299847
+    },
+    {
+      "id": "cena-invisible",
+      "title": "John Cena · invisible",
+      "joke": "Vision and escaping detection.",
+      "source": "https://tenor.com/view/john-cena-you-cant-see-me-youre-blind-wrestler-gif-14537197",
+      "download": "https://media.tenor.com/IQ5zuNhltCEAAAPo/john-cena-you-cant-see-me.mp4",
+      "media": "media/meme-cena-invisible.mp4",
+      "duration": 1.96,
+      "start_time": 0,
+      "display_seconds": 1.96,
+      "events": [
+        "vision_activity",
+        "possible_low_hp_escape"
+      ],
+      "bytes": 778735
+    },
+    {
+      "id": "thanos-myself",
+      "title": "Thanos · do it myself",
+      "joke": "Taking matters into your own hands.",
+      "source": "https://tenor.com/view/thanos-fine-ill-do-it-myself-ill-do-it-myself-gif-22181201",
+      "download": "https://media.tenor.com/vCqpL7x4sPUAAAPo/thanos-fine-ill-do-it-myself.mp4",
+      "media": "media/meme-thanos-myself.mp4",
+      "duration": 2.1,
+      "start_time": 0,
+      "display_seconds": 2.1,
+      "events": [
+        "manpower_advantage",
+        "low_hp_kill"
+      ],
+      "bytes": 404730
+    },
+    {
+      "id": "strange-bargain",
+      "title": "Doctor Strange · bargain",
+      "joke": "Returning for another attempt.",
+      "source": "https://tenor.com/view/dormammu-ive-come-to-bargain-dormammu-dr-strange1-dr-strange-gif-25069074",
+      "download": "https://media.tenor.com/tvYPOKLseBUAAAPo/dormammu-ive-come-to-bargain-dormammu.mp4",
+      "media": "media/meme-strange-bargain.mp4",
+      "duration": 8.975633,
+      "start_time": 0,
+      "display_seconds": 3.5,
+      "events": [
+        "respawn"
+      ],
+      "bytes": 1617031
+    },
+    {
+      "id": "spongebob-ready",
+      "title": "SpongeBob · ready",
+      "joke": "Ready for the next round.",
+      "source": "https://tenor.com/view/spongebob-im-ready-square-pants-squarebob-gif-10364707",
+      "download": "https://media.tenor.com/9tYzzbyLf9cAAAPo/spongebob-im-ready.mp4",
+      "media": "media/meme-spongebob-ready.mp4",
+      "duration": 4.133333,
+      "start_time": 0,
+      "display_seconds": 3.5,
+      "events": [
+        "game_start",
+        "minions_spawning"
+      ],
+      "bytes": 282898
+    },
+    {
+      "id": "gandalf-pass",
+      "title": "Gandalf · shall not pass",
+      "joke": "A little defensive magic.",
+      "source": "https://tenor.com/view/you-shall-not-pass-gandalf-gif-8224531",
+      "download": "https://media.tenor.com/ZzhRs6kpGGMAAAPo/you-shall-not-pass-gandalf.mp4",
+      "media": "media/meme-gandalf-pass.mp4",
+      "duration": 3.0,
+      "start_time": 0,
+      "display_seconds": 3.0,
+      "events": [
+        "dragon_earth",
+        "inhibitor_respawned"
+      ],
+      "bytes": 126745
+    },
+    {
+      "id": "gru-answer",
+      "title": "Gru · the answer is clear",
+      "joke": "An extremely confident plan.",
+      "source": "https://tenor.com/view/despicable-me-gru-the-answer-is-clear-gif-9091697056505454906",
+      "download": "https://media.tenor.com/fiwyTZJ44ToAAAPo/despicable-me-gru.mp4",
+      "media": "media/meme-gru-answer.mp4",
+      "duration": 1.933333,
+      "start_time": 0,
+      "display_seconds": 1.93,
+      "events": [
+        "assist",
+        "possible_power_spike"
+      ],
+      "bytes": 88139
+    },
+    {
+      "id": "patrick-money",
+      "title": "Patrick · throwing money",
+      "joke": "Money comes and goes.",
+      "source": "https://tenor.com/view/patrick-spongebob-squarepants-spongebob-mr-krabs-money-gif-24719413",
+      "download": "https://media.tenor.com/2Ay1ftWimrQAAAPo/patrick-spongebob-squarepants.mp4",
+      "media": "media/meme-patrick-money.mp4",
+      "duration": 0.96,
+      "start_time": 0,
+      "display_seconds": 1.5,
+      "events": [
+        "inventory_removed",
+        "cs_milestone"
+      ],
+      "bytes": 179853
     }
   ]
 }

@@ -12,6 +12,12 @@ from this page; editing JSON is no longer necessary.
   Uploads are local copies (up to 256 MB); the original file is untouched.
 - Change display name, enabled state, clip volume, start offset, looping, duration,
   priority or cooldown, then **Save event**. **Save & play in OBS** also previews it.
+- **Variety · random media pool** adds alternatives to the main file. Drop several
+  files or choose existing library media; each card has its own duration and start
+  offset. Save the event to apply. Random selection avoids the previous pick for
+  that event and prefers files outside the last three reactions when possible.
+  Turn random selection off to play only the main file, retaining the alternatives.
+  Pools are saved separately for My setup and Meme pack; volume remains event-owned.
 - Choose **Hello World placeholder** to unassign media. Files stay in the library.
 - **New rule** builds either a Riot event filter or a local snapshot threshold rule.
   For example, health crossing below 15%, or DragonKill with DragonType equal to Elder.

@@ -40,7 +40,7 @@ def make_handler(service, *, root: Path, port: int, load_config):
                 try: self.send_bytes(json.dumps(service.volume()).encode())
                 except Exception: self.send_bytes(b'{"error":"OBS audio is unavailable. Start OBS with WebSocket enabled."}',status=503)
                 return
-            if path in {'/control.js','/control.css','/presentation.js'}:
+            if path in {'/control.js','/control.css','/presentation.js','/pool.js'}:
                 self.send_bytes((root/path[1:]).read_bytes(),'text/javascript' if path.endswith('.js') else 'text/css'); return
             if path=='/state':
                 self.send_bytes(json.dumps(service.snapshot()).encode()); return
@@ -53,6 +53,8 @@ def make_handler(service, *, root: Path, port: int, load_config):
                     if path=='/asset':
                         value=parse_qs(urlparse(self.path).query).get('path',[''])[0]
                         permitted={a['path'] for a in service.library()}|{r.get(f,'') for r in service.engine.config['events'].values() for f in ('media','audio')}
+                        permitted.update(item['media'] for rule in service.engine.config['events'].values() for item in rule.get('media_pool',[]))
+                        permitted.update(a.get(f,'') for a in service.engine.active() for f in ('media','audio'))
                         target=service.media_path(value) if value in permitted else None
                     else:
                         rule=service.engine.config['events'].get(path[7:],{})

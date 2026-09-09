@@ -2,6 +2,7 @@
 from collections import Counter
 import copy
 import time
+from .media_pool import MediaPicker
 
 DIRECT = {'GameStart': ('game_start', 45), 'MinionsSpawning': ('minions_spawning', 25),
           'FirstBlood': ('first_blood', 85), 'Ace': ('ace', 88),
@@ -47,6 +48,7 @@ class Engine:
         self.slots=[]; self.serial=0; self.reset()
 
     def reset(self):
+        self.media_picker = MediaPicker()
         self.previous=None; self.game_time=-1; self.seen=set(); self.cooldowns={}
         self.kills=[]; self.objectives=[]; self.low_at=None; self.last_damage=-999
         self.metrics={}; self.slots=[]; self.history=[]
@@ -78,15 +80,18 @@ class Engine:
             if same and same['priority']>rule['priority']: record('Higher priority in this family'); continue
             if same: self.slots.remove(same)
             self.serial+=1
+            variant=self.media_picker.choose(key,rule)
             alert=dict(candidate,id=self.serial,family=family,priority=rule['priority'],
-                       expires=now+max(1,min(60,rule.get('duration',6))),
-                       remaining=max(1,min(60,rule.get('duration',6))),media=rule.get('media',''),volume=rule.get('volume',0.7),
-                       start_time=rule.get('start_time',0),loop=rule.get('loop',False),audio=rule.get('audio',''))
+                       expires=now+max(1,min(60,variant['duration'])),
+                       remaining=max(1,min(60,variant['duration'])),media=variant['media'],volume=rule.get('volume',0.7),
+                       start_time=variant['start_time'],loop=variant['loop'],audio=rule.get('audio',''))
             alert['title']=rule.get('title') or candidate.get('title') or key.replace('_',' ').title()
             self.slots.append(alert)
             self.slots.sort(key=lambda a:(a['priority'],a['id']),reverse=True)
             self.slots=self.slots[:max(1,min(3,self.config.get('max_alerts',3)))]
             self.cooldowns[key]=now
+            if alert in self.slots:
+                self.media_picker.remember(key,alert['media'])
             record('Displayed' if alert in self.slots else 'Dropped: three higher-priority alerts')
         return self.active()
 

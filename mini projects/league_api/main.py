@@ -79,10 +79,14 @@ class Service:
                 key=body.get('key') if path=='/event' else 'custom_'+uuid.uuid4().hex[:12]
                 if path=='/event' and key not in config['events']: raise ValueError('Unknown event')
                 old=config['events'].get(key,{'enabled':True,'priority':50,'duration':6,'cooldown':10,'volume':.7,'media':''})
-                allowed={'enabled','priority','duration','cooldown','volume','media','title','start_time','loop','trigger','audio'}
+                allowed={'enabled','priority','duration','cooldown','volume','media','title','start_time','loop','trigger','audio','media_pool','pool_enabled'}
                 patch=body.get('rule',{})
                 if not isinstance(patch,dict) or set(patch)-allowed: raise ValueError('Unknown event setting')
                 rule=validate_rule({**old,**patch},custom=key.startswith('custom_'))
+                old_pool={item['media'] for item in old.get('media_pool',[])}
+                for item in rule.get('media_pool',[]):
+                    if item['media'] not in old_pool and not self.media_path(item['media']):
+                        raise ValueError('Choose an existing file for each alternative')
                 if rule['media'] and rule['media']!=old.get('media') and not self.media_path(rule['media']): raise ValueError('Choose an existing supported media file')
                 if rule.get('audio') and rule['audio']!=old.get('audio'):
                     audio=self.media_path(rule['audio'])
@@ -116,7 +120,7 @@ class Service:
                 alert['remaining']=max(0,alert['expires']-self.engine.clock())
                 path=self.media_path(alert['media']) if alert['media'] else None
                 if path:
-                    alert['media']='/media/'+alert['key']+'?alert='+str(alert['id'])
+                    alert['media']='/asset?path='+quote(alert['media'])
                     alert['media_kind']=('image' if path.suffix.lower() in {'.png','.jpg','.jpeg','.gif','.webp'} else 'audio' if path.suffix.lower() in {'.mp3','.wav','.ogg','.m4a'} else 'video')
                 else: alert['media']=''
                 audio=self.media_path(alert.get('audio',''))

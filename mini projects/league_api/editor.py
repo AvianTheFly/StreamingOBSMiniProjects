@@ -105,6 +105,22 @@ def validate_rule(rule, custom=False):
     if len(r['audio'])>2048: raise ValueError('Audio path too long')
     r['media']=str(r.get('media',''))
     if len(r['media'])>2048: raise ValueError('Media path too long')
+    if not isinstance(r.get('pool_enabled',True),bool): raise ValueError('Pool enabled must be true or false')
+    pool=r.get('media_pool',[])
+    if not isinstance(pool,list) or len(pool)>30: raise ValueError('Use at most 30 alternatives per event')
+    r['media_pool']=[]
+    seen={r['media']}
+    for item in pool:
+        if not isinstance(item,dict) or set(item)-{'media','duration','start_time','loop'}:
+            raise ValueError('Invalid media pool entry')
+        media=item.get('media')
+        if not isinstance(media,str) or not media or len(media)>2048: raise ValueError('Choose a media file for each alternative')
+        if media in seen: continue
+        seen.add(media)
+        loop=item.get('loop',False)
+        if not isinstance(loop,bool): raise ValueError('Loop must be true or false')
+        r['media_pool'].append({'media':media,'duration':number(item.get('duration',2),1,60,'Variant duration'),
+                              'start_time':number(item.get('start_time',0),0,86400,'Variant start'),'loop':loop})
     if custom:
         tr=r.get('trigger',{})
         if not isinstance(tr,dict): raise ValueError('Choose a valid trigger')
