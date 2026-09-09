@@ -96,13 +96,14 @@ class SongPlayer:
         try:
             obs.configure_media_source_properties(
                 SINGLE_SOURCE_NAME,
-                restart_on_activate=False,
-                close_when_inactive=False,
+                restart_on_activate=True,
+                close_when_inactive=True,
                 looping=False,
                 clear_on_media_end=False,
             )
         except Exception as exc:
             print(f"{_TAG} ⚠  Could not configure shared Music source: {exc}")
+        self._stop_and_hide_source()
 
     def stop(self) -> None:
         """Cancel pending loads and stop the active source on shutdown."""
@@ -282,6 +283,7 @@ class SongPlayer:
             with media_startup(SINGLE_SOURCE_NAME, cancelled=self._cancelled, timeout=MEDIA_START_TIMEOUT):
                 obs.stop_media(SINGLE_SOURCE_NAME)
                 obs.hide_source(SCENE, SINGLE_SOURCE_NAME)
+                obs.configure_media_source_properties(SINGLE_SOURCE_NAME, restart_on_activate=False, close_when_inactive=False)
                 self._set_monitor_and_output(SINGLE_SOURCE_NAME)
                 obs.set_input_volume_db(SINGLE_SOURCE_NAME, self.volume_for_stem(stem))
                 volume_applied = True
@@ -530,7 +532,7 @@ class SongPlayer:
 
     def _stop_and_hide_source(self) -> None:
         try:
-            obs.stop_media(SINGLE_SOURCE_NAME)
+            obs.park_media_source(SCENE, SINGLE_SOURCE_NAME)
         except Exception as exc:
             print(f"{_TAG} Could not stop '{SINGLE_SOURCE_NAME}': {exc}")
         self._safe_hide(SINGLE_SOURCE_NAME)

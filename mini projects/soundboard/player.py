@@ -131,6 +131,7 @@ class SoundboardPlayer:
 
             with media_startup(SINGLE_SOURCE_NAME, cancelled=self._cancelled, timeout=CONFIG.media_start_timeout):
                 self._stop_and_hide_source()
+                self._apply_runtime_media_settings()
                 self._state_store.apply_for_stem(stem)
                 state_applied = True
                 if not self._state_store.has_transform_override(stem):
@@ -228,7 +229,6 @@ class SoundboardPlayer:
             )
         except Exception as exc:
             print(f"{_TAG} Could not ensure shared OBS source: {exc}")
-        self._apply_runtime_media_settings()
         self._stop_and_hide_source()
         self._state_store.ensure_baseline()
 
@@ -416,7 +416,7 @@ class SoundboardPlayer:
 
     def _stop_and_hide_source(self) -> None:
         try:
-            obs.stop_media(SINGLE_SOURCE_NAME)
+            obs.park_media_source(CONFIG.scene, SINGLE_SOURCE_NAME)
         except Exception:
             pass
         try:

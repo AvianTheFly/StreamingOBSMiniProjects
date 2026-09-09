@@ -588,7 +588,7 @@ def run_media_project(
     # visible and played merely because the scene became active.
     for source_name in managed_sources:
         try:
-            obs.stop_media(source_name)
+            obs.park_media_source(cfg.scene, source_name)
         except Exception:
             pass
         try:
@@ -607,7 +607,7 @@ def run_media_project(
 
         for name in to_hide:
             try:
-                obs.hide_source(cfg.scene, name)
+                obs.park_media_source(cfg.scene, name)
             except Exception:
                 pass
 
@@ -654,7 +654,7 @@ def run_media_project(
             prev = currently_playing[0]
             if prev_source:
                 try:
-                    obs.stop_media(prev_source)
+                    obs.park_media_source(cfg.scene, prev_source)
                 except Exception:
                     pass
                 try:
@@ -743,29 +743,29 @@ def run_media_project(
             except Exception as exc:
                 print(f"[{cfg.project_name}] Playback failed for '{source_name}': {exc}")
             finally:
-                if source_state_store is not None:
-                    try:
-                        source_state_store.capture_override_for_stem(name)
-                    except Exception as exc:
-                        print(f"[{cfg.project_name}] Could not save single-source override for '{name}': {exc}")
-
                 with play_lock:
-                    still_current = currently_playing[0] == name
-
-                if still_current:
-                    obs.hide_source(cfg.scene, source_name)
-                    with visible_lock:
-                        visible_sources.discard(source_name)
-
-                with play_lock:
-                    if currently_playing[0] == name:
+                    # A second trigger can play the same asset on the same
+                    # source. Only this request may save or park its playback.
+                    still_current = current_play_request_id[0] == request_id
+                    if still_current:
+                        if source_state_store is not None:
+                            try:
+                                source_state_store.capture_override_for_stem(name)
+                            except Exception as exc:
+                                print(f"[{cfg.project_name}] Could not save single-source override for '{name}': {exc}")
+                        try:
+                            obs.park_media_source(cfg.scene, source_name)
+                        except Exception as exc:
+                            print(f"[{cfg.project_name}] Could not park '{source_name}': {exc}")
+                        with visible_lock:
+                            visible_sources.discard(source_name)
                         currently_playing[0] = None
-                    if current_source_name[0] == source_name:
                         current_source_name[0] = None
 
                 # Announce completion so the coordinator can resume any
                 # projects it paused on our behalf.
-                coordinator.announce_finished(cfg.project_name)
+                if still_current:
+                    coordinator.announce_finished(cfg.project_name)
 
         coordinator.request_to_play(cfg.project_name, on_ready=_do_play)
 
@@ -835,7 +835,7 @@ def run_media_project(
                     source_state_store.capture_override_for_stem(name)
                 except Exception as exc:
                     print(f"[{cfg.project_name}] Could not save single-source override for '{name}': {exc}")
-            obs.hide_source(cfg.scene, source_name)
+            obs.park_media_source(cfg.scene, source_name)
             with visible_lock:
                 visible_sources.discard(source_name)
 
@@ -1189,8 +1189,7 @@ def run_media_project(
             if current_source_name[0] == stop_src:
                 current_source_name[0] = None
         print(f"[{cfg.project_name}] Trigger while playing — stopping '{stop_src}'.")
-        obs.stop_media(stop_src)
-        obs.hide_source(cfg.scene, stop_src)
+        obs.park_media_source(cfg.scene, stop_src)
         with visible_lock:
             visible_sources.discard(stop_src)
 

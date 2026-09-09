@@ -1,10 +1,12 @@
 """Offline lifecycle tests, including slow loads and rapidly replaced requests."""
 import sys
+import ast
 import threading
 import unittest
 from contextlib import nullcontext
 from pathlib import Path
 from unittest.mock import Mock, patch
+from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from lib.paths import ensure_import_paths, load_project_env
@@ -103,7 +105,8 @@ class DirectPlaybackTests(unittest.TestCase):
             player.play('ss__new')
             obs.set_media_source_file.assert_called_once()
             obs.restart_media.assert_not_called()
-            self.assertEqual(obs.stop_media.call_count, 2)
+            obs.stop_media.assert_called_once()  # stop before loading
+            self.assertEqual(obs.park_media_source.call_count, 2)  # initialization and completion
 
     def test_cancel_during_load_never_starts_visualizer_or_shows_source(self):
         cancel = threading.Event()
@@ -163,6 +166,36 @@ class DirectPlaybackTests(unittest.TestCase):
                     scene='test', source_name='player', filepath=Path('new.mp4'), start_timeout=1))
                 self.assertEqual(obs.restart_media.call_count, int(same))
                 obs.set_media_source_file.assert_called_once()
+
+    def test_shared_effect_completion_cannot_park_or_save_a_newer_identical_clip(self):
+        # Exercise the nested completion callback without starting the Hub's
+        # keyboard/event loop. Simulate another request during media polling.
+        tree = ast.parse(Path(media_project.__file__).read_text(encoding='utf-8'))
+        callback = next(node for node in ast.walk(tree)
+                        if isinstance(node, ast.FunctionDef) and node.name == '_do_play')
+        for replaced in (False, True):
+            with self.subTest(replaced=replaced):
+                request = [1]
+                playing, source = ['hooray'], ['player']
+                store, obs, coordinator = Mock(), Mock(), Mock()
+                if replaced:
+                    obs.wait_for_media_end.side_effect = lambda *a, **kw: request.__setitem__(0, 2)
+                scope = dict(
+                    play_lock=threading.Lock(), visible_lock=threading.Lock(),
+                    current_play_request_id=request, request_id=1, currently_playing=playing,
+                    current_source_name=source, name='hooray', source_name='player',
+                    cfg=SimpleNamespace(project_name='test', scene='effects',
+                                        media_start_timeout=1, media_total_timeout=10),
+                    visible_sources=set(), _single_source_store_for=lambda _: store,
+                    apply_runtime_media_settings=Mock(), apply_runtime_audio_settings=Mock(),
+                    _single_source_mode=False, filepath=Path('hooray.mp4'),
+                    _start_media_source_playback=Mock(), obs=obs, coordinator=coordinator)
+                exec(compile(ast.Module(body=[callback], type_ignores=[]), '<callback>', 'exec'), scope)
+                scope['_do_play']()
+                self.assertEqual(obs.park_media_source.call_count, int(not replaced))
+                self.assertEqual(store.capture_override_for_stem.call_count, int(not replaced))
+                self.assertEqual(coordinator.announce_finished.call_count, int(not replaced))
+                self.assertEqual(playing, ['hooray' if replaced else None])
 
 
 if __name__ == '__main__':

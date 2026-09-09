@@ -502,7 +502,7 @@ def create_media_source(scene: str, source_name: str, filepath: str | Path, hidd
     settings = {
         "local_file": str(filepath),
         "is_local_file": True,
-        "restart_on_activate": False,
+        "restart_on_activate": True,
         "close_when_inactive": True,
         "hw_decode": True,
         "looping": False,
@@ -1152,6 +1152,22 @@ def configure_media_source_properties(
         settings["speed_percent"] = float(speed_percent)
     if settings:
         get_obs().set_input_settings(source, settings, overlay=True)
+
+
+def park_media_source(scene: str, source: str) -> None:
+    """Leave an unused managed source safe to restore on the next OBS launch.
+
+    restart_on_activate=False allows OBS to start a local file even when hidden
+    while constructing a scene collection. Both idle flags must be true.
+    Playback code explicitly switches them back for an actual play request.
+    """
+    try:
+        configure_media_source_properties(source, restart_on_activate=True, close_when_inactive=True)
+    finally:
+        try:
+            stop_media(source)
+        finally:
+            hide_source(scene, source)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

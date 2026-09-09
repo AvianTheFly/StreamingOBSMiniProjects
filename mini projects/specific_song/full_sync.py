@@ -146,7 +146,7 @@ def _obs_create(req, obs_name: str, media_path: Path) -> bool:
     settings = {
         "local_file"         : str(media_path),
         "is_local_file"      : True,
-        "restart_on_activate": False,
+        "restart_on_activate": True,
         "close_when_inactive": True,
         "hw_decode"          : True,
         "looping"            : False,

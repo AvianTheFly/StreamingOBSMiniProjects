@@ -1060,9 +1060,10 @@ def run(
         finally:
             try:
                 replay_fader.capture()
-                stop_media(SOURCE_NAME)
-                obs.hide_source(SCENE, SOURCE_NAME)
-                _end_replay(cancelled=_cancel_watcher.is_set())
+                try:
+                    obs.park_media_source(SCENE, SOURCE_NAME)
+                finally:
+                    _end_replay(cancelled=_cancel_watcher.is_set())
             finally:
                 with _lock:
                     _is_multi_clip_active[0] = False

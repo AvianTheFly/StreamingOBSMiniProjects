@@ -446,7 +446,8 @@ def _apply_media_config(source_name: str, monitor: str, *, is_media: bool) -> No
     try:
         configure_media_source_properties(
             source_name,
-            restart_on_activate=False,
+            restart_on_activate=True,
+            close_when_inactive=True,
         )
     except Exception as e:
         print(f"[sync]     (media config failed for '{source_name}'): {e}")

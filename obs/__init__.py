@@ -29,7 +29,7 @@ from .interaction import (
     set_source_transform, get_source_transform, get_canvas_size, get_scene_source_transforms, set_source_transform_by_id,
     configure_input_audio,
     set_input_audio_tracks,
-    save_replay_buffer_and_wait, set_media_source_file, configure_media_source_properties,
+    save_replay_buffer_and_wait, set_media_source_file, configure_media_source_properties, park_media_source,
     get_input_volume, set_input_volume_db, set_input_volume_mul,
     get_input_audio_monitor_type, set_input_audio_monitor_type,
     get_input_list, set_desktop_audio_volume,
@@ -77,7 +77,7 @@ __all__ = [
     "get_input_list", "set_desktop_audio_volume",
     # Replay buffer
     "save_replay_buffer_and_wait",
-    "configure_media_source_properties",
+    "configure_media_source_properties", "park_media_source",
     # Mute
     "set_input_mute", "get_input_mute",
     # Stream title
