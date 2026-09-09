@@ -12,6 +12,7 @@ from lib.shared_media.layout_rules import (
     resolve_rule_for_stem,
 )
 from lib.shared_media.single_source_state import SingleSourceStateStore
+from lib.shared_media.playback_worker import PlaybackWorker
 
 from .config import CONFIG
 
@@ -43,7 +44,8 @@ class SoundboardPlayer:
         self._paused = False
         self._current_stem: str | None = None
         self._current_file: Path | None = None
-        self._play_thread: threading.Thread | None = None
+        self._requests = PlaybackWorker("soundboard:playback")
+        self._cancel_event = threading.Event()
         # Keep each asset's OBS filters and placement across shared-source swaps.
         self._state_store = SingleSourceStateStore(
             project_dir=_PROJECT_DIR,
@@ -63,7 +65,10 @@ class SoundboardPlayer:
     @property
     def is_busy(self) -> bool:
         with self._lock:
-            return self._is_busy
+            return self._is_busy or self._requests.busy
+
+    def _cancelled(self) -> bool:
+        return self._abort_flag or self._cancel_event.is_set()
 
     @property
     def is_paused(self) -> bool:
@@ -88,28 +93,13 @@ class SoundboardPlayer:
         volume_db: float,
         categories: list[str],
         on_finish=None,
-    ) -> None:
-        with self._lock:
-            old_thread = self._play_thread
-        if old_thread is not None and old_thread.is_alive():
-            self.abort()
-            old_thread.join(timeout=5)
-
-        thread = threading.Thread(
-            target=self.play,
-            kwargs={
-                "stem": stem,
-                "filepath": filepath,
-                "volume_db": volume_db,
-                "categories": categories,
-                "on_finish": on_finish,
-            },
-            daemon=True,
-            name=f"soundboard:{stem}",
+    ) -> threading.Event:
+        return self._requests.submit(
+            lambda cancel: self.play(
+                stem=stem, filepath=filepath, volume_db=volume_db,
+                categories=categories, on_finish=on_finish, cancelled=cancel,
+            )
         )
-        with self._lock:
-            self._play_thread = thread
-        thread.start()
 
     def play(
         self,
@@ -119,6 +109,7 @@ class SoundboardPlayer:
         volume_db: float,
         categories: list[str],
         on_finish=None,
+        cancelled: threading.Event | None = None,
     ) -> None:
         with self._lock:
             if self._is_busy:
@@ -129,41 +120,34 @@ class SoundboardPlayer:
             self._paused = False
             self._current_stem = stem
             self._current_file = filepath
+            self._cancel_event = cancelled if cancelled is not None else threading.Event()
 
+        state_applied = False
         try:
+            if self._cancelled():
+                return
             print(f"{_TAG} Playing: '{SINGLE_SOURCE_NAME}'")
 
             self._stop_and_hide_source()
-            current_file = self._current_media_file()
-            same_file = False
-            if current_file is not None:
-                try:
-                    same_file = current_file.resolve() == filepath.resolve()
-                except OSError:
-                    same_file = str(current_file).casefold() == str(filepath).casefold()
-
-            # Replaying the same effect does not need another decoder/file swap.
-            if not same_file:
-                obs.set_media_source_file(SINGLE_SOURCE_NAME, filepath)
-                if not self._wait_for_media_file(filepath):
-                    current = self._current_media_file()
-                    current_name = current.name if current else "unknown"
-                    raise RuntimeError(
-                        f"OBS did not confirm file swap to '{filepath.name}' (current: '{current_name}')."
-                    )
-
-                # Changing local_file can start decoding immediately. Stop that
-                # implicit start before the one intentional restart below.
-                try:
-                    obs.stop_media(SINGLE_SOURCE_NAME)
-                except Exception:
-                    pass
-
+            if self._cancelled():
+                return
             self._state_store.apply_for_stem(stem)
+            state_applied = True
             if not self._state_store.has_transform_override(stem):
                 self._apply_layout_rule(stem, filepath, categories)
             self._apply_runtime_audio_settings(volume_db)
 
+            if self._cancelled():
+                return
+            # Finish presentation/audio setup BEFORE the file change; OBS
+            # starts a changed file automatically, including hidden sources.
+            changed = obs.set_media_source_file(SINGLE_SOURCE_NAME, filepath, managed_decode=True)
+            same_file = not changed
+            if changed:
+                if not self._wait_for_media_file(filepath):
+                    raise RuntimeError(f"OBS did not confirm file swap to '{filepath.name}'.")
+            if self._cancelled():
+                return
             obs.show_source(CONFIG.scene, SINGLE_SOURCE_NAME)
             settle = max(0.0, float(getattr(CONFIG, "media_swap_settle_ms", 0) or 0) / 1000.0)
             if settle > 0:
@@ -171,7 +155,10 @@ class SoundboardPlayer:
             else:
                 time.sleep(0.03)
 
-            obs.restart_media(SINGLE_SOURCE_NAME)
+            if self._cancelled():
+                return
+            if same_file:
+                obs.restart_media(SINGLE_SOURCE_NAME)
             started = self._poll_until_done(expected_file=filepath)
             if not started and not self._abort_flag:
                 raise RuntimeError(f"Playback did not start cleanly for '{filepath.name}'.")
@@ -179,7 +166,8 @@ class SoundboardPlayer:
             print(f"{_TAG} Playback failed for '{SINGLE_SOURCE_NAME}': {exc}")
         finally:
             try:
-                self._state_store.capture_override_for_stem(stem)
+                if state_applied:
+                    self._state_store.capture_override_for_stem(stem)
             except Exception as exc:
                 print(f"{_TAG} Could not save single-source override for '{stem}': {exc}")
             self._stop_and_hide_source()
@@ -226,6 +214,7 @@ class SoundboardPlayer:
         print(f"{_TAG} Resumed: '{stem}'")
 
     def abort(self) -> None:
+        self._requests.cancel()
         with self._lock:
             if not self._is_busy:
                 return
@@ -284,7 +273,6 @@ class SoundboardPlayer:
                 restart_on_activate=False,
                 close_when_inactive=False,
                 looping=False,
-                hw_decode=True,
                 clear_on_media_end=False,
             )
         except Exception as exc:
@@ -359,7 +347,7 @@ class SoundboardPlayer:
 
         while True:
             with self._lock:
-                if self._abort_flag:
+                if self._cancelled():
                     return True
                 paused = self._paused
 

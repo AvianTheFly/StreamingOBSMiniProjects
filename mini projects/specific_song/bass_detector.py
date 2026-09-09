@@ -154,6 +154,7 @@ class BassDetector:
 
         self._audio_data: np.ndarray | None = None
         self._running = False
+        self._paused = threading.Event()
         self._file_thread: threading.Thread | None = None
         self._decoder = None
         self._decoder_lock = threading.Lock()
@@ -195,6 +196,12 @@ class BassDetector:
             self._file_thread.start()
         else:
             print("[BassDetector] No audio file configured — signals will be flat.")
+
+    def pause(self) -> None:
+        self._paused.set()
+
+    def resume(self) -> None:
+        self._paused.clear()
 
     def stop(self) -> None:
         self._running = False
@@ -266,6 +273,10 @@ class BassDetector:
             size = self.block_size * 4
             next_frame = time.monotonic()
             while self._running:
+                if self._paused.is_set():
+                    time.sleep(0.05)
+                    next_frame = time.monotonic()
+                    continue
                 raw = decoder.stdout.read(size)
                 if not raw or not self._running:
                     break

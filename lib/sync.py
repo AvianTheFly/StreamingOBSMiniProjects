@@ -440,14 +440,13 @@ def sync_assets(
 # ── Internal helpers ──────────────────────────────────────────────────────────
 
 def _apply_media_config(source_name: str, monitor: str, *, is_media: bool) -> None:
-    """Apply restart/hw_decode properties and audio monitoring to a media source."""
+    """Apply activation behavior and monitoring without reopening the decoder."""
     if not is_media:
         return
     try:
         configure_media_source_properties(
             source_name,
             restart_on_activate=False,
-            hw_decode=True,
         )
     except Exception as e:
         print(f"[sync]     (media config failed for '{source_name}'): {e}")

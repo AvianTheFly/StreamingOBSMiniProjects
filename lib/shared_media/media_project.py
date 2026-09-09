@@ -120,16 +120,11 @@ def _start_media_source_playback(
         pass
     time.sleep(0.03)
 
-    obs.set_media_source_file(source_name, filepath)
+    same_file = not obs.set_media_source_file(source_name, filepath, managed_decode=True)
     file_applied = _wait_for_media_source_file(source_name, filepath, timeout=min(2.0, max(0.5, start_timeout)))
     if not file_applied:
         return False
-    # A local_file change can itself start the OBS media input. Cancel that
-    # implicit start so this helper has exactly one playback start below.
-    try:
-        obs.stop_media(source_name)
-    except Exception:
-        pass
+    # The changed file starts automatically with restart_on_activate=False.
     try:
         obs.show_source(scene, source_name)
     except Exception:
@@ -139,7 +134,8 @@ def _start_media_source_playback(
     else:
         time.sleep(0.03)
     try:
-        obs.restart_media(source_name)
+        if same_file:
+            obs.restart_media(source_name)
     except Exception:
         pass
 
@@ -720,8 +716,10 @@ def run_media_project(
                         raise RuntimeError(f"Shared source '{source_name}' did not start playback cleanly.")
                 else:
                     obs.stop_media(source_name)
+                    changed = obs.set_media_source_file(source_name, filepath, managed_decode=True)
                     obs.show_source(cfg.scene, source_name)
-                    obs.restart_media(source_name)
+                    if not changed:
+                        obs.restart_media(source_name)
                 obs.wait_for_media_end(
                     source_name,
                     start_timeout=cfg.media_start_timeout,
@@ -806,8 +804,10 @@ def run_media_project(
                     raise RuntimeError(f"Shared source '{source_name}' did not start playback cleanly.")
             else:
                 obs.stop_media(source_name)
+                changed = obs.set_media_source_file(source_name, filepath, managed_decode=True)
                 obs.show_source(cfg.scene, source_name)
-                obs.restart_media(source_name)
+                if not changed:
+                    obs.restart_media(source_name)
             obs.wait_for_media_end(
                 source_name,
                 start_timeout=cfg.media_start_timeout,
@@ -860,7 +860,6 @@ def run_media_project(
                 restart_on_activate=False,
                 close_when_inactive=True,
                 looping=False,
-                hw_decode=True,
                 clear_on_media_end=False,
             )
         except Exception as exc:

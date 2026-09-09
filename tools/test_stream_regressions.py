@@ -39,6 +39,7 @@ class RegressionTests(unittest.TestCase):
         player = SongPlayer.__new__(SongPlayer)
         player._lock = threading.Lock()
         player._abort_flag = False
+        player._cancel_event = threading.Event()
         player._paused = False
         states = iter(['OBS_MEDIA_STATE_STOPPED'] * 3
                       + ['OBS_MEDIA_STATE_PLAYING'] * 6

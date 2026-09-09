@@ -102,6 +102,7 @@ class BassAnimator:
         )
         self._thread: threading.Thread | None = None
         self._stop = threading.Event()
+        self._paused = threading.Event()
         self._exit_requested = threading.Event()
         self._disabled_filter: str | None = None
         self._mask_applied = False
@@ -135,12 +136,22 @@ class BassAnimator:
         self._exit_requested.set()
         self._thread.join(timeout=JUMP_DURATION + 0.5)
 
+    def pause(self) -> None:
+        self._paused.set()
+        self._detector.pause()
+
+    def resume(self) -> None:
+        self._detector.resume()
+        self._paused.clear()
+
     def stop(self) -> None:
         self._stop.set()
         self._exit_requested.set()
         self._detector.stop()
         if self._thread is not None:
-            self._thread.join(timeout=2)
+            # Do not let a delayed old animator write transforms into the next
+            # song. OBS requests already have a connection timeout.
+            self._thread.join()
             self._thread = None
         self._remove_mask()
         self._reset_transform()
@@ -164,6 +175,10 @@ class BassAnimator:
         last_t = time.monotonic()
 
         while not self._stop.is_set() and not self._exit_requested.is_set():
+            if self._paused.is_set():
+                self._stop.wait(0.05)
+                last_t = time.monotonic()
+                continue
             now = time.monotonic()
             dt = max(1e-4, now - last_t)
             last_t = now

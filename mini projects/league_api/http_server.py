@@ -40,7 +40,7 @@ def make_handler(service, *, root: Path, port: int, load_config):
                 try: self.send_bytes(json.dumps(service.volume()).encode())
                 except Exception: self.send_bytes(b'{"error":"OBS audio is unavailable. Start OBS with WebSocket enabled."}',status=503)
                 return
-            if path in {'/control.js','/control.css','/presentation.js','/pool.js'}:
+            if path in {'/control.js','/control.css','/presentation.js','/pool.js','/monitor.js'}:
                 self.send_bytes((root/path[1:]).read_bytes(),'text/javascript' if path.endswith('.js') else 'text/css'); return
             if path=='/state':
                 self.send_bytes(json.dumps(service.snapshot()).encode()); return

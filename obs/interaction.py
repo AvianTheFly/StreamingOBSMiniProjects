@@ -1088,19 +1088,32 @@ def save_replay_buffer_and_wait(timeout: float = 15.0) -> str | None:
 #  Media source file targeting
 # ─────────────────────────────────────────────────────────────────────────────
 
-def set_media_source_file(source: str, filepath: str | Path) -> None:
+def set_media_source_file(source: str, filepath: str | Path, *, managed_decode: bool = False) -> bool:
     """
     Point an ffmpeg_source (media source) input at a new local file without
-    changing any other settings.  Call restart_media() afterwards to play.
+    changing any other settings. OBS automatically starts a changed file when
+    restart_on_activate=False, even if hidden. Do not immediately stop/restart
+    it again. An unchanged file needs an explicit restart to replay it.
+    Returns True if the file/decoder changed, False if already configured.
     """
-    get_obs().set_input_settings(
-        source,
-        {
-            "local_file"   : str(filepath),
-            "is_local_file": True,
-        },
-        overlay=True,
-    )
+    settings = {"local_file": str(filepath), "is_local_file": True}
+    if managed_decode:
+        from .media_decode import hardware_decode_for
+        hardware = hardware_decode_for(filepath)
+        if hardware is not None:
+            settings['hw_decode'] = hardware
+            print(f"[OBS] Loading '{Path(filepath).name}' on '{source}' ({'hardware' if hardware else 'software'} decode)")
+    client = get_obs()
+    current = client.get_input_settings(source).input_settings
+    # OBS compares path strings literally. Avoid reopening the same file just
+    # because one caller used Windows slashes and another used forward slashes.
+    same_path = str(current.get('local_file') or '').replace('\\', '/').casefold() == str(filepath).replace('\\', '/').casefold()
+    changes = {key: value for key, value in settings.items()
+               if (not same_path if key == 'local_file' else current.get(key, True if key == 'is_local_file' else None) != value)}
+    if not changes:
+        return False
+    client.set_input_settings(source, changes, overlay=True)
+    return True
 
 
 def configure_media_source_properties(

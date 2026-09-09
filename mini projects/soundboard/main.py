@@ -245,6 +245,7 @@ def run(
         if player.is_busy:
             print(f"{_TAG} Stopping '{SINGLE_SOURCE_NAME}'.")
             player.abort()
+        coordinator.announce_finished(CONFIG.project_name)
 
     def eligible_random_stems(category_query: str = "") -> list[str]:
         stems = sorted(name_index.keys())
@@ -338,7 +339,6 @@ def run(
 
         def _do_play() -> None:
             if play_request_id[0] != request_id:
-                coordinator.announce_finished(CONFIG.project_name)
                 return
 
             settings = active_settings[0]
@@ -346,7 +346,10 @@ def run(
             volume_db = source_volume_for(stem)
 
             def _on_finish() -> None:
-                coordinator.announce_finished(CONFIG.project_name)
+                # Old cleanup must not resume Music under the newly requested
+                # effect. Only the current request owns the coordinator pause.
+                if play_request_id[0] == request_id:
+                    coordinator.announce_finished(CONFIG.project_name)
 
             player.play_async(
                 stem=stem,

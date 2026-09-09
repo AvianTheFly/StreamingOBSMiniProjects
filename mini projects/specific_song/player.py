@@ -6,8 +6,8 @@
 # ----------
 #   player.play(source_name)   — blocking; call from a daemon thread
 #   player.play_async(source)  — non-blocking wrapper
-#   player.pause()             — hide source mid-playback (OBS keeps running)
-#   player.resume()            — un-hide source
+#   player.pause()             — pause media and visualizer analysis
+#   player.resume()            — resume media and visualizer analysis
 #   player.abort()             — stop immediately and hide
 #   player.is_busy             — True while a song is active
 #   player.current_source      — name of the currently active source, or None
@@ -21,6 +21,7 @@ from pathlib import Path
 import obs  # root-level obs package — always on sys.path from hub
 from lib.project_settings import load_project_settings, shift_asset_volume_db, audio_settings_transaction
 from lib.shared_media.controls import effective_volume_db
+from lib.shared_media.playback_worker import PlaybackWorker
 
 from .config import (
     SCENE,
@@ -87,7 +88,8 @@ class SongPlayer:
         self._abort_flag     = False
         self._paused         = False
         self._current_source: str | None = None
-        self._play_thread:   threading.Thread | None = None
+        self._requests = PlaybackWorker("specific_song:playback")
+        self._cancel_event = threading.Event()
         self._animator:      "BassAnimator | None"    = None
         self._stop_event     = threading.Event()
         try:
@@ -96,22 +98,25 @@ class SongPlayer:
                 restart_on_activate=False,
                 close_when_inactive=False,
                 looping=False,
-                hw_decode=True,
                 clear_on_media_end=False,
             )
         except Exception as exc:
             print(f"{_TAG} ⚠  Could not configure shared Music source: {exc}")
 
     def stop(self) -> None:
-        """Shutdown the player (no-op watcher threads to join)."""
+        """Cancel pending loads and stop the active source on shutdown."""
         self._stop_event.set()
+        self.abort()
 
     # ── Properties ────────────────────────────────────────────────────────────
 
     @property
     def is_busy(self) -> bool:
         with self._lock:
-            return self._is_busy
+            return self._is_busy or self._requests.busy
+
+    def _cancelled(self) -> bool:
+        return self._abort_flag or self._cancel_event.is_set()
 
     @property
     def current_source(self) -> str | None:
@@ -218,7 +223,7 @@ class SongPlayer:
 
     # ── Public API ────────────────────────────────────────────────────────────
 
-    def play(self, source_name: str) -> None:
+    def play(self, source_name: str, *, cancelled: threading.Event | None = None) -> None:
         """
         Point the single OBS source at source_name's media file, show it,
         wait for it to finish, then hide it.  Blocking — call from a daemon thread.
@@ -235,6 +240,7 @@ class SongPlayer:
             self._abort_flag     = False
             self._paused         = False
             self._current_source = source_name
+            self._cancel_event = cancelled if cancelled is not None else threading.Event()
 
         # Resolve the actual media file from the source stem.
         audio_file = _resolve_audio_file(source_name)
@@ -242,6 +248,10 @@ class SongPlayer:
         volume_applied = False
 
         try:
+            if self._cancelled():
+                return
+            if audio_file is None:
+                raise FileNotFoundError(f"No media file found for '{source_name}'")
             print(f"{_TAG} ▶  Playing: '{source_name}'")
 
             # If the OBS fader was moved since the previous play, that was the
@@ -265,49 +275,33 @@ class SongPlayer:
                 # Analysis starts incrementally after playback; never decode a
                 # whole song on the hotkey-to-playback path.
 
-            if self._abort_flag:
+            if self._cancelled():
                 return
 
-            # Point the single source at this song's file before showing it.
-            if audio_file:
-                current_file = self._current_media_file(SINGLE_SOURCE_NAME)
-                try:
-                    same_file = bool(current_file and current_file.resolve() == audio_file.resolve())
-                except OSError:
-                    same_file = bool(current_file and str(current_file).casefold() == str(audio_file).casefold())
-                try:
-                    obs.stop_media(SINGLE_SOURCE_NAME)
-                except Exception:
-                    pass
-                if not same_file:
-                    try:
-                        obs.set_media_source_file(SINGLE_SOURCE_NAME, audio_file)
-                    except Exception as exc:
-                        print(f"{_TAG} ⚠  Could not set media file for '{SINGLE_SOURCE_NAME}': {exc}")
-                    else:
-                        if not self._wait_for_media_file(SINGLE_SOURCE_NAME, audio_file):
-                            current = self._current_media_file(SINGLE_SOURCE_NAME)
-                            current_name = current.name if current else "unknown"
-                            print(
-                                f"{_TAG} ⚠  OBS did not confirm file swap to '{audio_file.name}' "
-                                f"(current: '{current_name}')."
-                            )
-                        # Cancel the implicit start caused by changing local_file.
-                        try:
-                            obs.stop_media(SINGLE_SOURCE_NAME)
-                        except Exception:
-                            pass
-            else:
-                print(f"{_TAG} ⚠  No media file found for '{source_name}' — OBS source unchanged.")
-
-            obs.show_source(SCENE, SINGLE_SOURCE_NAME)
-            self._apply_fullscreen(SINGLE_SOURCE_NAME)
+            # Set the new asset's level before changing local_file: OBS starts
+            # the new decoder as part of that update, even while hidden.
             self._set_monitor_and_output(SINGLE_SOURCE_NAME)
             obs.set_input_volume_db(SINGLE_SOURCE_NAME, self.volume_for_stem(stem))
             volume_applied = True
 
+            # Point the single source at this song's file before showing it.
+            obs.stop_media(SINGLE_SOURCE_NAME)
+            obs.hide_source(SCENE, SINGLE_SOURCE_NAME)
+            same_file = not obs.set_media_source_file(SINGLE_SOURCE_NAME, audio_file, managed_decode=True)
+            if not self._wait_for_media_file(SINGLE_SOURCE_NAME, audio_file):
+                raise RuntimeError(f"OBS did not confirm file swap to '{audio_file.name}'.")
+
+            if self._cancelled():
+                return
+            obs.show_source(SCENE, SINGLE_SOURCE_NAME)
+            self._apply_fullscreen(SINGLE_SOURCE_NAME)
+            if self._cancelled():
+                return
             try:
-                obs.restart_media(SINGLE_SOURCE_NAME)
+                # A changed file already starts in OBS's deferred update.
+                # Only replaying the same file needs an explicit restart.
+                if same_file:
+                    obs.restart_media(SINGLE_SOURCE_NAME)
             except Exception as exc:
                 print(f"{_TAG} ⚠  Could not restart media: {exc}")
 
@@ -317,7 +311,7 @@ class SongPlayer:
             ended_cleanly = self._poll_until_done(SINGLE_SOURCE_NAME, expected_file=audio_file)
             self._safe_hide(SINGLE_SOURCE_NAME)
 
-            if self._abort_flag:
+            if self._cancelled():
                 print(f"{_TAG} ⏹  Aborted: '{source_name}'")
             elif ended_cleanly:
                 print(f"{_TAG} ✅  Finished: '{source_name}'")
@@ -329,8 +323,11 @@ class SongPlayer:
             self._safe_hide(SINGLE_SOURCE_NAME)
 
         finally:
+            # Hidden sources with restart_on_activate=False may keep decoding.
+            # Every exit (abort, timeout, error, normal end) explicitly stops it.
+            self._stop_and_hide_source()
             # A fader move made in OBS while this song was playing becomes the
-            # new project-wide Music level. UI changes already match the saved
+            # saved level for this asset. UI changes already match the saved
             # value, so this is a no-op for changes made in the Hub.
             try:
                 if volume_applied:
@@ -345,22 +342,9 @@ class SongPlayer:
                 self._current_source = None
                 self._paused         = False
 
-    def play_async(self, source_name: str) -> None:
-        """Non-blocking: aborts any current song, waits for its thread to exit,
-        then spawns a new daemon thread that calls play()."""
-        with self._lock:
-            old_thread = self._play_thread
-        if old_thread is not None and old_thread.is_alive():
-            self.abort()
-            old_thread.join(timeout=5)
-
-        t = threading.Thread(
-            target=self.play, args=(source_name,),
-            daemon=True, name=f"specific_song:{source_name}"
-        )
-        with self._lock:
-            self._play_thread = t
-        t.start()
+    def play_async(self, source_name: str) -> threading.Event:
+        """Replace pending work; old cleanup finishes before the next file loads."""
+        return self._requests.submit(lambda cancel: self.play(source_name, cancelled=cancel))
 
     def pause(self) -> None:
         """Pause the media at its current position."""
@@ -371,8 +355,13 @@ class SongPlayer:
             src = self._current_source  # logical name, for logging only
         try:
             obs.pause_media(SINGLE_SOURCE_NAME)
+            if self._animator is not None:
+                self._animator.pause()
         except Exception as exc:
             print(f"{_TAG} ⚠  Could not pause media: {exc}")
+            with self._lock:
+                self._paused = False
+            return
         print(f"{_TAG} ⏸  Paused: '{src}'")
 
     def resume(self) -> None:
@@ -384,18 +373,23 @@ class SongPlayer:
             src = self._current_source  # logical name, for logging only
         try:
             obs.play_media(SINGLE_SOURCE_NAME)
+            if self._animator is not None:
+                self._animator.resume()
             print(f"{_TAG} ▶  Resumed: '{src}'")
         except Exception as exc:
             print(f"{_TAG} ⚠  Could not resume: {exc}")
+            with self._lock:
+                self._paused = True
 
     def abort(self) -> None:
-        """Signal the play loop to stop immediately and mark the player idle."""
+        """Cancel pending/active playback; remain busy until cleanup finishes."""
+        self._requests.cancel()
         with self._lock:
             if not self._is_busy:
                 return
             self._abort_flag = True
             self._paused     = False
-        self._safe_hide(SINGLE_SOURCE_NAME)
+        self._stop_and_hide_source()
         print(f"{_TAG} ⏹  Abort requested.")
 
     # ── Internal helpers ──────────────────────────────────────────────────────
@@ -448,7 +442,7 @@ class SongPlayer:
 
         while True:
             with self._lock:
-                if self._abort_flag:
+                if self._cancelled():
                     return False
                 paused = self._paused
 
@@ -540,3 +534,10 @@ class SongPlayer:
             obs.hide_source(SCENE, source_name)
         except Exception as exc:
             print(f"{_TAG} ⚠  Could not hide '{source_name}': {exc}")
+
+    def _stop_and_hide_source(self) -> None:
+        try:
+            obs.stop_media(SINGLE_SOURCE_NAME)
+        except Exception as exc:
+            print(f"{_TAG} Could not stop '{SINGLE_SOURCE_NAME}': {exc}")
+        self._safe_hide(SINGLE_SOURCE_NAME)
