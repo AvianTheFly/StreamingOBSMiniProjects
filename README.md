@@ -45,6 +45,7 @@ Start with the layer that owns the change; these files are shared by the running
 | --- | --- |
 | Application startup and shutdown | `hub.py` (UI + modules), `main.py` (module runner) |
 | Supported module discovery | `lib/project_registry.py` |
+| Module config to editor field defaults | `lib/editor_config.py` |
 | Browser UI and its API | `hub_ui/app/`, `hub_ui/server.py` |
 | Shared asset/hotkey editor | `lib/hotkey_editor/`; `hotkey_editor.py` is its launcher |
 | Playback arbitration between modules | `coordinator.py`, `hub_rules.py` |

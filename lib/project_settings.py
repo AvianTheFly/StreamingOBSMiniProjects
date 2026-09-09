@@ -199,9 +199,9 @@ def shift_project_volume_db(
 ) -> bool:
     """Shift every profile by the same amount and persist it.
 
-    This is used when the user moves a shared source's fader directly in OBS.
-    Per-file offsets stay intact, so the OBS move behaves like the project-level
-    slider in the Hub.
+    This is a bulk project-level operation, not a shared-source fader handler.
+    A fader edit belongs to the loaded asset: use shift_asset_volume_db for that.
+    Per-file offsets remain intact; every profile's project level is shifted.
     """
     delta = float(delta_db)
     if abs(delta) <= 0.05:
