@@ -570,7 +570,7 @@ def run_media_project(
                 scene=cfg.scene,
                 source_name=_shared_source,
                 tag=f"[{cfg.project_name}]",
-                include_filters=cfg.project_name == "tik_tok",
+                include_filters=cfg.project_name in {"tik_tok", "soundboard"},
                 include_audio=False,
                 include_audio_volume=False,
                 include_media_settings=False,

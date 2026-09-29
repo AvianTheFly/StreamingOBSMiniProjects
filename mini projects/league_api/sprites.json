@@ -1,0 +1,19 @@
+{
+  "image": "F:\\EVERYTHING STREAM RELATED\\Streaming Scripts v2\\mini projects\\league_api\\levelup-filtered.png",
+  "original_image": "F:/EVERYTHING STREAM RELATED/Assets/VisualAndAudio/sprites/levelup.png",
+  "filters": [
+    {
+      "filterEnabled": true,
+      "filterIndex": 0,
+      "filterKind": "chroma_key_filter_v2",
+      "filterName": "Chroma Key",
+      "filterSettings": {
+        "key_color": 4278190080,
+        "key_color_type": "custom",
+        "similarity": 1,
+        "smoothness": 24,
+        "spill": 1
+      }
+    }
+  ]
+}

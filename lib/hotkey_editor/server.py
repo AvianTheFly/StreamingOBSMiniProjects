@@ -28,6 +28,13 @@ from lib.hotkey_editor.schema import (
     VOICE_COMMANDS_FIELD as _VOICE_COMMANDS_FIELD,
     config_fields_for_project as _config_fields_for_proj,
 )
+from lib.hotkey_editor.profiles import (
+    PROFILE_ACTIONS, change_profile, profile_response,
+    default_profile as _default_profile,
+    default_editor_state as _default_editor_state,
+    profile_response_fields as _profile_response_fields,
+)
+from lib.shared_media.phrase_scoring import coverage_score, normalize_phrase
 from lib.hotkeys import load_hotkeys, save_hotkeys
 from lib.shared_media.controls import action_catalog, normalize_file_volume_offsets, normalize_interface_hotkeys
 from lib.shared_media.profile_store import create_media_profile
@@ -304,53 +311,25 @@ def _score_phrase(
                 candidate_map[key] = stem
 
     if strategy == "coverage_difflib":
-        # Same 55/45 word-coverage + difflib blend used by specific_song/matcher.py
-        import re as _re
-        import difflib as _difflib
-        def _norm(t: str) -> str:
-            return _re.sub(r"[^a-z0-9]+", " ", t.lower()).strip()
-        def _cov_score(q: str, c: str) -> float:
-            if not c:
-                return 0.0
-            if c in q or q in c:
-                shorter, longer = min(len(c), len(q)), max(len(c), len(q))
-                if longer == 0 or shorter / longer >= 0.6:
-                    return 1.0
-            q_w = set(q.split()); c_w = set(c.split())
-            coverage = len(c_w & q_w) / len(c_w) if c_w else 0.0
-            ratio = _difflib.SequenceMatcher(None, q, c).ratio()
-            return coverage * 0.55 + ratio * 0.45
-        q_norm = _norm(phrase_lower)
-        stem_scores: dict[str, float] = {}
-        for cand, stem in candidate_map.items():
-            sc = _cov_score(q_norm, _norm(cand))
-            stem_scores[stem] = max(stem_scores.get(stem, 0.0), sc)
-        return sorted(
-            [{"stem": s, "score": round(v, 3)} for s, v in stem_scores.items()],
-            key=lambda x: x["score"], reverse=True,
-        )
+        query = normalize_phrase(phrase_lower)
+        scores = ((cand, coverage_score(query, normalize_phrase(cand))) for cand in candidate_map)
+    else:
+        try:
+            from rapidfuzz import fuzz, process as rfprocess
+            ranked = rfprocess.extract(phrase_lower, list(candidate_map), scorer=fuzz.WRatio, limit=None)
+            scores = ((cand, score / 100) for cand, score, _ in ranked)
+        except ImportError:
+            from difflib import SequenceMatcher
+            scores = ((cand, SequenceMatcher(None, phrase_lower, cand).ratio()) for cand in candidate_map)
 
-    try:
-        from rapidfuzz import fuzz, process as rfprocess
-        raw = rfprocess.extract(phrase_lower, list(candidate_map.keys()), scorer=fuzz.WRatio, limit=None)
-        stem_scores: dict[str, float] = {}
-        for cand, score, _ in raw:
-            stem = candidate_map[cand]
-            stem_scores[stem] = max(stem_scores.get(stem, 0.0), score)
-        return sorted(
-            [{"stem": s, "score": round(v / 100, 3)} for s, v in stem_scores.items()],
-            key=lambda x: x["score"], reverse=True,
-        )
-    except ImportError:
-        from difflib import SequenceMatcher
-        stem_scores = {}
-        for cand, stem in candidate_map.items():
-            r = SequenceMatcher(None, phrase_lower, cand).ratio()
-            stem_scores[stem] = max(stem_scores.get(stem, 0.0), r)
-        return sorted(
-            [{"stem": s, "score": round(v, 3)} for s, v in stem_scores.items()],
-            key=lambda x: x["score"], reverse=True,
-        )
+    stem_scores: dict[str, float] = {}
+    for candidate, score in scores:
+        stem = candidate_map[candidate]
+        stem_scores[stem] = max(stem_scores.get(stem, 0.0), score)
+    return sorted(
+        [{"stem": stem, "score": round(score, 3)} for stem, score in stem_scores.items()],
+        key=lambda item: item["score"], reverse=True,
+    )
 
 
 def _safe_transform(raw: dict) -> dict:
@@ -734,32 +713,6 @@ def _unique_archive_path(folder: Path, filename: str) -> Path:
 
 # ── Editor-state helpers ──────────────────────────────────────────────────────
 
-def _default_profile() -> dict:
-    return {
-        "trigger_sequences": "",
-        "hotkeys": {},
-        "interface_hotkeys": {},
-        "project_volume_db": 0.0,
-        "profile_volume_db": 0.0,
-        "category_volume_db": {},
-        "file_volume_offsets": {},
-        "group_names": {},
-        "display_names": {},
-        "categories": [],
-        "sound_categories": {},
-        "empty_groups": [],
-        "unbound_groups": [],
-    }
-
-
-def _default_editor_state() -> dict:
-    return {
-        "live_profile":   "default",
-        "active_profile": "default",
-        "profiles":       {"default": _default_profile()},
-    }
-
-
 def _load_editor_state(proj: dict) -> dict:
     state_file: Path = proj["state_file"]
     hotkeys_file: Path = proj["hotkeys_file"]
@@ -811,31 +764,6 @@ def _save_editor_state(proj: dict, state: dict) -> None:
 def _sync_hotkeys_file(proj: dict, profile: dict) -> None:
     """Write only the bound hotkeys to hotkeys.json for mini-project consumption."""
     save_hotkeys(proj["hotkeys_file"], profile.get("hotkeys", {}))
-
-
-def _safe_float(value, default: float = 0.0) -> float:
-    try:
-        return float(value)
-    except (TypeError, ValueError):
-        return float(default)
-
-
-def _profile_response_fields(profile: dict) -> dict:
-    return {
-        "profile_trigger_sequences": profile.get("trigger_sequences", ""),
-        "hotkeys":        profile.get("hotkeys", {}),
-        "interface_hotkeys": normalize_interface_hotkeys(profile.get("interface_hotkeys", {})),
-        "project_volume_db": _safe_float(profile.get("project_volume_db"), 0.0),
-        "profile_volume_db": _safe_float(profile.get("profile_volume_db"), 0.0),
-        "category_volume_db": normalize_file_volume_offsets(profile.get("category_volume_db", {})),
-        "file_volume_offsets": normalize_file_volume_offsets(profile.get("file_volume_offsets", {})),
-        "group_names":    profile.get("group_names", {}),
-        "display_names":  profile.get("display_names", {}),
-        "categories":     profile.get("categories", []),
-        "sound_categories": profile.get("sound_categories", {}),
-        "empty_groups":   profile.get("empty_groups", []),
-        "unbound_groups": profile.get("unbound_groups", []),
-    }
 
 
 def _build_api_data(proj: dict, state: dict, all_projects: list[dict], current_proj: dict) -> dict:
@@ -993,14 +921,13 @@ def _make_handler(*, current: dict, all_projects: list[dict], server_ref: list):
                 self._json_err("Invalid JSON")
                 return
 
+            profile_action = path.removeprefix("/api/profile/")
+            if path.startswith("/api/profile/") and profile_action in PROFILE_ACTIONS:
+                self._handle_profile(profile_action, data)
+                return
+
             routes = {
                 "/api/save":                  self._handle_save,
-                "/api/profile/create":        self._handle_profile_create,
-                "/api/profile/duplicate":     self._handle_profile_duplicate,
-                "/api/profile/delete":        self._handle_profile_delete,
-                "/api/profile/rename":        self._handle_profile_rename,
-                "/api/profile/set_live":      self._handle_profile_set_live,
-                "/api/profile/switch":        self._handle_profile_switch,
                 "/api/config/save":           self._handle_config_save,
                 "/api/phrases/save":          self._handle_phrases_save,
                 "/api/voice/score":           self._handle_voice_score,
@@ -1167,20 +1094,7 @@ def _make_handler(*, current: dict, all_projects: list[dict], server_ref: list):
             except Exception as exc:
                 return self._json_err(str(exc))
 
-            hf = Path(created["hotkeys_file"])
-            new_proj = {
-                "key": created["key"],
-                "name": created["name"],
-                "asset_dir": Path(created["asset_dir"]),
-                "hotkeys_file": hf,
-                "extensions": set(created.get("extensions", set())),
-                "config_defaults": created.get("config_defaults", {}),
-                "state_file": hf.parent / f"{hf.stem}_editor.json",
-                "features": created.get("features", {}),
-                "profile_store_file": Path(created["profile_store_file"]) if created.get("profile_store_file") else None,
-                "can_create_profiles": bool(created.get("can_create_profiles")),
-                "phrases_file": Path(created.get("phrases_file") or hf.parent / "phrases.json"),
-            }
+            new_proj = _normalize_project(created)
             all_projects.append(new_proj)
             current["proj"] = new_proj
             state = _load_editor_state(new_proj)
@@ -1274,130 +1188,24 @@ def _make_handler(*, current: dict, all_projects: list[dict], server_ref: list):
             except Exception as exc:
                 self._json_err(str(exc))
 
-        def _handle_profile_create(self, data):
-            name = str(data.get("name", "")).strip()
-            if not name:
-                return self._json_err("Name required")
-            proj  = current["proj"]
+        def _handle_profile(self, action: str, data: dict):
+            proj = current["proj"]
             state = _load_editor_state(proj)
-            if name in state["profiles"]:
-                return self._json_err(f"Profile '{name}' already exists")
-            active = state.get("active_profile", "default")
-            state["profiles"][name] = copy.deepcopy(
-                state["profiles"].get(active, _default_profile())
-            )
-            state["active_profile"] = name
+            old_live = state.get("live_profile")
+            try:
+                change_profile(state, action, data)
+            except ValueError as exc:
+                return self._json_err(str(exc))
+            live = state["live_profile"]
+            if action == "delete" and live != old_live:
+                _sync_hotkeys_file(proj, state["profiles"][live])
             _save_editor_state(proj, state)
-            profile = state["profiles"][name]
-            self._json_ok({
-                "ok": True,
-                "profile_names":  sorted(state["profiles"].keys()),
-                "active_profile": name,
-                "live_profile":   state.get("live_profile", "default"),
-                **_profile_response_fields(profile),
-            })
-
-        def _handle_profile_duplicate(self, data):
-            name = str(data.get("name", "")).strip()
-            source_name = str(data.get("source", "")).strip()
-            if not name:
-                return self._json_err("Name required")
-            proj  = current["proj"]
-            state = _load_editor_state(proj)
-            if name in state["profiles"]:
-                return self._json_err(f"Profile '{name}' already exists")
-            source_name = source_name or state.get("active_profile", "default")
-            if source_name not in state["profiles"]:
-                return self._json_err(f"Profile '{source_name}' not found")
-            state["profiles"][name] = copy.deepcopy(state["profiles"][source_name])
-            state["active_profile"] = name
-            _save_editor_state(proj, state)
-            profile = state["profiles"][name]
-            self._json_ok({
-                "ok": True,
-                "profile_names":  sorted(state["profiles"].keys()),
-                "active_profile": name,
-                "live_profile":   state.get("live_profile", "default"),
-                **_profile_response_fields(profile),
-            })
-
-        def _handle_profile_delete(self, data):
-            name = str(data.get("name", "")).strip()
-            proj  = current["proj"]
-            state = _load_editor_state(proj)
-            if name not in state["profiles"]:
-                return self._json_err(f"Profile '{name}' not found")
-            if len(state["profiles"]) <= 1:
-                return self._json_err("Cannot delete the last profile")
-            del state["profiles"][name]
-            if state.get("live_profile") == name:
-                new_live = next(iter(state["profiles"]))
-                state["live_profile"] = new_live
-                _sync_hotkeys_file(proj, state["profiles"][new_live])
-            if state.get("active_profile") == name:
-                state["active_profile"] = state["live_profile"]
-            _save_editor_state(proj, state)
-            active  = state["active_profile"]
-            profile = state["profiles"].get(active, _default_profile())
-            self._json_ok({
-                "ok": True,
-                "profile_names":  sorted(state["profiles"].keys()),
-                "active_profile": active,
-                "live_profile":   state.get("live_profile", "default"),
-                **_profile_response_fields(profile),
-            })
-
-        def _handle_profile_rename(self, data):
-            from_name = str(data.get("from", "")).strip()
-            to_name   = str(data.get("to", "")).strip()
-            if not from_name or not to_name:
-                return self._json_err("from and to required")
-            proj  = current["proj"]
-            state = _load_editor_state(proj)
-            if from_name not in state["profiles"]:
-                return self._json_err(f"Profile '{from_name}' not found")
-            if to_name in state["profiles"]:
-                return self._json_err(f"Profile '{to_name}' already exists")
-            state["profiles"][to_name] = state["profiles"].pop(from_name)
-            if state.get("live_profile")   == from_name: state["live_profile"]   = to_name
-            if state.get("active_profile") == from_name: state["active_profile"] = to_name
-            _save_editor_state(proj, state)
-            self._json_ok({
-                "ok": True,
-                "profile_names":  sorted(state["profiles"].keys()),
-                "active_profile": state["active_profile"],
-                "live_profile":   state.get("live_profile", "default"),
-            })
-
-        def _handle_profile_set_live(self, data):
-            name = str(data.get("name", "")).strip()
-            proj  = current["proj"]
-            state = _load_editor_state(proj)
-            if name not in state["profiles"]:
-                return self._json_err(f"Profile '{name}' not found")
-            state["live_profile"] = name
-            _save_editor_state(proj, state)
-            _sync_hotkeys_file(proj, state["profiles"][name])
-            count = len(state["profiles"][name].get("hotkeys", {}))
-            print(f"[hotkey_editor] Live profile → '{name}'  ({count} hotkeys → {proj['hotkeys_file']})")
-            self._json_ok({"ok": True, "live_profile": name})
-
-        def _handle_profile_switch(self, data):
-            name = str(data.get("name", "")).strip()
-            proj  = current["proj"]
-            state = _load_editor_state(proj)
-            if name not in state["profiles"]:
-                return self._json_err(f"Profile '{name}' not found")
-            state["active_profile"] = name
-            _save_editor_state(proj, state)
-            profile = state["profiles"][name]
-            self._json_ok({
-                "ok": True,
-                "profile_names":  sorted(state["profiles"].keys()),
-                "active_profile": name,
-                "live_profile":   state.get("live_profile", "default"),
-                **_profile_response_fields(profile),
-            })
+            if action == "set_live":
+                profile = state["profiles"][live]
+                _sync_hotkeys_file(proj, profile)
+                count = len(profile.get("hotkeys", {}))
+                print(f"[hotkey_editor] Live profile → '{live}'  ({count} hotkeys → {proj['hotkeys_file']})")
+            self._json_ok(profile_response(state, action))
 
         # ── Pending moves ─────────────────────────────────────────────────────
 
@@ -1486,6 +1294,23 @@ def _make_handler(*, current: dict, all_projects: list[dict], server_ref: list):
 
 # ── Public entry point ────────────────────────────────────────────────────────
 
+def _normalize_project(p: dict) -> dict:
+    hf = Path(p["hotkeys_file"])
+    return {
+        "key":          p.get("key", p["name"].lower().replace(" ", "_")),
+        "name":         p["name"],
+        "asset_dir":    Path(p["asset_dir"]),
+        "hotkeys_file": hf,
+        "extensions":   set(p.get("extensions", p.get("valid_extensions", set()))),
+        "config_defaults": p.get("config_defaults", {}),
+        "features":     p.get("features", {}),
+        "profile_store_file": Path(p["profile_store_file"]) if p.get("profile_store_file") else None,
+        "can_create_profiles": bool(p.get("can_create_profiles")),
+        "phrases_file": Path(p.get("phrases_file") or hf.parent / "phrases.json"),
+        "state_file":   hf.parent / f"{hf.stem}_editor.json",
+    }
+
+
 def run_editor(
     *,
     asset_dir:        Path,
@@ -1494,45 +1319,24 @@ def run_editor(
     project_name:     str,
     port:             int = 8765,
     all_projects:     list[dict] | None = None,
+    open_browser:     bool = True,
+    stop_event:       threading.Event | None = None,
 ) -> None:
-    """Start the hotkey editor server and open the browser. Blocks until Ctrl+C.
+    """Serve until Ctrl+C or stop_event; optionally open a browser for standalone use.
 
     If *all_projects* is provided, the UI will show a project switcher.
     Each entry must have keys: key, name, asset_dir, hotkeys_file, extensions.
     """
 
-    def _norm(p: dict) -> dict:
-        hf = Path(p["hotkeys_file"])
-        return {
-            "key":          p.get("key", p["name"].lower().replace(" ", "_")),
-            "name":         p["name"],
-            "asset_dir":    Path(p["asset_dir"]),
-            "hotkeys_file": hf,
-            "extensions":   set(p.get("extensions", p.get("valid_extensions", set()))),
-            "config_defaults": p.get("config_defaults", {}),
-            "features":     p.get("features", {}),
-            "profile_store_file": Path(p["profile_store_file"]) if p.get("profile_store_file") else None,
-            "can_create_profiles": bool(p.get("can_create_profiles")),
-            "phrases_file": Path(p.get("phrases_file") or hf.parent / "phrases.json"),
-            "state_file":   hf.parent / f"{hf.stem}_editor.json",
-        }
-
-    primary = {
-        "key":          project_name.lower().replace(" ", "_"),
-        "name":         project_name,
-        "asset_dir":    asset_dir,
+    primary = _normalize_project({
+        "name": project_name,
+        "asset_dir": asset_dir,
         "hotkeys_file": hotkeys_file,
-        "extensions":   valid_extensions,
-        "config_defaults": {},
-        "features": {},
-        "profile_store_file": None,
-        "can_create_profiles": False,
-        "phrases_file": hotkeys_file.parent / "phrases.json",
-        "state_file":   hotkeys_file.parent / f"{hotkeys_file.stem}_editor.json",
-    }
+        "extensions": valid_extensions,
+    })
 
     if all_projects:
-        normalized = [_norm(p) for p in all_projects]
+        normalized = [_normalize_project(p) for p in all_projects]
         keys = [p["key"] for p in normalized]
         if primary["key"] not in keys:
             normalized.insert(0, primary)
@@ -1594,10 +1398,18 @@ def run_editor(
         print(f"  [NOTE] Port {port} was in use — using {actual_port} instead.")
     if not asset_dir.is_dir():
         print("  [WARN] Asset directory not found — sounds list will be empty.")
-    print("\n  Opening browser… Ctrl+C to stop.\n")
+    print("\n  Ctrl+C to stop.\n")
 
-    threading.Timer(0.4, lambda: webbrowser.open(url)).start()
+    if open_browser:
+        threading.Timer(0.4, lambda: webbrowser.open(url)).start()
+    if stop_event is not None:
+        def _stop_with_hub():
+            stop_event.wait()
+            server.shutdown()
+        threading.Thread(target=_stop_with_hub, daemon=True, name="editor-shutdown").start()
     try:
         server.serve_forever()
     except KeyboardInterrupt:
         print("\n[hotkey_editor] Stopped.")
+    finally:
+        server.server_close()

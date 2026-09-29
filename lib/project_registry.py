@@ -29,6 +29,7 @@ SKIP_PROJECT_DIRS = {
 }
 
 SUPPORTED_RUNTIME_PROJECTS = {
+    "twitch_celebrations",
     "instant_replay",
     "league",
     "league_api",

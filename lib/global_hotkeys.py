@@ -112,7 +112,9 @@ class _SubprocessHotkeyBus:
                     [sys.executable, "-u", worker_path],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
-                    stdin=subprocess.DEVNULL,
+                    # A pipe owned by this parent lets the child detect even
+                    # a forced Hub exit without waiting for another keystroke.
+                    stdin=subprocess.PIPE,
                     bufsize=1,
                     text=True,
                     encoding="utf-8",

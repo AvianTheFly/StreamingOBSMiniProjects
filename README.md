@@ -14,6 +14,8 @@ The Hub intentionally loads only these stream modules:
 - `love_me`
 - Music (internal module key: `specific_song`)
 - `instant_replay`
+- `twitch_celebrations` — varied border parties for raids/follows/subs/gifts/cheers;
+  [setup and extension guide](mini%20projects/twitch_celebrations/README.md).
 
 It also loads `sound_effects` as a supporting audio module used by League.
 Legacy folders such as `stream_title` and `browser_lenses` are retained for
@@ -28,6 +30,12 @@ reference but are disabled and are not discovered by the Hub.
 - Run only one project: `py -3.11 hub.py --only soundboard`
 - Open the hotkey editor: `py -3.11 hotkey_editor.py`
 - Check the environment: `py -3.11 tools/doctor.py`
+
+In **Instant Replay**, pick a clip and **Load preview** to trim it. Drag the start/end
+sliders, enter times in seconds, or use **Start here / End here** while scrubbing.
+**Preview selection** plays just that moment; enable **Loop selection** to refine it.
+**Save trimmed copy** adds a full-resolution cut to the library for OBS or a
+compilation, keeping the original and its saved audio level. Trimming works with OBS closed.
 
 ## Important Folders
 
@@ -49,6 +57,8 @@ Start with the layer that owns the change; these files are shared by the running
 | Browser UI and its API | `hub_ui/app/`, `hub_ui/server.py` |
 | Shared asset/hotkey editor | `lib/hotkey_editor/`; `hotkey_editor.py` is its launcher |
 | Hotkey-editor labels, field types and visibility | `lib/hotkey_editor/schema.py` |
+| Editor profile defaults, responses and profile changes (no I/O) | `lib/hotkey_editor/profiles.py` |
+| Song-name scoring shared by playback and editor previews | `lib/shared_media/phrase_scoring.py` |
 | Playback arbitration between modules | `coordinator.py`, `hub_rules.py` |
 | Live module interfaces and registry | `lib/project_runtime.py` (also exported by `shared.py`) |
 | Shared hotkey/voice helpers and event bus | `shared.py`, `events.py` |
@@ -57,6 +67,12 @@ Start with the layer that owns the change; these files are shared by the running
 | Shared-source per-asset volume tracking | `lib/asset_fader.py` |
 | Settings transactions and recovery | `lib/project_settings.py`, `lib/settings_backups.py` |
 | Module-specific behavior | `mini projects/<module>/main.py` and `interface.py` |
+
+Both launchers use `main.run_hub()` for runtime setup, discovery, filtering and
+module startup. Importing either launcher does not parse arguments or start
+services. The UI waits for OBS if it is offline; the console launcher exits.
+The embedded hotkey editor uses `open_browser=False` and the Hub's `stop_event`
+so browser behavior and shutdown stay local to that server.
 
 For League alerts, `engine.py` detects and schedules events, `editor.py` validates
 and persists settings, `presentation.py` switches media setups, and `main.py`

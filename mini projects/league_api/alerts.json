@@ -1,9 +1,9 @@
 {
   "poll_seconds": 0.5,
-  "max_alerts": 3,
+  "max_alerts": 1,
   "events": {
     "game_start": {
-      "enabled": true,
+      "enabled": false,
       "priority": 45.0,
       "duration": 1.8,
       "cooldown": 0.0,
@@ -30,7 +30,7 @@
       "pool_enabled": true
     },
     "minions_spawning": {
-      "enabled": true,
+      "enabled": false,
       "priority": 25.0,
       "duration": 1.1,
       "cooldown": 0.0,
@@ -53,13 +53,13 @@
     "first_blood": {
       "enabled": true,
       "priority": 85.0,
-      "duration": 1.6,
-      "cooldown": 0.0,
+      "duration": 2.5,
+      "cooldown": 18,
       "media": "media/meme-squidward-dab.mp4",
       "volume": 0.7,
-      "start_time": 0.0,
+      "start_time": 0,
       "loop": false,
-      "title": "",
+      "title": "You got first blood",
       "audio": "",
       "media_pool": [
         {
@@ -75,18 +75,18 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": false
     },
     "ace": {
       "enabled": true,
       "priority": 88.0,
-      "duration": 1.6,
-      "cooldown": 0.0,
+      "duration": 2.5,
+      "cooldown": 18,
       "media": "media/meme-thanos-snap.mp4",
       "volume": 0.7,
-      "start_time": 0.0,
+      "start_time": 0,
       "loop": false,
-      "title": "",
+      "title": "Your team aced them",
       "audio": "",
       "media_pool": [
         {
@@ -96,10 +96,10 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": false
     },
     "turret_destroyed": {
-      "enabled": true,
+      "enabled": false,
       "priority": 55.0,
       "duration": 1.5,
       "cooldown": 0.0,
@@ -122,13 +122,13 @@
     "first_turret": {
       "enabled": true,
       "priority": 70.0,
-      "duration": 1.5,
-      "cooldown": 0.0,
+      "duration": 2.5,
+      "cooldown": 18,
       "media": "media/meme-ralph-wreck.mp4",
       "volume": 0.7,
-      "start_time": 0.0,
+      "start_time": 0,
       "loop": false,
-      "title": "",
+      "title": "Your team took first turret",
       "audio": "",
       "media_pool": [
         {
@@ -138,18 +138,18 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": false
     },
     "inhibitor_destroyed": {
       "enabled": true,
       "priority": 65.0,
-      "duration": 1.5,
-      "cooldown": 0.0,
+      "duration": 2.5,
+      "cooldown": 18,
       "media": "media/meme-ralph-wreck.mp4",
       "volume": 0.7,
-      "start_time": 0.0,
+      "start_time": 0,
       "loop": false,
-      "title": "",
+      "title": "Your team destroyed an inhibitor",
       "audio": "",
       "media_pool": [
         {
@@ -165,10 +165,10 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": false
     },
     "inhibitor_respawning_soon": {
-      "enabled": true,
+      "enabled": false,
       "priority": 30.0,
       "duration": 1.4,
       "cooldown": 0.0,
@@ -189,7 +189,7 @@
       "pool_enabled": true
     },
     "inhibitor_respawned": {
-      "enabled": true,
+      "enabled": false,
       "priority": 35.0,
       "duration": 1.8,
       "cooldown": 0.0,
@@ -216,7 +216,7 @@
       "pool_enabled": true
     },
     "void_grub": {
-      "enabled": true,
+      "enabled": false,
       "priority": 48.0,
       "duration": 1.8,
       "cooldown": 0.0,
@@ -237,7 +237,7 @@
       "pool_enabled": true
     },
     "herald": {
-      "enabled": true,
+      "enabled": false,
       "priority": 65.0,
       "duration": 1.5,
       "cooldown": 0.0,
@@ -260,13 +260,13 @@
     "baron": {
       "enabled": true,
       "priority": 90.0,
-      "duration": 2.5,
-      "cooldown": 0.0,
+      "duration": 2.85,
+      "cooldown": 18,
       "media": "media/meme-avengers.mp4",
       "volume": 0.7,
-      "start_time": 0.0,
+      "start_time": 0,
       "loop": false,
-      "title": "",
+      "title": "Your team secured Baron",
       "audio": "",
       "media_pool": [
         {
@@ -276,7 +276,7 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": false
     },
     "atakhan_legacy": {
       "enabled": false,
@@ -308,13 +308,13 @@
     "kill": {
       "enabled": true,
       "priority": 70.0,
-      "duration": 1.6,
-      "cooldown": 0.0,
+      "duration": 2.5,
+      "cooldown": 25,
       "media": "media/meme-squidward-dab.mp4",
       "volume": 0.7,
-      "start_time": 0.0,
+      "start_time": 0,
       "loop": false,
-      "title": "",
+      "title": "You got a kill",
       "audio": "",
       "media_pool": [
         {
@@ -330,18 +330,18 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": false
     },
     "death": {
       "enabled": true,
       "priority": 72.0,
-      "duration": 1.8,
-      "cooldown": 0.0,
+      "duration": 2.5,
+      "cooldown": 25,
       "media": "media/meme-michael-no.mp4",
       "volume": 0.7,
-      "start_time": 0.0,
+      "start_time": 0,
       "loop": false,
-      "title": "",
+      "title": "You died",
       "audio": "",
       "media_pool": [
         {
@@ -351,10 +351,10 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": false
     },
     "assist": {
-      "enabled": true,
+      "enabled": false,
       "priority": 50.0,
       "duration": 1.8,
       "cooldown": 0.0,
@@ -377,13 +377,13 @@
     "double_kill": {
       "enabled": true,
       "priority": 82.0,
-      "duration": 2.2,
-      "cooldown": 0.0,
+      "duration": 3.5,
+      "cooldown": 18,
       "media": "media/meme-tobey-dance.mp4",
       "volume": 0.7,
-      "start_time": 0.0,
+      "start_time": 0,
       "loop": false,
-      "title": "",
+      "title": "Double kill!",
       "audio": "",
       "media_pool": [
         {
@@ -399,18 +399,18 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": false
     },
     "triple_kill": {
       "enabled": true,
       "priority": 88.0,
-      "duration": 2.2,
-      "cooldown": 0.0,
+      "duration": 3.5,
+      "cooldown": 18,
       "media": "media/meme-tobey-dance.mp4",
       "volume": 0.7,
-      "start_time": 0.0,
+      "start_time": 0,
       "loop": false,
-      "title": "",
+      "title": "Triple kill!",
       "audio": "",
       "media_pool": [
         {
@@ -420,18 +420,18 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": false
     },
     "quadra_kill": {
       "enabled": true,
       "priority": 94.0,
-      "duration": 2.5,
-      "cooldown": 0.0,
+      "duration": 3.5,
+      "cooldown": 18,
       "media": "media/meme-tobey-dance.mp4",
       "volume": 0.7,
-      "start_time": 0.0,
+      "start_time": 0,
       "loop": false,
-      "title": "",
+      "title": "Quadra kill!",
       "audio": "",
       "media_pool": [
         {
@@ -447,18 +447,18 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": false
     },
     "pentakill": {
       "enabled": true,
       "priority": 100.0,
-      "duration": 1.6,
-      "cooldown": 0.0,
+      "duration": 2.5,
+      "cooldown": 18,
       "media": "media/meme-thanos-snap.mp4",
       "volume": 0.7,
-      "start_time": 0.0,
+      "start_time": 0,
       "loop": false,
-      "title": "",
+      "title": "PENTAKILL!",
       "audio": "",
       "media_pool": [
         {
@@ -468,10 +468,10 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": false
     },
     "dragon": {
-      "enabled": true,
+      "enabled": false,
       "priority": 68.0,
       "duration": 2.2,
       "cooldown": 0.0,
@@ -494,13 +494,13 @@
     "dragon_air": {
       "enabled": true,
       "priority": 68.0,
-      "duration": 2.2,
-      "cooldown": 0.0,
+      "duration": 3.5,
+      "cooldown": 18,
       "media": "media/meme-mcqueen-speed.mp4",
       "volume": 0.7,
-      "start_time": 0.0,
+      "start_time": 0,
       "loop": false,
-      "title": "",
+      "title": "Your team secured Cloud Dragon",
       "audio": "",
       "media_pool": [
         {
@@ -516,18 +516,18 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": false
     },
     "dragon_earth": {
       "enabled": true,
       "priority": 68.0,
-      "duration": 2.2,
-      "cooldown": 0.0,
+      "duration": 3.5,
+      "cooldown": 18,
       "media": "media/meme-toph-armor.mp4",
       "volume": 0.7,
       "start_time": 1.3,
       "loop": false,
-      "title": "",
+      "title": "Your team secured Mountain Dragon",
       "audio": "",
       "media_pool": [
         {
@@ -543,18 +543,18 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": false
     },
     "dragon_fire": {
       "enabled": true,
       "priority": 68.0,
-      "duration": 1.0,
-      "cooldown": 0.0,
+      "duration": 2.5,
+      "cooldown": 18,
       "media": "media/meme-zuko-fire.mp4",
       "volume": 0.7,
-      "start_time": 0.0,
+      "start_time": 0,
       "loop": false,
-      "title": "",
+      "title": "Your team secured Infernal Dragon",
       "audio": "",
       "media_pool": [
         {
@@ -570,18 +570,18 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": false
     },
     "dragon_water": {
       "enabled": true,
       "priority": 68.0,
-      "duration": 1.3,
-      "cooldown": 0.0,
+      "duration": 2.5,
+      "cooldown": 18,
       "media": "media/meme-katara-water.mp4",
       "volume": 0.7,
-      "start_time": 0.0,
+      "start_time": 0,
       "loop": false,
-      "title": "",
+      "title": "Your team secured Ocean Dragon",
       "audio": "",
       "media_pool": [
         {
@@ -597,18 +597,18 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": false
     },
     "dragon_hextech": {
       "enabled": true,
       "priority": 68.0,
-      "duration": 2.2,
-      "cooldown": 0.0,
+      "duration": 3.5,
+      "cooldown": 18,
       "media": "media/meme-palpatine-power.mp4",
       "volume": 0.7,
-      "start_time": 0.0,
+      "start_time": 0,
       "loop": false,
-      "title": "",
+      "title": "Your team secured Hextech Dragon",
       "audio": "",
       "media_pool": [
         {
@@ -624,18 +624,18 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": false
     },
     "dragon_chemtech": {
       "enabled": true,
       "priority": 68.0,
-      "duration": 1.9,
-      "cooldown": 0.0,
+      "duration": 2.5,
+      "cooldown": 18,
       "media": "media/meme-jesse-science.mp4",
       "volume": 0.7,
-      "start_time": 0.0,
+      "start_time": 0,
       "loop": false,
-      "title": "",
+      "title": "Your team secured Chemtech Dragon",
       "audio": "",
       "media_pool": [
         {
@@ -651,18 +651,18 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": false
     },
     "dragon_elder": {
       "enabled": true,
       "priority": 92.0,
-      "duration": 2.5,
-      "cooldown": 0.0,
+      "duration": 3.5,
+      "cooldown": 18,
       "media": "media/meme-palpatine-power.mp4",
       "volume": 0.7,
-      "start_time": 0.0,
+      "start_time": 0,
       "loop": false,
-      "title": "",
+      "title": "Your team secured Elder Dragon",
       "audio": "",
       "media_pool": [
         {
@@ -672,18 +672,18 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": false
     },
     "victory": {
       "enabled": true,
       "priority": 99.0,
-      "duration": 2.5,
-      "cooldown": 0.0,
+      "duration": 3.5,
+      "cooldown": 18,
       "media": "media/meme-tobey-dance.mp4",
       "volume": 0.7,
-      "start_time": 0.0,
+      "start_time": 0,
       "loop": false,
-      "title": "",
+      "title": "Victory!",
       "audio": "",
       "media_pool": [
         {
@@ -693,18 +693,18 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": false
     },
     "defeat": {
       "enabled": true,
       "priority": 99.0,
-      "duration": 1.8,
-      "cooldown": 0.0,
+      "duration": 2.5,
+      "cooldown": 18,
       "media": "media/meme-michael-no.mp4",
       "volume": 0.7,
-      "start_time": 0.0,
+      "start_time": 0,
       "loop": false,
-      "title": "",
+      "title": "Defeat",
       "audio": "",
       "media_pool": [
         {
@@ -714,10 +714,10 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": false
     },
     "game_end": {
-      "enabled": true,
+      "enabled": false,
       "priority": 99.0,
       "duration": 2.5,
       "cooldown": 0.0,
@@ -746,13 +746,13 @@
     "objective_steal": {
       "enabled": true,
       "priority": 96.0,
-      "duration": 2.5,
-      "cooldown": 0.0,
+      "duration": 3.4,
+      "cooldown": 18,
       "media": "media/meme-swiper-steal.mp4",
       "volume": 0.7,
-      "start_time": 0.0,
+      "start_time": 0,
       "loop": false,
-      "title": "",
+      "title": "Your team stole the objective!",
       "audio": "",
       "media_pool": [
         {
@@ -768,7 +768,7 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": false
     },
     "level_up": {
       "enabled": true,
@@ -795,10 +795,11 @@
           "loop": false
         }
       ],
-      "pool_enabled": true
+      "pool_enabled": true,
+      "autoplay": false
     },
     "ultimate_learned": {
-      "enabled": true,
+      "enabled": false,
       "priority": 60.0,
       "duration": 1.8,
       "cooldown": 0.0,
@@ -846,7 +847,7 @@
       "pool_enabled": true
     },
     "respawn": {
-      "enabled": true,
+      "enabled": false,
       "priority": 40.0,
       "duration": 1.8,
       "cooldown": 0.0,
@@ -873,7 +874,7 @@
       "pool_enabled": true
     },
     "inventory_added": {
-      "enabled": true,
+      "enabled": false,
       "priority": 30.0,
       "duration": 1.4,
       "cooldown": 0.0,
@@ -921,7 +922,7 @@
       "pool_enabled": true
     },
     "possible_purchase": {
-      "enabled": true,
+      "enabled": false,
       "priority": 40.0,
       "duration": 1.7,
       "cooldown": 20.0,
@@ -948,7 +949,7 @@
       "pool_enabled": true
     },
     "possible_item_upgrade": {
-      "enabled": true,
+      "enabled": false,
       "priority": 50.0,
       "duration": 1.8,
       "cooldown": 20.0,
@@ -996,7 +997,7 @@
       "pool_enabled": true
     },
     "possible_base_visit": {
-      "enabled": true,
+      "enabled": false,
       "priority": 58.0,
       "duration": 1.8,
       "cooldown": 20.0,
@@ -1017,7 +1018,7 @@
       "pool_enabled": true
     },
     "low_health": {
-      "enabled": true,
+      "enabled": false,
       "priority": 60.0,
       "duration": 1.8,
       "cooldown": 20.0,
@@ -1038,7 +1039,7 @@
       "pool_enabled": true
     },
     "heavy_health_loss": {
-      "enabled": true,
+      "enabled": false,
       "priority": 55.0,
       "duration": 1.8,
       "cooldown": 20.0,
@@ -1059,7 +1060,7 @@
       "pool_enabled": true
     },
     "large_heal": {
-      "enabled": true,
+      "enabled": false,
       "priority": 35.0,
       "duration": 1.3,
       "cooldown": 20.0,
@@ -1101,7 +1102,7 @@
       "pool_enabled": true
     },
     "possible_combat": {
-      "enabled": true,
+      "enabled": false,
       "priority": 40.0,
       "duration": 1.0,
       "cooldown": 20.0,
@@ -1122,7 +1123,7 @@
       "pool_enabled": true
     },
     "low_hp_kill": {
-      "enabled": true,
+      "enabled": false,
       "priority": 91.0,
       "duration": 1.4,
       "cooldown": 0.0,
@@ -1149,7 +1150,7 @@
       "pool_enabled": true
     },
     "low_hp_multikill": {
-      "enabled": true,
+      "enabled": false,
       "priority": 97.0,
       "duration": 1.4,
       "cooldown": 0.0,
@@ -1170,7 +1171,7 @@
       "pool_enabled": true
     },
     "possible_low_hp_escape": {
-      "enabled": true,
+      "enabled": false,
       "priority": 85.0,
       "duration": 2.2,
       "cooldown": 20.0,
@@ -1191,7 +1192,7 @@
       "pool_enabled": true
     },
     "possible_teamfight": {
-      "enabled": true,
+      "enabled": false,
       "priority": 75.0,
       "duration": 1.0,
       "cooldown": 20.0,
@@ -1212,7 +1213,7 @@
       "pool_enabled": true
     },
     "possible_objective_fight": {
-      "enabled": true,
+      "enabled": false,
       "priority": 80.0,
       "duration": 1.0,
       "cooldown": 20.0,
@@ -1239,7 +1240,7 @@
       "pool_enabled": true
     },
     "possible_power_spike": {
-      "enabled": true,
+      "enabled": false,
       "priority": 55.0,
       "duration": 1.4,
       "cooldown": 20.0,
@@ -1260,7 +1261,7 @@
       "pool_enabled": true
     },
     "cs_milestone": {
-      "enabled": true,
+      "enabled": false,
       "priority": 30.0,
       "duration": 1.1,
       "cooldown": 0.0,
@@ -1302,7 +1303,7 @@
       "pool_enabled": true
     },
     "manpower_advantage": {
-      "enabled": true,
+      "enabled": false,
       "priority": 45.0,
       "duration": 1.8,
       "cooldown": 20.0,
@@ -1390,10 +1391,10 @@
       "media_pool": []
     }
   },
-  "revision": 66,
+  "revision": 70,
   "paused": false,
   "presentation": "memes",
-  "overlay_enabled": true,
+  "overlay_enabled": false,
   "layout": {
     "x": 24,
     "y": 440,
@@ -1444,8 +1445,8 @@
         "first_blood": {
           "media": "media/meme-squidward-dab.mp4",
           "audio": "",
-          "duration": 1.6,
-          "start_time": 0.0,
+          "duration": 2.5,
+          "start_time": 0,
           "loop": false,
           "media_pool": [
             {
@@ -1461,13 +1462,13 @@
               "loop": false
             }
           ],
-          "pool_enabled": true
+          "pool_enabled": false
         },
         "ace": {
           "media": "media/meme-thanos-snap.mp4",
           "audio": "",
-          "duration": 1.6,
-          "start_time": 0.0,
+          "duration": 2.5,
+          "start_time": 0,
           "loop": false,
           "media_pool": [
             {
@@ -1477,7 +1478,7 @@
               "loop": false
             }
           ],
-          "pool_enabled": true
+          "pool_enabled": false
         },
         "turret_destroyed": {
           "media": "media/meme-ralph-wreck.mp4",
@@ -1498,8 +1499,8 @@
         "first_turret": {
           "media": "media/meme-ralph-wreck.mp4",
           "audio": "",
-          "duration": 1.5,
-          "start_time": 0.0,
+          "duration": 2.5,
+          "start_time": 0,
           "loop": false,
           "media_pool": [
             {
@@ -1509,13 +1510,13 @@
               "loop": false
             }
           ],
-          "pool_enabled": true
+          "pool_enabled": false
         },
         "inhibitor_destroyed": {
           "media": "media/meme-ralph-wreck.mp4",
           "audio": "",
-          "duration": 1.5,
-          "start_time": 0.0,
+          "duration": 2.5,
+          "start_time": 0,
           "loop": false,
           "media_pool": [
             {
@@ -1531,7 +1532,7 @@
               "loop": false
             }
           ],
-          "pool_enabled": true
+          "pool_enabled": false
         },
         "inhibitor_respawning_soon": {
           "media": "media/meme-terminator-back.mp4",
@@ -1606,8 +1607,8 @@
         "baron": {
           "media": "media/meme-avengers.mp4",
           "audio": "",
-          "duration": 2.5,
-          "start_time": 0.0,
+          "duration": 2.85,
+          "start_time": 0,
           "loop": false,
           "media_pool": [
             {
@@ -1617,7 +1618,7 @@
               "loop": false
             }
           ],
-          "pool_enabled": true
+          "pool_enabled": false
         },
         "atakhan_legacy": {
           "media": "media/meme-avengers.mp4",
@@ -1644,8 +1645,8 @@
         "kill": {
           "media": "media/meme-squidward-dab.mp4",
           "audio": "",
-          "duration": 1.6,
-          "start_time": 0.0,
+          "duration": 2.5,
+          "start_time": 0,
           "loop": false,
           "media_pool": [
             {
@@ -1661,13 +1662,13 @@
               "loop": false
             }
           ],
-          "pool_enabled": true
+          "pool_enabled": false
         },
         "death": {
           "media": "media/meme-michael-no.mp4",
           "audio": "",
-          "duration": 1.8,
-          "start_time": 0.0,
+          "duration": 2.5,
+          "start_time": 0,
           "loop": false,
           "media_pool": [
             {
@@ -1677,7 +1678,7 @@
               "loop": false
             }
           ],
-          "pool_enabled": true
+          "pool_enabled": false
         },
         "assist": {
           "media": "media/meme-gru-answer.mp4",
@@ -1698,8 +1699,8 @@
         "double_kill": {
           "media": "media/meme-tobey-dance.mp4",
           "audio": "",
-          "duration": 2.2,
-          "start_time": 0.0,
+          "duration": 3.5,
+          "start_time": 0,
           "loop": false,
           "media_pool": [
             {
@@ -1715,13 +1716,13 @@
               "loop": false
             }
           ],
-          "pool_enabled": true
+          "pool_enabled": false
         },
         "triple_kill": {
           "media": "media/meme-tobey-dance.mp4",
           "audio": "",
-          "duration": 2.2,
-          "start_time": 0.0,
+          "duration": 3.5,
+          "start_time": 0,
           "loop": false,
           "media_pool": [
             {
@@ -1731,13 +1732,13 @@
               "loop": false
             }
           ],
-          "pool_enabled": true
+          "pool_enabled": false
         },
         "quadra_kill": {
           "media": "media/meme-tobey-dance.mp4",
           "audio": "",
-          "duration": 2.5,
-          "start_time": 0.0,
+          "duration": 3.5,
+          "start_time": 0,
           "loop": false,
           "media_pool": [
             {
@@ -1753,13 +1754,13 @@
               "loop": false
             }
           ],
-          "pool_enabled": true
+          "pool_enabled": false
         },
         "pentakill": {
           "media": "media/meme-thanos-snap.mp4",
           "audio": "",
-          "duration": 1.6,
-          "start_time": 0.0,
+          "duration": 2.5,
+          "start_time": 0,
           "loop": false,
           "media_pool": [
             {
@@ -1769,7 +1770,7 @@
               "loop": false
             }
           ],
-          "pool_enabled": true
+          "pool_enabled": false
         },
         "dragon": {
           "media": "media/meme-avengers.mp4",
@@ -1790,8 +1791,8 @@
         "dragon_air": {
           "media": "media/meme-mcqueen-speed.mp4",
           "audio": "",
-          "duration": 2.2,
-          "start_time": 0.0,
+          "duration": 3.5,
+          "start_time": 0,
           "loop": false,
           "media_pool": [
             {
@@ -1807,12 +1808,12 @@
               "loop": false
             }
           ],
-          "pool_enabled": true
+          "pool_enabled": false
         },
         "dragon_earth": {
           "media": "media/meme-toph-armor.mp4",
           "audio": "",
-          "duration": 2.2,
+          "duration": 3.5,
           "start_time": 1.3,
           "loop": false,
           "media_pool": [
@@ -1829,13 +1830,13 @@
               "loop": false
             }
           ],
-          "pool_enabled": true
+          "pool_enabled": false
         },
         "dragon_fire": {
           "media": "media/meme-zuko-fire.mp4",
           "audio": "",
-          "duration": 1.0,
-          "start_time": 0.0,
+          "duration": 2.5,
+          "start_time": 0,
           "loop": false,
           "media_pool": [
             {
@@ -1851,13 +1852,13 @@
               "loop": false
             }
           ],
-          "pool_enabled": true
+          "pool_enabled": false
         },
         "dragon_water": {
           "media": "media/meme-katara-water.mp4",
           "audio": "",
-          "duration": 1.3,
-          "start_time": 0.0,
+          "duration": 2.5,
+          "start_time": 0,
           "loop": false,
           "media_pool": [
             {
@@ -1873,13 +1874,13 @@
               "loop": false
             }
           ],
-          "pool_enabled": true
+          "pool_enabled": false
         },
         "dragon_hextech": {
           "media": "media/meme-palpatine-power.mp4",
           "audio": "",
-          "duration": 2.2,
-          "start_time": 0.0,
+          "duration": 3.5,
+          "start_time": 0,
           "loop": false,
           "media_pool": [
             {
@@ -1895,13 +1896,13 @@
               "loop": false
             }
           ],
-          "pool_enabled": true
+          "pool_enabled": false
         },
         "dragon_chemtech": {
           "media": "media/meme-jesse-science.mp4",
           "audio": "",
-          "duration": 1.9,
-          "start_time": 0.0,
+          "duration": 2.5,
+          "start_time": 0,
           "loop": false,
           "media_pool": [
             {
@@ -1917,13 +1918,13 @@
               "loop": false
             }
           ],
-          "pool_enabled": true
+          "pool_enabled": false
         },
         "dragon_elder": {
           "media": "media/meme-palpatine-power.mp4",
           "audio": "",
-          "duration": 2.5,
-          "start_time": 0.0,
+          "duration": 3.5,
+          "start_time": 0,
           "loop": false,
           "media_pool": [
             {
@@ -1933,13 +1934,13 @@
               "loop": false
             }
           ],
-          "pool_enabled": true
+          "pool_enabled": false
         },
         "victory": {
           "media": "media/meme-tobey-dance.mp4",
           "audio": "",
-          "duration": 2.5,
-          "start_time": 0.0,
+          "duration": 3.5,
+          "start_time": 0,
           "loop": false,
           "media_pool": [
             {
@@ -1949,13 +1950,13 @@
               "loop": false
             }
           ],
-          "pool_enabled": true
+          "pool_enabled": false
         },
         "defeat": {
           "media": "media/meme-michael-no.mp4",
           "audio": "",
-          "duration": 1.8,
-          "start_time": 0.0,
+          "duration": 2.5,
+          "start_time": 0,
           "loop": false,
           "media_pool": [
             {
@@ -1965,7 +1966,7 @@
               "loop": false
             }
           ],
-          "pool_enabled": true
+          "pool_enabled": false
         },
         "game_end": {
           "media": "media/meme-avengers.mp4",
@@ -1992,8 +1993,8 @@
         "objective_steal": {
           "media": "media/meme-swiper-steal.mp4",
           "audio": "",
-          "duration": 2.5,
-          "start_time": 0.0,
+          "duration": 3.4,
+          "start_time": 0,
           "loop": false,
           "media_pool": [
             {
@@ -2009,7 +2010,7 @@
               "loop": false
             }
           ],
-          "pool_enabled": true
+          "pool_enabled": false
         },
         "level_up": {
           "media": "media/meme-goku-power.mp4",
@@ -2922,5 +2923,7 @@
       }
     }
   },
-  "variety_pack_version": 1
+  "variety_pack_version": 1,
+  "autoplay_gap_seconds": 18,
+  "death_reactions_enabled": false
 }

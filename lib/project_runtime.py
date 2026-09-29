@@ -176,52 +176,26 @@ class _ProjectRegistry:
         return conflicts
 
     def revert_all(self, except_: str | None = None) -> None:
-        """
-        Call revert() on every registered project, optionally skipping one.
-
-        Use for emergency stop or when a project needs exclusive OBS ownership.
-        """
-        for iface in self.all():
-            if iface.name == except_:
-                continue
-            try:
-                iface.revert()
-            except Exception as exc:
-                print(f"[registry] revert failed for '{iface.name}': {exc}")
+        """Stop and clean up all projects, optionally excluding the requester."""
+        self._dispatch_all("revert", except_)
 
     def pause_all(self, except_: str | None = None) -> None:
-        """
-        Ask every registered project to pause (non-destructive suspension).
-
-        Projects that don't implement pause() are unaffected (default is no-op).
-        Use this when a project temporarily needs audio/visual focus and wants
-        to resume other projects when it finishes.
-
-        Pattern:
-            project_registry.pause_all(except_="my_project")
-            player.play_async(src, on_complete=lambda: project_registry.resume_all(except_="my_project"))
-        """
-        for iface in self.all():
-            if iface.name == except_:
-                continue
-            try:
-                iface.pause()
-            except Exception as exc:
-                print(f"[registry] pause failed for '{iface.name}': {exc}")
+        """Temporarily suspend other projects; unsupported pause methods are no-ops."""
+        self._dispatch_all("pause", except_)
 
     def resume_all(self, except_: str | None = None) -> None:
-        """
-        Ask every registered project to resume after a pause_all().
+        """Resume after pause_all(); idle projects treat this as a no-op."""
+        self._dispatch_all("resume", except_)
 
-        Projects that were idle (didn't need to pause) treat this as a no-op.
-        """
+    def _dispatch_all(self, action: str, except_: str | None) -> None:
+        # all() releases the registry lock before any project code runs.
         for iface in self.all():
             if iface.name == except_:
                 continue
             try:
-                iface.resume()
+                getattr(iface, action)()
             except Exception as exc:
-                print(f"[registry] resume failed for '{iface.name}': {exc}")
+                print(f"[registry] {action} failed for '{iface.name}': {exc}")
 
 
 project_registry = _ProjectRegistry()

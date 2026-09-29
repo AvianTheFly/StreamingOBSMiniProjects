@@ -34,8 +34,11 @@ class AssetFader:
         temporary.write_text(json.dumps(values, indent=2), encoding='utf-8')
         temporary.replace(self.path)
 
-    def apply(self, file):
+    def apply(self, file, *, fallback=None):
         key = str(Path(file).resolve()).casefold()
-        volume = self.values().get(key)
+        values = self.values()
+        volume = values.get(key)
+        if volume is None and fallback:
+            volume = values.get(str(Path(fallback).resolve()).casefold())
         if volume is not None and self.loaded() == key:
             obs.set_input_volume_db(self.source, volume)

@@ -32,6 +32,69 @@ import threading
 from dataclasses import dataclass, field
 
 
+class SceneSession:
+    """Central ownership of a temporary scene and its return handoff.
+
+    A scene selected by somebody else ends ownership; it is never reclaimed
+    by a playlist advancing or by a delayed resume callback.
+    """
+
+    def __init__(self, requester, scene, fallback):
+        import obs
+        from shared import project_registry
+        self.scene = scene
+        self.previous = obs.get_current_scene()
+        self.fallback = fallback
+        self.activated = False
+        self.finished = False
+        self.paused = []
+        for iface in project_registry.all():
+            if iface.name == requester:
+                continue
+            try:
+                if iface.get_status().is_paused:
+                    continue
+                iface.pause()
+                self.paused.append(iface)
+            except Exception as exc:
+                print(f"[coordinator] Could not pause {iface.name}: {exc}")
+
+    def owns_scene(self):
+        import obs
+        return not self.finished and obs.get_current_scene() == self.scene
+
+    def activate(self):
+        import obs
+        if self.finished:
+            return False
+        if self.activated:
+            return self.owns_scene()
+        # Do not overwrite a scene selected while the first clip was loading.
+        if obs.get_current_scene() != self.previous:
+            return False
+        obs.switch_scene(self.scene)
+        self.activated = True
+        return True
+
+    def finish(self):
+        import obs
+        if self.finished:
+            return
+        owned = self.owns_scene()
+        self.finished = True
+        # Resume only while this session still owns the scene. A later owner
+        # is responsible for its own handoff.
+        if owned or not self.activated:
+            for iface in self.paused:
+                try:
+                    iface.resume()
+                except Exception as exc:
+                    print(f"[coordinator] Could not resume {iface.name}: {exc}")
+        if owned and obs.get_current_scene() == self.scene:
+            target = self.previous if self.previous != self.scene else self.fallback
+            obs.switch_scene(target or self.fallback)
+
+
 @dataclass
 class CoordinationRule:
     """
@@ -97,6 +160,9 @@ class PlayCoordinator:
         return result
 
     # ── Runtime API ───────────────────────────────────────────────────────────
+
+    def scene_session(self, requester, scene, fallback):
+        return SceneSession(requester, scene, fallback)
 
     def request_to_play(
         self,

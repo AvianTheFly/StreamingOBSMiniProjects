@@ -4,16 +4,29 @@ import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from lib.shared_media import layout_rules, single_source_state
 from hub_ui import replay_media
+from obs import interaction
 
 
 class LoadingTests(unittest.TestCase):
     def setUp(self):
         layout_rules._probe_dimension_key.cache_clear()
+
+    def test_media_properties_skip_noop_and_respect_live_changes(self):
+        client = Mock()
+        current = {'looping': False, 'speed_percent': 90, 'hw_decode': True}
+        client.get_input_settings.return_value.input_settings = current
+        with patch.object(interaction, 'get_obs', return_value=client):
+            interaction.configure_media_source_properties('player', looping=False)
+            client.set_input_settings.assert_not_called()
+            current['looping'] = True  # A manual edit must not be hidden by a cache.
+            interaction.configure_media_source_properties('player', looping=False)
+            client.set_input_settings.assert_called_once_with(
+                'player', {'looping': False}, overlay=True)
 
     def test_dimensions_cached_until_file_changes(self):
         result = SimpleNamespace(returncode=0, stdout='{"streams":[{"width":1280,"height":720}]}')

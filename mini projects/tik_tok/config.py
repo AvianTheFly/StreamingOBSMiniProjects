@@ -4,6 +4,7 @@ from pathlib import Path
 from lib.shared_media.media_config import MediaProjectConfig
 from lib.hotkeys import load_hotkeys
 from lib.shared_media.config_overrides import (
+    audio_tracks_override,
     bool_override,
     extensions_override,
     float_override,
@@ -51,4 +52,6 @@ CONFIG = MediaProjectConfig(
     source_bounds={"left": 0, "right": 1618, "top": 330, "bottom": 213},
 
     single_source_mode=True,
+    monitor=text_override(OVERRIDES, "monitor", "OBS_MONITORING_TYPE_MONITOR_ONLY"),
+    audio_tracks=audio_tracks_override(OVERRIDES),
 )

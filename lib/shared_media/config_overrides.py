@@ -24,6 +24,20 @@ def text_override(overrides: dict[str, Any], key: str, default: str) -> str:
     return str(value).strip() or default
 
 
+def audio_tracks_override(overrides: dict[str, Any]) -> dict[str, bool] | None:
+    """An explicit track list disables unlisted tracks; empty preserves OBS routing."""
+    value = overrides.get("audio_tracks")
+    if not value:
+        return None
+    if isinstance(value, dict):
+        return {str(i): bool(value.get(str(i), False)) for i in range(1, 7)}
+    items = value if isinstance(value, list) else str(value).split(",")
+    selected = {str(item).strip() for item in items}
+    if not selected <= {str(i) for i in range(1, 7)}:
+        raise ValueError("audio_tracks must contain track numbers 1 through 6")
+    return {str(i): str(i) in selected for i in range(1, 7)}
+
+
 def float_override(overrides: dict[str, Any], key: str, default: float | None) -> float | None:
     value = overrides.get(key, default)
     if value in ("", None):

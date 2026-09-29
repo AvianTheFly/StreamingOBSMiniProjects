@@ -1111,7 +1111,9 @@ class _Handler(http.server.BaseHTTPRequestHandler):
                 name = str(name).strip()
                 if not name:
                     continue
-                vol = obs.get_input_volume(name) or {}
+                vol = obs.get_input_volume(name)
+                if vol is None:
+                    continue
                 muted = obs.get_input_mute(name)
                 monitor = obs.get_input_audio_monitor_type(name)
                 inputs.append({
@@ -1272,9 +1274,18 @@ class _Handler(http.server.BaseHTTPRequestHandler):
                 list_clips = _live.get("list_clips")
                 data = decorate(list_clips() if callable(list_clips) else disk_rows(REPLAY_DIR))
                 data["ready"] = callable(_live.get("play_sequence"))
+                from lib.twitch_clips import status as twitch_clip_status
+                data["twitch_clip"] = twitch_clip_status()
                 self._json(200, data)
             except Exception as exc:
                 self._err(500, str(exc))
+        elif name == "instant_replay" and action == "trim":
+            from hub_ui.replay_trim import trim_status
+            query = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            try:
+                self._json(200, trim_status(query.get("job", [""])[0]))
+            except ValueError as exc:
+                self._err(400, str(exc))
         elif name == "instant_replay" and action in {"preview", "preview-media"}:
             try:
                 from instant_replay.library import resolve
@@ -1441,6 +1452,13 @@ class _Handler(http.server.BaseHTTPRequestHandler):
                 self._json(200, library.mutate(body, REPLAY_DIR))
             except library.Conflict as exc:
                 self._err(409, str(exc))
+            except (ValueError, OSError) as exc:
+                self._err(400, str(exc))
+        elif name == "instant_replay" and action == "trim":
+            from hub_ui.replay_trim import start_trim
+            from instant_replay.config import REPLAY_DIR
+            try:
+                self._json(202, start_trim(body, REPLAY_DIR))
             except (ValueError, OSError) as exc:
                 self._err(400, str(exc))
         elif name == "instant_replay" and action == "skip":
@@ -1613,13 +1631,13 @@ class _Handler(http.server.BaseHTTPRequestHandler):
                     self._json(200, {"match": None, "top": []})
                     return
                 from specific_song.config import SONGS_JSON, MATCH_THRESHOLD
-                from specific_song.matcher import find_best_match, rank_matches
+                from specific_song.matcher import rank_matches
                 if not Path(SONGS_JSON).exists():
                     self._json(200, {"match": None, "top": []})
                     return
                 songs = json.loads(Path(SONGS_JSON).read_text(encoding="utf-8"))
-                best = find_best_match(query, songs, threshold=MATCH_THRESHOLD)
-                top  = rank_matches(query, songs, top_n=5)
+                top = rank_matches(query, songs, top_n=5)
+                best = top[0] if top and top[0][1] >= MATCH_THRESHOLD else None
                 self._json(200, {
                     "match": {"song": best[0], "score": round(best[1] * 100)} if best else None,
                     "top":   [{"song": s, "score": round(sc * 100)} for s, sc in top],

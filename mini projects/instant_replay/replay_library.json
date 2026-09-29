@@ -1,0 +1,394 @@
+{
+  "revision": 114,
+  "clips": {
+    "91ed52307cc2afbf0b478fa1": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1023 2026-09-14\\Replay 2026-09-14 15-32-21_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789414345.6368015,
+      "kept": true,
+      "game": "Game 1023 2026-09-14"
+    },
+    "be5338a3ba0643518a4296fe": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\cuts\\Replay 2026-09-14 15-32-21_ir_trimmed_cut_7b99bf0be8.mkv",
+      "title": "Replay 2026-09-14 15-32-21_ir_trimmed.mkv (cut)",
+      "notes": "",
+      "favorite": false,
+      "kept": true,
+      "trim_source": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1023 2026-09-14\\Replay 2026-09-14 15-32-21_ir_trimmed.mkv",
+      "trim_start": 0.2,
+      "trim_end": 16.3
+    },
+    "e6cc2f1622bf782f0b9feec9": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1030 2026-09-15\\Replay 2026-09-15 12-39-23_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789490368.1961277,
+      "kept": true,
+      "game": "Game 1030 2026-09-15"
+    },
+    "0dc833800c05204e411cf721": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1032 2026-09-15\\Replay 2026-09-15 14-09-26_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789495795.5393531,
+      "kept": true,
+      "game": "Game 1032 2026-09-15"
+    },
+    "6a69ee4e90858a9c2ca781a8": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1036 2026-09-16\\Replay 2026-09-16 13-03-05_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789578204.9583285,
+      "kept": true,
+      "game": "Game 1036 2026-09-16"
+    },
+    "bef7d7a296eb5a8ec48d94c9": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1038 2026-09-16\\Replay 2026-09-16 14-39-08_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789583955.843621,
+      "kept": true,
+      "game": "Game 1038 2026-09-16"
+    },
+    "97ffa778cf8dec2c8cead10e": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1040 2026-09-16\\Replay 2026-09-16 15-33-43_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789587238.4357066,
+      "kept": true,
+      "game": "Game 1040 2026-09-16"
+    },
+    "a9fe55d6c1684edc9228a07e": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1044 2026-09-16\\Replay 2026-09-16 22-53-30_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789613613.1804893,
+      "kept": true,
+      "game": "Game 1044 2026-09-16"
+    },
+    "69b98133cde7854430463f2e": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1046 2026-09-17\\Replay 2026-09-17 00-14-35_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789618484.2205462,
+      "kept": true,
+      "game": "Game 1046 2026-09-17"
+    },
+    "8e7b1dfc92787452efb71632": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1048 2026-09-17\\Replay 2026-09-17 10-44-30_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789656286.5711217,
+      "kept": true,
+      "game": "Game 1048 2026-09-17"
+    },
+    "35c9b643be8c3fcfeb1b7c90": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1050 2026-09-17\\Replay 2026-09-17 11-39-44_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789659599.2406986,
+      "kept": true,
+      "game": "Game 1050 2026-09-17"
+    },
+    "7c08691988a897a303efcf7f": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1058 2026-09-17\\Replay 2026-09-17 16-04-32_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789675488.8479552,
+      "kept": true,
+      "game": "Game 1058 2026-09-17"
+    },
+    "d49b2a6496f2e7e30bb52a96": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1061 2026-09-18\\Replay 2026-09-18 08-45-04_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789735548.0400414,
+      "kept": true,
+      "game": "Game 1061 2026-09-18"
+    },
+    "2644a293ba46f2a537730d23": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1062 2026-09-18\\Replay 2026-09-18 09-11-18_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789737092.1167872,
+      "kept": true,
+      "game": "Game 1062 2026-09-18"
+    },
+    "bb2f64753cd39b092ef9bd28": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Ungrouped\\Replay 2026-09-18 10-05-07.mp4",
+      "tag": "untagged",
+      "saved_at": 1789740311.047619,
+      "kept": true,
+      "game": "Game 1063 2026-09-18"
+    },
+    "fd41fe81e7c15278ed982318": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1065 2026-09-18\\Replay 2026-09-18 10-57-26_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789743458.0925553,
+      "kept": true,
+      "game": "Game 1065 2026-09-18"
+    },
+    "f8edf5192d81418bab0fb96a": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1066 2026-09-18\\Replay 2026-09-18 11-48-32_ir_trimmed.mkv",
+      "tag": "fail",
+      "saved_at": 1789746544.8401616,
+      "kept": true,
+      "game": "Game 1066 2026-09-18"
+    },
+    "ec52c75738f9001576e9252f": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1068 2026-09-20\\Replay 2026-09-20 01-08-06_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789880898.3568983,
+      "kept": true,
+      "game": "Game 1068 2026-09-20"
+    },
+    "3f19861f8e3f9b44f89e16b1": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1070 2026-09-20\\Replay 2026-09-20 02-20-55_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789885259.979638,
+      "kept": true,
+      "game": "Game 1070 2026-09-20"
+    },
+    "fcfb512603299fbf61005d93": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1070 2026-09-20\\Replay 2026-09-20 02-21-21_ir_trimmed.mkv",
+      "tag": "fail",
+      "saved_at": 1789885312.714837,
+      "kept": true,
+      "game": "Game 1070 2026-09-20"
+    },
+    "79578a2720d0f1fbb8ed731b": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1070 2026-09-20\\Replay 2026-09-20 02-23-34_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789885430.6963394,
+      "kept": true,
+      "game": "Game 1070 2026-09-20"
+    },
+    "21edf74a3c19806bdcf5d6d0": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1074 2026-09-20\\Replay 2026-09-20 04-40-42_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789893653.4834468,
+      "kept": true,
+      "game": "Game 1074 2026-09-20"
+    },
+    "c8993deac5aadb7297bf1aee": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1074 2026-09-20\\Replay 2026-09-20 04-44-57_ir_trimmed.mkv",
+      "tag": "fail",
+      "saved_at": 1789893926.7227461,
+      "kept": true,
+      "game": "Game 1074 2026-09-20"
+    },
+    "015558e1d274a88befe155f0": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1076 2026-09-20\\Replay 2026-09-20 21-46-46_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789955223.873264,
+      "kept": true,
+      "game": "Game 1076 2026-09-20"
+    },
+    "2e6a1fb7a49770b54e928857": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1076 2026-09-20\\Replay 2026-09-20 21-54-24_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789955682.3620749,
+      "kept": true,
+      "game": "Game 1076 2026-09-20"
+    },
+    "1853f4d5fe8aca1b7af10e6b": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1076 2026-09-20\\Replay 2026-09-20 21-58-25_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789955919.2237008,
+      "kept": true,
+      "game": "Game 1076 2026-09-20"
+    },
+    "c96ecc08f5a8d09ddbe8edbc": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1077 2026-09-20\\Replay 2026-09-20 22-29-53_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789957812.8257513,
+      "kept": true,
+      "game": "Game 1077 2026-09-20"
+    },
+    "51eb95410843bc792fcda82d": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1078 2026-09-20\\Replay 2026-09-20 23-08-28_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789960135.166261,
+      "kept": true,
+      "game": "Game 1078 2026-09-20"
+    },
+    "abed3b4161a7de7dd142a415": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1078 2026-09-20\\Replay 2026-09-20 23-12-24_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789960362.2360716,
+      "kept": true,
+      "game": "Game 1078 2026-09-20"
+    },
+    "74a62ef260933b3970a87387": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1082 2026-09-21\\Replay 2026-09-21 01-11-56_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1789967547.4416616,
+      "kept": true,
+      "game": "Game 1082 2026-09-21"
+    },
+    "e9cd5343a0b719c774cb786c": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1092 2026-09-21\\Replay 2026-09-21 15-39-17_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1790019562.2955112,
+      "kept": true,
+      "game": "Game 1092 2026-09-21"
+    },
+    "ec741e30917e2bc9b5b55df4": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1093 2026-09-21\\Replay 2026-09-21 16-18-11_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1790021904.5463138,
+      "kept": true,
+      "game": "Game 1093 2026-09-21"
+    },
+    "5745d6a5df30a6b2ff7b8221": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1094 2026-09-21\\Replay 2026-09-21 16-36-32_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1790023008.030054,
+      "kept": true,
+      "game": "Game 1094 2026-09-21"
+    },
+    "31253fcf5c6c79e82a5979d0": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1094 2026-09-21\\Replay 2026-09-21 16-37-05_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1790023036.9071758,
+      "kept": true,
+      "game": "Game 1094 2026-09-21"
+    },
+    "5cf19abb963268c3d305ddf8": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1098 2026-09-21\\Replay 2026-09-21 22-09-40_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1790042996.3375478,
+      "kept": true,
+      "game": "Game 1098 2026-09-21"
+    },
+    "ab3cf2804c3d3bbd0018281f": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1098 2026-09-21\\Replay 2026-09-21 22-13-53_ir_trimmed.mkv",
+      "tag": "escape",
+      "saved_at": 1790043258.2156796,
+      "kept": true,
+      "game": "Game 1098 2026-09-21"
+    },
+    "f04e7edda981e10b75ad1a15": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1102 2026-09-22\\Replay 2026-09-21 23-13-23_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1790046812.9863727,
+      "kept": true,
+      "game": "Game 1102 2026-09-22"
+    },
+    "45d6eb67ea4e13e968002a08": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1103 2026-09-22\\Replay 2026-09-22 01-13-49_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1790054041.4420795,
+      "kept": true,
+      "game": "Game 1103 2026-09-22"
+    },
+    "1da361992bcead6b028adad6": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1103 2026-09-22\\Replay 2026-09-22 01-15-35_ir_trimmed.mkv",
+      "tag": "fail",
+      "saved_at": 1790054178.536219,
+      "kept": true,
+      "game": "Game 1103 2026-09-22"
+    },
+    "dff25979b72c8f2f844a6f42": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1104 2026-09-22\\Replay 2026-09-22 01-55-46_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1790056586.1621704,
+      "kept": true,
+      "game": "Game 1104 2026-09-22"
+    },
+    "5b686cbc28258d7ebcc88dd1": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1106 2026-09-22\\Replay 2026-09-22 11-54-20_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1790092474.345786,
+      "kept": true,
+      "game": "Game 1106 2026-09-22"
+    },
+    "cedcbfa395c6bc0610714d00": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1106 2026-09-22\\Replay 2026-09-22 12-03-23_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1790093006.25253,
+      "kept": true,
+      "game": "Game 1106 2026-09-22"
+    },
+    "f653a07066127fa0d46777fa": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1107 2026-09-22\\Replay 2026-09-22 12-16-41_ir_trimmed.mkv",
+      "tag": "escape",
+      "saved_at": 1790093841.4622867,
+      "kept": true,
+      "game": "Game 1107 2026-09-22"
+    },
+    "0ecdacb3ed80207b766be356": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1110 2026-09-22\\Replay 2026-09-22 13-36-49_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1790098612.236632,
+      "kept": true,
+      "game": "Game 1110 2026-09-22"
+    },
+    "d2c96b9b46be8de9817081e1": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1111 2026-09-22\\Replay 2026-09-22 14-12-05_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1790100729.5875876,
+      "kept": true,
+      "game": "Game 1111 2026-09-22"
+    },
+    "de2873533ca8c4625cd40f8b": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1111 2026-09-22\\Replay 2026-09-22 14-27-55_ir_trimmed.mkv",
+      "tag": "escape",
+      "saved_at": 1790101720.1791003,
+      "kept": true,
+      "game": "Game 1111 2026-09-22"
+    },
+    "d2bce15b4368708d54246dbf": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1112 2026-09-23\\Replay 2026-09-23 10-30-37_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1790173844.6577704,
+      "kept": true,
+      "game": "Game 1112 2026-09-23"
+    },
+    "c6649692e5bc3eb3efd365b3": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1112 2026-09-23\\Replay 2026-09-23 10-47-42_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1790174867.1378016,
+      "kept": true,
+      "game": "Game 1112 2026-09-23"
+    },
+    "65b6b160996538fa82e603db": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1115 2026-09-23\\Replay 2026-09-23 12-25-08_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1790180718.3843024,
+      "kept": true,
+      "game": "Game 1115 2026-09-23"
+    },
+    "50aa469de492d08c5d46f406": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1115 2026-09-23\\Replay 2026-09-23 12-26-45_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1790180809.179613,
+      "kept": true,
+      "game": "Game 1115 2026-09-23"
+    },
+    "253408cb11ebd12ef7f07fa8": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1115 2026-09-23\\Replay 2026-09-23 12-32-57_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1790181209.6826982,
+      "kept": true,
+      "game": "Game 1115 2026-09-23"
+    },
+    "96a5883f63dc15b99e5183ac": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1121 2026-09-26\\Replay 2026-09-26 01-31-01.mp4",
+      "tag": "untagged",
+      "saved_at": 1790400661.2205129,
+      "kept": true,
+      "game": "Game 1121 2026-09-26"
+    },
+    "8287399eb29b6ff01a326291": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1121 2026-09-26\\Replay 2026-09-26 01-31-13.mp4",
+      "tag": "untagged",
+      "saved_at": 1790400673.8221724,
+      "kept": true,
+      "game": "Game 1121 2026-09-26"
+    },
+    "115af637a31d9016927573d8": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1121 2026-09-26\\Replay 2026-09-26 01-56-21_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1790402210.1990259,
+      "kept": true,
+      "game": "Game 1121 2026-09-26"
+    },
+    "9dcec693d346ef3aa7985af5": {
+      "path": "F:\\EVERYTHING STREAM RELATED\\Assets\\Replays\\clips\\Game 1122 2026-09-26\\Replay 2026-09-26 02-09-45_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1790403001.614333,
+      "kept": true,
+      "game": "Game 1122 2026-09-26"
+    }
+  },
+  "groups": []
+}

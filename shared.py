@@ -77,9 +77,12 @@ class VoicePTT:
         tag: str = "",
         double_trigger_stops: bool = True,
         lockout_seconds: float = 0.5,
+        on_timed_transcript=None,
     ) -> None:
         self._timeout              = timeout
         self._on_transcript        = on_transcript
+        self._on_timed_transcript = on_timed_transcript
+        self._recording_wall_time = None
         self._tag                  = tag
         self._double_trigger_stops = double_trigger_stops
         self._lockout_seconds      = lockout_seconds
@@ -150,6 +153,7 @@ class VoicePTT:
 
         with self._lock:
             try:
+                pressed_at = time.time()
                 started = voice_mod.start_recording(self._tag)
             except Exception as exc:
                 print(f"[{self._tag}] start_recording raised: {exc}")
@@ -158,6 +162,7 @@ class VoicePTT:
                 # voice module rejected — another project is already recording
                 return
             self._recording = True
+            self._recording_wall_time = pressed_at
             self._state     = self._STATE_LISTENING
             t = threading.Timer(self._timeout, self._do_stop)
             self._timer = t
@@ -176,6 +181,7 @@ class VoicePTT:
             self._processing_started = time.monotonic()
             self._gen               += 1
             my_gen                   = self._gen
+            pressed_at               = self._recording_wall_time
             t = self._timer
             self._timer = None
 
@@ -192,7 +198,10 @@ class VoicePTT:
             with self._lock:
                 if self._gen == my_gen:
                     self._state = self._STATE_IDLE
-            self._on_transcript(text)
+            if self._on_timed_transcript:
+                self._on_timed_transcript(text, pressed_at)
+            else:
+                self._on_transcript(text)
 
         if voice_mod:
             voice_mod.stop_and_transcribe(_on_transcript_done, self._tag)

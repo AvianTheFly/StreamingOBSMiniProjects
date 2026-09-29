@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 import obs
+from lib.shared_media.config_overrides import load_config_overrides, audio_tracks_override
 
 
 _AUDIO_EXTS = {".mp3", ".wav", ".ogg", ".m4a", ".aac", ".flac", ".mp4", ".mkv", ".mov", ".webm"}
@@ -32,6 +33,9 @@ class LeagueKillAudioPlayer:
         self.tag = str(tag)
         self.default_volume_db = float(default_volume_db)
         self.monitor = str(monitor)
+        routing = load_config_overrides(self.project_dir)
+        self.monitor = str(routing.get("monitor", self.monitor))
+        self.audio_tracks = audio_tracks_override(routing)
         self.state_file = self.project_dir / "audio_hotkeys_editor.json"
         self.source_name = f"{self.source_prefix}player"
         self._lock = threading.Lock()
@@ -92,6 +96,8 @@ class LeagueKillAudioPlayer:
         try:
             obs.set_media_source_file(source_name, path)
             obs.set_input_audio_monitor_type(source_name, self.monitor)
+            if self.audio_tracks is not None:
+                obs.set_input_audio_tracks(source_name, self.audio_tracks)
             obs.set_input_volume_db(source_name, self._effective_volume_db(stem))
             obs.show_source(self.scene, source_name)
             obs.restart_media(source_name)

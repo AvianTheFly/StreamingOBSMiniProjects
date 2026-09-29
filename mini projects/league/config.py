@@ -26,7 +26,8 @@ RESPAWN_SFX_SOURCE = "Halo Respawn sound effect"
 RESPAWN_SFX_LEAD_SECONDS = 3.0
 
 # ── Death / Respawn ───────────────────────────────────────────────────────────
-# Death border stays visible until respawn — no duration needed.
+# Brief splash; corner reactions live in league_api.death_reactions.
+DEATH_DISPLAY_DURATION = 2.5
 DEATH_SCENE            = "LeagueGameAssets"
 DEATH_SOURCE           = "DeathBorder"
 DEATH_ENABLED          = True

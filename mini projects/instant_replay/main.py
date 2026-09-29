@@ -10,11 +10,9 @@ Voice Commands  (press "|" to start recording, press "|" again to transcribe)
   "save" / "save <tag>" — Save & trim the OBS replay buffer.
              Optional tags: win, escape, fail, objective (or just "save"
              for no tag).  Tags let you select clips later with "play <tag>".
-             Clip start is determined by (in priority order):
-               1. Manual mark         (set via "mark" command)
-               2. Kill-tracker anchor  (first kill in streak − PRE_ROLL_SECONDS)
-               3. Death anchor         (most recent death − DEATH_PRE_ROLL_SECONDS)
-               4. No trim             (save the full replay buffer as-is)
+             Plain save uses a manual mark, kill/death anchor, or full buffer.
+             "save N seconds" sets an explicit duration before the button press.
+             "save full" keeps the original OBS file without a second cut.
              The manual mark is consumed after each save.
 
   "play" / "play last" — Play the most recently saved clip.
@@ -23,7 +21,8 @@ Voice Commands  (press "|" to start recording, press "|" again to transcribe)
                          (e.g. "play win").
   "play <tag> N"       — Play the Nth clip with that tag
                          (e.g. "play win 1", "play win 2").
-  "play random"        — Play any saved clip at random.
+  "play random"        — Keep playing saved clips at random until stopped.
+  "stop replay"        — Leave replay immediately and return to normal.
              If called within PLAY_AFTER_SAVE_WINDOW seconds of a save
              command, waits for the save/trim to finish then plays immediately.
 
@@ -85,6 +84,7 @@ from pathlib import Path
 import obs
 from lib.global_hotkeys import key_char, subscribe_global_hotkeys, unsubscribe_global_hotkeys
 from shared import VoicePTT, project_registry
+from coordinator import coordinator
 from obs import (
     save_replay_buffer_and_wait,
     set_media_source_file,
@@ -98,6 +98,7 @@ from obs import (
 
 from .config import (
     DEATH_PRE_ROLL_SECONDS,
+    CLIPS_DIR,
     DESKTOP_AUDIO_INPUT,
     EDITED_DIR,
     HOTKEY_LISTEN,
@@ -151,14 +152,20 @@ def wait_for_replay_start(source, cancelled, timeout=8.0):
 
 
 def _replay_files_on_disk() -> list[Path]:
+    """Return replay media only; never treat full-stream recordings as clips."""
     root = Path(REPLAY_DIR)
     if not root.is_dir():
         return []
-    files = [
-        path
-        for path in root.rglob("*")
-        if path.is_file() and path.suffix.lower() in _REPLAY_MEDIA_EXTENSIONS
-    ]
+    files = [path for path in root.iterdir()
+             if path.is_file() and path.suffix.lower() in _REPLAY_MEDIA_EXTENSIONS]
+    for folder in (Path(CLIPS_DIR), Path(EDITED_DIR)):
+        if folder.is_dir():
+            files.extend(path for path in folder.rglob("*")
+                         if path.is_file() and path.suffix.lower() in _REPLAY_MEDIA_EXTENSIONS)
+    # Prefer the command-free cut over its retained OBS original.
+    files = [path for path in files
+             if path.name.endswith(TRIMMED_SUFFIX)
+             or not path.with_name(path.stem + TRIMMED_SUFFIX).is_file()]
     return sorted(files, key=lambda path: path.stat().st_mtime, reverse=True)
 
 
@@ -180,24 +187,45 @@ def _mute_desktop() -> None:
         return
     try:
         _desktop_was_muted = bool(obs.get_input_mute(DESKTOP_AUDIO_INPUT))
+        # Mark ownership before the request.  The shared OBS helper deliberately
+        # suppresses transient connection errors, so cleanup must still attempt
+        # an unmute even when this call's outcome cannot be confirmed.
+        _is_muted = True
         set_input_mute(DESKTOP_AUDIO_INPUT, True)
         print("[instant_replay] 🔇 Desktop audio muted.")
-        _is_muted = True
     except Exception as exc:
         print(f"[instant_replay] ⚠  Could not mute desktop audio: {exc}")
 
 
-def _unmute_desktop() -> None:
-    """Unmute Desktop Audio.  Idempotent — only runs if we actually muted."""
+def _unmute_desktop(*, force: bool = False, attempts: int = 4) -> bool:
+    """Force Desktop Audio on and verify OBS accepted it.
+
+    ``force`` is used by every replay-finish path, including duplicate/racing
+    cleanup calls.  This intentionally restores audio to unmuted rather than
+    trusting the pre-replay state: the desired post-replay invariant is that
+    global Desktop Audio is on.
+    """
     global _is_muted
-    if not _is_muted:
-        return
-    try:
-        set_input_mute(DESKTOP_AUDIO_INPUT, _desktop_was_muted)
-        print("[instant_replay] 🔊 Desktop audio unmuted.")
-        _is_muted = False
-    except Exception as exc:
-        print(f"[instant_replay] ⚠  Could not unmute desktop audio: {exc}")
+    if not force and not _is_muted:
+        return True
+    attempts = max(1, attempts)
+    for attempt in range(attempts):
+        try:
+            set_input_mute(DESKTOP_AUDIO_INPUT, False)
+            actual = obs.get_input_mute(DESKTOP_AUDIO_INPUT)
+            if actual is False:
+                _is_muted = False
+                print("[instant_replay] 🔊 Desktop audio verified unmuted.")
+                return True
+        except Exception as exc:
+            print(f"[instant_replay] Audio restore attempt failed: {exc}")
+        if attempt + 1 < attempts:
+            time.sleep(0.25)
+    # Keep ownership marked so a later duplicate cleanup or shutdown hook tries
+    # again instead of incorrectly assuming audio was restored.
+    _is_muted = True
+    print("[instant_replay] ⚠  Desktop audio unmute could not be verified.")
+    return False
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -224,53 +252,54 @@ for _sig in (signal.SIGINT, signal.SIGTERM):
 #  ffmpeg helper
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _trim_from_end(input_path: str, keep_seconds: float) -> str | None:
-    """
-    Extract the last `keep_seconds` of `input_path` using ffmpeg.
-    Uses output seeking (-to) with stream copy to avoid keyframe sync issues.
-    """
+def _saved_clip(replay_file: str, keep_seconds: float | None, *,
+                full_save: bool, tail_seconds: float) -> str | None:
+    """Full means the original OBS file; automatic saves retain their cutoff."""
+    if full_save:
+        return replay_file
+    return _trim_from_end(replay_file, keep_seconds, tail_seconds=tail_seconds)
+
+
+def _trim_from_end(input_path: str, keep_seconds: float | None,
+                   tail_seconds: float = 0) -> str | None:
+    """Cut at the command's button press, with bounded CPU-only encoding."""
+    import math
     base, _ = os.path.splitext(input_path)
     output_path = base + TRIMMED_SUFFIX
-
-    # Get the total duration of the input first
-    probe_cmd = [
-        "ffprobe", "-v", "error",
-        "-show_entries", "format=duration",
-        "-of", "csv=p=0",
-        input_path,
-    ]
-    probe_result = subprocess.run(probe_cmd, capture_output=True, text=True)
-    if probe_result.returncode != 0:
-        print(f"[instant_replay] ffprobe error:\n{probe_result.stderr[-400:]}")
-        return None
-
+    temporary = output_path + ".partial"
+    flags = (getattr(subprocess, "CREATE_NO_WINDOW", 0)
+             | getattr(subprocess, "BELOW_NORMAL_PRIORITY_CLASS", 0))
     try:
-        total_duration = float(probe_result.stdout.strip())
-    except ValueError:
-        print(f"[instant_replay] Could not parse duration from: {probe_result.stdout.strip()}")
+        probe = subprocess.run([
+            "ffprobe", "-v", "error", "-show_entries", "format=duration",
+            "-of", "csv=p=0", input_path,
+        ], capture_output=True, text=True, timeout=20, creationflags=flags)
+        duration = float(probe.stdout.strip())
+        if probe.returncode or not math.isfinite(duration):
+            raise ValueError("Cannot read replay duration")
+        end = duration - max(0, tail_seconds)
+        start = 0 if keep_seconds is None else max(0, end - keep_seconds)
+        if end - start < 0.1:
+            raise ValueError("The button press is outside the available replay buffer")
+        result = subprocess.run([
+            "ffmpeg", "-nostdin", "-v", "error", "-y", "-threads", "2",
+            "-ss", f"{start:.6f}", "-i", input_path,
+            "-t", f"{end - start:.6f}", "-map", "0:v:0", "-map", "0:a?",
+            "-map_metadata", "0", "-c:v", "libx264", "-preset", "veryfast",
+            "-crf", "18", "-threads", "2", "-c:a", "aac", "-b:a", "192k",
+            "-f", "matroska", temporary,
+        ], capture_output=True, text=True, timeout=1800, creationflags=flags)
+        if result.returncode or not Path(temporary).is_file() or not Path(temporary).stat().st_size:
+            raise ValueError(result.stderr[-800:] or "No cut produced")
+        Path(temporary).replace(output_path)
+        print(f"[instant_replay] Clip ready: {output_path} ({end-start:.1f}s; command tail removed)")
+        return output_path
+    except (OSError, ValueError, subprocess.TimeoutExpired) as exc:
+        print(f"[instant_replay] Trim failed; original retained: {exc}")
         return None
+    finally:
+        Path(temporary).unlink(missing_ok=True)
 
-    start_time = max(0, total_duration - keep_seconds)
-
-    cmd = [
-        "ffmpeg", "-y",
-        "-ss", f"{start_time:.3f}",
-        "-i", input_path,
-        "-avoid_negative_ts", "make_zero",
-        "-c", "copy",
-        output_path,
-    ]
-
-    print(f"[instant_replay] ✂  Trimming last {keep_seconds:.1f}s (start={start_time:.3f}s of {total_duration:.1f}s)…")
-    result = subprocess.run(cmd, capture_output=True, text=True)
-
-    if result.returncode != 0:
-        print(f"[instant_replay] ffmpeg error:\n{result.stderr[-800:]}")
-        return None
-
-    size_mb = Path(output_path).stat().st_size / 1_048_576
-    print(f"[instant_replay] ✅ Clip written: {output_path}  ({size_mb:.1f} MB)")
-    return output_path
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -341,7 +370,7 @@ def _parse_command(text: str) -> tuple[str | None, str, float, bool]:
     """
     Return (command, spec, clip_seconds, full_save).
 
-    Commands: 'save', 'mark', 'play'.
+    Commands: 'save', 'mark', 'play', 'stop'.
 
     For 'save':
       spec        — matched tag ('win', 'escape', 'fail') or "".
@@ -358,6 +387,9 @@ def _parse_command(text: str) -> tuple[str | None, str, float, bool]:
       spec — the play spec string ('all', 'highlights', 'win', …) or "".
     """
     lowered = " ".join(text.lower().strip().rstrip(".,!?;:").split())
+    if lowered in {"stop", "stop replay", "leave", "leave replay", "exit", "exit replay",
+                   "end replay", "cancel replay", "quit replay"}:
+        return ("stop", "", 0, False)
     # Group names may contain command words (e.g. "save the day").
     if lowered.startswith("play intro ") or lowered.startswith("play group "):
         return ("play", lowered[5:], 0, False)
@@ -476,11 +508,11 @@ def run(
     # Whether the replay scene is currently active.
     _replay_active = [False]
     _replay_paused = [False]
-    _paused_other_projects = [False]
 
-    # True while _play_all_clips_sequential is running with 2+ clips.
+    # True while a multi-clip or continuous-random replay is running.
     # Used by the hotkey handler to decide skip-to-next vs cancel-all.
     _is_multi_clip_active = [False]
+    _random_playback_active = [False]
 
     # Set by the hotkey when pressed during multi-clip playback — signals
     # the player to skip to the next clip rather than cancelling everything.
@@ -494,6 +526,8 @@ def run(
     # Set when the game starts; used to label the compiled reel at game-end.
     _current_game_label: list[str | None] = [None]
 
+    _scene_session = [None]
+
     # Watcher thread that auto-returns to RETURN_SCENE after playback.
     _watcher_thread: list[threading.Thread | None] = [None]
     _cancel_watcher = threading.Event()
@@ -506,6 +540,8 @@ def run(
         with _lock:
             current = {str(Path(item["path"]).resolve()): dict(item) for item in _clip_registry}
             previous = {str(Path(item["path"]).resolve()): dict(item) for item in _previous_game_clips}
+        from . import library
+        persisted = library.read()["clips"]
 
         rows = []
         edited_root = Path(EDITED_DIR).resolve()
@@ -516,7 +552,7 @@ def run(
             except OSError:
                 continue
             key = str(resolved)
-            metadata = current.get(key) or previous.get(key) or {}
+            metadata = current.get(key) or previous.get(key) or persisted.get(library.clip_id(resolved), {})
             scope = "current game" if key in current else ("previous game" if key in previous else "saved")
             try:
                 if resolved.is_relative_to(edited_root):
@@ -536,30 +572,10 @@ def run(
     # ── Scene / audio return helper ───────────────────────────────────────────
 
     def _end_replay(*, cancelled: bool = False) -> None:
-        """
-        Tear down an active replay: cancel the watcher, unmute audio, switch scene.
-        Safe to call from any thread; idempotent if replay is already inactive.
-        """
-        with _lock:
-            if not _replay_active[0]:
-                return
-            _replay_active[0] = False
-            _replay_paused[0] = False
-
+        # The playback worker performs the handoff after it stops touching OBS.
+        # Returning the scene here races a file load already in progress.
         _cancel_watcher.set()
-
-        # Unmute FIRST so there's no gap even if the scene switch lags.
-        _unmute_desktop()
-        _resume_other_projects()
-
-        reason = "cancelled" if cancelled else "ended"
-        try:
-            switch_scene(RETURN_SCENE)
-            print(f"[instant_replay] ↩  Replay {reason} — switched back to '{RETURN_SCENE}'.")
-        except Exception as exc:
-            print(f"[instant_replay] ❌ Could not switch to '{RETURN_SCENE}': {exc}")
-
-        _hide_replay_logo()
+        _unmute_desktop(force=True)
 
     from .interface import _live
     _live["replay_active"] = _replay_active
@@ -567,20 +583,6 @@ def run(
     _live["end_replay"]    = _end_replay
     _live["list_clips"]     = _list_clips
     _live["playback_detail"] = {}
-
-    def _pause_other_projects() -> None:
-        with _lock:
-            if _paused_other_projects[0]:
-                return
-            _paused_other_projects[0] = True
-        project_registry.pause_all(except_="instant_replay")
-
-    def _resume_other_projects() -> None:
-        with _lock:
-            if not _paused_other_projects[0]:
-                return
-            _paused_other_projects[0] = False
-        project_registry.resume_all(except_="instant_replay")
 
     def _pause_replay() -> None:
         with _lock:
@@ -599,10 +601,10 @@ def run(
             if not _replay_active[0] or not _replay_paused[0]:
                 return
             _replay_paused[0] = False
-        try:
-            switch_scene(SCENE)
-        except Exception as exc:
-            print(f"[instant_replay] Could not switch back to replay scene: {exc}")
+        session = _scene_session[0]
+        if session is None or not session.owns_scene():
+            _end_replay(cancelled=True)
+            return
         _mute_desktop()
         try:
             obs.play_media(SOURCE_NAME)
@@ -654,24 +656,24 @@ def run(
             _manual_mark_wall[0] = now
         print("[instant_replay] 📍 Mark set — clip will start from this moment.")
 
-    def _on_save(tag: str = "", clip_seconds: float = 0, full_save: bool = False) -> None:
+    def _on_save(tag: str = "", clip_seconds: float = 0, full_save: bool = False, pressed_at: float | None = None) -> None:
         with _lock:
             if _save_in_progress[0]:
                 print("[instant_replay] ⚠  Save already in progress — ignoring.")
                 return
+            _save_in_progress[0] = True
             manual_mark     = _manual_mark_wall[0]
             first_kill_time = tracker.first_kill_wall_time
             last_death_time = tracker.last_death_wall_time
 
-        now = time.time()
+        now = time.time() if pressed_at is None else pressed_at
 
         # Priority (highest first):
         #   1. "save full"       → keep_seconds = None  (entire buffer)
         #   2. explicit seconds  → keep_seconds = clip_seconds
         #   3. manual mark       → keep_seconds = now - mark_time
-        #   4. kill anchor       → keep_seconds = time_since_first_kill + PRE_ROLL
-        #   5. death anchor      → keep_seconds = time_since_death + PRE_ROLL
-        #   6. fallback          → keep_seconds = None  (entire buffer)
+        #   4. kill/death anchor  → automatic highlight
+        #   5. fallback          → entire pre-press buffer
         if full_save:
             keep_seconds = None
             anchor_label = "full replay buffer"
@@ -681,18 +683,12 @@ def run(
         elif manual_mark is not None:
             keep_seconds = now - manual_mark
             anchor_label = f"manual mark ({keep_seconds:.1f}s ago)"
-        elif first_kill_time is not None:
+        elif first_kill_time is not None and first_kill_time <= now:
             keep_seconds = (now - first_kill_time) + KILL_PRE_ROLL_SECONDS
-            anchor_label = (
-                f"kill anchor + {KILL_PRE_ROLL_SECONDS:.0f}s pre-roll "
-                f"({keep_seconds:.1f}s total)"
-            )
-        elif last_death_time is not None:
+            anchor_label = f"kill anchor ({keep_seconds:.1f}s total)"
+        elif last_death_time is not None and last_death_time <= now:
             keep_seconds = (now - last_death_time) + DEATH_PRE_ROLL_SECONDS
-            anchor_label = (
-                f"death anchor + {DEATH_PRE_ROLL_SECONDS:.0f}s pre-roll "
-                f"({keep_seconds:.1f}s total)"
-            )
+            anchor_label = f"death anchor ({keep_seconds:.1f}s total)"
         else:
             keep_seconds = None
             anchor_label = "full buffer (no mark, kill, or death detected)"
@@ -710,7 +706,10 @@ def run(
         def _worker() -> None:
             clip: str | None = None
             try:
-                replay_file = save_replay_buffer_and_wait(timeout=REPLAY_SAVE_TIMEOUT)
+                save_requested = [time.time()]
+                replay_file = save_replay_buffer_and_wait(
+                    timeout=REPLAY_SAVE_TIMEOUT,
+                    on_save_requested=lambda timestamp: save_requested.__setitem__(0, timestamp))
                 if not replay_file:
                     print(
                         "[instant_replay] ❌ Timed out waiting for replay save. "
@@ -718,14 +717,10 @@ def run(
                     )
                     return
 
-                if keep_seconds is not None:
-                    clip = _trim_from_end(replay_file, keep_seconds)
-                    if not clip:
-                        print("[instant_replay] ❌ Trim failed — check ffmpeg is on PATH.")
-                        return
-                else:
-                    clip = replay_file
-                    print(f"[instant_replay] ✅ Using full replay: {clip}")
+                clip = _saved_clip(replay_file, keep_seconds, full_save=full_save,
+                                   tail_seconds=max(0, save_requested[0] - now))
+                if not clip:
+                    return
 
                 with _lock:
                     _manual_mark_wall[0] = None  # consume mark after save
@@ -739,6 +734,9 @@ def run(
                         "index_for_tag": idx,
                         "saved_at": time.time(),
                     })
+                # Keep tags available after a restart and after game-end archiving.
+                from . import library
+                library.remember_capture(clip, tag=tag or "untagged", saved_at=time.time())
 
                 print(
                     f"[instant_replay] Clip ready ({tag or 'untagged'} #{idx}) — "
@@ -751,7 +749,13 @@ def run(
                 # Signal any waiting play() — even on failure so it doesn't hang.
                 new_event.set()
 
-        threading.Thread(target=_worker, daemon=True, name="ir-save-worker").start()
+        try:
+            threading.Thread(target=_worker, daemon=True, name="ir-save-worker").start()
+        except Exception:
+            with _lock:
+                _save_in_progress[0] = False
+            new_event.set()
+            raise
 
     # Keywords in the play spec that mean "play all clips from the current/last game"
     _HIGHLIGHTS_KEYWORDS = frozenset([
@@ -765,7 +769,8 @@ def run(
         """
         Route based on the play spec:
           "" / "last"          -> most recent clip (or deferred save-then-play)
-          "all" / "highlights" -> all clips from current game; if none, previous game
+            "random"             -> keep choosing saved clips until stopped
+            "all" / "highlights" -> all clips from current game; if none, previous game
           "game N"             -> play the highlight reel for Game N from edited/
           "game last"          -> play the most recent highlight reel from edited/
           "<tag>"              -> most recent clip of that tag
@@ -789,11 +794,11 @@ def run(
             if not candidates:
                 print("[instant_replay] No saved clips available for random playback.")
                 return
-            pool = [p for p in candidates if p != last_random_clip[0]] or candidates
-            choice = random.choice(pool)
-            last_random_clip[0] = choice
-            print(f"[instant_replay] 🎲 Random clip: {choice.name}")
-            _play_all_clips_sequential([str(choice)])
+            print(
+                f"[instant_replay] 🎲 Continuous random started ({len(candidates)} clip(s)). "
+                "Press '|' again or say 'stop replay' to leave; use Stop Replay in the Hub too."
+            )
+            _play_all_clips_sequential([], random_forever=True)
             return
 
         # ── "play game N" / "play game last" → edited reel ───────────────────
@@ -808,24 +813,32 @@ def run(
                 "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
                 "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
             }
+            from . import library
             reels = list_edited_reels()
-            if not reels:
-                print("[instant_replay] No compiled reels yet. Reels are created after each game.")
-                return
+            archived_numbers = library.game_numbers()
             if token in ("last", "latest"):
-                _, reel_path = reels[-1]
+                available_numbers = archived_numbers + [n for n, _ in reels]
+                if not available_numbers:
+                    print("[instant_replay] No saved game highlights yet.")
+                    return
+                target_num = max(available_numbers)
             else:
                 try:
                     target_num = int(token)
                 except ValueError:
                     target_num = _WORD_NUMS.get(token, -1)
-                matches = [(n, p) for n, p in reels if n == target_num]
-                if not matches:
-                    available = ", ".join(f"Game {n}" for n, _ in reels)
-                    print(f"[instant_replay] No reel for Game {target_num}. Available: {available}")
-                    return
-                _, reel_path = matches[0]
-            print(f"[instant_replay] Playing reel: {reel_path.name}")
+            archived = library.game_paths(target_num, REPLAY_DIR)
+            if archived:
+                print(f"[instant_replay] Playing Game {target_num} ({len(archived)} individual cut(s)).")
+                _play_all_clips_sequential(archived)
+                return
+            matches = [(n, p) for n, p in reels if n == target_num]
+            if not matches:
+                available = ", ".join(f"Game {n}" for n in sorted(set(archived_numbers + [n for n, _ in reels])))
+                print(f"[instant_replay] No highlights for Game {target_num}. Available: {available or '(none)'}")
+                return
+            _, reel_path = matches[0]
+            print(f"[instant_replay] Playing legacy reel: {reel_path.name}")
             _play_all_clips_sequential([str(reel_path)])
             return
 
@@ -959,7 +972,11 @@ def run(
             matches = [e for e in _clip_registry if e["tag"].lower() == tag]
 
         if not matches:
-            return []
+            from . import library
+            persisted = library.tagged_paths(tag, REPLAY_DIR)
+            if number is not None:
+                return [persisted[number - 1]] if 0 < number <= len(persisted) else []
+            return [persisted[-1]] if persisted else []
 
         # Sort by saved_at ascending so index 0 = first clip of this tag
         matches.sort(key=lambda e: e["saved_at"])
@@ -988,8 +1005,10 @@ def run(
     from lib.asset_fader import AssetFader
     replay_fader = AssetFader(SOURCE_NAME, Path(__file__).parent / 'asset_volumes.json')
 
-    def _play_all_clips_sequential(clips: list[str]) -> None:
-        """One owner controls OBS until the whole replay session finishes."""
+    def _play_all_clips_sequential(
+        clips: list[str], *, random_forever: bool = False
+    ) -> None:
+        """One owner controls OBS until a sequence or random session finishes."""
         if not _playback_gate.acquire(blocking=False):
             print("[instant_replay] Replay already starting/playing; stop it before choosing another.")
             return
@@ -997,19 +1016,49 @@ def run(
             _cancel_watcher.clear()
             _skip_clip.clear()
             with _lock:
-                _is_multi_clip_active[0] = len(clips) > 1
+                _is_multi_clip_active[0] = random_forever or len(clips) > 1
+                _random_playback_active[0] = random_forever
                 _replay_active[0] = True
                 _replay_paused[0] = False
-            _pause_other_projects()
+            _scene_session[0] = coordinator.scene_session("instant_replay", SCENE, RETURN_SCENE)
             from . import library
             labels = library.read()["clips"]
-            for index, clip in enumerate(clips):
+            index = 0
+            while not _cancel_watcher.is_set():
+                session = _scene_session[0]
+                if session.activated and not session.owns_scene():
+                    _cancel_watcher.set()
+                    break
+                while _replay_paused[0] and not _cancel_watcher.is_set():
+                    if not session.owns_scene():
+                        _cancel_watcher.set()
+                        break
+                    _cancel_watcher.wait(0.1)
+                if _cancel_watcher.is_set():
+                    break
+                if random_forever:
+                    candidates = _replay_files_on_disk()
+                    if not candidates:
+                        print("[instant_replay] Random playback stopped: no saved clips remain.")
+                        break
+                    pool = [path for path in candidates if path != last_random_clip[0]] or candidates
+                    choice = random.choice(pool)
+                    last_random_clip[0] = choice
+                    clip = str(choice)
+                    total: int | str = "∞"
+                    print(f"[instant_replay] 🎲 Random clip: {choice.name}")
+                else:
+                    if index >= len(clips):
+                        break
+                    clip = clips[index]
+                    total = len(clips)
+                index += 1
                 if _cancel_watcher.is_set():
                     break
                 clip_path = Path(clip)
                 _live["playback_detail"] = {
                     "name": labels.get(library.clip_id(clip), {}).get("title") or clip_path.name,
-                    "index": index + 1, "total": len(clips),
+                    "index": index, "total": total,
                 }
                 if not clip_path.is_file() or clip_path.stat().st_size <= 0:
                     print(f"[instant_replay] Missing or empty clip: {clip}")
@@ -1024,10 +1073,13 @@ def run(
                 stop_media(SOURCE_NAME)
                 replay_fader.capture()
                 set_media_source_file(SOURCE_NAME, str(clip_path))
-                replay_fader.apply(clip_path)
+                volume_source = library.volume_source(clip_path, labels, replay_fader.values())
+                replay_fader.apply(clip_path, fallback=volume_source)
+                if _cancel_watcher.is_set() or not session.activate():
+                    _cancel_watcher.set()
+                    break
                 obs.show_source(SCENE, SOURCE_NAME)
                 _mute_desktop()
-                switch_scene(SCENE)
                 if not wait_for_replay_start(SOURCE_NAME, _cancel_watcher):
                     if not _cancel_watcher.is_set():
                         print(f"[instant_replay] Clip could not start: {clip_path.name}")
@@ -1038,6 +1090,9 @@ def run(
                 ended_polls = 0
                 deadline = time.monotonic() + 7200
                 while not _cancel_watcher.is_set():
+                    if not session.owns_scene():
+                        _cancel_watcher.set()
+                        break
                     if _skip_clip.is_set():
                         _skip_clip.clear()
                         break
@@ -1063,13 +1118,21 @@ def run(
                 try:
                     obs.park_media_source(SCENE, SOURCE_NAME)
                 finally:
-                    _end_replay(cancelled=_cancel_watcher.is_set())
+                    _unmute_desktop(force=True)
+                    _hide_replay_logo()
+                    with _lock:
+                        _replay_active[0] = False
+                        _replay_paused[0] = False
+                    session = _scene_session[0]
+                    _scene_session[0] = None
+                    if session:
+                        session.finish()
             finally:
                 with _lock:
                     _is_multi_clip_active[0] = False
+                    _random_playback_active[0] = False
                 _live["playback_detail"] = {}
                 _skip_clip.clear()
-                _resume_other_projects()
                 _playback_gate.release()
 
     def _play_clip_path(path_value: str) -> None:
@@ -1094,7 +1157,7 @@ def run(
 
     # ── Voice dispatch (called from background thread by voice.listener) ──────
 
-    def _dispatch(text: str) -> None:
+    def _dispatch(text: str, pressed_at: float | None = None) -> None:
         """Receive a transcribed string and run the matching command."""
         if not text or not text.strip():
             print("[instant_replay] ⚠  Transcription was empty.")
@@ -1102,20 +1165,25 @@ def run(
         print(f"[instant_replay] 💬 Heard: {text!r}")
         cmd, spec, clip_seconds, full_save = _parse_command(text)
         if cmd == "save":
-            _on_save(tag=spec, clip_seconds=clip_seconds, full_save=full_save)
+            _on_save(tag=spec, clip_seconds=clip_seconds, full_save=full_save, pressed_at=pressed_at)
         elif cmd == "play":
             _on_play(spec)
         elif cmd == "mark":
             _on_mark()
+        elif cmd == "stop":
+            print("[instant_replay] ⏹ Leaving replay.")
+            _cancel_watcher.set()
+            _end_replay(cancelled=True)
         else:
             print(
                 f"[instant_replay] ⚠  Didn't recognise a command in {text!r}. "
-                "Say 'random', 'play last', 'save', or 'mark'. See Instant Replay in the Hub for all commands."
+                "Say 'random', 'stop replay', 'play last', 'save', or 'mark'. See Instant Replay in the Hub for all commands."
             )
 
     ptt = VoicePTT(
         timeout=RECORD_TIMEOUT_SECONDS,
         on_transcript=_dispatch,
+        on_timed_transcript=_dispatch,
         tag="instant_replay",
     )
 
@@ -1129,9 +1197,14 @@ def run(
         with _lock:
             replay_running = _replay_active[0]
             is_multi = _is_multi_clip_active[0]
+            is_random = _random_playback_active[0]
 
         if replay_running:
-            if is_multi and not _skip_clip.is_set():
+            if is_random:
+                print("[instant_replay] ⏹ Hotkey pressed during random replay — leaving replay.")
+                _cancel_watcher.set()
+                _end_replay(cancelled=True)
+            elif is_multi and not _skip_clip.is_set():
                 print("[instant_replay] ⏭  Hotkey pressed — skipping to next clip.")
                 _skip_clip.set()
             else:
@@ -1153,7 +1226,7 @@ def run(
     print(
         f"[instant_replay] ⌨  Armed — press '{HOTKEY_LISTEN}' to start recording, "
         "then press 'C' or trigger again to transcribe (auto-transcribes in 2s). "
-        "Say 'save [tag]', 'mark', or 'play [spec]'."
+        "Say 'save [tag]', 'mark', 'play [spec]', or 'stop replay'."
     )
     if startup_event is not None:
         startup_event.set()

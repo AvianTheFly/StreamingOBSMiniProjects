@@ -17,7 +17,7 @@ import threading
 import time
 from pathlib import Path
 
-from .client import get_obs
+from .client import get_obs, OBSUnavailable
 
 
 
@@ -837,6 +837,8 @@ def get_input_audio_monitor_type(input_name: str):
     """Return the OBS audio monitor type for an input, or None on failure."""
     try:
         return get_obs().get_input_audio_monitor_type(input_name).monitor_type
+    except OBSUnavailable:
+        return None
     except Exception as e:
         if _is_unsupported_audio_error(e):
             return None
@@ -868,6 +870,8 @@ def get_input_volume(input_name: str):
             "mul": getattr(r, "input_volume_mul", None),
             "db": getattr(r, "input_volume_db", None),
         }
+    except OBSUnavailable:
+        return None
     except Exception as e:
         if _is_unsupported_audio_error(e):
             return None
@@ -954,6 +958,8 @@ def get_input_mute(source: str) -> bool | None:
     try:
         resp = get_obs().get_input_mute(source)
         return resp.input_muted
+    except OBSUnavailable:
+        return None
     except Exception as e:
         if _is_unsupported_audio_error(e):
             return None
@@ -1049,7 +1055,7 @@ def configure_input_audio(
 #  Replay buffer
 # ─────────────────────────────────────────────────────────────────────────────
 
-def save_replay_buffer_and_wait(timeout: float = 15.0) -> str | None:
+def save_replay_buffer_and_wait(timeout: float = 15.0, *, on_save_requested=None) -> str | None:
     """
     Trigger OBS to save the replay buffer, block until OBS fires the
     ReplayBufferSaved event (meaning the file is fully written), and return
@@ -1073,6 +1079,8 @@ def save_replay_buffer_and_wait(timeout: float = 15.0) -> str | None:
     ev.callback.register(on_replay_buffer_saved)
 
     try:
+        if on_save_requested is not None:
+            on_save_requested(time.time())
         get_obs().save_replay_buffer()
         got_it = saved_event.wait(timeout=timeout)
     finally:
@@ -1151,7 +1159,14 @@ def configure_media_source_properties(
     if speed_percent is not None:
         settings["speed_percent"] = float(speed_percent)
     if settings:
-        get_obs().set_input_settings(source, settings, overlay=True)
+        # Read live values so manual OBS edits are respected. Avoid invoking
+        # the source update callback at all for repeated identical requests.
+        client = get_obs()
+        current = client.get_input_settings(source).input_settings
+        changes = {key: value for key, value in settings.items()
+                   if current.get(key) != value}
+        if changes:
+            client.set_input_settings(source, changes, overlay=True)
 
 
 def park_media_source(scene: str, source: str) -> None:

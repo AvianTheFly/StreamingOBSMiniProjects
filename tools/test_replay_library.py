@@ -76,6 +76,15 @@ class ReplayLibrary(unittest.TestCase):
         with self.assertRaises(ValueError): self.group()
         self.assertEqual(library.STATE_FILE.read_text(), "{")
 
+    def test_archived_capture_keeps_tag_and_game_association(self):
+        library.remember_capture(self.a, tag="win", saved_at=10)
+        archived = self.root / "clips" / "Game 7 2026-09-13" / self.a.name
+        archived.parent.mkdir(parents=True)
+        self.a.rename(archived)
+        library.archive_capture(self.a, archived, game="Game 7 2026-09-13")
+        self.assertEqual(library.tagged_paths("win", self.root), [str(archived)])
+        self.assertEqual(library.game_paths(7, self.root), [str(archived)])
+
     def test_voice_group_name_can_contain_other_command_words(self):
         self.assertEqual(_parse_command("Play intro save the day."), ("play", "intro save the day", 0, False))
         self.assertEqual(_parse_command("Play group highlights"), ("play", "group highlights", 0, False))

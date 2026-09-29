@@ -11,12 +11,23 @@ or any other GIL-holding work in the parent.
 from __future__ import annotations
 
 import json
+import os
 import queue
 import sys
 import threading
 
 
+def watch_parent(stream, exit_process=os._exit) -> None:
+    """EOF means the Hub closed its pipe, including after TerminateProcess."""
+    try:
+        stream.read()
+    finally:
+        exit_process(0)
+
+
 def main() -> None:
+    threading.Thread(target=watch_parent, args=(sys.stdin,),
+                     name="kb-parent-watch", daemon=True).start()
     try:
         from pynput import keyboard
     except Exception as exc:
@@ -44,7 +55,7 @@ def main() -> None:
                 out.write(json.dumps({"char": char, "name": name}) + "\n")
                 out.flush()
             except Exception:
-                return
+                os._exit(0)  # Never leave a global hook after its reader dies.
 
     threading.Thread(target=writer_loop, name="kb-writer", daemon=True).start()
 

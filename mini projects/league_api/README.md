@@ -125,3 +125,64 @@ need verification in a live match; synthetic tests cannot prove patch-specific f
 From `mini projects`: `python -m unittest league_api.test_engine -v`.
 The control page's five-alert preview should display only Pentakill, Objective Steal,
 and Ace. Clear returns the source to transparent immediately.
+
+## Death reactions: maintenance map
+
+The League module shows the existing DeathBorder once for 2.5 seconds
+(`league/config.py`, `DEATH_DISPLAY_DURATION`). Its existing respawn handler
+also hides the border. No source transforms or asset settings are changed.
+
+`death_reactions.py` owns the pure death lifecycle, timing constants, and two
+curated pools of existing meme videos. After the splash, a reserved corner card
+rotates every six seconds without immediate repeats. The existing alert layout
+and Death event clip volume apply; OBS master volume is untouched.
+
+A local kill/assist or personally credited objective within eight seconds before
+or after death latches Worth it until respawn. A teammate killing your actual
+killer within eight seconds after death also counts. Unrelated teammate kills
+and objectives do not count.
+Enemy/unknown objectives do not count. This is temporal correlation, not proof
+that the death caused the payoff; Riot provides no fight coordinates.
+New evidence immediately replaces a bad-death clip. Respawn, game reset,
+reconnect baseline, and clear remove the current reaction. Joining while dead
+waits until the next life. Pausing or hiding alerts hides reactions too.
+
+Integration: Engine feeds snapshots into the classifier; Service.snapshot maps
+its media through the existing asset endpoint and reserves the first of three
+browser cards. Ordinary event scheduling remains independent. Edit POOLS for
+media selection and the timing constants for pacing; keep splash timing in sync
+with league/config.py. Regression coverage lives in test_death_reactions.py.
+
+## Automatic meme context
+
+Built-in objective/structure celebrations require confirmed allied ownership;
+first blood requires the local recipient and ace requires the allied acing team.
+Explicit custom event rules keep their configured scope. Low-health kill reactions
+require a living player and an event at most two seconds old. Inferred fight
+reactions require local kill/death/assist involvement and a living local player.
+Escape reactions require recent damage, recovery above 20% health and eight
+seconds without further detected damage; shopping, death and polling gaps cancel
+the pending inference. These remain approximate signals, not location evidence.
+Saved media pools, presentation banks, volumes and layouts are unchanged.
+
+## Quiet autoplay tuning (2026-09-16)
+
+The saved meme setup now uses one card, a global 18-second start-to-start gap,
+and 25-second individual kill/death cooldowns. Ordinary events cannot interrupt
+an active card. Higher-priority events in the same family (kill to multikill)
+and victory/defeat may interrupt; skipped events are discarded, never queued.
+Manual previews bypass the global gap. History explains spacing suppressions.
+
+Only local kills/deaths/multikills, local first blood, allied ace, first turret,
+inhibitor, Baron, elemental dragons, objective steals and match results are
+selected. Routine health, shopping, assists, respawns and inferred fights are
+disabled. Level-up retains its sprites, with only its meme autoplay disabled.
+Each selected event has one fixed primary clip and an on-video event caption.
+Alternate pools are retained but disabled; personal presentation data, faders,
+asset offsets and layout have not been replaced.
+
+`autoplay_gap_seconds` controls global spacing; `death_reactions_enabled=false`
+disables the separate rotating death cards. Each rule's optional `autoplay=false`
+suppresses automatic cards while retaining its non-card behavior and previews.
+The older death classifier remains available but is off in the saved setup:
+one ordinary death clip replaces the sequence of guessed payoff reactions.

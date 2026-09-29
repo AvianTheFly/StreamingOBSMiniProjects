@@ -23,6 +23,8 @@ WHISPER_MODEL: str = os.environ.get("WHISPER_MODEL", "large-v3")
 WHISPER_DEVICE: str = os.environ.get("WHISPER_DEVICE", "cuda")
 WHISPER_COMPUTE: str = os.environ.get("WHISPER_COMPUTE", "float16")
 WHISPER_LANGUAGE: str = os.environ.get("WHISPER_LANGUAGE", "en")
+# Bound CPU inference so voice commands leave room for the game and OBS.
+WHISPER_CPU_THREADS: int = max(1, _env_int("WHISPER_CPU_THREADS", 2) or 2)
 
 # Microphone. Run tools/mic_test.py first to identify the correct device index.
 MIC_DEVICE: int | None = _env_int("MIC_DEVICE", 1)

@@ -47,6 +47,11 @@ REPLAY_DIR = _os.environ["REPLAY_DIR"]
 # Raw clips and originals in REPLAY_DIR are wiped on startup; this folder is kept.
 EDITED_DIR = _os.path.join(REPLAY_DIR, "edited")
 
+# Individual saved cuts are kept here after a game ends.  Their tags and game
+# association live in replay_library.json, so a game can be played as a group
+# without turning its cuts into one irreversible video file.
+CLIPS_DIR = _os.path.join(REPLAY_DIR, "clips")
+
 # ── Audio muting during replay playback ──────────────────────────────────────
 # Desktop Audio is fully muted while a replay plays so the viewer only hears
 # the replay audio.  Unmuted immediately when the replay ends.

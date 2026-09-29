@@ -25,6 +25,11 @@ def make_handler(service, *, root: Path, port: int, load_config):
             self.end_headers(); self.wfile.write(body)
         def do_GET(self):
             path=unquote(urlparse(self.path).path)
+            if path=='/sprite.png':
+                config=json.loads((root/'sprites.json').read_text(encoding='utf-8'))
+                self.send_bytes(Path(config['image']).read_bytes(),'image/png'); return
+            if path in {'/sprites.js','/sprite-control.js'}:
+                self.send_bytes((root/path[1:]).read_bytes(),'text/javascript'); return
             if path=='/settings': self.send_bytes(json.dumps(service.settings()).encode()); return
             if path in {'/memes','/meme-pack.json'}:
                 file=root/('meme_gallery.html' if path=='/memes' else 'meme_pack.json')
@@ -135,7 +140,9 @@ def make_handler(service, *, root: Path, port: int, load_config):
                     except Exception: self.send_bytes(b'{"error":"OBS volume could not be changed"}',status=503); return
                     self.send_bytes(json.dumps(result).encode()); return
                 with service.lock:
-                    if self.path=='/preview':
+                    if self.path=='/sprite-preview':
+                        service.engine.trigger_sprites(body.get('level',6))
+                    elif self.path=='/preview':
                         if not service.engine.config.get('overlay_enabled',True): raise ValueError('League alerts are off. Turn them on before previewing in OBS.')
                         keys=body.get('keys',[])
                         if not isinstance(keys,list) or any(k not in service.engine.config['events'] for k in keys): raise ValueError('Unknown alert')

@@ -3,6 +3,7 @@ from collections import Counter
 import copy
 import time
 from .media_pool import MediaPicker
+from .death_reactions import DeathReactions
 
 DIRECT = {'GameStart': ('game_start', 45), 'MinionsSpawning': ('minions_spawning', 25),
           'FirstBlood': ('first_blood', 85), 'Ace': ('ace', 88),
@@ -48,13 +49,25 @@ class Engine:
         self.slots=[]; self.serial=0; self.reset()
 
     def reset(self):
+        self.death_reactions = DeathReactions()
         self.media_picker = MediaPicker()
         self.previous=None; self.game_time=-1; self.seen=set(); self.cooldowns={}
         self.kills=[]; self.objectives=[]; self.low_at=None; self.last_damage=-999
-        self.metrics={}; self.slots=[]; self.history=[]
+        self.metrics={}; self.slots=[]; self.history=[]; self.sprite=None
+        self.last_autoplay=-float("inf")
 
     def clear(self):
+        self.death_reactions.reset()
         self.slots=[]
+        self.sprite=None
+
+    def trigger_sprites(self, level):
+        if isinstance(level,bool) or not isinstance(level,int) or not 1<=level<=100:
+            raise ValueError("Level must be an integer from 1 to 100")
+        if not self.config.get("overlay_enabled",True) or self.config.get("paused"):
+            return
+        self.serial+=1
+        self.sprite={"id":self.serial,"level":level,"expires":self.clock()+2}
 
     def active(self):
         now=self.clock(); self.slots=[a for a in self.slots if a['expires']>now]
@@ -73,10 +86,17 @@ class Engine:
             if self.config.get('paused') and candidate.get('confidence')!='preview': record('Paused'); continue
             if not rule.get('enabled',False): record('Disabled'); continue
             key=candidate['key']
+            automatic=candidate.get('confidence')!='preview'
+            if automatic and not rule.get('autoplay',True): record('Automatic meme disabled'); continue
             if now-self.cooldowns.get(key,-999999)<rule.get('cooldown',0): record('Cooldown'); continue
             # One reusable slot per semantic family; a penta upgrades a double.
             family=candidate.get('family',key)
             same=next((a for a in self.slots if a['family']==family),None)
+            if automatic and self.config.get('autoplay_gap_seconds',0):
+                upgrade=bool(same and rule['priority']>same['priority'])
+                ending=key in {'victory','defeat'}
+                if not upgrade and not ending and (self.slots or now-self.last_autoplay<self.config['autoplay_gap_seconds']):
+                    record('Spacing: waiting for a clear moment'); continue
             if same and same['priority']>rule['priority']: record('Higher priority in this family'); continue
             if same: self.slots.remove(same)
             self.serial+=1
@@ -92,6 +112,7 @@ class Engine:
             self.cooldowns[key]=now
             if alert in self.slots:
                 self.media_picker.remember(key,alert['media'])
+                if automatic: self.last_autoplay=now
             record('Displayed' if alert in self.slots else 'Dropped: three higher-priority alerts')
         return self.active()
 
@@ -147,15 +168,17 @@ class Engine:
                 if not fresh: continue
                 if local_name(killer):
                     emit('kill',e.get('VictimName',''),'combat_local')
-                    if ratio is not None and 0<ratio<=0.2:
+                    if not local.get('isDead') and t-et<=2 and ratio is not None and 0<ratio<=0.2:
                         emit('low_hp_kill',f'Kill observed at {ratio:.0%} health','combat_local')
                 elif local_name(e.get('VictimName')): emit('death',killer,'death')
                 elif any(local_name(n) for n in e.get('Assisters',[])): emit('assist',killer)
                 roles={player(n).get('position') for n in [killer]+e.get('Assisters',[])}-{'',None}
-                if len(roles)>=3: emit('possible_roam','Participants from several assigned roles; location unknown')
+                if len(roles)>=3 and (local_name(killer) or any(local_name(n) for n in e.get('Assisters',[]))): emit('possible_roam','Participants from several assigned roles; location unknown')
             elif name in {'DragonKill','HordeKill','HeraldKill','BaronKill','AtakhanKill'}:
                 if t-et<=20: self.objectives.append(e)
                 if not fresh: continue
+                # Built-in memes celebrate our side; unresolved/enemy ownership is not a win.
+                if not team or killer_team!=team: continue
                 key='dragon_'+str(e.get('DragonType','')).lower() if name=='DragonKill' else DIRECT[name][0]
                 if key not in self.config['events']: key='dragon'
                 emit(key,relation+' · '+killer,'objective_'+name)
@@ -165,12 +188,15 @@ class Engine:
             elif name=='Multikill' and local_name(killer):
                 count=int(e.get('KillStreak',0)); key={2:'double_kill',3:'triple_kill',4:'quadra_kill',5:'pentakill'}.get(count)
                 if key: emit(key,killer,'combat_local')
-                if key and ratio is not None and 0<ratio<=0.2: emit('low_hp_multikill',f'{count} kills · {ratio:.0%} health','combat_local')
+                if key and not local.get('isDead') and t-et<=2 and ratio is not None and 0<ratio<=0.2: emit('low_hp_multikill',f'{count} kills · {ratio:.0%} health','combat_local')
             elif name=='FirstBlood':
-                recipient=e.get('Recipient',''); emit('first_blood',recipient,'combat_local' if local_name(recipient) else 'first_blood')
+                recipient=e.get('Recipient','')
+                if local_name(recipient): emit('first_blood',recipient,'combat_local')
             elif name=='GameEnd': emit({'win':'victory','lose':'defeat'}.get(str(e.get('Result','')).lower(),'game_end'))
             elif name in DIRECT:
                 key=DIRECT[name][0]
+                if name=='Ace' and (not team or e.get('AcingTeam')!=team): continue
+                if name in {'TurretKilled','FirstBrick','InhibKilled'} and (not team or killer_team!=team): continue
                 detail=e.get('AcingTeam') or e.get(name) or killer or ''
                 emit(key,detail,'turret' if name in {'FirstBrick','TurretKilled'} else key)
         if not initial:
@@ -196,7 +222,10 @@ class Engine:
                            'decreases_by':before>after and before-after>=threshold}
                     if match.get(tr['operator']): emit(custom_key,f'{field}: {before:g} → {after:g}')
                 level=local.get('level',0); old_level=old_local.get('level',0)
-                if level>old_level: emit('level_up',f'Level {level}','power')
+                if level>old_level:
+                    emit('level_up',f'Level {level}','power')
+                    if self.config['events'].get('level_up',{}).get('enabled',False):
+                        self.trigger_sprites(int(level))
                 if old_local.get('isDead') and not local.get('isDead'): emit('respawn')
                 if not old_local.get('isDead') and local.get('isDead'): emit('death',family='death')
                 for slot,ability in active.get('abilities',{}).items():
@@ -222,13 +251,13 @@ class Engine:
                     if delta<-maximum*0.2: emit('heavy_health_loss',f'{-delta:.0f} net HP lost','health')
                     if delta>maximum*0.2: emit('large_heal',f'{delta:.0f} net HP gained','health')
                     if ratio<=0.2 and hp>0:
-                        self.low_at=t
+                        if t-self.last_damage<=3: self.low_at=t
                         if before_hp/max(1,before_stats.get('maxHealth',maximum))>0.2: emit('low_health',f'{ratio:.0%} HP','health')
-                    if self.low_at is not None and t-self.low_at>=8 and t-self.last_damage>=8:
+                    if self.low_at is not None and ratio>0.2 and 8<=t-self.low_at<=20 and t-self.last_damage>=8 and not added:
                         emit('possible_low_hp_escape','Survived eight seconds after low health','health'); self.low_at=None
                     if added and gold_delta<-50 and delta>maximum*0.15:
                         emit('possible_base_visit','Shopping signal plus health gain; recall not confirmed','inventory')
-                if local.get('isDead'): self.low_at=None
+                if local.get('isDead') or added or (self.low_at is not None and t-self.low_at>20): self.low_at=None
                 resource=stats.get('resourceValue'); before_resource=before_stats.get('resourceValue')
                 if resource is not None and before_resource is not None and before_resource-resource>30:
                     emit('resource_spent',f'{before_resource-resource:.0f} net resource lost; spell unknown')
@@ -237,9 +266,11 @@ class Engine:
                 if cs//50>prior_cs//50: emit('cs_milestone',f'{cs} CS')
                 if scores.get('wardScore',0)-prior_scores.get('wardScore',0)>=1: emit('vision_activity','Ward score increased; placement unknown')
                 if local.get('position')=='JUNGLE' and cs-prior_cs>=4: emit('possible_jungle_activity','CS jump; specific camp unknown')
-            if len(self.kills)>=3 and any(e.get('EventName')=='ChampionKill' and 0<=t-float(e.get('EventTime',0))<=2 for e in self.kills):
+            if not 0<dt<=3: self.low_at=None
+            involved=[e for e in self.kills if local_name(e.get('KillerName')) or local_name(e.get('VictimName')) or any(local_name(n) for n in e.get('Assisters',[]))]
+            if involved and not local.get('isDead') and len(self.kills)>=3 and any(e.get('EventName')=='ChampionKill' and 0<=t-float(e.get('EventTime',0))<=2 for e in self.kills):
                 emit('possible_teamfight',f'{len(self.kills)} champion deaths within 20 seconds','fight')
-            if self.kills and self.objectives and any(abs(float(k.get('EventTime',0))-float(o.get('EventTime',0)))<=12 for k in self.kills for o in self.objectives):
+            if involved and not local.get('isDead') and self.objectives and any(abs(float(k.get('EventTime',0))-float(o.get('EventTime',0)))<=12 for k in involved for o in self.objectives if 0<=t-float(o.get('EventTime',0))<=2):
                 emit('possible_objective_fight','Champion death within 12 seconds of an objective','fight')
             if team:
                 allies=sum(not p.get('isDead',False) for p in players if p.get('team')==team)
@@ -257,6 +288,10 @@ class Engine:
         self.metrics.update(game_time=t,local_player=local.get('riotId') or local.get('summonerName'),
                             objective_control=control,cs_per_minute=(local.get('scores',{}).get('creepScore',0)/(t/60) if t>0 else 0),
                             unknown_events=sorted({e.get('EventName','') for e in events}-{*DIRECT,'ChampionKill','Multikill','DragonKill','GameEnd'}))
+        if self.config.get('death_reactions_enabled',True):
+            self.death_reactions.update(data, local, names, players, initial, self.clock())
+        else:
+            self.death_reactions.reset()
         self.previous=copy.deepcopy(data); self.game_time=t
         self.submit(out)
         return out

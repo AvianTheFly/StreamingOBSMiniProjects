@@ -47,6 +47,8 @@ export const api = {
   saveReplayLibrary: (data) => _req("POST", "/api/projects/instant_replay/library", data),
   skipReplayClip: () => _req("POST", "/api/projects/instant_replay/skip", {}),
   replayPreview: (path) => _req("GET", `/api/projects/instant_replay/preview?path=${encodeURIComponent(path)}`),
+  trimReplay: (data) => _req("POST", "/api/projects/instant_replay/trim", data),
+  replayTrimStatus: (job) => _req("GET", `/api/projects/instant_replay/trim?job=${encodeURIComponent(job)}`),
 
   // ── Specific song ─────────────────────────────────────────────────────
   getSongLibrary:    ()       => _req("GET",  "/api/projects/specific_song/library"),

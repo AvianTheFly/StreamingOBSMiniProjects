@@ -327,10 +327,22 @@ def _apply_snapshot(
 
 
 def _apply_filters(source_name: str, desired_filters: list[dict[str, Any]]) -> None:
+    # OBS filter names are unique per source. A duplicated saved entry used to
+    # make the second CreateSourceFilter fail and abort the media swap entirely.
+    unique_filters: list[dict[str, Any]] = []
+    seen_names: set[str] = set()
+    for item in desired_filters:
+        name = str(item.get("name", "")).strip()
+        key = name.casefold()
+        if not name or key in seen_names:
+            continue
+        seen_names.add(key)
+        unique_filters.append(item)
+
     current = _snapshot_filters(source_name)
     # Read OBS each time so manual edits are visible, but avoid tearing down
     # and rebuilding an identical GPU filter chain on every asset playback.
-    if _filters_equal(current, desired_filters):
+    if _filters_equal(current, unique_filters):
         return
     for item in current:
         try:
@@ -338,16 +350,21 @@ def _apply_filters(source_name: str, desired_filters: list[dict[str, Any]]) -> N
         except Exception:
             pass
 
-    for item in desired_filters:
+    for item in unique_filters:
         name = str(item.get("name", "")).strip()
         kind = str(item.get("kind", "")).strip()
         if not name or not kind:
             continue
         settings = item.get("settings") if isinstance(item.get("settings"), dict) else {}
-        obs.create_source_filter(source_name, name, kind, settings)
-        obs.set_source_filter_enabled(source_name, name, bool(item.get("enabled", True)))
-        if settings:
-            obs.set_source_filter_settings(source_name, name, settings)
+        try:
+            obs.create_source_filter(source_name, name, kind, settings)
+            obs.set_source_filter_enabled(source_name, name, bool(item.get("enabled", True)))
+            if settings:
+                obs.set_source_filter_settings(source_name, name, settings)
+        except Exception as exc:
+            # A cosmetic filter failure must not prevent the asset itself from
+            # being loaded and played through the shared OBS media source.
+            print(f"[single-source] Could not apply filter '{name}' to '{source_name}': {exc}")
 
 
 def _snapshot_diff(baseline: dict[str, Any], current: dict[str, Any]) -> dict[str, Any]:

@@ -22,6 +22,7 @@ import obs  # root-level obs package — always on sys.path from hub
 from lib.project_settings import load_project_settings, shift_asset_volume_db, audio_settings_transaction
 from lib.shared_media.controls import effective_volume_db
 from lib.shared_media.playback_worker import PlaybackWorker
+from lib.shared_media.config_overrides import load_config_overrides, audio_tracks_override
 from lib.shared_media.media_startup import media_startup
 
 from .config import (
@@ -410,16 +411,21 @@ class SongPlayer:
             print(f"{_TAG} ⚠  Could not apply fullscreen transform: {exc}")
 
     def _set_monitor_and_output(self, source_name: str) -> None:
-        """Monitor music and include OBS's configured streaming audio track."""
+        """Honor saved routing, including desktop-monitored stream-only music."""
+        routing = load_config_overrides(_PROJECT_DIR)
         try:
             obs.configure_input_audio(
                 source_name,
-                monitor_type="OBS_MONITORING_TYPE_MONITOR_AND_OUTPUT",
+                monitor_type=routing.get("monitor", "OBS_MONITORING_TYPE_MONITOR_AND_OUTPUT"),
             )
         except Exception as exc:
             print(f"{_TAG} ⚠  Could not set audio monitoring for '{source_name}': {exc}")
 
         try:
+            tracks = audio_tracks_override(routing)
+            if tracks is not None:
+                obs.set_input_audio_tracks(source_name, tracks)
+                return
             track = obs.ensure_input_on_stream_track(source_name)
             print(f"{_TAG} 🎚  Streaming track {track} enabled for '{source_name}'; other tracks preserved")
         except Exception as exc:

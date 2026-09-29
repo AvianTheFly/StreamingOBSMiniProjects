@@ -116,6 +116,11 @@ class Service:
     def snapshot(self):
         with self.lock:
             alerts=self.engine.active()
+            reaction=self.engine.death_reactions.alert
+            if reaction and reaction["expires"] > self.engine.clock() and not self.engine.config.get("paused") and self.engine.config.get("overlay_enabled",True):
+                reaction=copy.deepcopy(reaction)
+                reaction["volume"]=self.engine.config["events"].get("death",{}).get("volume",.7)
+                alerts=[reaction]+[a for a in alerts if a["key"]!="death"][:2]
             for alert in alerts:
                 alert['remaining']=max(0,alert['expires']-self.engine.clock())
                 path=self.media_path(alert['media']) if alert['media'] else None
@@ -126,6 +131,7 @@ class Service:
                 audio=self.media_path(alert.get('audio',''))
                 alert['audio']='/asset?path='+quote(alert['audio']) if audio else ''
             return {'overlay_enabled':self.engine.config.get('overlay_enabled',True),'layout':self.engine.config.get('layout',LAYOUT),'status':self.status,'alerts':alerts,'metrics':self.engine.metrics,
+                    'sprite':({**self.engine.sprite,'remaining':max(0,self.engine.sprite['expires']-self.engine.clock())} if self.engine.sprite and self.engine.sprite['expires']>self.engine.clock() and not self.engine.config.get('paused') and self.engine.config.get('overlay_enabled',True) else None),
                     'history':self.engine.history[-20:],'error':self.error,'media_errors':self.media_errors[-10:],
                     'paused':self.engine.config.get('paused',False),'revision':self.engine.config.get('revision',0)}
 

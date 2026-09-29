@@ -12,7 +12,7 @@ import obs
 import events as hub_events
 
 from ..config import (
-    DEATH_SCENE, DEATH_SOURCE,
+    DEATH_SCENE, DEATH_SOURCE, DEATH_DISPLAY_DURATION,
     RESPAWN_SCENE, RESPAWN_SOURCE, RESPAWN_DISPLAY_DURATION,
     RESPAWN_SFX_SOURCE,
     UDYR_ANIMATION_SCENE, UDYR_ANIMATION_SOURCE,
@@ -24,7 +24,7 @@ def make_death_handler():
     def handle_death(player_data):
         print("[league] Died — showing death border, hiding Udyr animation.")
         try:
-            obs.show_source(DEATH_SCENE, DEATH_SOURCE)
+            show_overlay(DEATH_SCENE, DEATH_SOURCE, DEATH_DISPLAY_DURATION)
         except Exception as e:
             print(f"[league] Death handler error: {e}")
         try:

@@ -55,7 +55,7 @@ class _InstantReplayInterface(ProjectInterface):
     def action_catalog(self) -> list[dict]:
         return [
             {"key": "play_latest", "label": "Play Latest", "description": "Play the newest saved clip."},
-            {"key": "play_random", "label": "Play Random", "description": "Play any saved clip at random."},
+            {"key": "play_random", "label": "Play Random", "description": "Keep playing saved clips at random until stopped."},
             {"key": "play_highlights", "label": "Play Highlights", "description": "Play clips from the current or previous game."},
             {"key": "save", "label": "Save Replay", "description": "Save the current OBS replay buffer."},
             {"key": "mark", "label": "Mark Start", "description": "Mark the start point for the next saved clip."},
@@ -76,6 +76,8 @@ class _InstantReplayInterface(ProjectInterface):
             handler = _live.get("save_clip")
             if handler:
                 handler()
+                from lib.twitch_clips import request_clip
+                request_clip()
                 return {"ok": True, "action": action}
         elif action in {"play_latest", "play_random", "play_highlights"}:
             handler = _live.get("play_spec")

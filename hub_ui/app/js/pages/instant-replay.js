@@ -3,6 +3,7 @@ import { api } from "../api.js";
 import { state } from "../state.js";
 import { toast } from "../toast.js";
 import { esc } from "../utils.js";
+import { mountTrim } from "./replay-trim.js";
 
 let root, unwatch, refreshTimer, previewTimer, generation = 0;
 let clips = [], groups = [], revision = 0, selected = new Set();
@@ -10,6 +11,7 @@ let query = "", scope = "all", page = 0, tab = "clip", clipPath = "", draft = nu
 let dirty = false, saving = false, busy = false, loading = false, ready = false;
 let draftRevision = 0;
 let renderedClips = "";
+let disposeTrim;
 const PAGE_SIZE = 30;
 const $ = selector => root?.querySelector(selector);
 const title = clip => clip?.title || clip?.name || "Missing clip";
@@ -31,7 +33,7 @@ export function mount(container) {
     <details class="card ir-help mt-16"><summary>Live shortcuts &amp; how replays work <span class="ir-muted">— press |, say “random”</span></summary>
       <div class="ir-help-grid">
         <div><h3>Capture a moment</h3><p>Press <kbd>|</kbd>, then say <code>save</code>, <code>save win</code>, <code>save fail</code>, <code>save escape</code>, or <code>save 30</code>. Say <code>mark</code> to set the start of your next save; <code>save full</code> saves the full buffer.</p><div class="ir-actions">${button("irSaveBuffer", "Save replay buffer")}${button("irMark", "Mark start")}</div></div>
-        <div><h3>Play live</h3><p><code>random</code> plays a saved replay. <code>play last</code> plays the latest. <code>play highlights</code> plays this game's clips (with previous-game fallback). <code>play game 3</code> plays its reel; <code>play win 2</code> picks a tagged clip.</p></div>
+      <div><h3>Play live</h3><p><code>random</code> keeps choosing saved replays until you stop it. <code>play last</code> plays the latest. <code>play highlights</code> plays this game's clips (with previous-game fallback). <code>play game 3</code> plays its reel; <code>play win 2</code> picks a tagged clip.</p></div>
         <div><h3>Run an intro</h3><p>Create a compilation below, add clips, and arrange them. Save it, then use <b>Play compilation in OBS</b> or say <code>play intro [name]</code>. Clips play once in the order you chose.</p></div>
       </div><p>Voice sends after two seconds, or press <kbd>C</kbd> sooner. During a sequence, <kbd>|</kbd> skips a clip; during a single replay it stops playback. Stop replay ends the whole sequence. Browser previews never switch your OBS scene.</p>
     </details>
@@ -73,6 +75,7 @@ export function mount(container) {
 }
 
 export function unmount() {
+  disposeTrim?.(); disposeTrim = null;
   generation++; clearInterval(refreshTimer); clearTimeout(previewTimer); unwatch?.();
   $("video")?.pause(); root = null;
   window.removeEventListener("beforeunload", beforeUnload);
@@ -88,7 +91,7 @@ async function perform(fn, message) {
 }
 async function live(fn) {
   $("video")?.pause();
-  if (!ready) { toast.error("Replay playback is offline. Open OBS and restart the Hub to play."); return; }
+  if (!ready) { toast.error("Replay playback is offline. Open OBS to enable playback."); return; }
   if (busy) { toast.error("Stop the current replay before starting another."); return; }
   await perform(fn, "Playback requested in OBS");
 }
@@ -100,6 +103,26 @@ async function load(force = false) {
     if (!root || token !== generation) return;
     clips = data.clips || []; groups = data.groups || []; revision = data.revision;
     ready = !!data.ready;
+    let twitchStatus = $("#irTwitchClip");
+    if (!twitchStatus) {
+      twitchStatus = document.createElement("p");
+      twitchStatus.id = "irTwitchClip";
+      twitchStatus.className = "ir-muted";
+      $("#irSaveBuffer").parentElement.after(twitchStatus);
+    }
+    const twitch = data.twitch_clip;
+    twitchStatus.textContent = twitch?.message || (twitch ? "Save also requests a 60-second Twitch clip, independent of replay timing. " : "");
+    if (twitch?.status === "ready" && /^https:\/\/(clips\.twitch\.tv|www\.twitch\.tv)\//.test(twitch.url)) {
+      const link = document.createElement("a");
+      link.href = twitch.url; link.target = "_blank"; link.rel = "noopener noreferrer";
+      link.textContent = " Open Twitch clip";
+      twitchStatus.append(link);
+    } else if (twitch && (twitch.status === "error" || twitch.status === "idle")) {
+      const link = document.createElement("a");
+      link.href = "http://127.0.0.1:7443/"; link.target = "_blank"; link.rel = "noopener noreferrer";
+      link.textContent = " Connect Twitch";
+      twitchStatus.append(link);
+    }
     selected = new Set([...selected].filter(p => findClip(p)));
     $("#irGroupCount").textContent = `(${groups.length})`;
     renderClips();
@@ -150,6 +173,7 @@ function renderClips() {
   if (focusedId && focusedCheckbox) $(`#irClips [data-id="${focusedId}"] input`)?.focus();
 }
 function renderEditor() {
+  disposeTrim?.(); disposeTrim = null;
   clearTimeout(previewTimer); $("video")?.pause();
   $("#irClipTab").setAttribute("aria-selected", String(tab === "clip"));
   $("#irGroupTab").setAttribute("aria-selected", String(tab === "group"));
@@ -160,6 +184,7 @@ function renderEditor() {
   $("#irEditor").innerHTML = `<div class="ir-heading"><h2>Clip details</h2>${button("irPlayClip", "Play in OBS", true)}</div>
     <div class="ir-preview" id="irPreview"><span>Preview stays in this browser.</span>${button("irPreviewStart", "Load preview")}</div>
     <p id="irPreviewHint" class="ir-muted">A small preview is prepared on demand. Your original stays unchanged.</p>
+    <div id="irTrim"><p class="ir-muted">Load the preview to trim a moment and save it as a new clip.</p></div>
     <form id="irClipForm" class="ir-form"><label>Display name<input id="irTitle" maxlength="160" value="${esc(title(c))}" required></label>
     <label>Notes<textarea id="irNotes" rows="3" maxlength="4000" placeholder="What happens in this clip?">${esc(c.notes)}</textarea></label>
     <label class="ir-check"><input id="irFavorite" type="checkbox" ${c.favorite ? "checked" : ""}> Favorite</label>
@@ -187,6 +212,23 @@ async function startPreview(path) {
       if (result.status === "ready") {
         $("#irPreview").innerHTML = `<video controls preload="metadata" aria-label="Local clip preview" src="/api/projects/instant_replay/preview-media?path=${encodeURIComponent(path)}"></video>`;
         $("#irPreviewHint").textContent = "Local preview only. Use Play in OBS when you want it on stream.";
+        disposeTrim?.();
+        disposeTrim = mountTrim($("#irTrim"), $("#irPreview video"), {path, title: title(findClip(path))}, async (result, open) => {
+          await load(true);
+          // Keeping the original editor open also keeps any unsaved notes intact.
+          open.onclick = async () => {
+            if (!canLeave()) return;
+            await load(true);
+            if (!root || token !== generation || !findClip(result.path)) return;
+            dirty = false; clipPath = result.path; tab = "clip";
+            query = ""; scope = "all"; page = 0; $("#irSearch").value = ""; $("#irScope").value = "all";
+            renderClips(); renderEditor(); startPreview(result.path);
+            $("#irEditor").scrollIntoView({block: "start", behavior: "smooth"});
+          };
+        }, result => {
+          // Our own added copy must not make unsaved source notes conflict.
+          if (draftRevision === result.previous_revision) draftRevision = result.revision;
+        });
       } else if (result.status === "error") { $("#irPreview").textContent = result.error; }
       else { $("#irPreview").textContent = result.status === "busy" ? "Another preview is preparing. Yours will follow…" : "Preparing browser preview… You can keep editing."; previewTimer = setTimeout(poll, 2000); }
     } catch (e) { if (root && token === generation && clipPath === path && tab === "clip") $("#irPreview").textContent = e.message; }
@@ -297,7 +339,7 @@ function updateStatus(projects = []) {
   const p = projects?.find(p => p.name === "instant_replay"); busy = !!p?.is_active;
   const paused = busy && (p.current_activity || "").includes("paused");
   $("#irStatus").textContent = !ready ? "Playback offline" : paused ? "Paused in OBS" : busy ? "Playing in OBS" : "Ready for replay";
-  $("#irActivity").textContent = !ready ? " · You can still organize clips. Open OBS and restart the Hub to play." : busy ? ` · ${p.current_activity || "replay"}` : " · Preview and organize clips below";
+  $("#irActivity").textContent = !ready ? " · Preview, trim and organize clips here. Open OBS to enable playback." : busy ? ` · ${p.current_activity || "replay"}` : " · Preview and organize clips below";
   $("#irIndicator").className = `state-indicator state-indicator--${busy ? "active" : "idle"}`;
   $("#irPause").disabled = !busy || paused; $("#irResume").disabled = !paused;
   $("#irSkip").disabled = !busy; $("#irStop").disabled = !busy;

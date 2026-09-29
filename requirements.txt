@@ -9,3 +9,4 @@ rapidfuzz
 requests
 sounddevice
 urllib3
+websocket-client

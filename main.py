@@ -7,6 +7,7 @@ import queue
 import threading
 import time
 
+import log
 from lib.paths import ensure_import_paths, load_project_env
 from lib.project_registry import (
     discover_runnable_projects,
@@ -36,24 +37,19 @@ def _parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-ARGS = _parse_args()
-
-# Keep Windows consoles and background logs predictable before log.py starts.
-os.environ["PYTHONUTF8"] = "1"
-os.environ["PYTHONUNBUFFERED"] = "1"
-if ARGS.debug:
-    os.environ["LOG_LEVEL"] = "DEBUG"
-
-ensure_import_paths()
-load_project_env()
-
-import log
-
-log.start()
-
-from lib.process_priority import raise_priority
-
-raise_priority()
+def _configure_runtime(debug: bool) -> None:
+    """Initialize process services explicitly, never as a side effect of import."""
+    os.environ["PYTHONUTF8"] = "1"
+    os.environ["PYTHONUNBUFFERED"] = "1"
+    ensure_import_paths()
+    load_project_env()
+    if debug:
+        os.environ["LOG_LEVEL"] = "DEBUG"
+    log.start()
+    if debug:
+        log.set_level(log.DEBUG)
+    from lib.process_priority import raise_priority
+    raise_priority()
 
 
 def _run_target(
@@ -177,21 +173,24 @@ def run_hub(
     only: list[str] | None = None,
     skip: list[str] | None = None,
     debug: bool = False,
+    wait_for_obs: bool = True,
 ) -> list:
     """
     Start all hub mini-project threads and return the list of started projects.
 
     Unlike main(), this does NOT block — the caller controls the stop_event and
     is responsible for calling _join_projects(projects) on shutdown.
-    Used by hub.py to run the hub alongside the UI server.
+    Used by hub.py to run the hub alongside the UI server. The CLI opts out of
+    waiting for OBS so it retains its fail-fast behavior when OBS is unavailable.
     """
-    if debug:
-        os.environ["LOG_LEVEL"] = "DEBUG"
+    _configure_runtime(debug)
 
     from lib.settings_backups import start_settings_backups
     start_settings_backups(stop_event)
 
     obs_ready = _check_obs_connection()
+    if not obs_ready and not wait_for_obs:
+        return []
 
     projects = discover_runnable_projects(logger=log)
 
@@ -234,35 +233,17 @@ def run_hub(
 
 
 def main() -> None:
+    args = _parse_args()
     print("=" * 62)
     print("  OBS Hub")
     print("=" * 62)
 
     stop_event = threading.Event()
-    from lib.settings_backups import start_settings_backups
-    start_settings_backups(stop_event)
-    if not _check_obs_connection():
-        return
-
-    projects = discover_runnable_projects(logger=log)
-
-    # Import after discovery so all project interfaces are registered.
-    import hub_rules  # noqa: F401
-
-    only_names = normalize_project_names(ARGS.only)
-    skip_names = normalize_project_names(ARGS.skip)
-    projects = filter_projects(projects, only=only_names, skip=skip_names, logger=log)
-
+    projects = run_hub(stop_event, only=args.only, skip=args.skip,
+                       debug=args.debug, wait_for_obs=False)
     if not projects:
-        print("\n  [ERROR] No mini projects selected.")
-        print("  Check your --only / --skip arguments.")
+        stop_event.set()
         return
-
-    _print_project_table(projects)
-    _print_runtime_options(only_names, skip_names, debug=ARGS.debug)
-
-    _start_voice(stop_event)
-    _start_projects(projects, stop_event)
     _wait_for_shutdown(stop_event)
 
     print("  Shutting down...")

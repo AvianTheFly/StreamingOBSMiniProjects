@@ -30,7 +30,6 @@ from ..handlers.lifecycle import (
 from ..handlers.player_events import (
     make_death_handler, make_respawn_handler, make_respawn_sfx_handler, make_recall_complete_handler,
 )
-from ..handlers.level_up import make_level_up_handler
 from ..handlers.map_events import (
     make_minions_spawning_handler, make_first_brick_handler,
     make_turret_killed_handler,   make_inhib_killed_handler,
@@ -91,7 +90,7 @@ class LeagueAPIWatcher:
         self.events.register("respawn_3s",      make_respawn_sfx_handler())
         self.events.register("game_end",        make_game_end_handler())
         self.events.register("recall_complete", make_recall_complete_handler())
-        self.events.register("level_changed",   make_level_up_handler())
+        # Level sprites are driven by league_api in the shared browser overlay.
 
         # ── Event-feed events ─────────────────────────────────────────────
         # Toggle ENABLED flags and set scene/source names in config.py.

@@ -1,0 +1,3 @@
+const http=require('http'),fs=require('fs'),path=require('path');
+const types={'.html':'text/html','.png':'image/png','.gif':'image/gif','.json':'application/json','.md':'text/plain'};
+http.createServer((req,res)=>{const url=new URL(req.url,'http://localhost');const relative=decodeURIComponent(url.pathname==='/'?'/preview.html':url.pathname);const p=path.resolve(__dirname,'.'+relative);if(!p.startsWith(__dirname+path.sep)){res.writeHead(403);return res.end();}fs.readFile(p,(e,b)=>{if(e){res.writeHead(404);res.end();}else{res.writeHead(200,{'Content-Type':types[path.extname(p)]||'application/octet-stream'});res.end(b);}});}).listen(8793,'127.0.0.1',()=>console.log('Preview: http://127.0.0.1:8793'));

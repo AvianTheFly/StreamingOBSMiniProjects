@@ -62,6 +62,19 @@
 .ir-empty { padding: 32px 16px; color: var(--muted); line-height: 1.7; }
 .ir-preview { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: #090b0e; border: 1px solid var(--line); border-radius: 6px; aspect-ratio: 16 / 9; padding: 8px; color: var(--muted); text-align: center; }
 .ir-preview video { width: 100%; max-height: 340px; }
+.ir-preview:has(video) { position: sticky; top: 0; z-index: 2; aspect-ratio: auto; padding: 0; box-shadow: 0 6px 12px #090b0e80; }
+.ir-preview:has(video) video { max-height: min(28vh, 260px); }
+.ir-trim { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 16px; }
+.ir-trim .ir-heading { flex-wrap: wrap; gap: 6px; }
+.ir-trim fieldset { border: 0; padding: 0; min-width: 0; }
+.ir-trim-track { position: relative; height: 10px; margin: 18px 0; border-radius: 5px; background: var(--panel-3); overflow: hidden; }
+.ir-trim-track span { position: absolute; height: 100%; background: var(--accent-dim); }
+.ir-trim-track i { position: absolute; height: 100%; width: 2px; background: var(--text); }
+.ir-trim-range { display: grid; grid-template-columns: 38px minmax(60px, 1fr) 80px; gap: 10px; align-items: center; margin: 8px 0; font-size: 12px; }
+.ir-trim-range input[type=range] { width: 100%; padding: 0; accent-color: var(--accent); }
+.ir-trim-range input[type=number] { padding: 6px; font-variant-numeric: tabular-nums; }
+.ir-trim-name { display: grid; gap: 6px; margin-top: 14px; font-size: 12px; }
+.ir-trim [role=status] { margin: 10px 0; }
 .ir-form { display: grid; gap: 12px; margin: 16px 0; }
 .ir-form label:not(.ir-check) { display: grid; gap: 6px; }
 .ir-file { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 12px; color: var(--muted); font-size: 12px; }

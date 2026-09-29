@@ -1,0 +1,79 @@
+[
+  {
+    "name": "udyrisFIREAWAKE",
+    "file": "FIREAWAKE.gif",
+    "animal": "phoenix",
+    "motion": "bounce",
+    "width": 112,
+    "height": 112,
+    "frames": 40,
+    "durationMs": 1600,
+    "bytes": 287317
+  },
+  {
+    "name": "udyrisTHUNDERROAR",
+    "file": "THUNDERROAR.gif",
+    "animal": "bear",
+    "motion": "headbang",
+    "width": 112,
+    "height": 112,
+    "frames": 40,
+    "durationMs": 1600,
+    "bytes": 282002
+  },
+  {
+    "name": "udyrisTURTLEROLL",
+    "file": "TURTLEROLL.gif",
+    "animal": "turtle",
+    "motion": "roll",
+    "width": 112,
+    "height": 112,
+    "frames": 40,
+    "durationMs": 1600,
+    "bytes": 214019
+  },
+  {
+    "name": "udyrisRAMCHARGE",
+    "file": "RAMCHARGE.gif",
+    "animal": "ram",
+    "motion": "charge",
+    "width": 112,
+    "height": 112,
+    "frames": 40,
+    "durationMs": 1600,
+    "bytes": 252258
+  },
+  {
+    "name": "udyrisBEARJAM",
+    "file": "BEARJAM.gif",
+    "animal": "bear",
+    "motion": "dance",
+    "width": 112,
+    "height": 112,
+    "frames": 40,
+    "durationMs": 1600,
+    "bytes": 276323
+  },
+  {
+    "name": "udyrisTURTLESURGE",
+    "file": "TURTLESURGE.gif",
+    "animal": "turtle",
+    "motion": "yeet",
+    "width": 112,
+    "height": 112,
+    "frames": 40,
+    "durationMs": 1600,
+    "bytes": 189226
+  },
+  {
+    "name": "udyrisPHOENIXSPIN",
+    "file": "PHOENIXSPIN.gif",
+    "animal": "phoenix",
+    "motion": "spin",
+    "width": 112,
+    "height": 112,
+    "frames": 40,
+    "durationMs": 1600,
+    "bytes": 215229
+  }
+]

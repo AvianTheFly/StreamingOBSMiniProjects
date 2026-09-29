@@ -42,10 +42,37 @@ class ProjectRuntimeTests(unittest.TestCase):
             registry.register(iface)
         for action in ('pause', 'resume', 'revert'):
             getattr(broken, action).side_effect = RuntimeError('test failure')
-            with contextlib.redirect_stdout(io.StringIO()):
+            with contextlib.redirect_stdout(io.StringIO()) as output:
                 getattr(registry, action + '_all')(except_='requester')
+            self.assertEqual(output.getvalue(),
+                             f"[registry] {action} failed for 'broken': test failure\n")
             getattr(requester, action).assert_not_called()
             getattr(healthy, action).assert_called_once_with()
+
+    def test_bulk_actions_use_snapshot_and_release_registry_lock(self):
+        for action in ('pause', 'resume', 'revert'):
+            with self.subTest(action=action):
+                registry = runtime._ProjectRegistry()
+                first, second, added = [self.interface(name) for name in ('first', 'second', 'added')]
+                visited = []
+
+                def visit_first():
+                    # Callbacks may register interfaces; never hold the registry lock here.
+                    acquired = registry._lock.acquire(blocking=False)
+                    self.assertTrue(acquired)
+                    if acquired:
+                        registry._lock.release()
+                        registry.register(added)
+                    visited.append('first')
+
+                getattr(first, action).side_effect = visit_first
+                getattr(second, action).side_effect = lambda: visited.append('second')
+                registry.register(first)
+                registry.register(second)
+                getattr(registry, action + '_all')()
+                self.assertEqual(visited, ['first', 'second'])
+                getattr(added, action).assert_not_called()
+                self.assertIs(registry.get('added'), added)
 
     def test_base_interface_action_dispatch_and_unknown_action(self):
         iface = runtime.ProjectInterface()

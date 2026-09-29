@@ -37,6 +37,77 @@ def _write(data):
     temporary.replace(STATE_FILE)
 
 
+def remember_capture(path, *, tag="untagged", saved_at=None):
+    """Persist a newly saved cut's selection metadata without touching UI data."""
+    path = Path(path).resolve()
+    with LOCK:
+        data = read()
+        meta = data["clips"].setdefault(clip_id(path), {})
+        meta.update(path=str(path), tag=str(tag or "untagged"),
+                    saved_at=float(saved_at) if saved_at is not None else None,
+                    kept=True)
+        _write(data)
+
+
+def archive_capture(source, destination, *, game=""):
+    """Move persistent metadata (and any group references) to an archived cut."""
+    source, destination = Path(source).resolve(), Path(destination).resolve()
+    with LOCK:
+        data = read()
+        old_key, new_key = clip_id(source), clip_id(destination)
+        meta = dict(data["clips"].pop(old_key, {}))
+        meta.update(path=str(destination), game=str(game or meta.get("game") or ""), kept=True)
+        data["clips"].setdefault(new_key, {}).update(meta)
+        for group in data["groups"]:
+            group["paths"] = [str(destination) if Path(p).resolve() == source else p
+                              for p in group.get("paths", [])]
+        _write(data)
+
+
+def tagged_paths(tag, root):
+    """Return all existing archived/current cuts for a tag, oldest first."""
+    root = Path(root).resolve()
+    rows = []
+    with LOCK:
+        for meta in read()["clips"].values():
+            path = Path(meta.get("path", ""))
+            if str(meta.get("tag", "")).casefold() != str(tag).casefold():
+                continue
+            try:
+                resolved = resolve(path, root)
+            except ValueError:
+                continue
+            rows.append((float(meta.get("saved_at") or resolved.stat().st_mtime), str(resolved)))
+    return [path for _, path in sorted(rows)]
+
+
+def game_paths(game_number, root):
+    """Return individual cuts belonging to Game N, oldest first."""
+    prefix = f"Game {game_number}"
+    rows = []
+    with LOCK:
+        for meta in read()["clips"].values():
+            if not str(meta.get("game", "")).startswith(prefix):
+                continue
+            try:
+                resolved = resolve(meta.get("path", ""), root)
+            except ValueError:
+                continue
+            rows.append((float(meta.get("saved_at") or resolved.stat().st_mtime), str(resolved)))
+    return [path for _, path in sorted(rows)]
+
+
+def game_numbers():
+    """Return game numbers that have an archived individual-cut pool."""
+    numbers = set()
+    with LOCK:
+        for meta in read()["clips"].values():
+            prefix = str(meta.get("game", "")).split(" ")
+            if len(prefix) >= 2 and prefix[0] == "Game" and prefix[1].isdigit():
+                numbers.add(int(prefix[1]))
+    return sorted(numbers)
+
+
 def resolve(path, root):
     candidate = Path(path).resolve()
     if not candidate.is_relative_to(Path(root).resolve()) or candidate.suffix.lower() not in MEDIA_EXTENSIONS:
@@ -53,7 +124,8 @@ def decorate(rows):
         meta = data["clips"].get(key, {})
         row.update(id=key, title=meta.get("title") or row["name"],
                    notes=meta.get("notes", ""), favorite=meta.get("favorite", False),
-                   kept=meta.get("kept", False))
+                   kept=meta.get("kept", False), tag=meta.get("tag", row.get("tag", "")),
+                   game=meta.get("game", ""))
     return {"clips": rows, "groups": data["groups"], "revision": data["revision"]}
 
 
@@ -122,6 +194,17 @@ def mutate(body, root):
             raise ValueError("Unknown replay library action.")
         _write(data)
         return data
+
+
+def volume_source(path, labels, levels):
+    """Use a cut's source level until the cut gets its own fader adjustment."""
+    seen = set()
+    while path and clip_id(path) not in seen:
+        seen.add(clip_id(path))
+        if str(Path(path).resolve()).casefold() in levels:
+            return path
+        path = labels.get(clip_id(path), {}).get("trim_source")
+    return None
 
 
 def group_paths(identifier, root, *, by_name=False):

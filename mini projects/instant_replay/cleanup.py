@@ -1,23 +1,21 @@
 """
 instant_replay/cleanup.py
 =========================
-Manages raw replay clips and produces permanent highlight reels.
+Archives raw replay clips as individual, selectable cuts.
 
 Directory layout
 ----------------
   REPLAY_DIR/          <- OBS replay buffer writes here; trimmed clips land here too.
                           App-managed clips are kept until they are merged.
-  REPLAY_DIR/edited/   <- Permanent highlight reels, one MKV per game session.
-                          Never touched by the startup wipe.
+  REPLAY_DIR/clips/    <- Permanent individual cuts, grouped by game folder.
+  REPLAY_DIR/edited/   <- Legacy compiled highlight reels; kept for playback.
 
-Workflow (run_once / game-end merge)
+Workflow (run_once / game-end archive)
 -------------------------------------
   1. Scan REPLAY_DIR root for *_ir_trimmed.mkv files.
   2. Group them by game session (game_sessions.json, or 10-min window fallback).
-  3. Resolve overlaps: consecutive clips that share wall-clock time are stitched
-     seamlessly by trimming the start of the later clip to the exact boundary.
-  4. Merge all clips into one MKV in edited/ (singletons are copied, not skipped).
-  5. Delete the *_ir_trimmed.mkv source clips from REPLAY_DIR.
+  3. Move each clip into clips/<game>/ and retain its library metadata.
+  4. No new combined reel is made and no saved cut is deleted.
 
 Game numbering
 --------------
@@ -41,7 +39,7 @@ import threading
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from .config import EDITED_DIR, REPLAY_DIR
+from .config import CLIPS_DIR, EDITED_DIR, REPLAY_DIR
 from . import library
 
 _TAG = "[instant_replay.cleanup]"
@@ -93,7 +91,9 @@ def _find_trimmed() -> list[tuple[datetime, Path]]:
     for f in raw_dir.iterdir():
         if f.is_dir():
             continue
-        if f.name.endswith("_ir_trimmed.mkv"):
+        meta = curated.get(library.clip_id(f), {})
+        if (f.name.endswith("_ir_trimmed.mkv")
+                or (meta.get("kept") and f.suffix.lower() in library.MEDIA_EXTENSIONS)):
             if curated.get(library.clip_id(f), {}).get("merged"):
                 continue
             ts = _parse_timestamp(f.name)
@@ -342,10 +342,7 @@ def list_edited_reels() -> list[tuple[int, Path]]:
 
 def run_once(game_label: str | None = None) -> int:
     """
-    Process all *_ir_trimmed.mkv clips currently in REPLAY_DIR:
-      - Resolve overlaps.
-      - Merge or copy into edited/<label>_reel.mkv.
-      - Delete source trimmed clips.
+    Archive all *_ir_trimmed.mkv clips currently in REPLAY_DIR individually.
 
     game_label: if provided, treat all found clips as one group with that label
                 (used by run_for_game()).  If None, group automatically from sessions.
@@ -356,8 +353,8 @@ def run_once(game_label: str | None = None) -> int:
     if not items:
         return 0
 
-    edited_dir = Path(EDITED_DIR)
-    edited_dir.mkdir(parents=True, exist_ok=True)
+    archive_root = Path(CLIPS_DIR)
+    archive_root.mkdir(parents=True, exist_ok=True)
 
     if game_label is not None:
         groups: list[tuple[str | None, list[Path]]] = [
@@ -378,47 +375,27 @@ def run_once(game_label: str | None = None) -> int:
                     _groups.append([path])
             groups = [(None, g) for g in _groups]
 
-    removed = 0
+    archived = 0
 
     for label, group in groups:
         if not group:
             continue
 
-        if label:
-            output = edited_dir / f"{label}_reel.mkv"
-        else:
-            base = group[0].name.replace("_ir_trimmed.mkv", "")
-            output = edited_dir / f"{base}_reel.mkv"
-
-        if output.exists():
-            print(f"{_TAG} Reel already exists — cleaning up source clips: {output.name}")
-            for p in group:
-                if _safe_unlink(p):
-                    removed += 1
-            continue
-
-        processed, temps = _resolve_overlaps(group)
-        try:
-            if not processed:
+        folder = archive_root / (label or "Ungrouped")
+        folder.mkdir(parents=True, exist_ok=True)
+        for source in group:
+            destination = folder / source.name
+            if destination.exists():
+                print(f"{_TAG} Archived cut already exists: {destination.name}")
                 continue
+            try:
+                shutil.move(str(source), str(destination))
+                library.archive_capture(source, destination, game=label or "")
+                archived += 1
+            except OSError as exc:
+                print(f"{_TAG} Could not archive {source.name}: {exc}")
 
-            n = len(processed)
-            verb = "Moving" if n == 1 else f"Merging {n} clips"
-            print(f"{_TAG} {verb} → {output.name}")
-
-            if _merge_into(processed, output):
-                size_mb = output.stat().st_size / 1_048_576
-                print(f"{_TAG} Reel ready: {output.name}  ({size_mb:.1f} MB)")
-                for p in group:
-                    if _safe_unlink(p):
-                        removed += 1
-            else:
-                print(f"{_TAG} Merge failed — source clips kept for retry.")
-        finally:
-            for t in temps:
-                _safe_unlink(t)
-
-    return removed
+    return archived
 
 
 # ---------------------------------------------------------------------------
@@ -426,14 +403,14 @@ def run_once(game_label: str | None = None) -> int:
 
 def run_for_game(game_label: str) -> None:
     """
-    Merge all clips currently in REPLAY_DIR into one reel labelled game_label.
+    Archive all current clips individually under game_label.
     Runs in a background thread 30 s after game-end so in-progress trims finish.
     """
-    print(f"{_TAG} Compiling reel for '{game_label}'...")
+    print(f"{_TAG} Archiving individual cuts for '{game_label}'...")
     try:
-        removed = run_once(game_label=game_label)
-        if removed > 0:
-            print(f"{_TAG} Done ({removed} source clip(s) cleaned up).")
+        archived = run_once(game_label=game_label)
+        if archived > 0:
+            print(f"{_TAG} Done ({archived} individual clip(s) archived).")
         else:
             print(f"{_TAG} No clips found for '{game_label}'.")
     except Exception as exc:
