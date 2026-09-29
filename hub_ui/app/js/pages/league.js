@@ -15,7 +15,7 @@ export function mount(container) {
         <div class="page-subtitle">Live game overlay automation via Riot Live Client API</div>
       </div>
       <div class="page-actions">
-        <a class="btn btn-primary btn-sm" href="#projects/league_api">Edit League API Alerts</a>
+        <a class="btn btn-primary btn-sm" href="#projects/league_api">Edit production borders</a>
         <button class="btn btn-secondary btn-sm" id="leagueRevertBtn">Revert overlays</button>
       </div>
     </div>
@@ -36,8 +36,8 @@ export function mount(container) {
             <li>Level-up sprites</li>
             <li>Kill streak triangles</li>
             <li>Multi-kill overlays (Double – Penta)</li>
-            <li>Map event overlays (Dragon, Baron, Herald…)</li>
-            <li>Turret / Inhibitor destroyed overlays</li>
+            <li>Dragon atmosphere & objective borders in League API</li>
+            <li>Tower / Inhibitor border celebrations in League API</li>
           </ul>
         </div>
       </div>

@@ -4,6 +4,8 @@ import copy
 import time
 from .media_pool import MediaPicker
 from .death_reactions import DeathReactions
+from .production import ProductionDirector
+from .production.objectives import element
 
 DIRECT = {'GameStart': ('game_start', 45), 'MinionsSpawning': ('minions_spawning', 25),
           'FirstBlood': ('first_blood', 85), 'Ace': ('ace', 88),
@@ -44,11 +46,13 @@ def inventory(player):
     return result
 
 class Engine:
-    def __init__(self, config=None, clock=time.monotonic):
+    def __init__(self, config=None, clock=time.monotonic, production_settings=None):
         self.config=config or defaults(); self.clock=clock
+        self.production=ProductionDirector(production_settings, clock)
         self.slots=[]; self.serial=0; self.reset()
 
     def reset(self):
+        self.production=ProductionDirector(self.production.settings, self.clock)
         self.death_reactions = DeathReactions()
         self.media_picker = MediaPicker()
         self.previous=None; self.game_time=-1; self.seen=set(); self.cooldowns={}
@@ -56,10 +60,11 @@ class Engine:
         self.metrics={}; self.slots=[]; self.history=[]; self.sprite=None
         self.last_autoplay=-float("inf")
 
-    def clear(self):
+    def clear(self, production=True):
         self.death_reactions.reset()
         self.slots=[]
         self.sprite=None
+        if production: self.production.clear()
 
     def trigger_sprites(self, level):
         if isinstance(level,bool) or not isinstance(level,int) or not 1<=level<=100:
@@ -76,7 +81,7 @@ class Engine:
 
     def submit(self, candidates):
         if not self.config.get('overlay_enabled',True):
-            self.clear(); return []
+            self.clear(production=False); return []
         now=self.clock(); self.active()
         for candidate in sorted(candidates,key=lambda a:self.config['events'].get(a['key'],{}).get('priority',0),reverse=True):
             rule=self.config['events'].get(candidate['key'],{})
@@ -179,7 +184,7 @@ class Engine:
                 if not fresh: continue
                 # Built-in memes celebrate our side; unresolved/enemy ownership is not a win.
                 if not team or killer_team!=team: continue
-                key='dragon_'+str(e.get('DragonType','')).lower() if name=='DragonKill' else DIRECT[name][0]
+                key='dragon_'+str(element(e.get('DragonType')) or '').lower() if name=='DragonKill' else DIRECT[name][0]
                 if key not in self.config['events']: key='dragon'
                 emit(key,relation+' · '+killer,'objective_'+name)
                 if str(e.get('Stolen','')).lower()=='true':
@@ -293,5 +298,6 @@ class Engine:
         else:
             self.death_reactions.reset()
         self.previous=copy.deepcopy(data); self.game_time=t
+        self.production.ingest(data, out, baseline=initial)
         self.submit(out)
         return out

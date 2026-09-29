@@ -6,13 +6,11 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 import requests
-import urllib3
+from lib.league_live_client import fetch_snapshot, LiveClientUnavailable
 
 from ..config import (
-    LEAGUE_API_URL,
     POLL_INTERVAL,
     DISCONNECTED_INTERVAL,
-    REQUEST_TIMEOUT,
     LEAGUE_KILL_AUDIO_DEFAULT_VOLUME_DB,
     LEAGUE_KILL_AUDIO_DIR,
     LEAGUE_KILL_AUDIO_MONITOR,
@@ -38,8 +36,6 @@ from ..handlers.map_events import (
 )
 from ..handlers.kill_events       import make_multikill_handler, make_ace_handler
 from ..handlers.champion_kill_handler import make_champion_kill_handler
-
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Shared file that instant_replay/cleanup.py reads to group clips by game.
 _SESSIONS_FILE = Path.home() / ".claude" / "game_sessions.json"
@@ -193,7 +189,7 @@ class LeagueAPIWatcher:
                 self.detector.process(me, data, riot_game_name)
                 self.stop_event.wait(POLL_INTERVAL)
 
-            except requests.exceptions.ConnectionError:
+            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout, LiveClientUnavailable):
                 self._on_disconnected()
                 self.stop_event.wait(DISCONNECTED_INTERVAL)
 
@@ -206,9 +202,7 @@ class LeagueAPIWatcher:
     # ── Private ───────────────────────────────────────────────────────────────
 
     def _fetch(self) -> dict:
-        resp = requests.get(LEAGUE_API_URL, verify=False, timeout=REQUEST_TIMEOUT)
-        resp.raise_for_status()
-        return resp.json()
+        return fetch_snapshot()
 
     def _on_connected(self) -> None:
         if not self.game_connected:

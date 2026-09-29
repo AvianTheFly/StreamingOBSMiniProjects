@@ -28,8 +28,10 @@ class GameStateDetector:
 
         # ── Event-feed tracker ────────────────────────────────────────────
         # Tracks the highest EventID seen so we never fire the same event twice.
-        # Starts at -1 so EventID 0 is processed on the very first poll.
+        # The first poll records a baseline without replaying its history.
         self._last_event_id = -1
+        self._event_baseline = True
+        self._game_time = None
 
         # ── Recall watch state ────────────────────────────────────────────
         self._recall_watching   = False
@@ -66,6 +68,10 @@ class GameStateDetector:
                          compare against it rather than summonerName.
         """
         active = data.get("activePlayer", {})
+        game_time = data.get('gameData', {}).get('gameTime', 0)
+        if self._game_time is not None and game_time < self._game_time - 2:
+            self.reset()
+        self._game_time = game_time
 
         # State-diff detectors
         self._detect_death_respawn(me)
@@ -166,12 +172,19 @@ class GameStateDetector:
         my_name = riot_game_name.strip().lower()
         raw_events = data.get("events", {}).get("Events", [])
 
-        for event in raw_events:
+        baseline = self._event_baseline
+        self._event_baseline = False
+        game_time = data.get('gameData', {}).get('gameTime', 0)
+        for event in sorted(raw_events, key=lambda e: e.get('EventID', -1)):
             eid = event.get("EventID", -1)
             if eid <= self._last_event_id:
                 continue  # already processed
 
             self._last_event_id = max(self._last_event_id, eid)
+            # Hub startup/reconnect establishes a baseline instead of replaying
+            # old kill audio and streak overlays from the cumulative history.
+            if baseline or not 0 <= game_time - event.get('EventTime', 0) <= 5:
+                continue
             self._dispatch_event(event, my_name)
 
     def _dispatch_event(self, event: dict, my_name: str) -> None:

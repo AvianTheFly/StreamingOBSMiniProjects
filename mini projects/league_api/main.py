@@ -10,14 +10,12 @@ import json
 import copy
 import uuid
 from pathlib import Path
-import ssl
-import shutil
-import subprocess
 import threading
 import time
 from http.server import ThreadingHTTPServer
-from urllib.request import build_opener, HTTPSHandler, ProxyHandler
 from urllib.parse import quote
+from lib.league_live_client import fetch_snapshot
+from .production import ProductionSettings
 
 from .http_server import make_handler
 from .engine import Engine, defaults
@@ -37,9 +35,23 @@ def load_config():
 class Service:
     def __init__(self, stop_event):
         self.parent_stop=stop_event; self.stop_event=threading.Event(); self.lock=threading.RLock()
-        self.engine=Engine(load_config()); self.status='Waiting for a League game'
+        self.production_store=ProductionSettings(ROOT/'production.json')
+        self.engine=Engine(load_config(),production_settings=self.production_store.load()); self.status='Waiting for a League game'
         self.last_success=None; self.error=None; self.clients=0; self.media_errors=[]
         self.store=SettingsStore(ROOT/'alerts.json'); self.audio_lock=threading.Lock()
+        self.last_overlay=-1000
+
+    def production_settings(self):
+        with self.lock:
+            return {'settings':copy.deepcopy(self.engine.production.settings),
+                    'overlay_ready':time.monotonic()-self.last_overlay<4,
+                    'status':self.status}
+
+    def save_production(self,body):
+        with self.lock:
+            updated=self.production_store.save(self.engine.production.settings,body)
+            self.engine.production.configure(updated)
+            return self.production_settings()
 
     def settings(self):
         with self.lock:
@@ -95,7 +107,7 @@ class Service:
             from lib.settings_backups import SettingsBackups
             SettingsBackups().snapshot()
             self.engine.config=self.store.save(config)
-            if config.get('paused') or not config.get('overlay_enabled',True) or 'presentation' in body: self.engine.clear()
+            if config.get('paused') or not config.get('overlay_enabled',True) or 'presentation' in body: self.engine.clear(production=False)
             # Apply volume changes to currently playing clips without restarting them.
             for a in self.engine.slots:
                 if a['key'] in config['events']: a['volume']=config['events'][a['key']]['volume']
@@ -130,7 +142,7 @@ class Service:
                 else: alert['media']=''
                 audio=self.media_path(alert.get('audio',''))
                 alert['audio']='/asset?path='+quote(alert['audio']) if audio else ''
-            return {'overlay_enabled':self.engine.config.get('overlay_enabled',True),'layout':self.engine.config.get('layout',LAYOUT),'status':self.status,'alerts':alerts,'metrics':self.engine.metrics,
+            return {'production':self.engine.production.snapshot(),'overlay_enabled':self.engine.config.get('overlay_enabled',True),'layout':self.engine.config.get('layout',LAYOUT),'status':self.status,'alerts':alerts,'metrics':self.engine.metrics,
                     'sprite':({**self.engine.sprite,'remaining':max(0,self.engine.sprite['expires']-self.engine.clock())} if self.engine.sprite and self.engine.sprite['expires']>self.engine.clock() and not self.engine.config.get('paused') and self.engine.config.get('overlay_enabled',True) else None),
                     'history':self.engine.history[-20:],'error':self.error,'media_errors':self.media_errors[-10:],
                     'paused':self.engine.config.get('paused',False),'revision':self.engine.config.get('revision',0)}
@@ -145,10 +157,9 @@ class Service:
     def poll(self):
         # Riot's local game endpoint uses a self-signed certificate. This context
         # and disabled proxies are scoped exclusively to the fixed loopback URL.
-        opener=build_opener(ProxyHandler({}),HTTPSHandler(context=ssl._create_unverified_context()))
         while not self.stop_event.is_set() and not self.parent_stop.is_set():
             try:
-                with opener.open(LIVE_URL,timeout=2) as response: data=json.load(response)
+                data=fetch_snapshot()
                 if not isinstance(data.get('gameData',{}).get('gameTime'),(float,int)):
                     raise ValueError('Live API response is missing gameTime')
                 now=time.monotonic()
@@ -159,7 +170,7 @@ class Service:
             except Exception as exc:
                 with self.lock:
                     self.status='Waiting for a League game'
-                    if self.last_success and time.monotonic()-self.last_success>10: self.engine.clear()
+                    if self.last_success and time.monotonic()-self.last_success>3: self.engine.clear()
                     # Connection refusal is normal outside a game; don't flood logs.
                     self.error=str(exc) if isinstance(exc,(ValueError,KeyError,TypeError)) else None
             self.stop_event.wait(max(.25,min(5,float(self.engine.config.get('poll_seconds',.5)))))
@@ -183,17 +194,10 @@ def run(input_queue,stop_event,*,startup_event=None):
         server.daemon_threads=True
         web=threading.Thread(target=server.serve_forever,daemon=True); web.start()
         # Recover a browser source that OBS loaded before the HTTP service existed.
-        def refresh_obs():
-            node=shutil.which('node')
-            if node:
-                try:
-                    subprocess.run([node,str(ROOT.parents[1]/'obs'/'league_api_setup.mjs'),'--refresh'],
-                                   timeout=20,capture_output=True,
-                                   creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
-                except (OSError,subprocess.TimeoutExpired): pass
-        threading.Thread(target=refresh_obs,daemon=True).start()
+        from .production.obs_source import recover_overlay
+        threading.Thread(target=recover_overlay,args=(service,),daemon=True,name='league-browser-recovery').start()
         if startup_event: startup_event.set()
-        print(f'[league_api] Ready: http://127.0.0.1:{PORT} · one OBS source, maximum three alerts',flush=True)
+        print(f'[league_api] Ready: http://127.0.0.1:{PORT}/production · borders and optional clip alerts',flush=True)
         service.poll()
     finally:
         service.engine.clear(); server.shutdown(); server.server_close()

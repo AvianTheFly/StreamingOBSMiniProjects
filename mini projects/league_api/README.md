@@ -1,5 +1,10 @@
 # League API alerts
 
+Production borders are now the default Hub page. See [production/README.md](production/README.md)
+for dragon atmosphere, short objective celebrations, controls, code ownership and
+the API review. The sections below describe the optional clip editor, linked from
+the production page. Its saved media banks and layout are preserved.
+
 ## Use the Hub editor
 
 Start the normal **Run Hub.bat**, then choose **League API Alerts** in the sidebar,
@@ -37,7 +42,7 @@ Custom snapshot rules skip missing fields and reconnect baselines. Their health 
 can include death/respawn; this is shown in the rule builder.
 
 One browser source, `League API Alerts`, in your existing `League API` scene.
-Three reusable cards appear on the right of the 1920×1080 canvas. Idle is fully
+Optional clip cards use the saved layout on the 1920×1080 canvas. Idle is fully
 transparent. No game or scene switching, recording, or replay saving is performed.
 
 ## Run
@@ -76,8 +81,8 @@ together. Set volume to 0 for silent visual variants.
 All supplied direct event names have handlers, including inhibitor respawn events,
 per-grub events, dragon variants, first blood, first turret and win/lose. Atakhan is
 available but disabled as a legacy trigger. Champion kills, assists and multikills
-focus on the local player; objectives, structures, first blood and aces are global
-and include team/participant context when known. Ambiguous identities remain unknown.
+focus on the local player; objectives, structures and aces celebrate resolved friendly
+ownership. First blood is local. Ambiguous identities remain unknown.
 
 Snapshot comparisons detect local level/rank increases, death/respawn, inventory
 additions/removals, health/resource changes, CS milestones and vision score increases.

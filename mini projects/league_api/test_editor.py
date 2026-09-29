@@ -89,5 +89,24 @@ class HTTPTests(unittest.TestCase):
         key=next(k for k in saved['config']['events'] if k.startswith('custom_'))
         self.assertIn(key,self.service.store.load()['events'])
         self.send('/delete',{'revision':1,'key':key}).close(); self.assertNotIn(key,self.service.store.load()['events'])
+    def test_production_controls_leave_personal_clip_settings_alone(self):
+        before=copy.deepcopy(self.service.engine.config)
+        with patch('lib.settings_backups.SettingsBackups.snapshot'):
+            data=json.load(self.send('/production/configure',{'revision':0,'settings':{'enabled':True,'opacity':.6}}))
+        self.assertEqual(data['settings']['opacity'],.6)
+        self.assertEqual(self.service.engine.config,before)
+        self.send('/production/preview',{'key':'earth_cycle'}).close()
+        self.assertTrue(json.load(self.send('/state'))['production']['ambient'])
+        self.assertFalse(json.load(self.send('/production/settings'))['overlay_ready'])
+        self.send('/state?consumer=obs').close()
+        self.assertTrue(json.load(self.send('/production/settings'))['overlay_ready'])
+        self.send('/production/clear',{}).close()
+        self.assertIsNone(json.load(self.send('/state'))['production']['ambient'])
+        with self.assertRaises(HTTPError): self.send('/production/configure',{'revision':0,'settings':{'enabled':False}})
+    def test_host_and_cross_origin_preview_rejected(self):
+        with self.assertRaises(HTTPError) as exc: self.send('/state',headers={'Host':'attacker.example'})
+        self.assertEqual(exc.exception.code,403)
+        with self.assertRaises(HTTPError) as exc: self.send('/production/preview',{}, {'Origin':'https://example.com'})
+        self.assertEqual(exc.exception.code,403)
 
 if __name__=='__main__': unittest.main()

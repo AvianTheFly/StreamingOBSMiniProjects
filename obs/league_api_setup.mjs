@@ -44,18 +44,9 @@ ws.onmessage=async ({data})=>{
       } else if(process.argv.includes('--inspect')) {
         console.log(JSON.stringify({video,items:await request('GetSceneItemList',{sceneName}),current:scenes.currentProgramSceneName}));
       } else {
-        const inputSettings={url:'http://127.0.0.1:7431/overlay',width:video.baseWidth,height:video.baseHeight,fps:30,shutdown:false,restart_when_active:false,reroute_audio:true};
-        const inputs=await request('GetInputList');
-        const existing=inputs.inputs.find(i=>i.inputName===inputName);
-        if(existing && existing.inputKind!=='browser_source') throw new Error('Source name exists with another input kind');
-        if(!existing) await request('CreateInput',{sceneName,inputName,inputKind:'browser_source',inputSettings,sceneItemEnabled:true});
-        else await request('SetInputSettings',{inputName,inputSettings,overlay:true});
-        let items=await request('GetSceneItemList',{sceneName});
-        if(!items.sceneItems.some(i=>i.sourceName===inputName)) await request('CreateSceneItem',{sceneName,sourceName:inputName,sceneItemEnabled:true});
-        items=await request('GetSceneItemList',{sceneName});
-        const item=items.sceneItems.find(i=>i.sourceName===inputName);
-        await request('SetSceneItemTransform',{sceneName,sceneItemId:item.sceneItemId,sceneItemTransform:{positionX:0,positionY:0,scaleX:1,scaleY:1}});
-        await request('SetSceneItemEnabled',{sceneName,sceneItemId:item.sceneItemId,sceneItemEnabled:true});
+        // Use the service's settings snapshot and transform-preserving repair.
+        const response=await fetch('http://127.0.0.1:7431/production/obs',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+        if(!response.ok) throw new Error('Start the supported Hub before setting up the League browser source');
         console.log(JSON.stringify({scene:sceneName,source:inputName,settings:(await request('GetInputSettings',{inputName})).inputSettings,items:(await request('GetSceneItemList',{sceneName})).sceneItems.map(i=>({name:i.sourceName,enabled:i.sceneItemEnabled}))}));
       }
       clearTimeout(timer); ws.close();

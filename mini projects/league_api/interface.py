@@ -6,7 +6,10 @@ class LeagueAPIInterface(ProjectInterface):
     produces_audio=True
     def get_status(self):
         s=_live.get('service')
-        return ProjectStatus(self.name,bool(s and s.snapshot()['alerts']),s.status if s else None,self.controlled_scenes,True)
+        snapshot=s.snapshot() if s else {}
+        production=snapshot.get('production',{})
+        active=bool(snapshot.get('alerts') or production.get('ambient') or production.get('effect'))
+        return ProjectStatus(self.name,active,s.status if s else None,self.controlled_scenes,True)
     def revert(self):
         s=_live.get('service')
         if s:

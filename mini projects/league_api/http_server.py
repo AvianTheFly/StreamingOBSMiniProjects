@@ -10,6 +10,7 @@ import json
 import mimetypes
 import re
 import uuid
+import time
 from http.server import BaseHTTPRequestHandler
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
@@ -19,12 +20,30 @@ def make_handler(service, *, root: Path, port: int, load_config):
     """Bind a handler to one service without importing or starting the Hub."""
     class Handler(BaseHTTPRequestHandler):
         def log_message(self,*args): pass
+        def local_origins(self):
+            listening_port=self.server.server_address[1]
+            return {f'127.0.0.1:{listening_port}',f'localhost:{listening_port}'}
+        def reject_post(self, status):
+            # Windows may reset a socket with unread JSON, hiding the HTTP error.
+            try: size=int(self.headers.get('Content-Length','0'))
+            except ValueError: size=0
+            if 0<size<=65536: self.rfile.read(size)
+            self.send_error(status)
         def send_bytes(self, body, content_type='application/json', status=200):
             self.send_response(status); self.send_header('Content-Type',content_type)
             self.send_header('Content-Length',str(len(body))); self.send_header('Cache-Control','no-store')
             self.end_headers(); self.wfile.write(body)
         def do_GET(self):
+            if self.headers.get('Host') not in self.local_origins():
+                self.send_error(403); return
             path=unquote(urlparse(self.path).path)
+            if path=='/production/settings':
+                self.send_bytes(json.dumps(service.production_settings()).encode()); return
+            if path=='/production':
+                self.send_bytes((root/'production'/'web'/'control.html').read_bytes(),'text/html; charset=utf-8'); return
+            if path.startswith('/production/') and path.removeprefix('/production/') in {'overlay.js','scene.js','materials.js','terrain.js','bursts.js','control.js','control.css'}:
+                file=root/'production'/'web'/path.removeprefix('/production/')
+                self.send_bytes(file.read_bytes(),'text/css' if file.suffix=='.css' else 'text/javascript'); return
             if path=='/sprite.png':
                 config=json.loads((root/'sprites.json').read_text(encoding='utf-8'))
                 self.send_bytes(Path(config['image']).read_bytes(),'image/png'); return
@@ -48,6 +67,8 @@ def make_handler(service, *, root: Path, port: int, load_config):
             if path in {'/control.js','/control.css','/presentation.js','/pool.js','/monitor.js'}:
                 self.send_bytes((root/path[1:]).read_bytes(),'text/javascript' if path.endswith('.js') else 'text/css'); return
             if path=='/state':
+                query=parse_qs(urlparse(self.path).query)
+                if query.get('consumer')==['obs']: service.last_overlay=time.monotonic()
                 self.send_bytes(json.dumps(service.snapshot()).encode()); return
             if path=='/catalog':
                 self.send_bytes(json.dumps(service.engine.config['events']).encode()); return
@@ -90,9 +111,11 @@ def make_handler(service, *, root: Path, port: int, load_config):
                     return
             self.send_error(404)
         def do_POST(self):
+            if self.headers.get('Host') not in self.local_origins():
+                self.reject_post(403); return
             # Local control page only; no cross-origin browser mutations.
-            if self.headers.get('Origin') not in (None,f'http://127.0.0.1:{port}',f'http://localhost:{port}'):
-                self.send_error(403); return
+            if self.headers.get('Origin') not in {None,*(f'http://{host}' for host in self.local_origins())}:
+                self.reject_post(403); return
             path=urlparse(self.path).path
             if path=='/upload':
                 try:
@@ -126,12 +149,27 @@ def make_handler(service, *, root: Path, port: int, load_config):
                 except (ValueError,OSError) as exc: self.send_bytes(json.dumps({'error':str(exc)}).encode(),status=400)
                 return
             if self.headers.get('Content-Type','').split(';')[0]!='application/json':
-                self.send_error(415); return
+                self.reject_post(415); return
             try:
                 size=int(self.headers.get('Content-Length','0'))
                 if not 0<size<=65536: raise ValueError('Invalid body size')
                 body=json.loads(self.rfile.read(size))
                 if not isinstance(body,dict): raise ValueError('Expected an object')
+                if path=='/production/configure':
+                    self.send_bytes(json.dumps(service.save_production(body)).encode()); return
+                if path=='/production/preview':
+                    with service.lock: service.engine.production.preview(body.get('key','earth_cycle'))
+                    self.send_bytes(b'{}'); return
+                if path=='/production/clear':
+                    with service.lock: service.engine.production.clear()
+                    self.send_bytes(b'{}'); return
+                if path=='/production/obs':
+                    from .production.obs_source import repair_overlay
+                    try: repair_overlay(service)
+                    except ValueError: raise
+                    except Exception:
+                        self.send_bytes(b'{"error":"OBS is unavailable. Start OBS with WebSocket enabled."}',status=503); return
+                    self.send_bytes(b'{}'); return
                 if path in {'/event','/custom','/delete','/options'}:
                     self.send_bytes(json.dumps(service.save_edit(path,body)).encode()); return
                 if path=='/volume':
@@ -155,7 +193,9 @@ def make_handler(service, *, root: Path, port: int, load_config):
                         finally: service.engine.config=saved
                     elif self.path=='/clear': service.engine.clear()
                     elif self.path=='/stop': service.engine.clear(); service.stop_event.set()
-                    elif self.path=='/reload': service.engine.config=load_config()
+                    elif self.path=='/reload':
+                        service.engine.config=load_config()
+                        service.engine.production.configure(service.production_store.load())
                     elif self.path=='/media-error': service.media_errors.append(str(body.get('key','unknown'))[:100])
                     else: self.send_error(404); return
                 self.send_bytes(b'{}')

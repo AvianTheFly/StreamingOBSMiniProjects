@@ -1,0 +1,12 @@
+{
+  "revision": 0,
+  "enabled": true,
+  "dragon_ambience": true,
+  "objectives": true,
+  "combat": true,
+  "structures": true,
+  "opacity": 0.8,
+  "edge_width": 56,
+  "burst_seconds": 2.7,
+  "spacing_seconds": 4
+}

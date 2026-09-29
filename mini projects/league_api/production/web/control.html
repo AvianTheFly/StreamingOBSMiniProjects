@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>League production borders</title>
+    <link rel="stylesheet" href="/production/control.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <p class="eyebrow">LEAGUE · PRODUCTION</p>
+        <h1>Let the edges tell the story.</h1>
+        <p>Quiet dragon atmosphere. A brief celebration when your team takes it.</p>
+      </div>
+      <a href="/">Clip alerts & media →</a>
+    </header>
+    <p id="notice" role="status" aria-live="polite"></p>
+    <section class="controls">
+      <div class="section-head">
+        <h2>Production borders</h2>
+        <span id="connection">Connecting…</span>
+      </div>
+      <form id="settings">
+        <div class="toggles">
+          <label><input type="checkbox" name="enabled" />Enable production borders</label>
+          <label><input type="checkbox" name="dragon_ambience" />Dragon atmosphere</label>
+          <label><input type="checkbox" name="objectives" />Team objectives & aces</label>
+          <label><input type="checkbox" name="combat" />Your double kills through pentakills</label>
+          <label><input type="checkbox" name="structures" />Enemy towers & inhibitors</label>
+        </div>
+        <div class="ranges">
+          <label
+            >Strength <output id="opacityValue"></output
+            ><input type="range" name="opacity" min="0.2" max="1" step="0.05"
+          /></label>
+          <label
+            >Edge depth <output id="edgeValue"></output
+            ><input type="range" name="edge_width" min="24" max="84" step="1"
+          /></label>
+          <label
+            >Celebration length (seconds)<input
+              type="number"
+              name="burst_seconds"
+              min="1"
+              max="5"
+              step="0.1"
+          /></label>
+          <label
+            >Minimum gap (seconds)<input
+              type="number"
+              name="spacing_seconds"
+              min="1"
+              max="30"
+              step="1"
+          /></label>
+        </div>
+        <div class="actions">
+          <button type="submit" class="primary">Save borders</button
+          ><button type="button" id="reload">Discard edits</button
+          ><button type="button" id="clear">Clear current effects</button>
+        </div>
+      </form>
+      <p class="muted">
+        One objective atmosphere and one short celebration at a time. These visuals are silent and
+        leave your existing kill, death and respawn sounds alone.
+      </p>
+    </section>
+    <section>
+      <div class="section-head">
+        <h2>Try a show</h2>
+        <button id="obs">Reconnect OBS source</button>
+      </div>
+      <p id="ready">Checking OBS overlay…</p>
+      <div class="previews">
+        <button data-preview="earth_cycle" class="featured">
+          <strong>Mountain dragon · full cycle</strong
+          ><span>Stone rises along the edges, then breaks into tumbling chips.</span>
+        </button>
+        <button data-preview="dragon_fire">Infernal dragon</button
+        ><button data-preview="dragon_water">Ocean dragon</button
+        ><button data-preview="dragon_air">Cloud dragon</button
+        ><button data-preview="dragon_hextech">Hextech dragon</button
+        ><button data-preview="dragon_chemtech">Chemtech dragon</button
+        ><button data-preview="dragon_elder">Elder dragon</button
+        ><button data-preview="baron">Baron</button><button data-preview="herald">Herald</button
+        ><button data-preview="pentakill">Pentakill</button
+        ><button data-preview="ace">Team ace</button
+        ><button data-preview="turret_destroyed">Tower down</button>
+      </div>
+      <details id="monitorPanel" class="monitor-tools">
+        <summary>Open silent live monitor</summary>
+        <div class="monitor">
+          <iframe id="monitor" title="League production monitor" src="about:blank"></iframe>
+        </div>
+      </details>
+      <p class="muted">
+        Test buttons also show the effect in OBS. Keep the source above your game capture.
+      </p>
+    </section>
+    <section class="note">
+      <h2>When does the dragon border appear?</h2>
+      <p>
+        Dragon kills are detected directly. Spawn atmosphere uses the five-minute respawn timer once
+        the repeating element is known after the third elemental drake. Early random dragons,
+        Swiftplay, and uncertain Soul or Elder transitions stay clear.
+      </p>
+      <p>
+        The middle of the picture stays transparent. Your saved clip banks, Mom Frog and Hooray are
+        unchanged.
+      </p>
+    </section>
+    <script src="/monitor.js"></script>
+    <script type="module" src="/production/control.js"></script>
+  </body>
+</html>
