@@ -190,3 +190,12 @@ tests cover the shared boundaries. All tests use temporary settings or mocked
 external operations; never use a live stream as the synthetic-event test fixture.
 
 The architecture checkpoint before this refactor is Git commit `4821e9c`.
+
+Validation on 2026-09-29 covered 107 targeted regression/lifecycle cases, including
+real HTTP and SSE responses, partial startup failure and disconnect cleanup. The
+supported Hub was subsequently reopened with these files and one keyboard child.
+All ten modules were registered; settings, profiles and mixer endpoints returned
+200. Headless Chrome loaded the Hub and received its status event stream. League,
+Twitch celebrations and Channel Points reported healthy overlay connections.
+OBS was open and not streaming during final verification; no synthetic stream
+effects or desktop input were used. Replay configuration remained on C:.

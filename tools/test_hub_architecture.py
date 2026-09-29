@@ -78,9 +78,7 @@ assert not any(t.name.startswith('hub_ui:') for t in threading.enumerate())
         http_server = server.http.server.ThreadingHTTPServer(('127.0.0.1', 0), server._Handler)
         local_stops = []
         real_thread = threading.Thread
-        calls = []
         def thread_factory(**kwargs):
-            calls.append(kwargs['name'])
             if kwargs['name'] == 'hub_ui:poll':
                 local_stops.append(kwargs['args'][0])
                 return real_thread(target=lambda: kwargs['args'][0].wait(), daemon=True)
@@ -173,6 +171,18 @@ assert not any(t.name.startswith('hub_ui:') for t in threading.enumerate())
                     self.assertEqual(request('/api/project-actions/soundboard/pause', {})[0], 200)
                     command.assert_called_once_with('soundboard', 'pause')
                     self.assertEqual(request('/api/audio', {'project': 'soundboard', 'project_volume_db': 'NaN'})[0], 400)
+                    stream = http.client.HTTPConnection('127.0.0.1', port, timeout=3)
+                    try:
+                        stream.request('GET', '/api/events')
+                        response = stream.getresponse()
+                        self.assertEqual(response.status, 200)
+                        self.assertIn('text/event-stream', response.getheader('Content-Type'))
+                        event = json.loads(response.readline().decode().removeprefix('data: '))
+                        self.assertEqual(event['type'], 'status_update')
+                        self.assertEqual(event['payload']['projects'], [{'name': 'soundboard'}])
+                        response.close()
+                    finally:
+                        stream.close()
                 finally:
                     stop.set()
                     thread.join(4)
