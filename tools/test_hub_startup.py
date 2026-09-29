@@ -34,6 +34,7 @@ assert not log._started
                 'filter_projects', '_print_project_table', '_print_runtime_options',
                 '_start_voice', '_start_projects')}
             stack.enter_context(patch('lib.settings_backups.start_settings_backups'))
+            stack.enter_context(patch('lib.browser_effects.start_browser_effects'))
             stack.enter_context(patch.dict(sys.modules, hub_rules=Mock()))
             background = stack.enter_context(patch.object(main.threading, 'Thread'))
             mocks['_check_obs_connection'].return_value = obs_ready

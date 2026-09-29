@@ -211,13 +211,13 @@ def run(
 
     def volume_state() -> dict:
         settings = active_settings[0]
-        current_stem = player.current_stem
+        current_stem = player.current_stem or player.loaded_browser_stem
         return {
             "project_volume_db": CONFIG.project_volume_db + (settings.project_volume_db if settings else 0.0),
             "profile_volume_db": CONFIG.profile_volume_db + (settings.profile_volume_db if settings else 0.0),
             "profile": active_profile_name[0],
             "current_stem": current_stem,
-            "source_name": SINGLE_SOURCE_NAME if current_stem else None,
+            "source_name": player.current_source or (player.browser_source if player.loaded_browser_stem else None),
         }
 
     def end_manual_window() -> None:
@@ -467,13 +467,18 @@ def run(
             name_index.clear()
             name_index.update(_build_name_index())
             reload_runtime_profiles(force=True)
+        elif action == "test_muffins":
+            threading.Thread(target=play_asset, args=('die die die',), daemon=True,
+                             name='soundboard-muffin-test').start()
         else:
             return {"ok": False, "error": f"Unsupported media action: {action}"}
         return {"ok": True, "action": action, "message": f"{CONFIG.project_name}: {action} ran."}
 
     _live["run_action"] = run_interface_action
     _live["volume_state"] = volume_state
-    _live["action_catalog"] = action_catalog
+    _live["action_catalog"] = lambda: action_catalog() + [
+        {'key':'test_muffins', 'label':'Test Muffin Dance',
+         'description':'Play Ctrl+6’s muffin song with animated screen borders.'}]
 
     def handle_manual_trigger(char: str, clip_value) -> None:
         if ptt is not None:

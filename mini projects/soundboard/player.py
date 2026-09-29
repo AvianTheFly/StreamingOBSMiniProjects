@@ -47,6 +47,10 @@ class SoundboardPlayer:
         self._current_file: Path | None = None
         self._requests = PlaybackWorker("soundboard:playback")
         self._cancel_event = threading.Event()
+        from lib.browser_effects.player import BrowserPlayer
+        self._browser = BrowserPlayer(CONFIG.project_name, _PROJECT_DIR, CONFIG.scene,
+                                      CONFIG.monitor, CONFIG.audio_tracks)
+        self._using_browser = False
         # Keep each asset's OBS filters and placement across shared-source swaps.
         self._state_store = SingleSourceStateStore(
             project_dir=_PROJECT_DIR,
@@ -84,7 +88,15 @@ class SoundboardPlayer:
     @property
     def current_source(self) -> str | None:
         with self._lock:
-            return SINGLE_SOURCE_NAME if self._current_stem else None
+            return (self._browser.source if self._using_browser else SINGLE_SOURCE_NAME) if self._current_stem else None
+
+    @property
+    def loaded_browser_stem(self) -> str | None:
+        return self._browser.channel.last_stem if self._browser.loaded else None
+
+    @property
+    def browser_source(self) -> str:
+        return self._browser.source
 
     def play_async(
         self,
@@ -122,10 +134,17 @@ class SoundboardPlayer:
             self._current_stem = stem
             self._current_file = filepath
             self._cancel_event = cancelled if cancelled is not None else threading.Event()
+            self._using_browser = bool(self._browser.effect(stem))
+            if not self._using_browser:
+                self._browser.loaded = False
 
         state_applied = False
         try:
             if self._cancelled():
+                return
+            if self._using_browser:
+                self._stop_and_hide_source()
+                self._browser.play(stem, filepath, volume_db, self._cancelled, CONFIG.media_total_timeout)
                 return
             print(f"{_TAG} Playing: '{SINGLE_SOURCE_NAME}'")
 
@@ -170,6 +189,7 @@ class SoundboardPlayer:
                 self._paused = False
                 self._current_stem = None
                 self._current_file = None
+                self._using_browser = False
             if on_finish:
                 try:
                     on_finish()
@@ -182,6 +202,10 @@ class SoundboardPlayer:
                 return
             self._paused = True
             stem = self._current_stem
+            browser = self._using_browser
+        if browser:
+            self._browser.pause(True)
+            return
         try:
             obs.pause_media(SINGLE_SOURCE_NAME)
         except Exception as exc:
@@ -197,6 +221,10 @@ class SoundboardPlayer:
                 return
             self._paused = False
             stem = self._current_stem
+            browser = self._using_browser
+        if browser:
+            self._browser.pause(False)
+            return
         try:
             obs.play_media(SINGLE_SOURCE_NAME)
         except Exception as exc:
@@ -214,6 +242,9 @@ class SoundboardPlayer:
                 return
             self._abort_flag = True
             self._paused = False
+            browser = self._using_browser
+        if browser:
+            self._browser.abort()
         self._stop_and_hide_source()
         print(f"{_TAG} Abort requested.")
 

@@ -41,6 +41,7 @@ class Service:
             return dict(active=active, queue=len(self.engine.queue), settings=self.settings,
                         themes=THEMES, history=list(self.engine.history),
                         connected=self.twitch.connected, message=self.twitch.message, auth=self.twitch.auth,
+                        subscriptions=self.twitch.subscriptions, last_event=self.twitch.last_event,
                         overlay_ready=time.monotonic()-self.last_overlay < 3)
 
     def save(self, body):
@@ -92,6 +93,12 @@ class Service:
                                    reroute_audio=True,shutdown=False,restart_when_active=False)),raw=True)
             obs.ensure_input_on_stream_track(SOURCE)
         else:
+            settings = client.send('GetInputSettings',dict(inputName=SOURCE),raw=True)['inputSettings']
+            expected = dict(url=f'http://127.0.0.1:{PORT}/overlay', width=1920,height=1080,
+                            reroute_audio=True,shutdown=False,restart_when_active=False)
+            patch = {key:value for key,value in expected.items() if settings.get(key) != value}
+            if patch:
+                client.send('SetInputSettings',dict(inputName=SOURCE,inputSettings=patch,overlay=True),raw=True)
             items = client.send('GetSceneItemList',{'sceneName':scene},raw=True)['sceneItems']
             if not any(x['sourceName']==SOURCE for x in items):
                 client.send('CreateSceneItem',dict(sceneName=scene,sourceName=SOURCE,sceneItemEnabled=True),raw=True)
@@ -106,6 +113,18 @@ def run(input_queue, stop_event, *, startup_event=None):
     _live['service'] = service
     threading.Thread(target=server.serve_forever,daemon=True,name='celebrations-http').start()
     threading.Thread(target=service.twitch.listen,daemon=True,name='celebrations-twitch').start()
+    # OBS may have opened this page before the local HTTP server was available.
+    # Reload existing input once; polling then handles later server interruptions.
+    def reload_existing():
+        try:
+            import obs
+            client = obs.get_obs()
+            inputs = client.send('GetInputList',{},raw=True)['inputs']
+            if any(x['inputName']==SOURCE and x['inputKind']=='browser_source' for x in inputs):
+                client.send('PressInputPropertiesButton',dict(inputName=SOURCE,propertyName='refreshnocache'),raw=True)
+        except Exception:
+            pass  # OBS can be offline while Twitch is listening.
+    threading.Thread(target=reload_existing,daemon=True,name='celebrations-overlay-reload').start()
     if startup_event: startup_event.set()
     print(f'[twitch_celebrations] Ready: http://127.0.0.1:{PORT}',flush=True)
     try:

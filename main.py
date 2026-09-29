@@ -188,6 +188,9 @@ def run_hub(
     from lib.settings_backups import start_settings_backups
     start_settings_backups(stop_event)
 
+    from lib.browser_effects import start_browser_effects
+    start_browser_effects(stop_event)
+
     obs_ready = _check_obs_connection()
     if not obs_ready and not wait_for_obs:
         return []
@@ -212,8 +215,9 @@ def run_hub(
     else:
         # Keep the League editor available without opening OBS. Other modules
         # initialize once OBS connects, using this same Hub and keyboard worker.
-        offline = [p for p in projects if p.name == 'league_api']
-        pending = [p for p in projects if p.name != 'league_api']
+        offline_names = {'league_api', 'twitch_celebrations'}
+        offline = [p for p in projects if p.name in offline_names]
+        pending = [p for p in projects if p.name not in offline_names]
         _start_projects(offline, stop_event)
         def await_obs():
             from obs import get_obs
@@ -227,7 +231,7 @@ def run_hub(
                 _start_projects(pending, stop_event)
                 return
         threading.Thread(target=await_obs, name='hub_wait_for_obs', daemon=True).start()
-        print('  League editor available. Other modules will start when OBS connects.')
+        print('  League editor and Twitch alerts available. Other modules will start when OBS connects.')
 
     return projects
 

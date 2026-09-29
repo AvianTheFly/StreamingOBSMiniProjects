@@ -424,6 +424,13 @@ def _obs_source_matches_runtime_stem(source_name: str, stem: str) -> bool:
     if not stem:
         return False
 
+    # Browser sources load a fixed page; their owning session knows the asset.
+    from lib.browser_effects.runtime import find_channel
+    from lib.browser_effects.obs_source import source_name as browser_source_name
+    if source_name == browser_source_name('soundboard'):
+        channel = find_channel('soundboard')
+        return bool(channel and channel.matches(stem))
+
     settings = _obs_input_settings(source_name)
     local_file = str(settings.get("local_file") or "").strip()
     if not local_file:

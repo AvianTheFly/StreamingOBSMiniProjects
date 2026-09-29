@@ -31,14 +31,25 @@ class Twitch:
         self.connected = False
         self.message = 'Connect Twitch to receive raids, follows, subscriptions, gifts and cheers.'
         self.socket = None
+        self.subscriptions = {}
+        self.last_event = None
+        self.last_validated = 0
+
+    def validate_token(self, token):
+        response = requests.get('https://id.twitch.tv/oauth2/validate',
+                                headers={'Authorization':'OAuth '+token}, timeout=15)
+        response.raise_for_status()
+        info = response.json()
+        if info.get('user_id') != os.environ.get('TWITCH_BROADCASTER_ID') or info.get('client_id') != os.environ.get('TWITCH_CLIENT_ID'):
+            raise ValueError('Saved Twitch authorization belongs to another account or application. Connect Twitch again.')
+        self.last_validated = time.monotonic()
+        return info
 
     def save_tokens(self, data):
-        valid = requests.get('https://id.twitch.tv/oauth2/validate', headers={'Authorization':'OAuth '+data['access_token']}, timeout=15)
-        valid.raise_for_status()
-        info = valid.json()
+        info = self.validate_token(data['access_token'])
         if info.get('user_id') != os.environ.get('TWITCH_BROADCASTER_ID') or not set(SCOPES.split()) <= set(info.get('scopes', [])):
             raise ValueError('Authorize the channel owner with all requested celebration permissions.')
-        self.tokens = dict(access_token=data['access_token'], refresh_token=data['refresh_token'], expires_at=time.time()+data['expires_in'])
+        self.tokens = dict(access_token=data['access_token'], refresh_token=data.get('refresh_token', self.tokens.get('refresh_token')), expires_at=time.time()+data['expires_in'])
         self.path.parent.mkdir(parents=True, exist_ok=True)
         tmp = self.path.with_suffix('.tmp')
         tmp.write_text(json.dumps(self.tokens))
@@ -67,6 +78,25 @@ class Twitch:
             self.busy = True
             threading.Thread(target=self.poll_auth, args=(data,), daemon=True).start()
             return self.auth
+
+    def subscribe(self, session, token):
+        channel = os.environ['TWITCH_BROADCASTER_ID']
+        states = {}
+        for event, version, label in EVENTS:
+            condition = {'to_broadcaster_user_id':channel} if event == 'channel.raid' else {'broadcaster_user_id':channel}
+            if event == 'channel.follow':
+                condition['moderator_user_id'] = channel
+            r = requests.post('https://api.twitch.tv/helix/eventsub/subscriptions', headers={
+                'Client-Id':os.environ['TWITCH_CLIENT_ID'], 'Authorization':'Bearer '+token}, json={
+                'type':event, 'version':version, 'condition':condition,
+                'transport':{'method':'websocket', 'session_id':session}}, timeout=10)
+            states[label] = {'enabled':r.status_code == 202, 'status':r.status_code}
+        self.subscriptions = states
+        if not any(state['enabled'] for state in states.values()):
+            raise ValueError('Twitch refused every event subscription. Connect Twitch again to authorize this channel.')
+        unavailable = [label for label, state in states.items() if not state['enabled']]
+        self.message = ('Connected. Unavailable events: '+', '.join(unavailable)+'. Check Twitch permissions/channel eligibility.'
+                        if unavailable else 'Listening for raids, follows, subs, gifts and cheers.')
 
     def poll_auth(self, data):
         deadline = time.monotonic()+data['expires_in']
@@ -103,55 +133,62 @@ class Twitch:
             sock = None
             try:
                 token = self.token()
-                valid = requests.get('https://id.twitch.tv/oauth2/validate', headers={'Authorization':'OAuth '+token}, timeout=15)
-                if valid.status_code == 401:
+                try:
+                    self.validate_token(token)
+                except requests.HTTPError as exc:
+                    if exc.response is None or exc.response.status_code != 401:
+                        raise
                     with self.lock:
                         self.tokens['expires_at'] = 0
                     token = self.token()
-                else:
-                    valid.raise_for_status()
                 sock = websocket.create_connection('wss://eventsub.wss.twitch.tv/ws?keepalive_timeout_seconds=30', timeout=35)
                 self.socket = sock
-                session = json.loads(sock.recv())['payload']['session']['id']
-                channel = os.environ['TWITCH_BROADCASTER_ID']
-                unavailable = []
-                for event, version, label in EVENTS:
-                    condition = {'to_broadcaster_user_id':channel} if event == 'channel.raid' else {'broadcaster_user_id':channel}
-                    if event == 'channel.follow':
-                        condition['moderator_user_id'] = channel
-                    r = requests.post('https://api.twitch.tv/helix/eventsub/subscriptions', headers={
-                        'Client-Id':os.environ['TWITCH_CLIENT_ID'], 'Authorization':'Bearer '+token}, json={
-                        'type':event, 'version':version, 'condition':condition,
-                        'transport':{'method':'websocket', 'session_id':session}}, timeout=15)
-                    if not r.ok:
-                        unavailable.append(label)
-                if len(unavailable) == len(EVENTS):
-                    raise ValueError('No subscriptions could be created')
+                welcome = json.loads(sock.recv())
+                if welcome.get('metadata',{}).get('message_type') != 'session_welcome':
+                    raise ValueError('Unexpected Twitch handshake')
+                session = welcome['payload']['session']['id']
+                self.subscribe(session, token)
                 self.connected = True
-                self.message = ('Connected. Unavailable events: '+', '.join(unavailable)+'. Check Twitch permissions/channel eligibility.'
-                                if unavailable else 'Listening for raids, follows, subs, gifts and cheers.')
-                started = time.monotonic()
-                while not self.stop.is_set() and time.monotonic()-started < 3300:
+                while not self.stop.is_set():
+                    # Twitch requires validation at startup and at least hourly.
+                    # Keep healthy sockets open so refresh does not drop raids.
+                    if time.monotonic()-self.last_validated > 3300:
+                        token = self.token()
+                        self.validate_token(token)
                     msg = json.loads(sock.recv())
                     kind = msg.get('metadata',{}).get('message_type')
                     if kind == 'notification':
                         self.notification(msg)
                     elif kind == 'revocation':
-                        raise ValueError('Subscription revoked')
+                        label = next((label for typ,ver,label in EVENTS if typ == msg['payload']['subscription']['type']), None)
+                        if label:
+                            self.subscriptions[label] = {'enabled':False, 'status':msg['payload']['subscription']['status']}
+                            self.message = f'{label.title()} subscription revoked. Connect Twitch to restore permissions.'
+                        if not any(x['enabled'] for x in self.subscriptions.values()):
+                            raise ValueError('All event subscriptions were revoked')
                     elif kind == 'session_reconnect':
                         url = msg['payload']['session']['reconnect_url']
                         parsed = urlparse(url)
                         if parsed.scheme != 'wss' or parsed.hostname != 'eventsub.wss.twitch.tv':
                             raise ValueError('Invalid reconnect URL')
                         replacement = websocket.create_connection(url, timeout=35)
-                        json.loads(replacement.recv())['payload']['session']
+                        handoff = json.loads(replacement.recv())
+                        if handoff.get('metadata',{}).get('message_type') != 'session_welcome':
+                            replacement.close()
+                            raise ValueError('Unexpected Twitch reconnect handshake')
                         sock.close()
                         sock = replacement
                         self.socket = sock
+            except ValueError as exc:
+                self.message = str(exc)
+            except requests.HTTPError as exc:
+                status = exc.response.status_code if exc.response is not None else 'unknown'
+                self.message = f'Twitch authorization/API returned {status}. Retrying; Connect Twitch if this persists.'
             except Exception:
-                self.message = 'Twitch disconnected. Retrying; reconnect authorization if this persists.'
+                self.message = 'Twitch disconnected. Retrying automatically; check network if this persists.'
             finally:
                 self.connected = False
+                self.subscriptions = {}
                 if sock:
                     sock.close()
                 self.socket = None
@@ -165,4 +202,5 @@ class Twitch:
         if kind == 'subscribe' and event.get('is_gift'):
             return  # The aggregate gift event already celebrates this batch.
         name = event.get('from_broadcaster_user_name') if kind == 'raid' else event.get('user_name')
+        self.last_event = dict(kind=kind, name=name or 'Anonymous legend', received_at=time.time())
         self.receive(kind, name or 'Anonymous legend', event.get('viewers',event.get('total',event.get('bits',1))), metadata['message_id'])

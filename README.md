@@ -112,3 +112,15 @@ Do not commit `.env`.
 
 Voice model settings are environment-driven. `WHISPER_MODEL` can be a model name
 such as `large-v3` or a local folder outside the repo.
+
+## Browser production effects
+
+After opening the soundboard trigger window, Ctrl+6 plays the existing muffin song with animated border characters through
+`Hub Soundboard Effects`. The Soundboard page has a **Test Muffin Dance** button.
+The original audio level and recording/stream routing are preserved. See
+[browser effect architecture](lib/browser_effects/README.md) for the modular renderer,
+playback contract and instructions for adding effects.
+
+Twitch Celebrations connects automatically with saved authorization. Its control
+page reports raid/follow/sub/gift/cheer subscription health and the last live event.
+An OBS-first startup now reloads the alert page once its local server is ready.

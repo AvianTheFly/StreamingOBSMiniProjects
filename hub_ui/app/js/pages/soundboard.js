@@ -39,6 +39,7 @@ export function mount(container, projectName) {
       <div class="card project-summary-card"><div class="card-title">Routing</div><div class="project-summary-list"><div><span>Scene</span><strong id="sbScenes">${esc(proj?.controlled_scenes?.join(", ") || "Not reported")}</strong></div><div><span>Audio</span><strong id="sbAudio">${proj?.produces_audio ? "Enabled" : "Not reported"}</strong></div><div><span>Volume</span><strong id="sbVolume">Not reported</strong></div><div><span>Activity</span><strong id="sbActivity">Idle</strong></div></div><div class="project-link-row"><a href="/editor" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">Hotkeys and OBS Canvas</a><a href="#profiles" class="btn btn-secondary btn-sm">Profile Triggers</a></div></div>
     </div>
     <div id="sbHotkeys" class="mt-16"></div>
+    ${_projectName === 'soundboard' ? '<p class="text-muted mt-16">The muffin song now plays an animated border show. Use Test Muffin Dance above to try it in OBS.</p>' : ''}
   `;
 
   _hotkeyHost = container.querySelector("#sbHotkeys");

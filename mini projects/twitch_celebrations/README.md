@@ -91,3 +91,18 @@ Official protocol references:
 Verification: `py -3.11 tools/test_twitch_celebrations.py`.
 End-to-end Twitch delivery requires completing channel authorization and an actual
 event; private preview and mocked event normalization do not establish that.
+
+The control page reports the health of **each** event subscription, including raids,
+and the last live notification received. Saved tokens reconnect automatically and
+refresh on expiry; startup validation checks both channel owner and application.
+Hourly validation keeps a healthy EventSub socket open. A Twitch reconnect handoff
+retains subscriptions; individual revocations mark only that event unavailable.
+Twitch starts even while OBS is offline. The existing OBS alert source refreshes
+once when this server starts so an OBS-first startup recovers an initially offline
+page. Browser sources are attached in the broadcast scenes Test, Lobbies, just
+screen and afk on this machine.
+
+Manual soundboard production effects have their own reusable service at port 7444.
+See `lib/browser_effects/README.md`; after the soundboard trigger, Ctrl+6 plays a muffin border show using the
+existing soundboard audio/volume instead of its small video. This is independent
+of Twitch's queue and celebration settings.

@@ -105,4 +105,51 @@ class HTTPTests(unittest.TestCase):
             server.shutdown();server.server_close();thread.join()
 
 
+class TransportTests(unittest.TestCase):
+    def test_incoming_raid_and_partial_permissions(self):
+        from unittest.mock import Mock
+        twitch=Twitch(threading.Event(),lambda *args:None)
+        ok=Mock(status_code=202);denied=Mock(status_code=403)
+        with patch.dict(os.environ,{'TWITCH_BROADCASTER_ID':'123','TWITCH_CLIENT_ID':'client'}), \
+             patch('twitch_celebrations.twitch.requests.post',side_effect=[ok,denied,denied,denied,denied]) as request:
+            twitch.subscribe('session','token')
+        raid=request.call_args_list[0].kwargs['json']
+        self.assertEqual(raid['condition'],{'to_broadcaster_user_id':'123'})
+        self.assertEqual(raid['transport'],{'method':'websocket','session_id':'session'})
+        self.assertTrue(twitch.subscriptions['raid']['enabled'])
+        self.assertFalse(twitch.subscriptions['follow']['enabled'])
+
+    def test_token_validation_rejects_wrong_owner_or_client(self):
+        from unittest.mock import Mock
+        twitch=Twitch(threading.Event(),lambda *args:None)
+        response=Mock();response.json.return_value={'user_id':'someone-else','client_id':'client'}
+        with patch.dict(os.environ,{'TWITCH_BROADCASTER_ID':'123','TWITCH_CLIENT_ID':'client'}), \
+             patch('twitch_celebrations.twitch.requests.get',return_value=response):
+            with self.assertRaises(ValueError):twitch.validate_token('token')
+            response.json.return_value={'user_id':'123','client_id':'different-client'}
+            with self.assertRaises(ValueError):twitch.validate_token('token')
+
+    def test_reconnect_handoff_keeps_subscriptions_and_delivers_notification(self):
+        from unittest.mock import Mock
+        import time
+        stop=threading.Event();twitch=Twitch(stop,lambda *args:None)
+        welcome=lambda sid:json.dumps({'metadata':{'message_type':'session_welcome'},'payload':{'session':{'id':sid}}})
+        reconnect=json.dumps({'metadata':{'message_type':'session_reconnect'},'payload':{'session':{'reconnect_url':'wss://eventsub.wss.twitch.tv/ws?handoff=test'}}})
+        notification=json.dumps({'metadata':{'message_type':'notification'},'payload':{}})
+        old=Mock();old.recv.side_effect=[welcome('old'),reconnect]
+        replacement=Mock();replacement.recv.side_effect=[welcome('new'),notification]
+        twitch.last_validated=time.monotonic()
+        twitch.tokens={'access_token':'fixture'}
+        def subscribe(*args):twitch.subscriptions={'raid':{'enabled':True,'status':202}}
+        with patch.object(twitch,'token',return_value='fixture'),patch.object(twitch,'validate_token'), \
+             patch.object(twitch,'subscribe',side_effect=subscribe) as subscriptions, \
+             patch.object(twitch,'notification',side_effect=lambda msg:stop.set()) as receive, \
+             patch('websocket.create_connection',side_effect=[old,replacement]) as connect:
+            twitch.listen()
+        subscriptions.assert_called_once_with('old','fixture')
+        receive.assert_called_once()
+        self.assertEqual(connect.call_args_list[1].args[0],'wss://eventsub.wss.twitch.tv/ws?handoff=test')
+        old.close.assert_called_once();replacement.close.assert_called_once()
+
+
 if __name__=='__main__':unittest.main()
