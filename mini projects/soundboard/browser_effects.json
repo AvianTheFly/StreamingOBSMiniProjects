@@ -2,5 +2,40 @@
   "die die die": {
     "renderer": "muffins",
     "bpm": 126
+  },
+  "hooray": {
+    "renderer": "borders",
+    "style": "confetti",
+    "bpm": 132,
+    "color": "#ffd470",
+    "label": "HOORAY!"
+  },
+  "oh no": {
+    "renderer": "borders",
+    "style": "oops",
+    "bpm": 100,
+    "color": "#a9a1ff",
+    "label": "OH NO…"
+  },
+  "JOHN CENA": {
+    "renderer": "borders",
+    "style": "arena",
+    "bpm": 100,
+    "color": "#ffe08c",
+    "label": "THE CHAMP IS HERE"
+  },
+  "bonk_7zPAD7C": {
+    "renderer": "borders",
+    "style": "bonk",
+    "bpm": 126,
+    "color": "#ffb5cf",
+    "label": "BONK!"
+  },
+  "anime-wow-sound-effect": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "bpm": 126,
+    "color": "#97ecff",
+    "label": "WOW!"
   }
 }

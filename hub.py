@@ -120,7 +120,7 @@ def main() -> None:
     ui_thread.start()
 
     # Narrow, opt-in Channel Points effects, separate from personalized media.
-    from lib.viewer_rewards import start_viewer_rewards
+    from lib.twitch_redemptions import start_viewer_rewards
     start_viewer_rewards(stop_event)
 
     url = f"http://localhost:{args.port}"

@@ -41,6 +41,17 @@ class SessionTests(unittest.TestCase):
         self.assertTrue(self.channel.matches('DIE DIE DIE'))
         self.assertFalse(self.channel.matches('hooray'))
 
+    def test_catalog_selects_border_renderer_without_changing_profiles(self):
+        from lib.browser_effects.catalog import effect_for
+        with tempfile.TemporaryDirectory() as folder:
+            file=Path(folder)/'browser_effects.json'
+            file.write_text(json.dumps({'hooray': {'renderer':'borders','style':'confetti'}}))
+            self.assertEqual(effect_for(folder,'HOORAY')['style'],'confetti')
+            file.write_text(json.dumps({'hooray': {'renderer':'borders','style':'unknown'}}))
+            self.assertIsNone(effect_for(folder,'hooray'))
+            file.write_text(json.dumps({'hooray': {'renderer':'muffins','bpm':float('nan')}}))
+            self.assertIsNone(effect_for(folder,'hooray'))
+
 
 class HTTPTests(unittest.TestCase):
     def test_audio_ranges_expiry_host_and_cross_origin_ack(self):

@@ -30,7 +30,7 @@ class SettingsBackups:
     def recover_missing(self):
         for latest in self.backup_root.glob('**/latest.json'):
             relative = latest.parent.relative_to(self.backup_root)
-            if relative.parts[0] == '_obs_scenes':
+            if relative.parts[0] in {'_obs_scenes', '_twitch_redemptions'}:
                 continue  # OBS collections are recovery copies, never auto-replaced.
             target = self.root / relative
             if target.exists():
@@ -43,6 +43,9 @@ class SettingsBackups:
 
     def snapshot(self):
         sources = [(p, p.relative_to(self.root)) for p in self.paths()]
+        if self.root == PROJECT_ROOT and os.environ.get('LOCALAPPDATA'):
+            reward_settings = Path(os.environ['LOCALAPPDATA']) / 'StreamingHub' / 'viewer-rewards' / 'settings.json'
+            sources.append((reward_settings, Path('_twitch_redemptions') / 'settings.json'))
         if os.environ.get('APPDATA'):
             scenes = Path(os.environ['APPDATA']) / 'obs-studio' / 'basic' / 'scenes'
             sources += [(p, Path('_obs_scenes') / p.name) for p in scenes.glob('*.json')]

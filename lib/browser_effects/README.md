@@ -4,7 +4,9 @@ The supported v2 Hub starts one loopback service at **127.0.0.1:7444**.
 Each participating module owns a channel and an OBS browser input. Soundboard's
 `die die die` is the first production mapping: original audio, eight animated
 muffins, beat-driven dancing, microphones, party hats, stars and corner lights.
-The gameplay center is transparent. Open the existing soundboard trigger window
+Five more soundboard mappings use `borders`: Hooray (confetti), Oh No (reaction
+faces), John Cena (ring ropes/championship belts), Bonk (mallets), Anime Wow (stars).
+They keep their original audio length and per-asset gain. The gameplay center is transparent. Open the existing soundboard trigger window
 first, then use Ctrl+6 / the existing `^` profile mapping. The trigger gate is
 intentional and must be preserved. Voice matching, random groups and the explicit
 Hub test button use the same player path. No keyboard input is simulated.
@@ -22,6 +24,8 @@ Hub test button use the same player path. No keyboard input is simulated.
 | `http_server.py` | Host checks, scoped media, byte ranges and acknowledgements |
 | `web/playback.js` | Browser audio lifecycle, polling, offline cleanup |
 | `web/muffins.js` | Original canvas characters and audio-time choreography |
+| `web/renderers.js` | Explicit renderer selection for the active effect |
+| `web/borders.js` | Border confetti, reaction faces, belts, mallets and stars |
 
 ## Integration contract
 

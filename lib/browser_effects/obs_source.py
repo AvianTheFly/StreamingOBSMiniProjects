@@ -17,7 +17,7 @@ def attach(project, scene, monitor, tracks):
     if existing and existing['inputKind'] != 'browser_source':
         raise ValueError(f'{name} already belongs to another source kind')
     settings = dict(url=f'http://127.0.0.1:{PORT}/overlay/{project}', width=1920,
-                    height=1080, fps=30, reroute_audio=True, shutdown=False, restart_when_active=False)
+                    height=1080, fps=30, fps_custom=True, reroute_audio=True, shutdown=False, restart_when_active=False)
     if not existing:
         SettingsBackups().snapshot()
         obs.create_scene_if_missing(scene)

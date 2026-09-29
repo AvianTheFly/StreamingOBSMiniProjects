@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require('playwright');
 const web = path.resolve(__dirname, '../lib/browser_effects/web');
-const output = path.resolve(__dirname, '../tmp_obs_debug/muffin-preview.png');
+const output = process.env.EFFECT_PREVIEW_PATH || path.resolve(__dirname, '../tmp_obs_debug/muffin-preview.png');
 function silence(seconds) {
  const samples=44100*seconds, file=Buffer.alloc(44+samples*2);
  file.write('RIFF');file.writeUInt32LE(file.length-8,4);file.write('WAVEfmt ',8);
@@ -33,7 +33,7 @@ function silence(seconds) {
    if(url.pathname.startsWith('/api/ack/')){acks.push(route.request().postDataJSON());return route.fulfill({json:{ok:true}});}
    if(url.pathname.startsWith('/audio/'))return route.fulfill({body:wave,contentType:'audio/wav'});
    const file=url.pathname.startsWith('/overlay/')?'overlay.html':name;
-   if(!['overlay.html','overlay.css','playback.js','muffins.js'].includes(file))return route.fulfill({status:404});
+   if(!['overlay.html','overlay.css','playback.js','muffins.js','borders.js','renderers.js'].includes(file))return route.fulfill({status:404});
    return route.fulfill({body:fs.readFileSync(path.join(web,file)),contentType:file.endsWith('.js')?'application/javascript':file.endsWith('.css')?'text/css':'text/html'});
   });
   await page.goto('http://effects.test/overlay/soundboard');
@@ -69,6 +69,22 @@ function silence(seconds) {
   assert.equal(await page.evaluate(()=>window.testAudio.at(-1).getAttribute('src')),null,'server loss must stop audio');
   const pixels=await page.evaluate(()=>document.getElementById('effects').getContext('2d').getImageData(0,0,1920,1080).data.some((x,i)=>i%4===3&&x));
   assert.equal(pixels,false,'completion and offline recovery must clear the canvas');
+  const borders=await page.evaluate(async()=>{
+   const {BorderShow}=await import('/borders.js'),canvas=document.getElementById('effects'),show=new BorderShow(canvas),c=canvas.getContext('2d');
+   return ['confetti','oops','arena','bonk','sparkles'].map(style=>{
+    show.draw(.3,4,{style,label:'BORDER TEST',bpm:126});
+    const center=c.getImageData(240,170,1440,670).data,all=c.getImageData(0,0,1920,1080).data;
+    const centralPixels=center.some((x,i)=>i%4===3&&x);let painted=0;for(let i=3;i<all.length;i+=4)if(all[i])painted++;
+    return {style,centralPixels,painted};
+   });
+  });
+  for(const b of borders){assert.equal(b.centralPixels,false,b.style+' must keep center clear');assert(b.painted>3000,b.style+' must draw props');}
+  offline=false;active=null;await page.waitForTimeout(400);
+  active={id:'border-audio',stem:'hooray',effect:{renderer:'borders',style:'confetti',label:'HOORAY!'},elapsed:0,started:false,paused:false};
+  await page.waitForFunction(()=>!window.testAudio.at(-1).paused);
+  await page.waitForFunction(()=>window.testAudio.at(-1).getAttribute('src')===null,{},{timeout:8000});
+  assert(acks.some(x=>x.id==='border-audio'&&x.status==='playing'));
+  assert(acks.some(x=>x.id==='border-audio'&&x.status==='ended'));
   assert.deepEqual(errors,[]);console.log('Browser audio, pause/resume, transparency, idle and offline cleanup passed. Preview: '+output);
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

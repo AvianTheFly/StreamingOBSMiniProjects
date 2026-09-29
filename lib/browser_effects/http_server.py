@@ -7,7 +7,7 @@ from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlparse
 
 WEB = Path(__file__).parent/'web'
-STATIC = {'overlay.html', 'playback.js', 'muffins.js', 'overlay.css'}
+STATIC = {'overlay.html', 'playback.js', 'muffins.js', 'borders.js', 'renderers.js', 'overlay.css'}
 
 
 def handler(find_channel, port):
