@@ -42,10 +42,13 @@ class Service:
         self.last_overlay=-1000
 
     def production_settings(self):
+        from .production.catalog import manifest, GROUPS
         with self.lock:
             return {'settings':copy.deepcopy(self.engine.production.settings),
                     'overlay_ready':time.monotonic()-self.last_overlay<4,
-                    'status':self.status}
+                    'status':self.status,'groups':GROUPS,
+                    'catalog':manifest(self.engine.production.settings,self.engine.config['events']),
+                    'activity':self.engine.production.history[-8:]}
 
     def save_production(self,body):
         with self.lock:

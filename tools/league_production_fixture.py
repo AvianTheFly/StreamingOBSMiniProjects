@@ -23,5 +23,12 @@ if __name__ == '__main__':
         handler = make_handler(service,root=web_root,port=0,load_config=main.load_config)
         server = ThreadingHTTPServer(('127.0.0.1',0),handler)
         print(json.dumps({'port':server.server_port}),flush=True)
-        try: server.serve_forever()
-        finally: server.server_close()
+        server.daemon_threads=True
+        threading.Thread(target=server.serve_forever,daemon=True).start()
+        # A closed parent pipe also ends the fixture after a crashed test runner.
+        def parent_closed():
+            sys.stdin.buffer.read()
+            service.stop_event.set()
+        threading.Thread(target=parent_closed,daemon=True).start()
+        try: service.stop_event.wait()
+        finally: server.shutdown();server.server_close()

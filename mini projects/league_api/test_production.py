@@ -94,10 +94,10 @@ class ProductionTests(unittest.TestCase):
         effect_id = self.director.snapshot()['effect']['id']
         self.now[0] = .3; self.director.ingest(game(), [observed('turret_destroyed')])
         self.assertEqual(self.director.snapshot()['effect']['id'], effect_id)
-        self.now[0] = 3; self.director.ingest(game(), [observed('turret_destroyed')])
+        self.now[0] = 4.5; self.director.ingest(game(), [])
         self.assertIsNone(self.director.snapshot()['effect'])
         self.now[0] = 5; self.director.ingest(game(), [observed('baron')])
-        self.assertEqual(self.director.snapshot()['effect']['kind'], 'baron')
+        self.assertEqual(self.director.snapshot()['effect']['kind'], 'void')
 
     def test_no_replay_after_baseline_duplicates_and_new_game(self):
         engine = Engine(clock=lambda: self.now[0], production_settings=self.settings)
@@ -107,7 +107,7 @@ class ProductionTests(unittest.TestCase):
         data['gameData']['gameTime'] = 1301
         data['events']['Events'].append(event(4, 'Multikill', 1301, KillerName='OldName', KillStreak=5))
         engine.ingest(data); self.assertTrue(engine.production.snapshot()['effect'])
-        self.now[0] = 4; engine.ingest(data)
+        self.now[0] = 5; engine.ingest(data)
         self.assertIsNone(engine.production.snapshot()['effect'])
         engine.production.preview('baron'); engine.ingest(data, baseline=True)
         self.assertIsNone(engine.production.snapshot()['effect'])
@@ -125,8 +125,7 @@ class ProductionTests(unittest.TestCase):
 
     def test_possible_events_audio_and_disabled_categories_never_display(self):
         self.director.ingest(game(), [{'key':'baron','confidence':'possible'},
-                                     {'key':'kill','confidence':'observed'},
-                                     {'key':'death','confidence':'observed'}])
+                                     {'key':'possible_combat','confidence':'possible'}])
         self.assertIsNone(self.director.snapshot()['effect'])
         self.director.configure({**self.settings, 'objectives':False, 'dragon_ambience':False})
         self.director.ingest(game(), [{'key':'baron','confidence':'observed'}])

@@ -4,6 +4,7 @@ const { spawn } = require('node:child_process');
 const path = require('node:path');
 const fs = require('node:fs');
 const os = require('node:os');
+const http = require('node:http');
 const { chromium } = require('playwright');
 const root = path.resolve(__dirname, '..');
 const artifacts =
@@ -12,8 +13,29 @@ fs.mkdirSync(artifacts, { recursive: true });
 const server = spawn(
   'py',
   ['-3.11', '-X', 'utf8', '-u', path.join(__dirname, 'league_production_fixture.py')],
-  { cwd: root, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] },
+  { cwd: root, windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] },
 );
+function localRequest(url, options = {}) {
+  return new Promise((resolve, reject) => {
+    const headers = { ...options.headers };
+    if (options.body) headers['Content-Length'] = Buffer.byteLength(options.body);
+    const req = http.request(url, { method: options.method || 'GET', headers }, (res) => {
+      const chunks = [];
+      res.on('data', (chunk) => chunks.push(chunk));
+      res.on('error', reject);
+      res.on('end', () => {
+        try {
+          const data = JSON.parse(Buffer.concat(chunks).toString());
+          resolve({ json: async () => data });
+        } catch (error) {
+          reject(error);
+        }
+      });
+    });
+    req.on('error', reject);
+    req.end(options.body);
+  });
+}
 server.stderr.on('data', (data) => process.stderr.write(data));
 async function endpoint() {
   return await new Promise((resolve, reject) => {
@@ -115,6 +137,49 @@ async function endpoint() {
           omitBackground: true,
         });
     }
+    const catalog = (await (await localRequest(base + '/production/settings')).json()).catalog;
+    let maxShowMs = 0;
+    for (const effect of catalog) {
+      for (const elapsed of [0.18, effect.duration * 0.5]) {
+        const stats = await page.evaluate((e) => window.renderProduction(e.theme, e), {
+          ...effect,
+          elapsed,
+        });
+        assert.equal(stats.centerAlpha, 0, effect.key + ' must preserve gameplay center');
+        assert(stats.filled > 500, effect.key + ' must have a visible border effect');
+      }
+      if (
+        [
+          'baron',
+          'herald',
+          'void_grub',
+          'dragon_fire',
+          'dragon_hextech',
+          'victory',
+          'level_up',
+        ].includes(effect.key)
+      ) {
+        await page.screenshot({
+          path: path.join(artifacts, effect.key + '.png'),
+          omitBackground: true,
+        });
+      }
+      const ms = await page.evaluate((e) => {
+        const start = performance.now();
+        for (let i = 0; i < 8; i++)
+          window.testScene.draw({
+            enabled: true,
+            opacity: 0.8,
+            edge_width: 56,
+            intensity: 1.15,
+            ambient: null,
+            effect: { ...e, elapsed: e.duration * 0.4 + i * 0.01 },
+          });
+        return (performance.now() - start) / 8;
+      }, effect);
+      maxShowMs = Math.max(maxShowMs, ms);
+    }
+    assert(maxShowMs < 30, 'Every show must fit a 30fps rendering budget');
     const timing = await page.evaluate(() => {
       const start = performance.now();
       for (let i = 0; i < 90; i++)
@@ -171,39 +236,85 @@ async function endpoint() {
     await editor.waitForFunction(
       () => document.querySelector('input[name=opacity]').value === '0.8',
     );
-    const before = await (await fetch(base + '/settings')).json();
+    const before = await (await localRequest(base + '/settings')).json();
     await editor.locator('input[name=opacity]').fill('0.6');
     await editor.getByRole('button', { name: 'Save borders' }).click();
     await editor.getByRole('status').filter({ hasText: 'Production borders saved.' }).waitFor();
-    const saved = await (await fetch(base + '/production/settings')).json();
+    const saved = await (await localRequest(base + '/production/settings')).json();
     assert.equal(saved.settings.opacity, 0.6);
-    assert.deepEqual((await (await fetch(base + '/settings')).json()).config, before.config);
+    assert.deepEqual((await (await localRequest(base + '/settings')).json()).config, before.config);
     await editor.locator('[data-preview=earth_cycle]').click();
     await editor.waitForFunction(() =>
       document.querySelector('#notice').textContent.startsWith('Showing'),
     );
-    assert((await (await fetch(base + '/state')).json()).production.ambient);
+    assert((await (await localRequest(base + '/state')).json()).production.ambient);
     await editor.getByRole('button', { name: 'Clear current effects' }).click();
     await editor.waitForFunction(() =>
       document.querySelector('#notice').textContent.startsWith('Current borders cleared'),
     );
-    assert.equal((await (await fetch(base + '/state')).json()).production.ambient, null);
+    assert.equal((await (await localRequest(base + '/state')).json()).production.ambient, null);
+    await editor.locator('#eventSearch').fill('takedown');
+    const killCard = editor.locator('[data-effect=kill]');
+    await killCard.getByLabel('TAKEDOWN Impact').fill('1.3');
+    await killCard.getByLabel('TAKEDOWN Seconds').fill('0.9');
+    await killCard.getByRole('checkbox').uncheck();
+    await editor.locator('#eventGroup').selectOption('progression');
+    await editor.locator('#eventSearch').fill('level');
+    await editor.locator('#eventGroup').selectOption('all');
+    await editor.locator('#eventSearch').fill('takedown');
+    assert.equal(await killCard.getByLabel('TAKEDOWN Seconds').inputValue(), '0.9');
+    await editor.getByRole('button', { name: 'Save effect edits' }).click();
+    await editor.locator('#eventSaveStatus').filter({ hasText: 'Effect edits saved.' }).waitFor();
+    let controls = (await (await localRequest(base + '/production/settings')).json()).settings;
+    assert.deepEqual(controls.event_options.kill, {
+      intensity: 1.3,
+      duration: 0.9,
+      enabled: false,
+    });
+    await killCard.getByRole('button', { name: 'Preview', exact: true }).click();
+    await editor.waitForFunction(
+      () => document.querySelector('#notice').textContent === 'Showing TAKEDOWN.',
+    );
+    assert.equal(
+      (await (await localRequest(base + '/state')).json()).production.effect.key,
+      'kill',
+    );
+    await killCard.getByRole('button', { name: 'Reset', exact: true }).click();
+    await killCard.getByLabel('TAKEDOWN Seconds').fill('1.1');
+    await editor.getByRole('button', { name: 'Save effect edits' }).click();
+    await editor.waitForFunction(
+      () =>
+        document.querySelector('#eventSaveStatus').textContent === 'Effect edits saved.' &&
+        document.querySelector('#eventSaveStatus').previousElementSibling.disabled === false,
+    );
+    controls = (await (await localRequest(base + '/production/settings')).json()).settings;
+    assert.deepEqual(
+      controls.event_options.kill,
+      { duration: 1.1 },
+      'Reset must remove earlier intensity/toggle overrides',
+    );
+    assert.equal(controls.opacity, 0.6, 'Event edits must preserve master strength');
     // A stale editor cannot overwrite another window's controls.
-    await fetch(base + '/production/configure', {
+    await localRequest(base + '/production/configure', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ revision: 1, settings: { opacity: 0.7 } }),
+      body: JSON.stringify({ revision: controls.revision, settings: { opacity: 0.7 } }),
     });
     await editor.getByRole('button', { name: 'Save borders' }).click();
     await editor.waitForFunction(() =>
       document.querySelector('#notice').textContent.includes('Reload before saving'),
     );
-    assert.equal((await (await fetch(base + '/production/settings')).json()).settings.opacity, 0.7);
+    assert.equal(
+      (await (await localRequest(base + '/production/settings')).json()).settings.opacity,
+      0.7,
+    );
     assert.deepEqual(errors, []);
     console.log(
       JSON.stringify({
         passed: true,
         ambientThemes: 7,
+        borderEvents: catalog.length,
+        maxShowFrameMs: Math.round(maxShowMs * 100) / 100,
         centerAlpha: 0,
         stoneFrameMs: Math.round(timing * 100) / 100,
         artifacts,
@@ -211,7 +322,7 @@ async function endpoint() {
     );
   } finally {
     if (browser) await browser.close();
-    server.kill();
+    server.stdin.end();
   }
 })().catch((error) => {
   console.error(error);

@@ -1,15 +1,6 @@
 import { rock, stones, noise, edgePoint } from './materials.js';
-export const colors = {
-  earth: '#d6ad68',
-  fire: '#ff8245',
-  water: '#68d7f0',
-  air: '#d5edf2',
-  hextech: '#be99ff',
-  chemtech: '#a9ed70',
-  elder: '#fff0c5',
-  void: '#c68bff',
-  gold: '#f5d990',
-};
+import { colors } from './palette.js';
+export { colors } from './palette.js';
 export function stoneBorder(c, edge, opacity, progress = 0, ingress = 0) {
   const base = c.globalAlpha;
   for (const s of stones(edge)) {
@@ -88,7 +79,12 @@ export function terrain(c, theme, t, options) {
           ...edgePoint(side, x + Math.sin(t + i) * 8, tall),
         );
         c.quadraticCurveTo(...edgePoint(side, x + 20, tall * 0.55), ...edgePoint(side, x + 20, 0));
-        c.fillStyle = i % 3 ? '#f66f36' : '#ffbd67';
+        const flame = c.createLinearGradient(...edgePoint(side, x, 0), ...edgePoint(side, x, tall));
+        flame.addColorStop(0, '#ffedb5');
+        flame.addColorStop(0.3, i % 3 ? '#ffa13b' : '#ffd278');
+        flame.addColorStop(0.75, '#f95a28');
+        flame.addColorStop(1, '#bd253600');
+        c.fillStyle = flame;
         c.globalAlpha = base * (0.28 + noise(i) * 0.2);
         c.fill();
       }

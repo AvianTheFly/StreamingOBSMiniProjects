@@ -2,6 +2,9 @@ const form = document.querySelector('#settings'),
   notice = document.querySelector('#notice');
 let saved = null,
   busy = false;
+let catalog = [],
+  groups = {};
+const edits = new Map();
 async function request(path, body) {
   const response = await fetch(
     path,
@@ -18,12 +21,20 @@ async function request(path, body) {
   return data;
 }
 function labels() {
+  document.querySelector('#intensityValue').textContent =
+    Math.round(form.elements.intensity.value * 100) + '%';
   document.querySelector('#opacityValue').textContent =
     Math.round(form.elements.opacity.value * 100) + '%';
   document.querySelector('#edgeValue').textContent = form.elements.edge_width.value + ' px';
 }
 function status(data) {
   document.querySelector('#connection').textContent = data.status;
+  document.querySelector('#activity').textContent =
+    (data.activity || [])
+      .slice(-4)
+      .reverse()
+      .map((a) => a.title + ' — ' + a.result)
+      .join(' · ') || 'Waiting for game events.';
   document.querySelector('#ready').textContent = data.overlay_ready
     ? 'OBS overlay is connected.'
     : 'OBS overlay is not connected. Start OBS or reconnect the source.';
@@ -38,6 +49,16 @@ async function reload() {
       else input.value = value;
     }
   }
+  catalog = data.catalog || [];
+  groups = data.groups || {};
+  edits.clear();
+  renderGallery();
+  const select = document.querySelector('#eventGroup');
+  if (select.options.length === 1)
+    for (const [key, title] of Object.entries(groups)) {
+      const option = new Option(title, key);
+      select.add(option);
+    }
   labels();
   status(data);
 }
@@ -58,6 +79,7 @@ form.addEventListener('input', labels);
 form.addEventListener('submit', (event) => {
   event.preventDefault();
   action(async () => {
+    if (!saved) throw new Error('Reload the controls before saving.');
     const settings = {};
     for (const input of form.elements) {
       if (!input.name) continue;
@@ -65,6 +87,8 @@ form.addEventListener('submit', (event) => {
     }
     const data = await request('/production/configure', { revision: saved.revision, settings });
     saved = data.settings;
+    catalog = data.catalog;
+    renderGallery();
     notice.textContent = 'Production borders saved.';
     status(data);
   });
@@ -92,7 +116,7 @@ document.querySelectorAll('[data-preview]').forEach(
         notice.textContent = 'Showing ' + button.textContent.trim().split('\n')[0] + '.';
       })),
 );
-await action(reload);
+
 setInterval(async () => {
   try {
     status(await request('/production/settings'));
@@ -100,3 +124,126 @@ setInterval(async () => {
     document.querySelector('#connection').textContent = 'League service disconnected';
   }
 }, 2000);
+
+function element(tag, text, className = '') {
+  const node = document.createElement(tag);
+  if (text) node.textContent = text;
+  if (className) node.className = className;
+  return node;
+}
+function renderGallery() {
+  const gallery = document.querySelector('#eventGallery');
+  gallery.replaceChildren();
+  const group = document.querySelector('#eventGroup').value,
+    query = document.querySelector('#eventSearch').value.toLowerCase();
+  const selected = catalog.filter(
+    (e) =>
+      (group === 'all' || e.category === group) &&
+      (e.title + ' ' + e.key).toLowerCase().includes(query),
+  );
+  document.querySelector('#eventCount').textContent =
+    selected.length + ' / ' + catalog.length + ' effects';
+  for (const event of selected) {
+    const reset = edits.has(event.key) && edits.get(event.key) === null;
+    const patch = edits.has(event.key)
+      ? edits.get(event.key) || {}
+      : saved.event_options?.[event.key] || {};
+    const card = element('article', null, 'event-card');
+    card.dataset.effect = event.key;
+    const head = element('div', null, 'section-head');
+    head.append(element('h3', event.title));
+    const toggle = document.createElement('input');
+    toggle.type = 'checkbox';
+    toggle.checked =
+      patch.enabled ?? (edits.has(event.key) ? event.default_enabled : event.event_enabled);
+    toggle.setAttribute('aria-label', 'Automatically show ' + event.title);
+    head.append(toggle);
+    card.append(head);
+    card.append(
+      element(
+        'p',
+        (groups[event.category] || event.category) +
+          (event.confidence === 'possible' ? ' · Unconfirmed signal' : ''),
+        'event-meta',
+      ),
+    );
+    const fields = element('div', null, 'event-fields');
+    for (const [name, label, min, max, step, value] of [
+      ['intensity', 'Impact', 0.3, 1.6, 0.05, patch.intensity ?? 1],
+      [
+        'duration',
+        'Seconds',
+        0.6,
+        5,
+        0.1,
+        patch.duration ?? (reset ? event.default_duration : event.duration),
+      ],
+    ]) {
+      const wrap = element('label', label),
+        input = document.createElement('input');
+      input.type = 'number';
+      input.min = min;
+      input.max = max;
+      input.step = step;
+      input.value = value;
+      input.setAttribute('aria-label', event.title + ' ' + label);
+      wrap.append(input);
+      fields.append(wrap);
+      input.oninput = () => {
+        updateEvent(event.key, name, Number(input.value));
+      };
+    }
+    card.append(fields);
+    toggle.onchange = () => {
+      updateEvent(event.key, 'enabled', toggle.checked);
+    };
+    const actions = element('div', null, 'event-actions'),
+      play = element('button', 'Preview'),
+      resetButton = element('button', 'Reset');
+    play.dataset.preview = event.key;
+    play.onclick = () =>
+      action(async () => {
+        await request('/production/preview', { key: event.key });
+        notice.textContent = 'Showing ' + event.title + '.';
+      });
+    resetButton.onclick = () => {
+      edits.set(event.key, null);
+      renderGallery();
+      markDirty();
+    };
+    actions.append(play, resetButton);
+    card.append(actions);
+    gallery.append(card);
+  }
+}
+function updateEvent(key, name, value) {
+  const previous = edits.has(key) ? edits.get(key) || {} : saved.event_options?.[key] || {};
+  edits.set(key, { ...previous, [name]: value });
+  markDirty();
+}
+function markDirty() {
+  document.querySelector('#eventSaveStatus').textContent = edits.size + ' effect edits to save';
+}
+document.querySelector('#eventGroup').onchange = renderGallery;
+document.querySelector('#eventSearch').oninput = renderGallery;
+document.querySelector('#saveEvents').onclick = () =>
+  action(async () => {
+    if (!saved) throw new Error('Reload the controls before saving.');
+    const event_options = structuredClone(saved.event_options || {});
+    for (const [key, patch] of edits) {
+      if (patch === null) delete event_options[key];
+      else event_options[key] = patch;
+    }
+    const data = await request('/production/configure', {
+      revision: saved.revision,
+      settings: { event_options },
+    });
+    saved = data.settings;
+    catalog = data.catalog;
+    edits.clear();
+    renderGallery();
+    document.querySelector('#eventSaveStatus').textContent = 'Effect edits saved.';
+    status(data);
+  });
+
+await action(reload);

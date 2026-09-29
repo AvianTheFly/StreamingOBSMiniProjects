@@ -1,0 +1,16 @@
+export const colors = {
+  earth: '#d6ad68',
+  fire: '#ff8245',
+  water: '#68d7f0',
+  air: '#d5edf2',
+  hextech: '#be99ff',
+  chemtech: '#a9ed70',
+  elder: '#fff0c5',
+  void: '#c68bff',
+  gold: '#f5d990',
+  blood: '#ff507a',
+  mint: '#70ffd0',
+  cyan: '#66eaff',
+  arcane: '#a5acff',
+  ash: '#9eb3cc',
+};

@@ -41,7 +41,7 @@ def make_handler(service, *, root: Path, port: int, load_config):
                 self.send_bytes(json.dumps(service.production_settings()).encode()); return
             if path=='/production':
                 self.send_bytes((root/'production'/'web'/'control.html').read_bytes(),'text/html; charset=utf-8'); return
-            if path.startswith('/production/') and path.removeprefix('/production/') in {'overlay.js','scene.js','materials.js','terrain.js','bursts.js','control.js','control.css'}:
+            if path.startswith('/production/') and path.removeprefix('/production/') in {'overlay.js','scene.js','materials.js','terrain.js','bursts.js','control.js','control.css','palette.js','primitives.js','combat.js','elements.js','objectives.js','progression.js'}:
                 file=root/'production'/'web'/path.removeprefix('/production/')
                 self.send_bytes(file.read_bytes(),'text/css' if file.suffix=='.css' else 'text/javascript'); return
             if path=='/sprite.png':

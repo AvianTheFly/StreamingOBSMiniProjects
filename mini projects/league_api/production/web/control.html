@@ -11,7 +11,9 @@
       <div>
         <p class="eyebrow">LEAGUE · PRODUCTION</p>
         <h1>Let the edges tell the story.</h1>
-        <p>Quiet dragon atmosphere. A brief celebration when your team takes it.</p>
+        <p>
+          Elemental borders, playful little moments, and big finishes for the plays that matter.
+        </p>
       </div>
       <a href="/">Clip alerts & media →</a>
     </header>
@@ -26,10 +28,20 @@
           <label><input type="checkbox" name="enabled" />Enable production borders</label>
           <label><input type="checkbox" name="dragon_ambience" />Dragon atmosphere</label>
           <label><input type="checkbox" name="objectives" />Team objectives & aces</label>
-          <label><input type="checkbox" name="combat" />Your double kills through pentakills</label>
+          <label><input type="checkbox" name="combat" />Your kills, assists & multikills</label>
           <label><input type="checkbox" name="structures" />Enemy towers & inhibitors</label>
+          <label><input type="checkbox" name="survival" />Health & respawn accents</label>
+          <label><input type="checkbox" name="progression" />Levels & ability upgrades</label>
+          <label><input type="checkbox" name="economy" />Items, farming & vision</label>
+          <label><input type="checkbox" name="lifecycle" />Match entrance & ending</label>
+          <label><input type="checkbox" name="custom_rules" />Enabled custom border rules</label>
+          <label><input type="checkbox" name="inferred" />Optional unconfirmed signals</label>
         </div>
         <div class="ranges">
+          <label
+            >Show impact <output id="intensityValue"></output
+            ><input type="range" name="intensity" min="0.5" max="1.6" step="0.05"
+          /></label>
           <label
             >Strength <output id="opacityValue"></output
             ><input type="range" name="opacity" min="0.2" max="1" step="0.05"
@@ -62,8 +74,9 @@
         </div>
       </form>
       <p class="muted">
-        One objective atmosphere and one short celebration at a time. These visuals are silent and
-        leave your existing kill, death and respawn sounds alone.
+        One objective atmosphere and one short celebration at a time. Major plays can take over;
+        frequent events have their own cooldowns. These visuals are silent and leave your existing
+        kill, death and respawn sounds alone.
       </p>
     </section>
     <section>
@@ -77,17 +90,31 @@
           <strong>Mountain dragon · full cycle</strong
           ><span>Stone rises along the edges, then breaks into tumbling chips.</span>
         </button>
-        <button data-preview="dragon_fire">Infernal dragon</button
-        ><button data-preview="dragon_water">Ocean dragon</button
-        ><button data-preview="dragon_air">Cloud dragon</button
-        ><button data-preview="dragon_hextech">Hextech dragon</button
-        ><button data-preview="dragon_chemtech">Chemtech dragon</button
-        ><button data-preview="dragon_elder">Elder dragon</button
-        ><button data-preview="baron">Baron</button><button data-preview="herald">Herald</button
-        ><button data-preview="pentakill">Pentakill</button
-        ><button data-preview="ace">Team ace</button
-        ><button data-preview="turret_destroyed">Tower down</button>
       </div>
+      <div class="gallery-tools">
+        <label
+          >Event group
+          <select id="eventGroup">
+            <option value="all">All events</option>
+          </select></label
+        ><label
+          >Find an event
+          <input id="eventSearch" type="search" placeholder="Dragon, kill, level, vision…" /></label
+        ><span id="eventCount"></span>
+      </div>
+      <p class="muted">
+        Preview any effect, even while its automatic toggle is off. Adjust individual effects below,
+        then save effect edits. Optional signals are correlations and stay off by default.
+      </p>
+      <div id="eventGallery" class="event-gallery"></div>
+      <div class="actions">
+        <button id="saveEvents" class="primary">Save effect edits</button
+        ><span id="eventSaveStatus" role="status"></span>
+      </div>
+      <details>
+        <summary>Recent production activity</summary>
+        <div id="activity" class="muted">Waiting for game events.</div>
+      </details>
       <details id="monitorPanel" class="monitor-tools">
         <summary>Open silent live monitor</summary>
         <div class="monitor">
