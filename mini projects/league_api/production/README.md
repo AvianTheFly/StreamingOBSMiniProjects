@@ -132,3 +132,12 @@ without live polling, OBS mutations or keyboard listeners. It verifies all seven
 ambient themes, center alpha, opacity, selected bursts, transport cleanup, controls
 and stale saves. Screenshots go to `LEAGUE_TEST_ARTIFACT_DIR` or a temp directory.
 The fixture always terminates after the browser test. No preview is sent on stream.
+
+Deployment verification on 2026-09-29: 74 focused Python checks passed, along with
+the actual Chrome rendering/control checks and the existing editor/monitor checks.
+The restarted supported Hub listed all ten modules with one keyboard child; ports
+7420/7431/7442/7443/7444 belonged to that Hub. OBS reported a healthy League overlay
+heartbeat. Its saved transforms, filters, fader, mute and audio routing matched
+before/after; the live stream continued. Twitch raids and redemptions remained
+connected. No synthetic League preview was sent to the live program. The temporary
+continuation plan was removed after this verification.
