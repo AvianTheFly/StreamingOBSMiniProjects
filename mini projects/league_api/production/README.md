@@ -173,5 +173,14 @@ continuation plan was removed after this verification.
 Expanded-catalog validation: all League Python suites plus shared-fetch, baseline
 and stream regression suites passed (81 checks), along with the existing editor
 and monitor checks. Isolated Chrome verified all 58 borders and seven atmospheres
-with zero alpha in the protected gameplay center. Runtime activation is tracked
-in the temporary expansion plan until the supported Hub reloads the new code.
+with zero alpha in the protected gameplay center. After the authorized hidden
+restart, the v2 Hub had one keyboard child and all ten modules ready. Its live
+catalog contained 58 built-ins plus the user's existing custom rule. Every new
+renderer route returned 200 and the actual controls loaded without browser errors.
+Real respawn, damage and low-health cues entered the activity history; no synthetic
+preview was sent to the live program. OBS's League source settings, transforms,
+filters and audio matched the pre-restart snapshot and the stream continued.
+Raids/follows/subs/gifts/cheers and Channel Points both reported connected with
+healthy overlay heartbeats. The temporary expansion plan was removed after these
+checks. Isolated Chrome's slowest effect averaged 1.97 ms per frame on this machine;
+this is a renderer measurement, not an OBS/game FPS guarantee.
