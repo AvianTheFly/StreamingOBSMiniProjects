@@ -95,12 +95,12 @@ class HTTPTests(unittest.TestCase):
                 server.shutdown();server.server_close();thread.join()
 
     def test_browser_fader_matches_only_its_loaded_asset(self):
-        from hub_ui.server import _obs_source_matches_runtime_stem
+        from hub_ui.audio import obs_source_matches_runtime_stem
         from lib.browser_effects.obs_source import source_name
         channel=Channel();channel.begin('die die die',Path('audio.wav'),{})
         with patch('lib.browser_effects.runtime.find_channel',return_value=channel):
-            self.assertTrue(_obs_source_matches_runtime_stem(source_name('soundboard'),'die die die'))
-            self.assertFalse(_obs_source_matches_runtime_stem(source_name('soundboard'),'hooray'))
+            self.assertTrue(obs_source_matches_runtime_stem(source_name('soundboard'),'die die die'))
+            self.assertFalse(obs_source_matches_runtime_stem(source_name('soundboard'),'hooray'))
 
     def test_player_cancellation_clears_browser_and_finishes(self):
         from lib.browser_effects.player import BrowserPlayer

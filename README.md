@@ -48,13 +48,19 @@ compilation, keeping the original and its saved audio level. Trimming works with
 ## Code entry points
 
 Start with the layer that owns the change; these files are shared by the running Hub.
+The [architecture map](docs/ARCHITECTURE.md) explains startup, module interaction,
+audio ownership, browser/Twitch/League flows, concurrency and extension boundaries.
 
 | Responsibility | Start here |
 | --- | --- |
 | Application startup and shutdown | `hub.py` (UI + modules), `main.py` (module runner) |
 | Supported module discovery | `lib/project_registry.py` |
 | Module config to editor field defaults | `lib/editor_config.py` |
-| Browser UI and its API | `hub_ui/app/`, `hub_ui/server.py` |
+| Browser UI and HTTP lifecycle | `hub_ui/app/`, `hub_ui/server.py` |
+| Hub feature HTTP endpoints | `hub_ui/routes/` (controls, audio, profiles, projects) |
+| Hub audio reconciliation | `hub_ui/audio.py` |
+| Hub actions, typed workflows and browser updates | `hub_ui/commands.py`, `hotkeys.py`, `updates.py` |
+| Hub settings and live status views | `hub_ui/settings.py`, `project_status.py` |
 | Shared asset/hotkey editor | `lib/hotkey_editor/`; `hotkey_editor.py` is its launcher |
 | Hotkey-editor labels, field types and visibility | `lib/hotkey_editor/schema.py` |
 | Editor profile defaults, responses and profile changes (no I/O) | `lib/hotkey_editor/profiles.py` |
