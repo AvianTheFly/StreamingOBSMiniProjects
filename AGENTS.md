@@ -1,5 +1,10 @@
 # Preserve the personalized streaming setup
 
+- Recording and Instant Replay storage was changed on 2026-09-29 to
+  `C:\StreamingMedia\Replays`. Keep OBS's recording directory and the root
+  `.env` `REPLAY_DIR=C:/StreamingMedia/Replays` synchronized. See
+  `RECORDING-STORAGE.md` before changing replay paths or restoring settings.
+
 - The supported application is this checkout's `Run Hub.bat` / `hub.py`. Do not
   launch archived copies, the legacy `media_profiles` module, or v3 as substitutes.
 - Soundboard's only desired profile is `default` in

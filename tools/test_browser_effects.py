@@ -41,6 +41,16 @@ class SessionTests(unittest.TestCase):
         self.assertTrue(self.channel.matches('DIE DIE DIE'))
         self.assertFalse(self.channel.matches('hooray'))
 
+    def test_celebrations_are_mapped_and_hooray_keeps_original_video(self):
+        from lib.browser_effects.catalog import effect_for
+        folder=Path('mini projects/soundboard')
+        profile=json.loads((folder/'hotkeys_editor.json').read_text())['profiles']['default']
+        self.assertEqual(profile['hotkeys']['@'], 'hooray')
+        self.assertIsNone(effect_for(folder, 'hooray'))
+        effects=[effect_for(folder, stem) for stem in profile['hotkeys']['!']]
+        self.assertTrue(all(effects))
+        self.assertEqual(len({(e['renderer'],e.get('style')) for e in effects}),len(effects))
+
     def test_catalog_selects_border_renderer_without_changing_profiles(self):
         from lib.browser_effects.catalog import effect_for
         with tempfile.TemporaryDirectory() as folder:

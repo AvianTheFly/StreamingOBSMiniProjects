@@ -71,7 +71,7 @@ function silence(seconds) {
   assert.equal(pixels,false,'completion and offline recovery must clear the canvas');
   const borders=await page.evaluate(async()=>{
    const {BorderShow}=await import('/borders.js'),canvas=document.getElementById('effects'),show=new BorderShow(canvas),c=canvas.getContext('2d');
-   return ['confetti','oops','arena','bonk','sparkles'].map(style=>{
+   return ['confetti','oops','arena','bonk','sparkles','disco','coffin','party','crabs','balloons','rats','raccoon','shades','racing','equalizer','cats'].map(style=>{
     show.draw(.3,4,{style,label:'BORDER TEST',bpm:126});
     const center=c.getImageData(240,170,1440,670).data,all=c.getImageData(0,0,1920,1080).data;
     const centralPixels=center.some((x,i)=>i%4===3&&x);let painted=0;for(let i=3;i<all.length;i+=4)if(all[i])painted++;
@@ -80,7 +80,7 @@ function silence(seconds) {
   });
   for(const b of borders){assert.equal(b.centralPixels,false,b.style+' must keep center clear');assert(b.painted>3000,b.style+' must draw props');}
   offline=false;active=null;await page.waitForTimeout(400);
-  active={id:'border-audio',stem:'hooray',effect:{renderer:'borders',style:'confetti',label:'HOORAY!'},elapsed:0,started:false,paused:false};
+  active={id:'border-audio',stem:'celebrate',effect:{renderer:'borders',style:'party',label:'CELEBRATE!'},elapsed:0,started:false,paused:false};
   await page.waitForFunction(()=>!window.testAudio.at(-1).paused);
   await page.waitForFunction(()=>window.testAudio.at(-1).getAttribute('src')===null,{},{timeout:8000});
   assert(acks.some(x=>x.id==='border-audio'&&x.status==='playing'));

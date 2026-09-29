@@ -3,19 +3,12 @@
     "renderer": "muffins",
     "bpm": 126
   },
-  "hooray": {
-    "renderer": "borders",
-    "style": "confetti",
-    "bpm": 132,
-    "color": "#ffd470",
-    "label": "HOORAY!"
-  },
   "oh no": {
     "renderer": "borders",
     "style": "oops",
     "bpm": 100,
     "color": "#a9a1ff",
-    "label": "OH NO…"
+    "label": "OH NO\u2026"
   },
   "JOHN CENA": {
     "renderer": "borders",
@@ -37,5 +30,82 @@
     "bpm": 126,
     "color": "#97ecff",
     "label": "WOW!"
+  },
+  "dancing music": {
+    "renderer": "borders",
+    "style": "disco",
+    "bpm": 120,
+    "color": "#d99bff",
+    "label": "DANCE!"
+  },
+  "coffin dnace": {
+    "renderer": "borders",
+    "style": "coffin",
+    "bpm": 128,
+    "color": "#bd9aff",
+    "label": "FINAL ENCORE"
+  },
+  "celebrate": {
+    "renderer": "borders",
+    "style": "party",
+    "bpm": 124,
+    "color": "#ffd470",
+    "label": "CELEBRATE!"
+  },
+  "crab rave": {
+    "renderer": "borders",
+    "style": "crabs",
+    "bpm": 125,
+    "color": "#ff886e",
+    "label": "CRAB RAVE"
+  },
+  "fun celebration": {
+    "renderer": "borders",
+    "style": "balloons",
+    "bpm": 132,
+    "color": "#ff9bd4",
+    "label": "PARTY TIME"
+  },
+  "rat dance": {
+    "renderer": "borders",
+    "style": "rats",
+    "bpm": 130,
+    "color": "#c8b5ff",
+    "label": "RAT DANCE"
+  },
+  "Pedro": {
+    "renderer": "borders",
+    "style": "raccoon",
+    "bpm": 128,
+    "color": "#7ae3dd",
+    "label": "PEDRO!"
+  },
+  "Sigma Boy": {
+    "renderer": "borders",
+    "style": "shades",
+    "bpm": 130,
+    "color": "#91baff",
+    "label": "SIGMA BOY"
+  },
+  "Deja Vu": {
+    "renderer": "borders",
+    "style": "racing",
+    "bpm": 154,
+    "color": "#ff657c",
+    "label": "DEJA VU"
+  },
+  "hype up music": {
+    "renderer": "borders",
+    "style": "equalizer",
+    "bpm": 140,
+    "color": "#95ffbd",
+    "label": "HYPE!"
+  },
+  "meow meow": {
+    "renderer": "borders",
+    "style": "cats",
+    "bpm": 126,
+    "color": "#ffc0dc",
+    "label": "MEOW MEOW"
   }
 }

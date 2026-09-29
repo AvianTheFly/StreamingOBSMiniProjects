@@ -4,8 +4,10 @@ The supported v2 Hub starts one loopback service at **127.0.0.1:7444**.
 Each participating module owns a channel and an OBS browser input. Soundboard's
 `die die die` is the first production mapping: original audio, eight animated
 muffins, beat-driven dancing, microphones, party hats, stars and corner lights.
-Five more soundboard mappings use `borders`: Hooray (confetti), Oh No (reaction
-faces), John Cena (ring ropes/championship belts), Bonk (mallets), Anime Wow (stars).
+Hooray uses its original confetti video, with no browser mapping. Ctrl+1 (`!`)
+celebrations each have themed borders: disco, coffin procession, party confetti,
+crabs, muffins, balloons, championship belts, rats, Pedro raccoons, sunglasses,
+racing trails, equalizer bars, and cats. Oh No, Bonk, and Anime Wow also use borders.
 They keep their original audio length and per-asset gain. The gameplay center is transparent. Open the existing soundboard trigger window
 first, then use Ctrl+6 / the existing `^` profile mapping. The trigger gate is
 intentional and must be preserved. Voice matching, random groups and the explicit

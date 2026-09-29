@@ -20,7 +20,7 @@ def effect_for(project_dir, stem):
     bpm = value.get('bpm', 126)
     if not isinstance(bpm, (int, float)) or not math.isfinite(bpm) or not 30 <= bpm <= 300:
         return None
-    if value['renderer'] == 'borders' and value.get('style') not in {'confetti', 'oops', 'arena', 'bonk', 'sparkles'}:
+    if value['renderer'] == 'borders' and value.get('style') not in {'confetti', 'oops', 'arena', 'bonk', 'sparkles', 'disco', 'coffin', 'party', 'crabs', 'balloons', 'rats', 'raccoon', 'shades', 'racing', 'equalizer', 'cats'}:
         return None
     if 'label' in value and (not isinstance(value['label'], str) or len(value['label']) > 64):
         return None
