@@ -1,140 +1,126 @@
-# love_me/player.py
-
+"""Sequential playback with cancellation and one owner for completion callbacks."""
 import threading
 
-from .config import (
-    SCENE,
-    ITEMS,
-    POLL_INTERVAL,
-    MEDIA_START_TIMEOUT,
-    MEDIA_TOTAL_TIMEOUT,
-)
-
 import obs
+from lib.shared_media.playback_worker import PlaybackWorker
+from .config import SCENE, ITEMS, POLL_INTERVAL, MEDIA_START_TIMEOUT, MEDIA_TOTAL_TIMEOUT
 
 
 class SequentialPlayer:
     def __init__(self):
-        self.lock          = threading.Lock()
-        self.is_busy       = False
+        self.lock = threading.RLock()
         self.current_index = 0
-        self.items         = ITEMS          # exposed so main.py can check length
-        self._abort_flag   = False
+        self.items = ITEMS
+        self._is_busy = False
+        self._active_cancel = None
+        self._requests = PlaybackWorker('love-me-playback')
+        self._generation = 0
+        self._on_complete = None
+
+    @property
+    def is_busy(self):
+        return self._is_busy or self._requests.busy
 
     def hide_all_sources(self):
-        obs.hide_sources(SCENE, [item["display_name"] for item in ITEMS])
+        obs.hide_sources(SCENE, [item['display_name'] for item in self.items])
 
-    def play_next_item(self):
+    def play_next_item(self, *, cancelled=None, generation=None, allowed=None, cancelled_check=None):
+        cancelled = cancelled if cancelled is not None else threading.Event()
+        stopped = cancelled_check or cancelled.is_set
         with self.lock:
-            if self.is_busy:
+            generation = self._generation if generation is None else generation
+            if stopped() or generation != self._generation or self._is_busy:
                 return
-            if self.current_index >= len(ITEMS):
-                print("[love_me] Sequence complete — no more items.")
+            if self.current_index >= len(self.items):
+                print('[love_me] Sequence complete — no more items.')
                 return
-            self.is_busy     = True
-            self._abort_flag = False
-            item             = ITEMS[self.current_index]
+            index = self.current_index
+            item = self.items[index]
+            self._is_busy = True
+            self._active_cancel = cancelled
 
-        display_name = item["display_name"]
-        monitor_name = item["monitor_name"]
-
+        display_name = item['display_name']
         try:
-            print(
-                f"[love_me] Playing {self.current_index + 1}/{len(ITEMS)}: "
-                f"display='{display_name}'  monitor='{monitor_name}'"
-            )
-
+            print(f"[love_me] Playing {index + 1}/{len(self.items)}: "
+                  f"display='{display_name}' monitor='{item['monitor_name']}'")
             self.hide_all_sources()
+            if stopped():
+                return
             obs.show_source(SCENE, display_name)
-
             finished = obs.wait_for_media_end(
-                source        = monitor_name,
-                poll_interval = POLL_INTERVAL,
-                start_timeout = MEDIA_START_TIMEOUT,
-                total_timeout = MEDIA_TOTAL_TIMEOUT,
+                source=item['monitor_name'], poll_interval=POLL_INTERVAL,
+                start_timeout=MEDIA_START_TIMEOUT, total_timeout=MEDIA_TOTAL_TIMEOUT,
+                cancelled=stopped,
+                allowed=allowed,
             )
-
-            obs.hide_source(SCENE, display_name)
-
-            if self._abort_flag:
-                print(f"[love_me] Aborted during: '{display_name}'")
-            elif finished:
-                print(f"[love_me] Finished: '{display_name}'")
-            else:
-                print(f"[love_me] Timeout/fallback: '{display_name}'")
-
             with self.lock:
-                if not self._abort_flag:
-                    self.current_index += 1
-
-        except Exception as e:
-            print(f"[love_me] Error playing '{display_name}': {e}")
+                if not stopped() and generation == self._generation:
+                    self.current_index = index + 1
+            result = 'Aborted' if cancelled.is_set() else ('Finished' if finished else 'Timeout/fallback')
+            print(f"[love_me] {result}: '{display_name}'")
+        except Exception as exc:
+            print(f"[love_me] Error playing '{display_name}': {exc}")
         finally:
-            with self.lock:
-                self.is_busy = False
+            try:
+                obs.hide_source(SCENE, display_name)
+            finally:
+                with self.lock:
+                    self._is_busy = False
+                    self._active_cancel = None
+
+    def _finish(self, generation):
+        with self.lock:
+            if generation != self._generation:
+                return
+            callback, self._on_complete = self._on_complete, None
+        if callback:
+            callback()
 
     def play_next_async(self, on_complete=None):
-        def _run():
-            self.play_next_item()
-            if on_complete:
-                on_complete()
-        threading.Thread(target=_run, daemon=True).start()
-
-    def can_accept_trigger(self) -> bool:
         with self.lock:
-            return not self.is_busy
+            self._generation += 1
+            generation = self._generation
+            self._on_complete = on_complete
+            def run(cancelled):
+                try:
+                    self.play_next_item(cancelled=cancelled, generation=generation)
+                finally:
+                    self._finish(generation)
+            try:
+                return self._requests.submit(run)
+            except Exception as exc:
+                callback, self._on_complete = self._on_complete, None
+                error = exc
+        if callback:
+            callback()
+        raise RuntimeError('Could not start Love Me playback') from error
+
+    def can_accept_trigger(self):
+        return not self.is_busy
 
     def abort(self):
-        """
-        Signal any in-progress playback to stop, hide all sources, reset index.
-        Safe to call from any thread.
-        """
         with self.lock:
-            self._abort_flag   = True
+            self._generation += 1
+            self._requests.cancel()
+            if self._active_cancel is not None:
+                self._active_cancel.set()
             self.current_index = 0
-        self.hide_all_sources()
-        print("[love_me] Abort complete.")
+            callback, self._on_complete = self._on_complete, None
+        try:
+            self.hide_all_sources()
+        finally:
+            if callback:
+                callback()
+        print('[love_me] Abort complete.')
 
     def abort_and_advance(self, on_complete=None):
-        """
-        Stop current playback and immediately play the next item.
-        Does NOT reset the index — advances it by one before playing.
-        Safe to call from any thread.
-        """
         with self.lock:
-            self._abort_flag = True
-            # Advance past the current item so play_next_item picks the right one.
-            # play_next_item will increment again on finish, so we pre-set the
-            # target index here and let the running thread's finally-block see
-            # _abort_flag and skip its own increment.
             self.current_index += 1
-
-        self.hide_all_sources()
-
-        # Brief yield so the in-flight play_next_item thread can exit its loop
-        # and release is_busy before we start the next item.
-        import time
-        deadline = time.monotonic() + 2.0
-        while True:
-            with self.lock:
-                if not self.is_busy:
-                    break
-            if time.monotonic() > deadline:
-                # Safety valve: force-clear and proceed anyway
-                with self.lock:
-                    self.is_busy = False
-                break
-            time.sleep(0.02)
-
-        with self.lock:
             if self.current_index >= len(self.items):
-                print("[love_me] Skip past end — resetting to item 1.")
                 self.current_index = 0
-
-        print("[love_me] Abort-and-advance complete, starting next item.")
-        self.play_next_async(on_complete=on_complete)
+            return self.play_next_async(on_complete=on_complete)
 
     def print_config(self):
-        print("[love_me] Items:")
-        for i, item in enumerate(ITEMS, 1):
-            print(f"  {i}. display='{item['display_name']}'  monitor='{item['monitor_name']}'")
+        print('[love_me] Items:')
+        for index, item in enumerate(self.items, 1):
+            print(f"  {index}. display='{item['display_name']}' monitor='{item['monitor_name']}'")

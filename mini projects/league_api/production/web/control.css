@@ -55,6 +55,12 @@ section {
   padding: 24px;
   margin: 20px 0;
 }
+.theme-gallery { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:14px; margin-top:18px }
+.theme-card { display:block; overflow:hidden; border:1px solid #36475b; border-radius:9px; color:#e4eaf1; background:#0b1017; text-decoration:none }
+.theme-card:hover { border-color:#d8b981; transform:translateY(-2px) }
+.theme-card img { display:block; width:100%; aspect-ratio:16/9; object-fit:cover }
+.theme-card span { display:block; padding:9px 12px; font-size:13px; font-weight:700 }
+#clientTheme { display:block; margin-top:8px; min-width:260px; background:#0b1017; color:#e4eaf1; border:1px solid #455066; border-radius:5px; padding:9px }
 .toggles {
   display: grid;
   grid-template-columns: 1fr 1fr;

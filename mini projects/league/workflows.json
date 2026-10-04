@@ -1,0 +1,379 @@
+{
+  "module": {
+    "id": "league",
+    "label": "League events",
+    "group": "Game",
+    "icon": "automation",
+    "description": "Detects player and match events.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "league.start",
+      "label": "Game starts",
+      "topic": "Game starts",
+      "trigger": {
+        "label": "Game starts",
+        "event": "league:game_start",
+        "kind": "event"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Detect a live game",
+          "owner": "league",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Publish game.connected",
+          "owner": "league",
+          "kind": "event",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Optional start overlay",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
+        "league": "e5c1c40d153f1aa5c9723f700c99c25e772bdaa7ab2a43a29e8c39c7b1b8a83a"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/league/handlers/lifecycle.py",
+          "symbol": "make_game_start_handler",
+          "hash": "500c0685206ae8dd05559d8f7f6386eda680bd61b046f7fc04b26c66d863ad20"
+        }
+      ]
+    },
+    {
+      "id": "league.end",
+      "label": "Game ends",
+      "topic": "Game ends",
+      "trigger": {
+        "label": "Game ends",
+        "event": "league:game_end",
+        "kind": "event"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Hide owned game overlays",
+          "owner": "league",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Publish game.disconnected",
+          "owner": "league",
+          "kind": "event",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "league": "e5c1c40d153f1aa5c9723f700c99c25e772bdaa7ab2a43a29e8c39c7b1b8a83a"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/league/handlers/lifecycle.py",
+          "symbol": "make_game_end_handler",
+          "hash": "86194c0464cbc8c055bbec1a492613e2695c1fda4bc364b2afbad759e6c34813"
+        }
+      ],
+      "effects": [
+        {
+          "resource": "overlay",
+          "intent": "Clear game overlays",
+          "role": "release",
+          "protection": "Overlay cleanup is separate from program-scene ownership."
+        },
+        {
+          "resource": "events",
+          "intent": "Publish game-disconnected reactions",
+          "role": "signal",
+          "protection": "Subscribers receive an event. Independent polling observers are not subscribers."
+        }
+      ]
+    },
+    {
+      "id": "league.kill",
+      "label": "Your champion kill",
+      "topic": "Your kill",
+      "trigger": {
+        "label": "Your champion kill",
+        "event": "league:champion_kill",
+        "kind": "event"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Update kill streak",
+          "owner": "league",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Choose streak sound",
+          "owner": "league",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Respect audio permission",
+          "owner": "coordination",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Play configured kill audio",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "coordination": "5057221ec74a11ea01e1c0bcfeab93e331ec71244136a2611a9c0808591898a3",
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
+        "league": "e5c1c40d153f1aa5c9723f700c99c25e772bdaa7ab2a43a29e8c39c7b1b8a83a"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/league/handlers/champion_kill_handler.py",
+          "symbol": "make_champion_kill_handler",
+          "hash": "421e12a406f84fc81601e834ff7ecf2fb0f33148a92c646ecb49cc946ed03ea8"
+        }
+      ]
+    },
+    {
+      "id": "league.player",
+      "label": "Death, respawn or recall",
+      "topic": "Death & respawn",
+      "trigger": {
+        "label": "Death, respawn or recall",
+        "event": "league:death",
+        "kind": "event"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Update player state",
+          "owner": "league",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Owned overlay policy",
+          "owner": "league",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Show / hide game overlay",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
+        "league": "e5c1c40d153f1aa5c9723f700c99c25e772bdaa7ab2a43a29e8c39c7b1b8a83a"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/league/handlers/player_events.py",
+          "symbol": "make_death_handler",
+          "hash": "98d91d9916a3746763971a4c443f4d61dcad703354725424d80edf747e781e97"
+        },
+        {
+          "path": "mini projects/league/handlers/player_events.py",
+          "symbol": "make_respawn_handler",
+          "hash": "e166166e7f5143bd13c59397c18b6af0415374b12bcc032ae4fc6a3527b2b489"
+        },
+        {
+          "path": "mini projects/league/handlers/player_events.py",
+          "symbol": "make_recall_complete_handler",
+          "hash": "53c0f39301441ccd86eff3e3a4139a4b3fa1254b0e1745173fa3dd6610adb46a"
+        }
+      ]
+    },
+    {
+      "id": "league.sfx",
+      "label": "Respawn sound cue",
+      "topic": "Death & respawn",
+      "trigger": {
+        "label": "Respawn sound cue",
+        "event": "league:respawn_3s",
+        "kind": "event"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Publish concurrent sfx.play",
+          "owner": "league",
+          "kind": "event",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Layered sound effect",
+          "owner": "sound_effects",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Respect module gate",
+          "owner": "coordination",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Play cue in OBS",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "coordination": "5057221ec74a11ea01e1c0bcfeab93e331ec71244136a2611a9c0808591898a3",
+        "sound_effects": "65bc17c0f7ab29429802b35c59fa6efcad6523e844464de8e612baeecf2eac3d",
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
+        "league": "e5c1c40d153f1aa5c9723f700c99c25e772bdaa7ab2a43a29e8c39c7b1b8a83a"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/league/handlers/player_events.py",
+          "symbol": "make_respawn_sfx_handler",
+          "hash": "ecda03697bc299226a525505ac3238acdc25edc4c72dc42881fc74b377c10eba"
+        }
+      ]
+    },
+    {
+      "id": "league.map",
+      "label": "Objectives, levels and assists",
+      "topic": "Objectives",
+      "trigger": {
+        "label": "Objectives, levels and assists",
+        "event": "league:*",
+        "kind": "event"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Dispatch registered handler",
+          "owner": "league",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Apply configured overlay / sound",
+          "owner": "league",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "OBS game assets",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
+        "league": "e5c1c40d153f1aa5c9723f700c99c25e772bdaa7ab2a43a29e8c39c7b1b8a83a"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/league/core/league_api.py",
+          "symbol": "LeagueAPIWatcher.__init__",
+          "hash": "5acda42c0d7b4e2d7f80e890050a170600e6a078036182d77f9cd32ad98b43b0"
+        }
+      ]
+    }
+  ]
+}

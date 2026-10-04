@@ -30,7 +30,7 @@ export async function mount(container) {
         Moving <em>All files</em> shifts every profile and file by the same amount.
         Moving <em>Profile</em> shifts every file in that profile.
         File sliders set the final output while keeping their stored offset relative to the stack.
-        Moving the shared Music fader directly in OBS does the same thing as <em>All files</em> here.
+        Moving the shared Music fader directly in OBS adjusts the currently loaded song.
       </p>
     </div>
     <div id="audioBody" class="audio-page-body"></div>

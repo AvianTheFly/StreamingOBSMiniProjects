@@ -1,0 +1,99 @@
+{
+  "module": {
+    "id": "voice",
+    "label": "Voice & microphone",
+    "group": "Inputs",
+    "icon": "voice",
+    "description": "One capture and decoder owner for all voice commands.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "voice.capture",
+      "label": "A voice trigger",
+      "topic": "Voice",
+      "trigger": {
+        "label": "A voice trigger",
+        "event": "voice.session",
+        "kind": "event"
+      },
+      "detail": "One microphone/model owner and exclusive session. Editor uploads share that inference lease; optional word timing disables speech VAD for musical uploads, consumes segment iteration under the same lease, and releases temporary files and busy state on success, cancellation or error. Normal command transcription is unchanged.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Microphone available?",
+          "owner": "voice",
+          "kind": "gate",
+          "detail": "Another consumer or model startup can reject the trigger."
+        },
+        {
+          "id": "1",
+          "label": "Capture for this module",
+          "owner": "voice",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Transcribe once",
+          "owner": "voice",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Deliver to the same session",
+          "owner": "voice",
+          "kind": "gate",
+          "detail": "Cancellation or a newer generation discards stale text."
+        },
+        {
+          "id": "4",
+          "label": "Feature interprets the command",
+          "owner": "hub",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "hub": "2651a208dfe2c15d06a55506164c7fc7795423742dfa750511fa1a7762484d50",
+        "voice": "59877feb7aa4c30cfb7a877cd2d0a388f528f3ccc816c6ee37964870389e0964"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "voice/service.py",
+          "symbol": "VoiceService.begin",
+          "hash": "29e02c01c021fef5b199cf0eaadd20335eb4b34d063f0c7476667cfed8680086"
+        },
+        {
+          "path": "voice/service.py",
+          "symbol": "VoiceService.finish",
+          "hash": "b3295b4490824acd973d4280c2fae956318d79160ef273036b14f5c8b6694dcb"
+        },
+        {
+          "path": "voice/service.py",
+          "symbol": "VoiceService._deliver",
+          "hash": "7cbb1a721749812885fcc521911a4271bee63fdbb340c9835964820db8dd3a70"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "module": {
+    "id": "spotify",
+    "label": "Spotify overlay",
+    "group": "Community",
+    "icon": "music",
+    "description": "Shows the current Spotify song and spectrum.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "spotify.track",
+      "label": "Spotify changes song",
+      "topic": "Music",
+      "trigger": {
+        "label": "Spotify changes song",
+        "event": "spotify.track",
+        "kind": "poll"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Observe Spotify media session",
+          "owner": "spotify",
+          "kind": "action",
+          "detail": "WinRT play/pause and metadata events wake the existing media loop promptly. A bounded freshness heartbeat remains; old subscriptions are removed on session replacement or shutdown."
+        },
+        {
+          "id": "1",
+          "label": "Song is playing?",
+          "owner": "spotify",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Analyze newest Spotify audio packet",
+          "owner": "spotify",
+          "kind": "action",
+          "detail": "One owned process captures only Spotify on an MTA thread and serves fresh spectra directly on the existing browser port. Hub status is sampled from a nonblocking latest-frame mailbox; a separate control mailbox carries media and visibility. Process identity checks replace global scans. Causal frequency windows and bounded cleanup preserve one capture. Fixed waveform gain and unsaturated full-window presence preserve loud/quiet contrast. Salient partial interactions supply a bounded roughness proxy; spectral flatness supplies noise content. Both reuse the existing transform and are published in complete audio frames. Absolute register energy uses Hann-compensated Parseval power from the same causal transforms. Display compression never supplies structural gain."
+        },
+        {
+          "id": "3",
+          "label": "OBS song visualizer",
+          "owner": "obs",
+          "kind": "output",
+          "detail": "Seventeen crisp compositions develop continuously. Eight sustained frequency voices retain bounded musical trails and stereo depth. Main outlines remain continuous and brighter than background paths; ordered waveform sheets and two staggered architectural banks preserve readable forms. Morphs match primary contours to primary contours and divide open curves into spatial sections. Crowded facet material stays quieter during reshaping. Actual geometry sets restrained lighting and transparent overlap order. Current attacks stay immediate, and invisible sources skip painting while musical history advances. Fast accents and steadier structural envelopes are separate. Sustained roughness drives bounded fine contour vibration and facet grain; musical presence guides shape evolution and slower color travel. Stronger onset thresholds reject small fluctuations. No emotion or genre classification is claimed. Main voices, physical strings and spatial memory follow those absolute register levels. Phrase intensity, timbre tension and falling/rising presence guide roundness, expansion, restrained support-line density and color saturation. Context measures gestures without increasing quiet-signal gain. Capture-clock generations now advance the instrument independently of painting; duplicate/stale packets do not replay motion. A bounded six-audible-second input calibration locks per track and never raises quiet-passage gain. The visible canvas renders directly with WebGL rather than copying across canvas contexts. Main sculpture size follows a separate 1.25-second sustained presence envelope; depth follows the existing phrase structure; bass drives a compression/lift rebound, midrange attacks drive damped alternating lean, and held roughness drives a slower readable fine vibration; broadband noise keeps a lighter moving grain without inventing hits. Quiet support contours stay subordinate; waveform sheets have independent register amplitudes. Related contour families are preferred for transport; phrase novelty, build/release gestures and bounded residence guide handoffs. The installed page begins with Signal architecture. Quiet music retains a readable main silhouette. Source attachment waits for the ready HTTP/capture worker identity and refreshes the existing managed loopback browser once per worker, including worker replacements. Failed attachment retries; stale identities cannot claim a replacing worker. Personal URLs, OBS settings and placement are preserved. A continuous audio-integrated camera orbit now eases yaw, pitch and roll without resetting on beats, songs or morphs. The view reconstructs authored XYZ positions before rotating them, uses a single fixed focal length and frame scale throughout the foreground orbit, and uses the same perspective parameters for GPU facet normals and Canvas fallback. Stereo and phrasing steer the orbit without changing the calibrated audio response. Unmatched decorative contours contract in XYZ around their own three-dimensional centroid. Fine facet grain reconstructs model coordinates with rational perspective interpolation so camera rotation cannot slide its crests across the surface; calibrated audio, palettes and placement retain their existing behavior. Production onset detection uses absolute register energy rather than logarithmic display bands. A bounded ordinary-fluctuation estimate rejects small changes without adjusting input gain. Only 40–178 Hz attacks produce a prompt whole-body size accent; midrange notes retain separate lean. The local bass spring retains compression/rebound without delaying the main size crest. Camera rotation never adds automatic zoom. Authored color accents follow phrase lift/release, and prominent sustained registers receive restrained trail emphasis. Known PCM timing and quiet/loud contrast have a finite regression fixture. Temporary GPU loss retains its original WebGL surface while a separate Canvas surface presents the same simulation. Context restoration releases the old renderer and returns to bounded WebGL presentation without resetting musical history. Permanent GPU unavailability retains a stable Canvas fallback."
+        }
+      ],
+      "owner_hashes": {
+        "spotify": "64aafcfac7c473dd4a4b19ded7e17935607fd67fdac879ddd4df9438b971dfea",
+        "obs": "01af456db45e144826db3dff034567f08dc604214b8bb866f0173b47fe4ee7a4"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/spotify/service.py",
+          "symbol": "media_thread",
+          "hash": "e40f02db8a511df268c89249d4d00c61df6d713cbb21c5bad8f2c33634e3296a"
+        },
+        {
+          "path": "mini projects/spotify/service.py",
+          "symbol": "watch_audio",
+          "hash": "7d8a013c5738c80cef34455f9c2a6c02464b470ebc11860a10ee2b6d0306f820"
+        },
+        {
+          "path": "mini projects/spotify/audio_worker.py",
+          "symbol": "capture_worker",
+          "hash": "9657172ae3b47aae819fce8e614209bbed69eb78bf7ced56b7a8c92b2f5e2df1"
+        },
+        {
+          "path": "mini projects/spotify/audio_worker.py",
+          "symbol": "relay_audio",
+          "hash": "9c2f801900a556c665295c4330748459482aee2e75f782aa952a89e43830cc58"
+        },
+        {
+          "path": "mini projects/spotify/audio_runtime.py",
+          "symbol": "run_audio_presentation",
+          "hash": "f15ba460acd4881f950cd25977e9157c5d4e0ea6cdea9363e925ac861c56c145"
+        },
+        {
+          "path": "mini projects/spotify/media_notifications.py",
+          "symbol": "MediaNotifications",
+          "hash": "eb5adc0ea0fd118180a3f84fda95408d49454f3397dd974ccb2ed9ce543dc498"
+        },
+        {
+          "path": "mini projects/spotify/audio_analysis.py",
+          "symbol": "AudioAnalysis",
+          "hash": "eba429781c110c4941fc08273da4feb07964fa4371574151fccdff16c3cc5bd5"
+        },
+        {
+          "path": "mini projects/spotify/audio_texture.py",
+          "symbol": "spectral_roughness",
+          "hash": "394ae6bc02663c3c0ef0e5aab173470b9ceb6b0550d336512f96c914b74dc770"
+        },
+        {
+          "path": "mini projects/spotify/main.py",
+          "symbol": "run",
+          "hash": "897d103800df2b5ae4f2394085341ee0485f3fb8e957161c0ced75fc7be387ba"
+        },
+        {
+          "path": "mini projects/spotify/obs_presentation.py",
+          "symbol": "OBSPresentation",
+          "hash": "eeb02944aec5497434071322f36531950e6da155e4b5cad026b854b9aedc8ecc"
+        },
+        {
+          "path": "mini projects/spotify/obs_presentation.py",
+          "symbol": "attach_obs",
+          "hash": "f9bd55110f64d8681185840d85f8f7725485232f498687b48aa231a18f9b92b1"
+        },
+        {
+          "path": "mini projects/spotify/presentation_state.py",
+          "symbol": "PresentationState",
+          "hash": "4d6ff95d403a431ba0f624523755229184bcb015b00a6148029f2d983d900c22"
+        }
+      ]
+    }
+  ]
+}

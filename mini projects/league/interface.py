@@ -48,7 +48,7 @@ _OVERLAY_SOURCES: list[tuple[str, str]] = [
     ("LeagueGameAssets", "TurtleTriangle"),
     ("LeagueGameAssets", "RamTriangle"),
     ("LeagueGameAssets", "PhoenixTriangle"),
-    ("Test", "LeagueHudUdyrAnimation"),
+    ("Test", "ScreenCaptureMAPHUD"),
 ]
 
 
@@ -70,6 +70,9 @@ class _LeagueInterface(ProjectInterface):
 
     def revert(self) -> None:
         """Hide every overlay source in LeagueGameAssets — best-effort sweep."""
+        watcher = _live.get('watcher')
+        if watcher:
+            watcher.hud.hide()
         for scene, source in _OVERLAY_SOURCES:
             try:
                 obs.hide_source(scene, source)

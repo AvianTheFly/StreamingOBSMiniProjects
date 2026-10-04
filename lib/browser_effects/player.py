@@ -23,11 +23,11 @@ class BrowserPlayer:
     def effect(self, stem):
         return effect_for(self.project_dir, stem)
 
-    def play(self, stem, filepath, volume_db, cancelled, timeout):
+    def play(self, stem, filepath, volume_db, cancelled, timeout, *, allowed=None):
         effect = self.effect(stem)
         if not effect:
             raise ValueError('No browser renderer mapped for this asset')
-        media = prepare_audio(filepath)
+        media = prepare_audio(filepath, cancelled=cancelled)
         if cancelled():
             return
         attach(self.project, self.scene, self.monitor, self.tracks)
@@ -43,10 +43,19 @@ class BrowserPlayer:
         self.playback_id = playback_id = self.channel.begin(stem, media, effect)
         started_at = time.monotonic()
         confirmed = False
+        suspended = False
         try:
             while not self.channel.done.wait(.05):
                 if cancelled():
                     return
+                if allowed is not None and not allowed():
+                    if not suspended:
+                        self.pause(True)
+                        suspended = True
+                    continue
+                if suspended:
+                    self.pause(False)
+                    suspended = False
                 active = self.channel.snapshot()['active']
                 elapsed = active['elapsed'] if active else time.monotonic()-started_at
                 if self.channel.started.is_set() and not confirmed:

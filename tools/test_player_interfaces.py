@@ -11,6 +11,17 @@ from specific_song import interface as songs
 
 
 class PlayerInterfaceTests(unittest.TestCase):
+    def test_desk_catalog_and_playback_use_soundboard_runtime_owner(self):
+        with patch.dict(soundboard._live, {}, clear=True):
+            self.assertEqual(soundboard.interface.asset_catalog(), [])
+            self.assertFalse(soundboard.interface.play_asset('hooray')['ok'])
+            getter = Mock(return_value=[{'source': 'hooray', 'name': 'Hooray'}])
+            runner = Mock(return_value={'ok': True, 'queued': True})
+            soundboard._live.update(asset_catalog=getter, play_asset=runner)
+            self.assertEqual(soundboard.interface.asset_catalog()[0]['source'], 'hooray')
+            self.assertTrue(soundboard.interface.play_asset('hooray')['queued'])
+            runner.assert_called_once_with('hooray')
+
     def test_status_preserves_project_labels_and_random_idle(self):
         for module, attribute, noun in (
             (soundboard, 'current_stem', 'clips'),
@@ -20,7 +31,7 @@ class PlayerInterfaceTests(unittest.TestCase):
                 iface = module.interface
                 self.assertFalse(iface.get_status().is_active)
                 self.assertIsNone(iface.get_status().current_activity)
-                player = Mock(is_busy=False, current_stem='stem', current_source='source')
+                player = Mock(is_busy=False, is_paused=False, current_stem='stem', current_source='source')
                 module._live.update(player=player, rand_active=[True])
                 self.assertEqual(iface.get_status().current_activity,
                                  f'random mode (idle between {noun})')
@@ -36,6 +47,16 @@ class PlayerInterfaceTests(unittest.TestCase):
                                      f'playing: {getattr(player, attribute)}' + (' [random]' if random else ''))
                 setattr(player, attribute, None)
                 self.assertEqual(iface.get_status().current_activity, 'playing: ')
+
+    def test_pause_status_comes_from_player_not_inactivity(self):
+        for module in (soundboard, songs):
+            with patch.dict(module._live, {}, clear=True):
+                player = Mock(is_busy=True, is_paused=True, current_stem='stem', current_source='source')
+                module._live['player'] = player
+                self.assertTrue(module.interface.get_status().is_paused)
+                player.is_paused = False
+                player.is_busy = False
+                self.assertFalse(module.interface.get_status().is_paused)
 
     def test_controls_use_current_player_and_stop_random_before_abort(self):
         for module in (soundboard, songs):

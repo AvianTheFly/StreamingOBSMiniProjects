@@ -1,0 +1,122 @@
+{
+  "artMaster": {
+    "width": 1672,
+    "height": 941
+  },
+  "assets": [
+    {
+      "file": "offline.png",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 2503603
+    },
+    {
+      "file": "intermission.png",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 2501987
+    },
+    {
+      "file": "ending.png",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 2508454
+    },
+    {
+      "file": "welcome.png",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 2503072
+    },
+    {
+      "file": "trailer-ending.png",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 2503727
+    },
+    {
+      "file": "court.png",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 2514611
+    },
+    {
+      "file": "court-genius.png",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 2506964
+    },
+    {
+      "file": "court-inting.png",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 2504783
+    },
+    {
+      "file": "profile-banner.png",
+      "width": 1200,
+      "height": 480,
+      "bytes": 884954
+    },
+    {
+      "file": "panels/about.png",
+      "width": 320,
+      "height": 100,
+      "bytes": 35027
+    },
+    {
+      "file": "panels/why-udyr-bot.png",
+      "width": 320,
+      "height": 100,
+      "bytes": 37432
+    },
+    {
+      "file": "panels/udyr-bot-club.png",
+      "width": 320,
+      "height": 100,
+      "bytes": 39091
+    },
+    {
+      "file": "panels/match-history.png",
+      "width": 320,
+      "height": 100,
+      "bytes": 33262
+    },
+    {
+      "file": "panels/find-me.png",
+      "width": 320,
+      "height": 100,
+      "bytes": 34761
+    },
+    {
+      "file": "panels/support.png",
+      "width": 320,
+      "height": 100,
+      "bytes": 36313
+    },
+    {
+      "file": "panels/pineapples.png",
+      "width": 320,
+      "height": 100,
+      "bytes": 38306
+    },
+    {
+      "file": "panels/pum-pum.png",
+      "width": 320,
+      "height": 100,
+      "bytes": 34967
+    },
+    {
+      "file": "panels/the-show.png",
+      "width": 320,
+      "height": 100,
+      "bytes": 35396
+    },
+    {
+      "file": "panels/clips.png",
+      "width": 320,
+      "height": 100,
+      "bytes": 37904
+    }
+  ]
+}

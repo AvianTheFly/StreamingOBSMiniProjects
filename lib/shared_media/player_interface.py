@@ -28,6 +28,7 @@ class PlayerInterface(ProjectInterface):
             current_activity=activity,
             controlled_scenes=self.controlled_scenes,
             can_revert=True,
+            is_paused=bool(player and player.is_paused),
         )
 
     def revert(self) -> None:

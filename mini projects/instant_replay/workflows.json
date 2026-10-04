@@ -1,0 +1,441 @@
+{
+  "module": {
+    "id": "instant_replay",
+    "label": "Replay studio",
+    "group": "Media",
+    "icon": "replay",
+    "description": "Captures moments and temporarily presents clips.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "instant_replay.anchors",
+      "label": "Your kill or death",
+      "topic": "Your kill",
+      "trigger": {
+        "label": "Your kill or death",
+        "event": "replay.anchor",
+        "kind": "poll"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Read the same live game data",
+          "owner": "instant_replay",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Remember kill / death anchor",
+          "owner": "instant_replay",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Used on the next save",
+          "owner": "instant_replay",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "instant_replay": "34090057aa047e80f8a4d0d71804534029b2633b116c443ba6979773f529b533"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/instant_replay/kill_tracker.py",
+          "symbol": "KillTracker._process_events",
+          "hash": "d841c7b7694616bd25e51c9bfb14487fa32ef6c0f486243413a524a758da3ea1"
+        }
+      ],
+      "effects": [
+        {
+          "resource": "clips",
+          "intent": "Remember a kill / death anchor",
+          "role": "read",
+          "protection": "The replay tracker observes its own game-data snapshots; a later save uses the anchor."
+        }
+      ]
+    },
+    {
+      "id": "instant_replay.save",
+      "label": "Save a replay",
+      "topic": "Save a replay",
+      "trigger": {
+        "label": "Save a replay",
+        "event": "replay.save",
+        "kind": "event"
+      },
+      "detail": "Replay-only and serious captures keep the original voice trigger timestamp for their cutoff. Controls are published after startup and withdrawn by their own runtime generation.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Save already running?",
+          "owner": "instant_replay",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Choose capture purpose and duration",
+          "owner": "instant_replay",
+          "kind": "gate",
+          "detail": "Replay only: 3–120 seconds, default 15. Serious: explicit duration → mark → kill → death → buffer."
+        },
+        {
+          "id": "2",
+          "label": "Ask OBS to save",
+          "owner": "obs",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Request Twitch for serious saves",
+          "owner": "twitch_clips",
+          "kind": "action",
+          "detail": "Replay-only capture does not call Twitch."
+        },
+        {
+          "id": "4",
+          "label": "Copy replay / encode serious cut",
+          "owner": "conversion",
+          "kind": "action",
+          "detail": "All audio tracks and originals are retained. Replay only preserves the pending mark."
+        },
+        {
+          "id": "5",
+          "label": "Persist purpose and capture result",
+          "owner": "instant_replay",
+          "kind": "end",
+          "detail": "The small cut and raw copy are excluded from automatic review; success/error feedback is published."
+        }
+      ],
+      "owner_hashes": {
+        "instant_replay": "34090057aa047e80f8a4d0d71804534029b2633b116c443ba6979773f529b533",
+        "conversion": "b714ec8a6641880ed03bdde834c87c760b5b902d357ffd74361bc6101d768e07",
+        "twitch_clips": "6cb4d1a0bfd46acfcee2107dc15ef18af573b5c472fa2821ac55c09974be6e37",
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3",
+          "label": "parallel"
+        },
+        {
+          "from": "2",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/instant_replay/capture.py",
+          "symbol": "ReplayCapture._on_save",
+          "hash": "3022c2fda809911eb715858aeed5b87a9ffe79396f174ced9b5b873d56f85f11"
+        },
+        {
+          "path": "mini projects/instant_replay/main.py",
+          "symbol": "run",
+          "hash": "7157049cf70046f6ecb6f66cc4515bc4d9b6d2b1472b9e7d35a2183707f9d18b"
+        }
+      ],
+      "effects": [
+        {
+          "resource": "clips",
+          "intent": "Save a local moment and its capture result",
+          "role": "write",
+          "protection": "The capture owner admits one save. Serious captures can request a companion Twitch clip; replay-only capture does not."
+        },
+        {
+          "resource": "jobs",
+          "intent": "Copy or encode the admitted capture",
+          "role": "write",
+          "protection": "Finite conversions share a bounded CPU budget."
+        }
+      ]
+    },
+    {
+      "id": "instant_replay.play",
+      "label": "Play a replay",
+      "topic": "Replay playback",
+      "trigger": {
+        "label": "Play a replay",
+        "event": "source.playback",
+        "kind": "event"
+      },
+      "detail": "Explicit replay always selects Quick Replay. Short Move/Wipe/Fade handles entry and owned return; showcase retains its selected full transition. Browser handoff cues keep live/camera visible between clips. Offline and runtime management share the same inventory and linked-copy visibility.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Acquire physical playback gate",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Reserve scene and scoped pause",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Prepare decoder while game stays live",
+          "owner": "media_workers",
+          "kind": "wait",
+          "detail": "Every clip decodes while hidden; handoff holds the next clip before it becomes audible or visible."
+        },
+        {
+          "id": "3",
+          "label": "Apply clip levels / first-frame hold",
+          "owner": "instant_replay",
+          "kind": "action",
+          "detail": "Pause and seek, then confirm a stable first-frame cursor before showing it through entry or revealing the next clip. Resume only after the reveal acknowledgement."
+        },
+        {
+          "id": "4",
+          "label": "Quick entry or showcase transition",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        },
+        {
+          "id": "5",
+          "label": "Return only if still owner",
+          "owner": "coordination",
+          "kind": "gate",
+          "detail": "Hold scoped pauses through the return transition. A newer manual scene choice prevents scene restoration and automatic resume."
+        },
+        {
+          "id": "6",
+          "label": "Release claim after final cleanup",
+          "owner": "coordination",
+          "kind": "end",
+          "detail": "Park the physical source and restore captured audio before releasing the playback gate."
+        }
+      ],
+      "owner_hashes": {
+        "media_workers": "99a1a00f5854b87301b5e62b0837f5e035bf87e45a4552403c603e0e3de1f064",
+        "instant_replay": "34090057aa047e80f8a4d0d71804534029b2633b116c443ba6979773f529b533",
+        "coordination": "af7125e6c03b3dbfc37fce3dfa9fe551779395b12a122ef592132b3885400afc",
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        },
+        {
+          "from": "5",
+          "to": "6"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/instant_replay/playback.py",
+          "symbol": "ReplayPlayback._play_all_clips_sequential",
+          "hash": "0cc20404f3599a8de3edc56fb2d39016b0f42774f3fc5c48f66805f9426a0372"
+        },
+        {
+          "path": "mini projects/instant_replay/source_playback.py",
+          "symbol": "_start_replay_clip",
+          "hash": "9265e8e50dd734cc63b331ec8dc9876e367329672f574fb5f1daf48464c829ac"
+        },
+        {
+          "path": "mini projects/instant_replay/inventory.py",
+          "symbol": "replay_files",
+          "hash": "fd8dfadb4386df1bb79ee6077b4401eca0b08a911d9483e88a4fbe8f3d1ce18d"
+        }
+      ],
+      "effects": [
+        {
+          "resource": "scene",
+          "intent": "Reserve a temporary replay presentation",
+          "role": "reserve",
+          "protection": "The reservation begins before loading. Owned cleanup restores the previous scene only while the lease is current.",
+          "watch": "A second temporary presentation cannot reserve an already-owned scene. A manual choice revokes the lease.",
+          "cases": {
+            "normal": {
+              "status": "ready",
+              "text": "Can reserve an available scene before decoder preparation."
+            },
+            "result": {
+              "status": "check",
+              "text": "A result hold is not itself a scene lease. Replay admission and the existing temporary owner still decide whether playback can begin."
+            },
+            "temporary": {
+              "status": "wait",
+              "text": "A second temporary reservation is refused while a lease already exists."
+            },
+            "manual": {
+              "status": "check",
+              "text": "A manual choice revokes an earlier replay lease. A new replay request is a new intent and may reserve again."
+            }
+          }
+        },
+        {
+          "resource": "audio",
+          "intent": "Pause configured modules until replay cleanup",
+          "role": "write",
+          "protection": "Scoped pause claims stay held through final source cleanup. Finishing releases only this request."
+        },
+        {
+          "resource": "source",
+          "intent": "Play clips through one owned source worker",
+          "role": "write",
+          "protection": "Replacement cancels the old request, then waits for its final cleanup before source reuse."
+        }
+      ]
+    },
+    {
+      "id": "instant_replay.archive",
+      "label": "Game ends",
+      "topic": "Game ends",
+      "trigger": {
+        "label": "Game ends",
+        "event": "game.disconnected",
+        "kind": "poll"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Detect game disconnected",
+          "owner": "instant_replay",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Keep the last game clip list",
+          "owner": "instant_replay",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Wait 30 seconds",
+          "owner": "instant_replay",
+          "kind": "wait",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Archive highlight candidates",
+          "owner": "instant_replay",
+          "kind": "action",
+          "detail": "Replay-only files are excluded. Archived paths retain aliases for the previous-game list."
+        },
+        {
+          "id": "4",
+          "label": "Saved clips remain on disk",
+          "owner": "instant_replay",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "instant_replay": "34090057aa047e80f8a4d0d71804534029b2633b116c443ba6979773f529b533"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/instant_replay/main.py",
+          "symbol": "run",
+          "hash": "7157049cf70046f6ecb6f66cc4515bc4d9b6d2b1472b9e7d35a2183707f9d18b"
+        },
+        {
+          "path": "mini projects/instant_replay/cleanup.py",
+          "symbol": "run_for_game",
+          "hash": "5e257ae67fce1fa39dbc9c3519a60a2fc410466b026f481df84a99850794ab67"
+        }
+      ],
+      "effects": [
+        {
+          "resource": "clips",
+          "intent": "Archive last-game highlight candidates",
+          "role": "write",
+          "protection": "Archive waits 30 seconds. Replay-only files stay excluded; saved files retain their identities.",
+          "cases": {
+            "normal": {
+              "status": "effect",
+              "text": "Archiving is independent of lobby scene ownership. It does not request the screen."
+            },
+            "result": {
+              "status": "effect",
+              "text": "Archiving is independent of lobby scene ownership. It does not request the screen."
+            },
+            "temporary": {
+              "status": "effect",
+              "text": "Archiving is independent of lobby scene ownership. It does not request the screen."
+            },
+            "manual": {
+              "status": "effect",
+              "text": "Archiving is independent of lobby scene ownership. It does not request the screen."
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

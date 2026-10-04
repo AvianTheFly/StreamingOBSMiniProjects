@@ -47,8 +47,11 @@ export function unmountProjectHotkeyPanel() {
 
 async function _load({ silent = false } = {}) {
   if (!_host || !_projectKey) return;
+  const host = _host;
+  const projectKey = _projectKey;
   try {
     const data = await api.getEditorProfiles();
+    if (_host !== host || _projectKey !== projectKey) return;
     const projects = Array.isArray(data?.projects) ? data.projects : [];
     _project = projects.find(project => project.key === _projectKey) || null;
     const editable = _editableProfiles(_project);
@@ -60,6 +63,7 @@ async function _load({ silent = false } = {}) {
     }
     _render();
   } catch (error) {
+    if (_host !== host || _projectKey !== projectKey) return;
     if (!silent) toast.error(`Could not load project hotkeys: ${error.message}`);
     if (_host) {
       _host.innerHTML = `<section class="card project-hotkey-shell"><div class="empty-state">Could not load project hotkeys.<br><code>${esc(error.message)}</code></div></section>`;

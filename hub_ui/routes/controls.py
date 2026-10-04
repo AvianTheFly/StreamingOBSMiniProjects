@@ -1,12 +1,75 @@
 """HTTP endpoints for controls; composed by the Hub request handler."""
 from __future__ import annotations
 
-import json
 import urllib.parse
+from lib.json_store import write_json
 from hub_ui import settings as hub_settings
 from hub_ui import commands, project_status, updates
 
 class ControlRoutes:
+    def _get_twitch_stream_settings(self):
+        from lib.twitch_stream_settings import service
+        self._json(200, service.snapshot())
+
+    def _post_twitch_stream_settings(self):
+        from lib.twitch_stream_settings import service
+        body = self._body()
+        if body.get('action') not in {'retry', 'login'}:
+            return self._err(400, 'Expected retry or login')
+        ok = service.retry(login=body['action'] == 'login')
+        self._json(200 if ok else 409, service.snapshot())
+
+    def _post_twitch_stream_settings_result(self):
+        from lib.twitch_stream_settings import service
+        ok = service.report(self._body())
+        self._json(200 if ok else 409, {'ok': ok})
+
+    def _get_voice(self):
+        from voice.service import service
+        self._json(200, service.diagnostics())
+
+    def _get_coordination(self):
+        from coordinator import coordinator
+        from lib.coordination.scenes import scene_director
+        # Events report changes, so the director may not yet have a scene after
+        # startup. Read the actual program view; never mutate scene ownership.
+        from obs.scenes import get_current_scene
+        from obs.outputs import get_stream_status
+        from lib.display_capture import snapshot
+        scenes = scene_director.snapshot()
+        try:
+            scenes['scene'] = get_current_scene()
+        except Exception:
+            scenes['observing'] = False
+        try:
+            display = snapshot()
+        except Exception:
+            display = {'visible': None}
+        try:
+            stream = {'active': get_stream_status()['active']}
+        except Exception:
+            stream = {'active': None}
+        self._json(200, {'scenes': scenes, 'display': display, 'stream': stream,
+                         **coordinator.snapshot()})
+
+    def _post_voice(self):
+        from voice.service import service
+        data = self._body()
+        action = data.get("action")
+        if action == "clear_history":
+            service.clear_history()
+            return self._json(200, {"ok": True})
+        session_id = data.get("session_id")
+        if not isinstance(session_id, int) or isinstance(session_id, bool):
+            return self._err(400, "Expected the current voice session ID")
+        if action == "finish":
+            ok = service.finish(session_id=session_id)
+        elif action == "cancel":
+            ok = service.cancel(reason="cancelled from Voice page", session_id=session_id)
+        else:
+            return self._err(400, "Unknown voice action")
+        self._json(200 if ok else 409, {"ok": ok, "error": None if ok else "Voice session has changed"})
+
     def _get_info(self):
         self._json(200, {"editor_port": getattr(self.server, "_editor_port", 8765)})
 
@@ -45,17 +108,26 @@ class ControlRoutes:
         body  = self._body()
         rules = body.get("rules", [])
         try:
-            hub_settings.RULES_FILE.write_text(
-                json.dumps(rules, indent=2, ensure_ascii=False), encoding="utf-8"
-            )
-        except Exception:
-            pass
-        hub_settings.apply_rules_from_list(rules)
+            parsed = hub_settings.parse_rules(rules)
+        except ValueError as exc:
+            return self._err(400, str(exc))
+        try:
+            write_json(hub_settings.RULES_FILE, rules)
+        except OSError as exc:
+            return self._err(500, f"Could not save rules: {exc}")
+        from coordinator import coordinator
+        coordinator.replace_rules(parsed)
         updates.broadcast("rules_updated", {"rules": rules})
         self._json(200, {"ok": True, "rules": rules})
 
     def _post_settings(self):
-        hub_settings.save_settings(self._body())
+        body = self._body()
+        try:
+            hub_settings.save_settings(body)
+        except ValueError as exc:
+            return self._err(400, f"Could not save settings: {exc}")
+        except OSError as exc:
+            return self._err(500, f"Could not save settings: {exc}")
         updates.broadcast("settings_updated", {})
         self._json(200, {"ok": True})
 

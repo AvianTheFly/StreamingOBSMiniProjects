@@ -9,12 +9,14 @@ const scene = new ProductionScene(canvas);
 let state = null,
   received = 0,
   frame = 0,
+  painted = false,
   lastFrame = 0,
   visible = !document.hidden;
 function clear() {
   cancelAnimationFrame(frame);
   frame = 0;
-  scene.clear();
+  if (painted) scene.clear();
+  painted = false;
 }
 function tick(now) {
   if (!visible || !state?.enabled) {
@@ -26,7 +28,7 @@ function tick(now) {
     clear();
     return;
   }
-  if (now - lastFrame >= (state.effect ? 1000 / 30 : 1000 / 15)) {
+  if (now - lastFrame >= (state.effect || state.death ? 1000 / 30 : 1000 / 15)) {
     lastFrame = now;
     const current = { ...state };
     if (current.ambient)
@@ -35,8 +37,10 @@ function tick(now) {
       current.effect = { ...current.effect, elapsed: current.effect.elapsed + elapsed };
       if (current.effect.elapsed >= current.effect.duration) current.effect = null;
     }
+    if(current.death)current.death={...current.death,elapsed:current.death.elapsed+elapsed,remaining:Number.isFinite(current.death.remaining)?Math.max(0,current.death.remaining-elapsed):null};
+    painted = true;
     scene.draw(current);
-    if (!current.ambient && !current.effect) {
+    if (!current.ambient && !current.effect && !current.death) {
       clear();
       return;
     }
@@ -45,9 +49,10 @@ function tick(now) {
 }
 window.leagueProduction = {
   update(next) {
-    state = next;
+    // Match artwork owns the entire sequence, including its result delay.
+    state = window.leagueMatchScreens?.ownsPresentation() ? null : next;
     received = performance.now();
-    if (!state?.enabled || (!state.ambient && !state.effect)) {
+    if (!state?.enabled || (!state.ambient && !state.effect && !state.death)) {
       clear();
       return;
     }
@@ -57,6 +62,6 @@ window.leagueProduction = {
 document.addEventListener('visibilitychange', () => {
   visible = !document.hidden;
   if (!visible) clear();
-  else if (!frame && state && (state.ambient || state.effect)) frame = requestAnimationFrame(tick);
+  else if (!frame && state && (state.ambient || state.effect || state.death)) frame = requestAnimationFrame(tick);
 });
 window.addEventListener('pagehide', clear);

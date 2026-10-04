@@ -2,6 +2,7 @@
 from collections import Counter
 import copy
 import time
+import math
 from .media_pool import MediaPicker
 from .death_reactions import DeathReactions
 from .production import ProductionDirector
@@ -57,11 +58,13 @@ class Engine:
         self.media_picker = MediaPicker()
         self.previous=None; self.game_time=-1; self.seen=set(); self.cooldowns={}
         self.kills=[]; self.objectives=[]; self.low_at=None; self.last_damage=-999
-        self.metrics={}; self.slots=[]; self.history=[]; self.sprite=None
+        self.metrics={}; self.slots=[]; self.history=[]; self.sprite=None; self.death_visual=None
         self.last_autoplay=-float("inf")
 
     def clear(self, production=True):
-        self.death_reactions.reset()
+        if production or not self.production.settings['enabled']:
+            self.death_reactions.reset()
+            self.death_visual=None
         self.slots=[]
         self.sprite=None
         if production: self.production.clear()
@@ -86,12 +89,17 @@ class Engine:
         for candidate in sorted(candidates,key=lambda a:self.config['events'].get(a['key'],{}).get('priority',0),reverse=True):
             rule=self.config['events'].get(candidate['key'],{})
             def record(reason):
+                from events import inspect_event
+                inspect_event('league_api:' + candidate['key'], owner='league_api', phase=reason,
+                              kind=candidate.get('confidence','confirmed'))
                 self.history.append({**candidate,'title':rule.get('title') or candidate.get('title',candidate['key']),'result':reason,'time':time.time()})
                 self.history=self.history[-100:]
             if self.config.get('paused') and candidate.get('confidence')!='preview': record('Paused'); continue
             if not rule.get('enabled',False): record('Disabled'); continue
             key=candidate['key']
             automatic=candidate.get('confidence')!='preview'
+            if automatic and self.production.settings['enabled']:
+                record('Handled by production border'); continue
             if automatic and not rule.get('autoplay',True): record('Automatic meme disabled'); continue
             if now-self.cooldowns.get(key,-999999)<rule.get('cooldown',0): record('Cooldown'); continue
             # One reusable slot per semantic family; a penta upgrades a double.
@@ -229,7 +237,7 @@ class Engine:
                 level=local.get('level',0); old_level=old_local.get('level',0)
                 if level>old_level:
                     emit('level_up',f'Level {level}','power')
-                    if self.config['events'].get('level_up',{}).get('enabled',False):
+                    if self.config['events'].get('level_up',{}).get('enabled',False) and not self.production.settings['enabled']:
                         self.trigger_sprites(int(level))
                 if old_local.get('isDead') and not local.get('isDead'): emit('respawn')
                 if not old_local.get('isDead') and local.get('isDead'): emit('death',family='death')
@@ -297,6 +305,15 @@ class Engine:
             self.death_reactions.update(data, local, names, players, initial, self.clock())
         else:
             self.death_reactions.reset()
+        if local.get('isDead') and not any(e.get('EventName')=='GameEnd' for e in events):
+            if self.death_visual is None:
+                self.death_visual={'started':self.clock()}
+            timer=local.get('respawnTimer')
+            valid_timer=type(timer) in (int,float) and math.isfinite(timer) and timer>=0
+            self.death_visual.update(remaining=timer if valid_timer else None,
+                                     worth=self.death_reactions.worth)
+        else:
+            self.death_visual=None
         self.previous=copy.deepcopy(data); self.game_time=t
         self.production.ingest(data, out, baseline=initial)
         self.submit(out)

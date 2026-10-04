@@ -1,0 +1,67 @@
+{
+  "module": {
+    "id": "obs",
+    "label": "OBS output",
+    "group": "Output",
+    "icon": "scene",
+    "description": "Receives owned scene, source and audio changes.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "obs.observation",
+      "label": "OBS connects or changes scene",
+      "topic": "Startup",
+      "trigger": {
+        "label": "OBS connects or changes scene",
+        "event": "scene.decision",
+        "kind": "event"
+      },
+      "detail": "Program scene reads use the guarded scene-list snapshot. If OBS has no valid program scene during a Studio Mode or collection change, callers wait rather than query the unsafe dedicated getter or guess a scene.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Shared OBS connection",
+          "owner": "obs",
+          "kind": "action",
+          "detail": "Serialize requests on one connection; use GetSceneList for current program reads and retain the SDK response fields. Missing program state stays unavailable without closing a healthy connection. Transport failures reconnect with shared backoff."
+        },
+        {
+          "id": "1",
+          "label": "Observe program scene events",
+          "owner": "obs",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Publish ownership evidence",
+          "owner": "coordination",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "obs": "01af456db45e144826db3dff034567f08dc604214b8bb866f0173b47fe4ee7a4",
+        "coordination": "9719a70125356a757d7dd8d4ef1fd4f079a6b403628d6c6088c434b8d230b5a6"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "lib/coordination/scene_events.py",
+          "symbol": "<module>",
+          "hash": "3a408899c4bdbd1de78dfccb73c4a09751eea84cb71087bb208c1a13728c8470"
+        }
+      ]
+    }
+  ]
+}

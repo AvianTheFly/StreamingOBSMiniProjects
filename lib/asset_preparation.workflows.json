@@ -1,0 +1,78 @@
+{
+  "module": {
+    "id": "preparation",
+    "label": "Asset preparation",
+    "group": "Shared resources",
+    "icon": "library",
+    "description": "Paces background media preparation.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "preparation.assets",
+      "label": "Assets need preparation",
+      "topic": "Background work",
+      "trigger": {
+        "label": "Assets need preparation",
+        "event": "assets.prepare",
+        "kind": "background"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Queue unprepared media",
+          "owner": "preparation",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "One paced preparation worker",
+          "owner": "preparation",
+          "kind": "wait",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Share conversion budget",
+          "owner": "conversion",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Reuse cached prepared media",
+          "owner": "preparation",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "preparation": "a1ad7dcb631d968f17e1744c36663dd81899ef7aa8b767078bd44508d083af17",
+        "conversion": "b714ec8a6641880ed03bdde834c87c760b5b902d357ffd74361bc6101d768e07"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "lib/asset_preparation.py",
+          "symbol": "AssetPreparation",
+          "hash": "8dd841e174853e9e8355ad2ace26b009d98278947db5041e4245e211ef78d3d4"
+        }
+      ]
+    }
+  ]
+}

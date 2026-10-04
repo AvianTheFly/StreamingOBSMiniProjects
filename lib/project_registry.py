@@ -29,15 +29,19 @@ SKIP_PROJECT_DIRS = {
 }
 
 SUPPORTED_RUNTIME_PROJECTS = {
+    "twitch_commands",
+    "starting_soon",
     "twitch_celebrations",
     "instant_replay",
     "league",
     "league_api",
+    "league_stats",
     "love_me",
     "scene_voice_switcher",
     "sound_effects",
     "soundboard",
     "specific_song",
+    "spotify",
     "tik_tok",
 }
 
@@ -82,7 +86,8 @@ def iter_project_dirs(*, include_root: bool = True) -> list[Path]:
     for root in roots:
         if not root.is_dir():
             continue
-        for folder in sorted(root.iterdir(), key=lambda item: item.name.lower()):
+        for name in sorted(SUPPORTED_RUNTIME_PROJECTS, key=str.lower):
+            folder = root / name
             if not _is_project_candidate(folder):
                 continue
             if folder.name in seen:

@@ -6,7 +6,7 @@ Archives raw replay clips as individual, selectable cuts.
 Directory layout
 ----------------
   REPLAY_DIR/          <- OBS replay buffer writes here; trimmed clips land here too.
-                          App-managed clips are kept until they are merged.
+                          Original recordings remain; managed cuts can be archived.
   REPLAY_DIR/clips/    <- Permanent individual cuts, grouped by game folder.
   REPLAY_DIR/edited/   <- Legacy compiled highlight reels; kept for playback.
 
@@ -34,9 +34,8 @@ from __future__ import annotations
 import json
 import re
 import shutil
-import subprocess
 import threading
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 from .config import CLIPS_DIR, EDITED_DIR, REPLAY_DIR
@@ -44,7 +43,6 @@ from . import library
 
 _TAG = "[instant_replay.cleanup]"
 _WINDOW_SECONDS = 600       # 10-minute fallback grouping window
-_MIN_OVERLAP_SECONDS = 1.5  # ignore overlaps smaller than this (timestamp imprecision)
 _SESSIONS_FILE = Path.home() / ".claude" / "game_sessions.json"
 _COUNTER_FILE  = Path.home() / ".claude" / "ir_game_counter.json"
 
@@ -92,6 +90,8 @@ def _find_trimmed() -> list[tuple[datetime, Path]]:
         if f.is_dir():
             continue
         meta = curated.get(library.clip_id(f), {})
+        if not library.highlight_candidate(meta):
+            continue
         if (f.name.endswith("_ir_trimmed.mkv")
                 or (meta.get("kept") and f.suffix.lower() in library.MEDIA_EXTENSIONS)):
             if curated.get(library.clip_id(f), {}).get("merged"):
@@ -116,122 +116,6 @@ def _safe_unlink(path: Path, *, missing_ok: bool = True) -> bool:
     except OSError as exc:
         print(f"{_TAG} Could not delete {path.name}: {exc}")
         return False
-
-
-def _get_clip_duration(path: Path) -> float | None:
-    """Return duration in seconds via ffprobe, or None on error."""
-    cmd = [
-        "ffprobe", "-v", "error",
-        "-show_entries", "format=duration",
-        "-of", "csv=p=0",
-        str(path),
-    ]
-    r = subprocess.run(cmd, capture_output=True, text=True)
-    if r.returncode != 0:
-        return None
-    try:
-        return float(r.stdout.strip())
-    except ValueError:
-        return None
-
-
-def _trim_clip_start(input_path: Path, skip_seconds: float, output_path: Path) -> bool:
-    """Write input_path with its first skip_seconds removed to output_path."""
-    cmd = [
-        "ffmpeg", "-y",
-        "-ss", f"{skip_seconds:.3f}",
-        "-i", str(input_path),
-        "-avoid_negative_ts", "make_zero",
-        "-c", "copy",
-        str(output_path),
-    ]
-    r = subprocess.run(cmd, capture_output=True, text=True)
-    if r.returncode != 0:
-        print(f"{_TAG} ffmpeg trim-start error:\n{r.stderr[-400:]}")
-    return r.returncode == 0
-
-
-# ---------------------------------------------------------------------------
-#  Overlap resolution
-
-def _resolve_overlaps(sorted_files: list[Path]) -> tuple[list[Path], list[Path]]:
-    """
-    For each consecutive pair of clips, if the later clip overlaps the earlier
-    one in wall-clock time, trim the overlap from the later clip's start so the
-    two stitch seamlessly.
-
-    clip_end  = OBS filename timestamp  (when the buffer was saved)
-    clip_start = clip_end - ffprobe_duration
-
-    Returns (processed_files, temp_files).  Caller must delete temp_files.
-    """
-    if len(sorted_files) <= 1:
-        return list(sorted_files), []
-
-    result: list[Path] = []
-    temps:  list[Path] = []
-    prev_end: datetime | None = None
-
-    for path in sorted_files:
-        clip_end = _parse_timestamp(path.name)
-        duration = _get_clip_duration(path)
-
-        if clip_end is None or duration is None:
-            result.append(path)
-            prev_end = clip_end
-            continue
-
-        clip_start = clip_end - timedelta(seconds=duration)
-
-        if prev_end is not None:
-            overlap = (prev_end - clip_start).total_seconds()
-            if overlap > _MIN_OVERLAP_SECONDS:
-                if overlap >= duration:
-                    print(f"{_TAG} {path.name} fully inside previous clip — skipping")
-                    continue  # don't update prev_end; this clip contributes nothing new
-                print(f"{_TAG} {overlap:.1f}s overlap — trimming start of {path.name}")
-                tmp = path.with_suffix(".overlap_trim.mkv")
-                if _trim_clip_start(path, overlap, tmp):
-                    result.append(tmp)
-                    temps.append(tmp)
-                else:
-                    print(f"{_TAG} Overlap trim failed — keeping original")
-                    result.append(path)
-                prev_end = clip_end
-                continue
-
-        result.append(path)
-        prev_end = clip_end
-
-    return result, temps
-
-
-# ---------------------------------------------------------------------------
-#  Merge / copy
-
-def _merge_into(files: list[Path], output: Path) -> bool:
-    """Concatenate files into output (stream-copy).  Single file = plain copy."""
-    output.parent.mkdir(parents=True, exist_ok=True)
-
-    if len(files) == 1:
-        shutil.copy2(files[0], output)
-        return True
-
-    list_path = output.with_suffix(".concat.txt")
-    try:
-        with open(list_path, "w", encoding="utf-8") as fh:
-            for p in files:
-                fh.write(f"file '{p.absolute()}'\n")
-        cmd = [
-            "ffmpeg", "-y", "-f", "concat", "-safe", "0",
-            "-i", str(list_path), "-c", "copy", str(output),
-        ]
-        r = subprocess.run(cmd, capture_output=True, text=True)
-        if r.returncode != 0:
-            print(f"{_TAG} ffmpeg merge error:\n{r.stderr[-500:]}")
-        return r.returncode == 0
-    finally:
-        list_path.unlink(missing_ok=True)
 
 
 # ---------------------------------------------------------------------------
@@ -338,7 +222,7 @@ def list_edited_reels() -> list[tuple[int, Path]]:
 
 
 # ---------------------------------------------------------------------------
-#  Core merge entry point
+#  Core archive entry point
 
 def run_once(game_label: str | None = None) -> int:
     """
@@ -407,14 +291,18 @@ def run_for_game(game_label: str) -> None:
     Runs in a background thread 30 s after game-end so in-progress trims finish.
     """
     print(f"{_TAG} Archiving individual cuts for '{game_label}'...")
+    from events import inspect_event
+    inspect_event('replay.archive', owner='instant_replay', phase='started')
     try:
         archived = run_once(game_label=game_label)
+        inspect_event('replay.archive', owner='instant_replay', phase='finished', count=archived)
         if archived > 0:
             print(f"{_TAG} Done ({archived} individual clip(s) archived).")
         else:
             print(f"{_TAG} No clips found for '{game_label}'.")
     except Exception as exc:
-        print(f"{_TAG} Error during game-end merge: {exc}")
+        inspect_event('replay.archive', owner='instant_replay', phase='failed')
+        print(f"{_TAG} Error during game-end archive: {exc}")
 
 
 # ---------------------------------------------------------------------------
@@ -425,7 +313,7 @@ _THREAD: threading.Thread | None = None
 
 
 def start_deferred(stop_event: threading.Event) -> None:
-    """Spawn a daemon thread that waits 60 s then merges any leftover clips."""
+    """Spawn a daemon thread that waits 60 s then archives leftover cuts."""
     global _STARTED, _THREAD
     if _STARTED:
         return

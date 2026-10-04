@@ -52,9 +52,14 @@ def subscription():
             _sse_clients.remove(inbox)
 
 def broadcast(event_type: str, payload: dict) -> None:
-    msg = f"data: {json.dumps({'type': event_type, 'payload': payload})}\n\n"
-    encoded = msg.encode("utf-8")
+    if event_type in {'hub_action', 'project_action', 'rules_updated', 'settings_updated'}:
+        import events
+        events.inspect_event(event_type, owner='hub', phase='accepted' if payload.get('result',{}).get('ok',True) else 'failed', **payload)
     with _sse_lock:
+        if not _sse_clients:
+            return
+        msg = f"data: {json.dumps({'type': event_type, 'payload': payload})}\n\n"
+        encoded = msg.encode("utf-8")
         for q in list(_sse_clients):
             try:
                 q.put_nowait(encoded)
@@ -70,7 +75,13 @@ def poll_loop(stop: threading.Event) -> None:
             changed = audio_service.sync_audio_memory_from_obs()
             for project in changed:
                 broadcast("audio_updated", {"project": project})
-            broadcast("status_update", {"projects": project_status.all_statuses()})
+            with _sse_lock:
+                has_clients = bool(_sse_clients)
+            from .workflow_map import journal, sample
+            if has_clients or journal.recording:
+                statuses = project_status.all_statuses()
+                if journal.recording: sample(statuses)
+                if has_clients: broadcast("status_update", {"projects": statuses})
         except Exception:
             pass
         stop.wait(2.0)

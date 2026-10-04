@@ -20,21 +20,48 @@ class _InstantReplayInterface(ProjectInterface):
     controlled_scenes = ["InstantReplay"]
     produces_audio    = True
 
+    def clip_catalog(self):
+        """Public saved-media contract for other presentations; no playback state."""
+        from .api import clips
+        return clips(purpose='highlight')
+
+    def clip_selection(self, paths):
+        """Validate every requested file through the replay library owner."""
+        from . import library
+        from .config import REPLAY_DIR
+        labels = library.read()['clips']
+        from lib.asset_fader import AssetFader
+        from pathlib import Path
+        levels = AssetFader('InstantReplayMedia', Path(__file__).with_name('asset_volumes.json')).values()
+        rows = []
+        for path in paths:
+            resolved = library.resolve(str(path), REPLAY_DIR)
+            volume_source = library.volume_source(resolved, labels, levels)
+            level_key = str(Path(volume_source).resolve()).casefold() if volume_source else ''
+            rows.append(dict(path=str(resolved), title=labels.get(library.clip_id(resolved), {}).get('title')
+                             or resolved.name, volume_db=levels.get(str(resolved).casefold(), levels.get(level_key))))
+        return rows
+
     def get_status(self) -> ProjectStatus:
+        from .stage import state as stage_state
         replay_active = _live.get("replay_active", [False])
         replay_paused = _live.get("replay_paused", [False])
         is_active     = bool(replay_active[0])
         is_paused     = bool(replay_paused[0]) if is_active else False
         detail = _live.get("playback_detail", {})
-        activity = "paused replay" if is_paused else "playing replay"
+        stage = stage_state()
+        kind = stage.get("kind", "clip")
+        noun = {"replay": "replay", "highlights": "highlights", "clip": "recorded clip"}.get(kind, "clips")
+        activity = f"{'paused' if is_paused else 'playing'} {noun}"
         if is_active and detail:
             activity += f" · {detail['index']}/{detail['total']} · {detail['name']}"
         return ProjectStatus(
             name             = self.name,
             is_active        = is_active,
-            current_activity = activity if is_active else None,
+            current_activity = activity if is_active else 'saving for replay' if stage.get('pending') else None,
             controlled_scenes= self.controlled_scenes,
             can_revert       = True,
+            is_paused        = is_paused,
         )
 
     def revert(self) -> None:
@@ -54,10 +81,14 @@ class _InstantReplayInterface(ProjectInterface):
 
     def action_catalog(self) -> list[dict]:
         return [
-            {"key": "play_latest", "label": "Play Latest", "description": "Play the newest saved clip."},
-            {"key": "play_random", "label": "Play Random", "description": "Keep playing saved clips at random until stopped."},
+            {"key": "quick_replay", "label": "Replay This Moment", "description": "Replay the last 15 seconds locally. No Twitch clip or highlight candidate."},
+            {"key": "play_replay", "label": "Replay Latest", "description": "Show the latest capture as an instant replay."},
+            {"key": "save_replay", "label": "Save & Replay", "description": "Save this moment and replay the finished cut with the live view."},
+            {"key": "play_showcase", "label": "Showcase Latest", "description": "Show the newest saved clip in the showcase layout."},
+            {"key": "play_latest", "label": "Play Latest Clip", "description": "Play the newest clip with a fresh or archive label."},
+            {"key": "play_random", "label": "Shuffle Clips", "description": "Keep playing saved clips at random until stopped."},
             {"key": "play_highlights", "label": "Play Highlights", "description": "Play clips from the current or previous game."},
-            {"key": "save", "label": "Save Replay", "description": "Save the current OBS replay buffer."},
+            {"key": "save", "label": "Save Replay", "description": "Save the OBS replay buffer and request a Twitch clip."},
             {"key": "mark", "label": "Mark Start", "description": "Mark the start point for the next saved clip."},
             {"key": "pause", "label": "Pause", "description": "Pause the current replay."},
             {"key": "resume", "label": "Resume", "description": "Resume the current replay."},
@@ -72,17 +103,24 @@ class _InstantReplayInterface(ProjectInterface):
             if handler:
                 handler()
                 return {"ok": True, "action": action}
+        elif action in ('save_replay', 'quick_replay'):
+            handler = _live.get(action)
+            if handler:
+                accepted = handler()
+                return {'ok': bool(accepted), 'action': action,
+                        **({} if accepted else {'error': 'A save or replay is already in progress.'})}
         elif action == "save":
             handler = _live.get("save_clip")
             if handler:
-                handler()
-                from lib.twitch_clips import request_clip
-                request_clip()
-                return {"ok": True, "action": action}
-        elif action in {"play_latest", "play_random", "play_highlights"}:
+                accepted = handler()
+                return {"ok": bool(accepted), "action": action,
+                        **({} if accepted else {'error': 'A capture is already saving.'})}
+        elif action in {"play_replay", "play_latest", "play_random", "play_highlights", "play_showcase"}:
             handler = _live.get("play_spec")
             if handler:
                 spec = {
+                    "play_replay": "replay",
+                    "play_showcase": "showcase",
                     "play_latest": "last",
                     "play_random": "random",
                     "play_highlights": "highlights",

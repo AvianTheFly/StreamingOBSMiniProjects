@@ -3,22 +3,18 @@ from __future__ import annotations
 import threading
 import time
 import subprocess
+import os
+from array import array
 from collections import deque
 from pathlib import Path
 
 import numpy as np
-
-# ── optional audio loader ─────────────────────────────────────────────────────
-try:
-    from pydub import AudioSegment as _AudioSegment
-    _PYDUB_OK = True
-except ImportError:
-    _PYDUB_OK = False
+from .analysis_cache import AnalysisCache, MAX_FILE_BYTES, close_analysis
 
 # Real-time audio-reactive control signals for an OBS visualizer.
 #
-# Audio source: the actual mp3/mp4 file that OBS is playing, decoded at startup
-# and processed frame-by-frame in real-time sync with wall-clock timing.
+# Audio source: the actual file OBS plays, decoded in paced blocks or read
+# from compact cached spectral measurements in real-time sync.
 # No virtual audio device or loopback needed.
 #
 # DSP approach (standard audio-visualizer practices):
@@ -36,42 +32,6 @@ _LT_FRAMES: int = 24
 _OOMPH_RATIO: float = 2.10
 _OOMPH_MIN_RMS: float = 0.014
 _PRESENCE_WEIGHTS = (0.16, 0.22, 0.30, 0.22, 0.10)  # sub, bass, motion, melody, air
-
-
-_AUDIO_CACHE = {}
-_AUDIO_CACHE_LOCK = threading.Lock()
-_AUDIO_CACHE_LIMIT = 64 * 1024 * 1024
-
-
-def _load_audio_file(path: Path, target_sr: int = 44100) -> tuple[np.ndarray, int]:
-    """Decode mono float PCM in ffmpeg, with a bounded cache for repeat plays."""
-    import subprocess
-    stat = path.stat()
-    key = (str(path.resolve()), stat.st_mtime_ns, stat.st_size, target_sr)
-    with _AUDIO_CACHE_LOCK:
-        cached = _AUDIO_CACHE.pop(key, None)
-        if cached is not None:
-            _AUDIO_CACHE[key] = cached
-            return cached, target_sr
-    # Conversion runs in ffmpeg, avoiding full stereo PCM copies and Python
-    # resampling while the user is triggering playback.
-    print(f"[BassDetector] Decoding '{path.name}' …")
-    result = subprocess.run(
-        ["ffmpeg", "-v", "error", "-threads", "1", "-i", str(path),
-         "-vn", "-ac", "1", "-ar", str(target_sr), "-f", "f32le", "pipe:1"],
-        capture_output=True, timeout=120,
-        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
-    if result.returncode:
-        raise RuntimeError(result.stderr.decode(errors="replace")[-500:])
-    raw = np.frombuffer(result.stdout, dtype="<f4")
-    raw.flags.writeable = False
-    with _AUDIO_CACHE_LOCK:
-        if raw.nbytes <= _AUDIO_CACHE_LIMIT:
-            while _AUDIO_CACHE and sum(v.nbytes for v in _AUDIO_CACHE.values()) + raw.nbytes > _AUDIO_CACHE_LIMIT:
-                _AUDIO_CACHE.pop(next(iter(_AUDIO_CACHE)))
-            _AUDIO_CACHE[key] = raw
-    print(f"[BassDetector] Loaded {len(raw) / target_sr:.1f}s @ {target_sr} Hz")
-    return raw, target_sr
 
 
 class BassDetector:
@@ -151,36 +111,13 @@ class BassDetector:
         self._wide_mask   = (freqs >= 60.0)           & (freqs <= 5000.0)
         self._melody_mask = (freqs >= 300.0)          & (freqs <= 2800.0)
         self._air_mask    = (freqs >= 2500.0)         & (freqs <= 9000.0)
+        self._window = np.hanning(block_size)
 
-        self._audio_data: np.ndarray | None = None
         self._running = False
         self._paused = threading.Event()
         self._file_thread: threading.Thread | None = None
         self._decoder = None
         self._decoder_lock = threading.Lock()
-
-    # ── Pre-loading ───────────────────────────────────────────────────────────
-
-    def preload(self) -> None:
-        """Decode the audio file into memory. Call this before start() for
-        the tightest sync with OBS playback."""
-        if self._audio_file is None or self._audio_data is not None:
-            return
-        try:
-            self._audio_data, self.sample_rate = _load_audio_file(
-                self._audio_file, self.sample_rate
-            )
-            # Recompute masks in case sample rate changed after load
-            freqs = np.fft.rfftfreq(self.block_size, d=1.0 / self.sample_rate)
-            self._sub_mask    = (freqs >= 20.0)                  & (freqs <= 80.0)
-            self._bass_mask   = (freqs >= self.bass_low_hz)      & (freqs <= self.bass_high_hz)
-            self._motion_mask = (freqs >= 140.0)                 & (freqs <= 1200.0)
-            self._wide_mask   = (freqs >= 60.0)                  & (freqs <= 5000.0)
-            self._melody_mask = (freqs >= 300.0)                 & (freqs <= 2800.0)
-            self._air_mask    = (freqs >= 2500.0)                & (freqs <= 9000.0)
-        except Exception as exc:
-            print(f"[BassDetector] Preload failed: {exc}")
-            self._audio_data = None
 
     # ── Lifecycle ─────────────────────────────────────────────────────────────
 
@@ -257,6 +194,16 @@ class BassDetector:
     def _stream_file_loop(self) -> None:
         """Bounded, paced CPU decoding. No full-song allocation or catch-up FFTs."""
         decoder = None
+        cache = self.analysis_cache()
+        cached = cache.load() if cache else None
+        if cached is not None:
+            try:
+                self._analysis_loop(cached)
+            finally:
+                close_analysis(cached)
+            return
+        features = array('d')
+        cacheable = cache is not None
         try:
             with self._decoder_lock:
                 if not self._running:
@@ -278,12 +225,21 @@ class BassDetector:
                     next_frame = time.monotonic()
                     continue
                 raw = decoder.stdout.read(size)
-                if not raw or not self._running:
+                if not self._running:
+                    break
+                if not raw:
+                    if cacheable and decoder.wait(timeout=1) == 0:
+                        cache.save(features)
                     break
                 chunk = np.frombuffer(raw[:len(raw)//4*4], dtype='<f4')
                 if len(chunk) < self.block_size:
                     chunk = np.pad(chunk, (0, self.block_size-len(chunk)))
-                self._process_frame(chunk, time.monotonic())
+                row = self._process_frame(chunk, time.monotonic())
+                if cacheable:
+                    features.extend(row)
+                    if len(features) * 8 + 1024 > MAX_FILE_BYTES:
+                        cacheable = False
+                        features = array('d')
                 # Backpressure prevents burst analysis after a desktop stall.
                 now = time.monotonic()
                 next_frame = max(next_frame + self.block_size / self.sample_rate, now)
@@ -304,29 +260,30 @@ class BassDetector:
                 if self._decoder is decoder:
                     self._decoder = None
 
-    def _file_loop(self) -> None:
-        data = self._audio_data
-        sr = self.sample_rate
-        block = self.block_size
-        hop_secs = block / sr          # ~23 ms at 44100/1024
-        n_samples = len(data)
-        pos = 0
-        wall_start = time.monotonic()
+    def analysis_cache(self):
+        if self._audio_file is None or os.environ.get('HUB_SONG_ANALYSIS_CACHE', '1') == '0':
+            return None
+        try:
+            return AnalysisCache(self._audio_file, self.sample_rate, self.block_size,
+                                 self.bass_low_hz, self.bass_high_hz)
+        except OSError:
+            return None
 
-        while self._running and pos < n_samples:
-            end = min(pos + block, n_samples)
-            chunk = data[pos:end]
-            if len(chunk) < block:
-                chunk = np.pad(chunk, (0, block - len(chunk)))
-
-            self._process_frame(chunk, time.monotonic())
-            pos += block
-
-            # Sleep until wall-clock catches up to the song position
-            expected_wall = wall_start + (pos / sr)
-            sleep_dur = expected_wall - time.monotonic()
-            if sleep_dur > 0.0005:
-                time.sleep(sleep_dur)
+    def _analysis_loop(self, rows) -> None:
+        """Reuse exact spectral measurements; retain live smoothing and beat timing."""
+        print(f'[BassDetector] Using prepared analysis: {self._audio_file.name}')
+        next_frame = time.monotonic()
+        for row in rows:
+            while self._running and self._paused.is_set():
+                time.sleep(0.05)
+                next_frame = time.monotonic()
+            if not self._running:
+                return
+            self._process_features(row, time.monotonic())
+            now = time.monotonic()
+            next_frame = max(next_frame + self.block_size / self.sample_rate, now)
+            if next_frame > now:
+                time.sleep(next_frame - now)
 
     # ── DSP ───────────────────────────────────────────────────────────────────
 
@@ -358,9 +315,25 @@ class BassDetector:
             return current_floor + (value - current_floor) * fall
         return current_floor + (value - current_floor) * rise
 
-    def _process_frame(self, mono: np.ndarray, now: float) -> None:
+    def _process_frame(self, mono: np.ndarray, now: float) -> tuple:
         """Analyse one block of audio and update all signal fields."""
+        features = self.frame_features(mono)
+        self._process_features(features, now)
+        return features
+
+    def frame_features(self, mono: np.ndarray) -> tuple:
+        """Time-independent measurements that can be computed once per asset."""
         frame_rms = float(np.sqrt(np.mean(mono ** 2)))
+        if frame_rms < _NOISE_FLOOR_RMS:
+            return (frame_rms, 0., 0., 0., 0., 0., 0.)
+        window = self._window if len(mono) == self.block_size else np.hanning(len(mono))
+        spectrum = np.abs(np.fft.rfft(mono * window))
+        return (frame_rms, *(self._compress_energy(self._band_rms(spectrum, mask))
+                            for mask in (self._sub_mask, self._bass_mask, self._motion_mask,
+                                         self._wide_mask, self._melody_mask, self._air_mask)))
+
+    def _process_features(self, features, now: float) -> None:
+        frame_rms, sub_raw, bass_raw, motion_raw, wide_raw, melody_raw, air_raw = map(float, features)
         if frame_rms < _NOISE_FLOOR_RMS:
             with self._lock:
                 rel = min(max(self.smoothing + 0.12, 0.58), 0.97)
@@ -371,16 +344,6 @@ class BassDetector:
                 self._presence  = self._smooth_envelope(self._presence,  0.0, 0.0, rel)
                 self._transient = self._smooth_envelope(self._transient, 0.0, 0.0, rel)
             return
-
-        windowed = mono * np.hanning(len(mono))
-        spectrum = np.abs(np.fft.rfft(windowed))
-
-        sub_raw    = self._compress_energy(self._band_rms(spectrum, self._sub_mask))
-        bass_raw   = self._compress_energy(self._band_rms(spectrum, self._bass_mask))
-        motion_raw = self._compress_energy(self._band_rms(spectrum, self._motion_mask))
-        wide_raw   = self._compress_energy(self._band_rms(spectrum, self._wide_mask))
-        melody_raw = self._compress_energy(self._band_rms(spectrum, self._melody_mask))
-        air_raw    = self._compress_energy(self._band_rms(spectrum, self._air_mask))
 
         transient_raw = (
             0.28 * max(0.0, sub_raw    - self._prev_sub_raw)

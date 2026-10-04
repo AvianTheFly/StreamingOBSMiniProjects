@@ -7,7 +7,8 @@ DEFAULTS = dict(revision=0, enabled=False, dragon_ambience=True, objectives=True
                 combat=True, structures=True, opacity=.8, edge_width=56,
                 burst_seconds=2.7, spacing_seconds=4, survival=True, progression=True,
                 economy=True, lifecycle=True, inferred=False, custom_rules=True,
-                intensity=1.15, event_options={})
+                intensity=1.15, event_options={}, match_screens=False,
+                result_delay_seconds=1.5, result_hold_seconds=5, start_hold_seconds=5)
 
 
 def validate(settings):
@@ -17,11 +18,12 @@ def validate(settings):
     if type(result['revision']) is not int or result['revision'] < 0:
         raise ValueError('Invalid production revision')
     for key in ('enabled', 'dragon_ambience', 'objectives', 'combat', 'structures',
-                'survival', 'progression', 'economy', 'lifecycle', 'inferred', 'custom_rules'):
+                'survival', 'progression', 'economy', 'lifecycle', 'inferred', 'custom_rules', 'match_screens'):
         if type(result[key]) is not bool:
             raise ValueError(key + ' must be true or false')
     for key, low, high in (('opacity', .2, 1), ('edge_width', 24, 84),
-                           ('burst_seconds', 1, 5), ('spacing_seconds', 1, 30), ('intensity', .5, 1.6)):
+                           ('burst_seconds', 1, 5), ('spacing_seconds', 1, 30), ('intensity', .5, 1.6),
+                           ('result_delay_seconds', 0, 5), ('result_hold_seconds', 2, 15), ('start_hold_seconds', 2, 10)):
         value = result[key]
         if type(value) not in (int, float) or not math.isfinite(value) or not low <= value <= high:
             raise ValueError(f'{key} must be between {low} and {high}')

@@ -1,0 +1,13 @@
+{
+  "tool": "built-in imagegen",
+  "assets": [
+    {
+      "file": "spirit-arcade-base.png",
+      "prompt": "Use case: stylized-concept. Asset type: original 16:9 1920x1080 OBS streaming lobby background. Create a richly illustrated Spirit Arcade at night, a cozy retro game lounge inhabited only by subtle carved bear, ram, turtle and phoenix motifs, no people or characters. Detailed painterly cinematic environment, polished purple teal amber lighting, nostalgic arcade cabinets at far left, rainy neon windows, original visual design. Layout is functional: a large completely blank black landscape display aperture exactly around x=140 y=240 width=660 height=370 in a straight-on rectangular arcade wall monitor; a blank dark vertical chat panel at x=1490 y=200 width=330 height=540; an empty host standing space at x=850 y=320 width=450 height=490 behind a low console counter whose top starts at y=810. The console foreground covers bottom 270 pixels; keep the host space unobstructed above it. Architectural frames surround the screen and chat panel, all inner display edges perfectly axis-aligned and front-facing. Wide composition, elegant visual hierarchy and breathing room. No text, no watermark, no logos, no baked chat, no streamer portrait. Output the complete background room only, opaque."
+    },
+    {
+      "file": "aurora-camp-base.png",
+      "prompt": "Use case: stylized-concept. Asset type: original OBS streaming lobby background, wide 16:9. A Bear's fireside camp in ancient forest ruins overlooking a misty mountain lake under a spectacular aurora. Rich cinematic painterly fantasy scenery, emerald silver copper light, mossy stone, warm campfire off center, subtle carved bear turtle ram phoenix spirits on the shelter. No people. Make room for live overlays: one large blank perfectly front-facing black projector screen on the LEFT with its inner aperture approximately x=120,y=210,width=700,height=390 on a 1920x1080 canvas, one blank dark straight-on vertical slate chat board on the RIGHT inner aperture x=1480,y=180,width=340,height=540. Empty host space in the middle x=910,y=310,width=420,height=500, dark soft natural background behind host. Low stone camp table occupies only y=850 to1080, so host can appear above table without covering it. Widescreen storytelling, secluded campsite and view of the sky/lake feel distinct from an indoor tavern, not just furniture recoloring. Rectangular display apertures are architectural objects with elegant restrained frames. No text no logos no watermark no baked camera no chat messages. Opaque complete scene."
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "locations": {
+    "ForgeLobby": {
+      "rotation": true,
+      "chat": [
+        1463,
+        203,
+        317,
+        470
+      ]
+    },
+    "SanctuaryLobby": {
+      "rotation": false
+    }
+  }
+}

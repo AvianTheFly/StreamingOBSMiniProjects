@@ -1,0 +1,68 @@
+[
+  {
+    "path": "C:\\Users\\Michael\\.codex\\visualizations\\2026\\10\\02\\01a0fb16-cbc2-70e2-94bf-95b8d229c706\\border-rework-20261002\\superseded-raster-originals\\sound-a.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "sha256": "6eca19d537594ff277155dbb08ebe6a0109bbe29a176aaefebab71a09ae07470"
+  },
+  {
+    "path": "C:\\Users\\Michael\\.codex\\visualizations\\2026\\10\\02\\01a0fb16-cbc2-70e2-94bf-95b8d229c706\\border-rework-20261002\\superseded-raster-originals\\sound-b.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "sha256": "8d29da6599913f4b43eecf1ee8958ec3a836c37a9ba84798e0fdf7dcf682550f"
+  },
+  {
+    "path": "C:\\Users\\Michael\\.codex\\visualizations\\2026\\10\\02\\01a0fb16-cbc2-70e2-94bf-95b8d229c706\\border-rework-20261002\\superseded-raster-originals\\sound-c.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "sha256": "ed11892cc071d7bd5008a4dfb3875579cf167d07f62ae73da9d5c56d68b14dfc"
+  },
+  {
+    "path": "mini projects/league_api/production/art/elements.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "sha256": "1e5e66011e03f8b4ff3f7893a590f744bb21f4cad7edd7eb81ac9769ca351935"
+  },
+  {
+    "path": "mini projects/league_api/production/art/relics.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "sha256": "35d43f539f1aff317152bb61f09ca722e84e556c5ef84c176dd6530e4e04b878"
+  },
+  {
+    "path": "mini projects/twitch_celebrations/art/celebrations.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "sha256": "4bb905e10489baf7daf1325c6ecf8333511a025e47e6ff0947e48a6c9e53387e"
+  }
+]

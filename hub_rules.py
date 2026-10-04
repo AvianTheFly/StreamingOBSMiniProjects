@@ -21,6 +21,7 @@ from pathlib import Path
 
 from coordinator import coordinator, CoordinationRule
 from shared import project_registry
+from lib.json_store import write_json
 
 _RULES_FILE = Path(__file__).resolve().parent / "hub_rules.json"
 
@@ -71,22 +72,19 @@ def _load() -> list[CoordinationRule] | None:
 
 def _save(rules: list[CoordinationRule]) -> None:
     try:
-        _RULES_FILE.write_text(
-            json.dumps(_rules_to_json(rules), indent=2, ensure_ascii=False),
-            encoding="utf-8",
-        )
+        write_json(_RULES_FILE, _rules_to_json(rules))
     except Exception as exc:
         print(f"[hub_rules] Failed to save rules: {exc}")
 
 
-# ── Apply rules at import time ────────────────────────────────────────────────
-
-_loaded = _load()
-if _loaded is not None:
-    _rules = _loaded
-else:
-    _rules = _auto_audio_rules()
-    _save(_rules)
-
-for _rule in _rules:
-    coordinator.add_rule(_rule)
+def initialize() -> None:
+    """Load policy after discovery; imports never write settings or mutate rules."""
+    loaded = _load()
+    if loaded is None:
+        if _RULES_FILE.exists():
+            return  # Preserve malformed user data for recovery, never overwrite it.
+        from lib.settings_backups import SettingsBackups
+        SettingsBackups().snapshot()
+        loaded = _auto_audio_rules()
+        _save(loaded)
+    coordinator.replace_rules(loaded)

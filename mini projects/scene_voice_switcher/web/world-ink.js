@@ -1,0 +1,12 @@
+// Local subject paint shared by related lobby performances, never scene policy.
+import {ellipse,TAU} from './shared/world-motion.js';
+export function duck(c,x,y,s=1,phase=0,helmet=false){
+ c.save();c.translate(x,y);c.scale(s,s);ellipse(c,-4,7,23,14,'#d9b45f');ellipse(c,9,-9,13,15,'#e9ce85');ellipse(c,-6,8,12,6,'#edd8a0');ellipse(c,13,-13,2,2,'#1d3438');c.fillStyle='#bc793f';c.beginPath();c.moveTo(21,-9);c.lineTo(35,-6);c.lineTo(21,-2);c.fill();
+ if(helmet){c.fillStyle='#59646a';c.beginPath();c.arc(9,-14,15,Math.PI,TAU);c.fill();c.fillRect(-8,-15,33,4);ellipse(c,9,-32,3,7,'#c6a365');}
+ c.rotate(Math.sin(phase)*.08);c.restore();
+}
+export function leaf(c,x,y,s,color='#7ba68d',turn=0){c.save();c.translate(x,y);c.rotate(turn);c.fillStyle=color;c.beginPath();c.moveTo(-s,0);c.bezierCurveTo(-s,-s,s,-s,s,0);c.bezierCurveTo(s,s,-s,s,-s,0);c.fill();c.strokeStyle='#d3d8a577';c.lineWidth=1;c.beginPath();c.moveTo(-s,0);c.lineTo(s,0);c.stroke();c.restore();}
+export function hammer(c,x,y,angle=0,s=1){c.save();c.translate(x,y);c.rotate(angle);c.scale(s,s);c.fillStyle='#9d7249';c.fillRect(-4,-5,8,55);c.strokeStyle='#d1b68c';c.lineWidth=1;c.strokeRect(-4,-5,8,55);c.fillStyle='#899399';c.beginPath();c.roundRect(-22,-15,44,18,3);c.fill();c.strokeStyle='#d7d5c1';c.stroke();c.restore();}
+export function crystal(c,x,y,s,color='#90e3ed',turn=0){c.save();c.translate(x,y);c.rotate(turn);c.fillStyle=color;c.strokeStyle='#e4fbf199';c.lineWidth=1.3;c.beginPath();c.moveTo(0,-s);c.lineTo(s*.48,-s*.2);c.lineTo(s*.33,s*.7);c.lineTo(-s*.3,s*.7);c.lineTo(-s*.5,-s*.2);c.closePath();c.fill();c.stroke();c.beginPath();c.moveTo(0,-s);c.lineTo(s*.1,s*.5);c.lineTo(-s*.5,-s*.2);c.stroke();c.restore();}
+export function moth(c,x,y,s,t,color='#e6cfaa'){c.save();c.translate(x,y);const wing=.4+.6*Math.abs(Math.sin(t*9));ellipse(c,-s*wing,0,s*wing,s*.6,color);ellipse(c,s*wing,0,s*wing,s*.6,color);ellipse(c,0,0,2,s*.65,'#70684e');c.restore();}
+export function mushroom(c,x,y,t){c.save();c.translate(x,y);c.fillStyle='#ddd4b5';c.fillRect(-5,-8,10,20);c.fillStyle='#b38d74';c.beginPath();c.ellipse(0,-9,19,12,0,Math.PI,TAU);c.fill();for(const x of [-8,3,9])ellipse(c,x,-15,2,2,'#f3e8c7');c.strokeStyle='#9baa8c';c.lineWidth=2;for(const side of [-1,1]){c.beginPath();c.moveTo(side*3,12);c.lineTo(side*8+Math.sin(t*8+side)*4,18);c.stroke();}ellipse(c,-2,1,1.4,1.4,'#29433d');ellipse(c,3,1,1.4,1.4,'#29433d');c.restore();}

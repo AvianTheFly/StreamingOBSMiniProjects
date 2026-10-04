@@ -35,6 +35,9 @@ class ProductionDirector:
             self.last_show = now
             self.cooldowns[show['key']] = now
         self.history.append(dict(title=show['title'],key=show['key'],result='Shown' if admitted else 'Skipped to keep gameplay clear',time=now))
+        from events import inspect_event
+        inspect_event('league_production.show', owner='league_api', kind=show['key'],
+                      phase='shown' if admitted else 'skipped', reason='Priority and spacing gate')
         self.history = self.history[-40:]
 
     def clear(self):
@@ -111,7 +114,7 @@ class ProductionDirector:
         if self.demo and self.demo['expires'] > now:
             t = now-self.demo['started']
             ambient = dict(id=self.demo['id'], theme='earth', started=self.demo['started'], estimated=False) if t < 3 else None
-            effect = dict(id=self.demo['id']+'-kill', kind='dragon', theme='earth', title='MOUNTAIN DRAGON SECURED',
+            effect = dict(id=self.demo['id']+'-kill', key='dragon_earth', kind='dragon', theme='earth', title='MOUNTAIN DRAGON SECURED',
                           started=self.demo['started']+3, expires=self.demo['started']+6.2, duration=3.2) if 3 <= t < 6.2 else None
         return dict(enabled=self.settings['enabled'], opacity=self.settings['opacity'], edge_width=self.settings['edge_width'], intensity=self.settings.get('intensity',1.15),
                     ambient={**ambient, 'elapsed':now-ambient['started']} if ambient else None,

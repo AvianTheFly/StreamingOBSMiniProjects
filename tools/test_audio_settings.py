@@ -13,6 +13,28 @@ from hub_ui import server, audio
 
 
 class AudioSettingsTests(unittest.TestCase):
+    def test_idle_sync_skips_repeat_obs_lookup_but_rechecks_changed_asset(self):
+        profile = {'file_volume_offsets': {'a': -12}}
+        context = (None, {'profiles': {'default': profile}}, 'default', 'a', 'player')
+        with patch('lib.project_registry.discover_editor_projects', return_value={'soundboard': Mock()}), \
+             patch.object(audio, 'runtime_audio_bindings', return_value={}), \
+             patch.object(audio, 'project_audio_context', return_value=context), \
+             patch.object(audio, 'obs_source_matches_runtime_stem', return_value=True) as matches, \
+             patch('obs.get_input_volume', return_value={'db': -12}), \
+             patch.object(audio, 'write_json_object') as save:
+            audio.sync_audio_memory_from_obs('soundboard')
+            matches.assert_called_once_with('player', 'a')
+            save.assert_not_called()
+            matches.reset_mock()
+            # Swapping the file during a fader read must not save the new file's
+            # volume against the old asset.
+            matches.side_effect = [True, False]
+            with patch('obs.get_input_volume', return_value={'db': -6}):
+                audio.sync_audio_memory_from_obs('soundboard')
+            self.assertEqual(matches.call_count, 2)
+            save.assert_not_called()
+            self.assertEqual(profile['file_volume_offsets'], {'a': -12})
+
     def test_asset_fader_recalls_each_file_independently(self):
         from lib.asset_fader import AssetFader
         with tempfile.TemporaryDirectory() as folder:

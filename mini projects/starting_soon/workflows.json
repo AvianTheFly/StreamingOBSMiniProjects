@@ -1,0 +1,233 @@
+{
+  "module": {
+    "id": "starting_soon",
+    "label": "Starting soon",
+    "group": "Media",
+    "icon": "play",
+    "description": "Owns the waiting room and its clip queue.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "starting_soon.open",
+      "label": "Open Starting Soon",
+      "topic": "Waiting room",
+      "trigger": {
+        "label": "Open Starting Soon",
+        "event": "hub_action",
+        "kind": "control"
+      },
+      "detail": "Opening prepares the dedicated stage and reserves a temporary SceneSession, then asks SceneDirector to enter with a short Fade. It does not play clips. The session retains scoped pauses until cleanup or revocation; newer scene choices prevent stale returns.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Prepare dedicated stage",
+          "owner": "starting_soon",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Reserve waiting-room session",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "OBS waiting room",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Automatic game routes wait",
+          "owner": "coordination",
+          "kind": "wait",
+          "detail": "The session retains its pause claims until finished or revoked."
+        }
+      ],
+      "owner_hashes": {
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
+        "starting_soon": "d36cefa1c1128c9b4c6e26381d39dc9c3172dc1538fdfa472b2a98a0a071bd6f",
+        "coordination": "af7125e6c03b3dbfc37fce3dfa9fe551779395b12a122ef592132b3885400afc"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/starting_soon/service.py",
+          "symbol": "StartingSoon.execute",
+          "hash": "228aa833c5c9c995e86f88902ff2675840f11b25e403ec03e8d83ef9ec8f80f6"
+        }
+      ]
+    },
+    {
+      "id": "starting_soon.playlist",
+      "label": "Play a waiting-room playlist",
+      "topic": "Waiting room",
+      "trigger": {
+        "label": "Play a waiting-room playlist",
+        "event": "source.playback",
+        "kind": "control"
+      },
+      "detail": "Highlight playback must be enabled and this waiting-room session must own the scene. Resolve the selected playlist, report missing files without erasing them, then admit one playback worker through its module gate. Live queue edits are separate from saved playlists. Disabling highlights requests cancellation and parks the native source; scenery and the waiting-room session remain.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Resolve playlist from replay library",
+          "owner": "starting_soon",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Skip missing clips",
+          "owner": "starting_soon",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Wait for source & module gate",
+          "owner": "media_workers",
+          "kind": "wait",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Play next clip",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        },
+        {
+          "id": "4",
+          "label": "Loop / shuffle / gap",
+          "owner": "starting_soon",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "5",
+          "label": "Finish only this session",
+          "owner": "coordination",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "media_workers": "99a1a00f5854b87301b5e62b0837f5e035bf87e45a4552403c603e0e3de1f064",
+        "starting_soon": "d36cefa1c1128c9b4c6e26381d39dc9c3172dc1538fdfa472b2a98a0a071bd6f",
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
+        "coordination": "af7125e6c03b3dbfc37fce3dfa9fe551779395b12a122ef592132b3885400afc"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/starting_soon/player.py",
+          "symbol": "ClipPlayer._play",
+          "hash": "ede083ac4838e91ab6442a54f7ee0de30b350245dfc9fe524eb61d983ee1e391"
+        }
+      ]
+    },
+    {
+      "id": "starting_soon.design",
+      "label": "Apply a reusable visual look",
+      "topic": "Waiting room",
+      "trigger": {
+        "label": "Save or apply a visual look",
+        "event": "hub_action",
+        "kind": "control"
+      },
+      "detail": "Artwork, editable copy, optional highlight frame, reveal style and drift are visual preferences. Named looks exclude playlists, clip placement overrides and volumes. Previews remain private; applying a look cannot start clips. Invalid personal data remains untouched, and unknown saved-look fields are preserved.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Validate visual preferences",
+          "owner": "starting_soon",
+          "kind": "gate",
+          "detail": "Validate the complete existing generation, named looks and proposed preferences."
+        },
+        {
+          "id": "1",
+          "label": "Snapshot and save atomically",
+          "owner": "starting_soon",
+          "kind": "action",
+          "detail": "Revision checks reject stale editors. Merge unknown personal fields and keep playlists and clip placements."
+        },
+        {
+          "id": "2",
+          "label": "Update browser layers",
+          "owner": "starting_soon",
+          "kind": "output",
+          "detail": "Artwork, transparent message and transparent frame have separate URLs. Two bounded image layers reject stale loads; page exit cancels animation and polling. Highlight disable cancels playback through its existing owner."
+        }
+      ],
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/starting_soon/settings.py",
+          "symbol": "save",
+          "hash": "72bda61a16afcd21c300d99e42fed8d99c0dd83937e51564b9b07061ec6820ef"
+        },
+        {
+          "path": "mini projects/starting_soon/api.py",
+          "symbol": "save",
+          "hash": "c41fd68a56096b8ffb55f7513df03672cfb9efc887626709303e2fa85e37e2af"
+        },
+        {
+          "path": "mini projects/starting_soon/looks.py",
+          "symbol": "validate",
+          "hash": "e0bf756321c2e2de80eb16d22c3b0afd66b6b9e95cc900462c787ac28b9a4738"
+        }
+      ],
+      "owner_hashes": {
+        "starting_soon": "d36cefa1c1128c9b4c6e26381d39dc9c3172dc1538fdfa472b2a98a0a071bd6f"
+      }
+    }
+  ]
+}

@@ -1,0 +1,200 @@
+[
+  {
+    "id": "wave",
+    "label": "Wave hello",
+    "key": "w",
+    "life": 2.4,
+    "stage": "back",
+    "weight": 18,
+    "description": "Penguins take turns waving while hello stars rise.",
+    "autoWeight": 0,
+    "impact": 0.2
+  },
+  {
+    "id": "confetti",
+    "label": "Confetti",
+    "key": " ",
+    "life": 10,
+    "stage": "front",
+    "weight": 96,
+    "description": "A fresh rainbow burst with every press.",
+    "autoWeight": 0.55,
+    "impact": 1
+  },
+  {
+    "id": "bubbles",
+    "label": "Bubble party",
+    "key": "b",
+    "life": 9,
+    "stage": "front",
+    "weight": 32,
+    "description": "Iridescent bubbles float up and pop into little stars.",
+    "autoWeight": 1,
+    "impact": 0.5
+  },
+  {
+    "id": "visitor",
+    "label": "Cosmic visitor",
+    "key": "u",
+    "life": 9,
+    "stage": "back",
+    "weight": 26,
+    "description": "A tiny UFO borrows a party duck and returns it.",
+    "autoWeight": 0.8,
+    "impact": 0.85
+  },
+  {
+    "id": "vinyl",
+    "label": "Vinyl orbit",
+    "key": "v",
+    "life": 8,
+    "stage": "back",
+    "weight": 24,
+    "description": "Glowing records launch from the booth and orbit the party.",
+    "autoWeight": 0.65,
+    "impact": 0.8
+  },
+  {
+    "id": "meteors",
+    "label": "Shooting stars",
+    "key": "s",
+    "life": 7,
+    "stage": "back",
+    "weight": 60,
+    "description": "Rainbow shooting stars skim the ceiling and burst.",
+    "autoWeight": 0.65,
+    "impact": 0.8
+  },
+  {
+    "id": "bloom",
+    "label": "Neon bloom",
+    "key": "n",
+    "life": 10,
+    "stage": "back",
+    "weight": 80,
+    "description": "Curling neon vines grow flowers around the room.",
+    "autoWeight": 0.7,
+    "impact": 0.8
+  },
+  {
+    "id": "ducks",
+    "label": "Duck parade",
+    "key": "d",
+    "life": 9,
+    "stage": "front",
+    "weight": 36,
+    "description": "A procession of bouncing ducks in colorful party hats.",
+    "autoWeight": 0.9,
+    "impact": 0.65
+  },
+  {
+    "id": "lanterns",
+    "label": "Floating lanterns",
+    "key": "l",
+    "life": 10,
+    "stage": "back",
+    "weight": 35,
+    "description": "Warm paper lanterns drift up the sides of the club.",
+    "autoWeight": 1.2,
+    "impact": 0.32
+  },
+  {
+    "id": "jellyfish",
+    "label": "Disco jellyfish",
+    "key": "j",
+    "life": 10,
+    "stage": "back",
+    "weight": 40,
+    "description": "Little luminous jellyfish dance on their way upstairs.",
+    "autoWeight": 1,
+    "impact": 0.5
+  },
+  {
+    "id": "planes",
+    "label": "Paper planes",
+    "key": "p",
+    "life": 9,
+    "stage": "back",
+    "weight": 24,
+    "description": "Colorful paper planes loop across the ceiling.",
+    "autoWeight": 1,
+    "impact": 0.4
+  },
+  {
+    "id": "robot",
+    "label": "Roller robot",
+    "key": "r",
+    "life": 9,
+    "stage": "front",
+    "weight": 28,
+    "description": "A tiny robot rolls through with a glowing drink.",
+    "autoWeight": 0.85,
+    "impact": 0.4
+  },
+  {
+    "id": "portal",
+    "label": "Toy portal",
+    "key": "o",
+    "life": 9,
+    "stage": "back",
+    "weight": 40,
+    "description": "A glowing portal spills out a duck, a record, a planet and a star.",
+    "autoWeight": 0.65,
+    "impact": 0.75
+  },
+  {
+    "id": "balloons",
+    "label": "Party balloons",
+    "key": "a",
+    "life": 10,
+    "stage": "front",
+    "weight": 40,
+    "description": "Iridescent balloons sway up from the edges.",
+    "autoWeight": 1,
+    "impact": 0.4
+  },
+  {
+    "id": "pinball",
+    "label": "Neon pinball",
+    "key": "i",
+    "life": 8,
+    "stage": "front",
+    "weight": 40,
+    "description": "A glowing pinball ricochets between the floor bumpers.",
+    "autoWeight": 0.85,
+    "impact": 0.3
+  },
+  {
+    "id": "fireflies",
+    "label": "Firefly stars",
+    "key": "f",
+    "life": 9,
+    "stage": "back",
+    "weight": 56,
+    "description": "Fireflies gather into a twirling constellation.",
+    "autoWeight": 1.3,
+    "impact": 0.25
+  },
+  {
+    "id": "moon",
+    "label": "Moon hello",
+    "key": "m",
+    "life": 9,
+    "stage": "back",
+    "weight": 24,
+    "description": "A sleepy little moon peeks in, winks and blows stars.",
+    "autoWeight": 0.8,
+    "impact": 0.35
+  },
+  {
+    "id": "fireworks",
+    "label": "Ceiling fireworks",
+    "key": "x",
+    "life": 7,
+    "stage": "back",
+    "weight": 75,
+    "description": "Three miniature colorful fireworks bloom overhead.",
+    "autoWeight": 0.35,
+    "impact": 1.05
+  }
+]

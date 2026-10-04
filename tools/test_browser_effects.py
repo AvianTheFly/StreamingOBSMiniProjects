@@ -14,9 +14,48 @@ from lib.browser_effects.http_server import handler
 
 
 class SessionTests(unittest.TestCase):
+    def test_extended_sound_catalog_resolves_authored_scenes_and_exceptions(self):
+        import re
+        from lib.browser_effects.catalog import effect_for, load_catalog
+        folder = Path('mini projects/soundboard')
+        catalog = load_catalog(folder)
+        source = Path('lib/browser_effects/art/library-scenes.js').read_text(encoding='utf-8')
+        authored = re.findall(r"case '([^']+)'", source)
+        scenes = [effect['scene'] for effect in catalog.values() if effect.get('scene')]
+        self.assertCountEqual(scenes, authored)
+        self.assertEqual(len(scenes), len(set(scenes)))
+        for stem in catalog:
+            self.assertIsNotNone(effect_for(folder, stem), stem)
+        self.assertEqual(effect_for(folder, 'hooray')['renderer'], 'hooray')
+        self.assertEqual(effect_for(folder, 'mom frog')['scene'], 'mom-frog')
+
+    def test_requested_border_groups_have_distinct_supported_shows(self):
+        from lib.browser_effects.catalog import effect_for
+        folder=Path('mini projects/soundboard')
+        profile=json.loads((folder/'hotkeys_editor.json').read_text())['profiles']['default']
+        for key, count in [('Z',7),('1',3),('!',13)]:
+            stems=profile['hotkeys'][key]
+            self.assertEqual(len(stems), count)
+            effects=[effect_for(folder, stem) for stem in stems]
+            self.assertTrue(all(effects), key)
+            self.assertTrue(all(e.get('rave') for e in effects), key)
+            self.assertEqual(len({(e['renderer'],e.get('style')) for e in effects}),count)
+
     def setUp(self):
         self.now=10
         self.channel=Channel(lambda:self.now)
+
+    def test_random_character_queue_keeps_existing_asset_identities(self):
+        from lib.browser_effects.catalog import effect_for
+        folder = Path('mini projects/soundboard')
+        profile = json.loads((folder/'hotkeys_editor.json').read_text())['profiles']['default']
+        stems = ['lizzard-1', 'gary_meow', 'mac-quack', 'bonk_7zPAD7C', 'piuw']
+        self.assertEqual(profile['hotkeys']['2'], stems)
+        effects = [effect_for(folder, stem) for stem in stems]
+        self.assertTrue(all(effects))
+        self.assertTrue(all(effect['renderer'] == 'borders' for effect in effects))
+        self.assertEqual([effect.get('scene') or effect['style'] for effect in effects],
+                         ['lizard', 'gary', 'quack', 'bonk', 'piuw'])
 
     def test_replacement_ignores_stale_end_and_stop(self):
         old=self.channel.begin('old',Path('old.wav'),{})
@@ -41,12 +80,12 @@ class SessionTests(unittest.TestCase):
         self.assertTrue(self.channel.matches('DIE DIE DIE'))
         self.assertFalse(self.channel.matches('hooray'))
 
-    def test_celebrations_are_mapped_and_hooray_keeps_original_video(self):
+    def test_celebrations_are_mapped_and_hooray_uses_transparent_confetti(self):
         from lib.browser_effects.catalog import effect_for
         folder=Path('mini projects/soundboard')
         profile=json.loads((folder/'hotkeys_editor.json').read_text())['profiles']['default']
         self.assertEqual(profile['hotkeys']['@'], 'hooray')
-        self.assertIsNone(effect_for(folder, 'hooray'))
+        self.assertEqual(effect_for(folder, 'hooray')['renderer'], 'hooray')
         effects=[effect_for(folder, stem) for stem in profile['hotkeys']['!']]
         self.assertTrue(all(effects))
         self.assertEqual(len({(e['renderer'],e.get('style')) for e in effects}),len(effects))
@@ -64,6 +103,24 @@ class SessionTests(unittest.TestCase):
 
 
 class HTTPTests(unittest.TestCase):
+    def test_published_json_file_keeps_original_bytes_and_api_json_still_serializes(self):
+        from lib.browser_effects.presentations import register,unregister
+        with tempfile.TemporaryDirectory() as folder:
+            file=Path(folder)/'montage.json';payload=b'{"shots":[{"file":"shot-example.jpg"}]}\n';file.write_bytes(payload)
+            token=register('json-fixture',{'montage.json':file},entry='montage.json')
+            server=ThreadingHTTPServer(('127.0.0.1',0),handler(lambda name:None,0))
+            server.RequestHandlerClass=handler(lambda name:None,server.server_port)
+            thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
+            url=f'http://127.0.0.1:{server.server_port}'
+            try:
+                with urlopen(url+'/presentation/json-fixture/montage.json') as response:
+                    self.assertEqual(response.headers['Content-Type'],'application/json')
+                    self.assertEqual(response.read(),payload)
+                with urlopen(url+'/api/state/missing') as response:
+                    self.assertEqual(json.load(response),{'active':None,'ready':False})
+            finally:
+                server.shutdown();server.server_close();thread.join();unregister('json-fixture',token)
+
     def test_audio_ranges_expiry_host_and_cross_origin_ack(self):
         with tempfile.TemporaryDirectory() as folder:
             file=Path(folder)/'sound.wav';file.write_bytes(b'0123456789')
@@ -141,11 +198,11 @@ class TriggerGateTests(unittest.TestCase):
              patch.object(main,'VoicePTT',return_value=None), \
              patch.object(main,'_load_runtime_settings',return_value=settings), \
              patch.object(main,'_build_name_index',return_value={'die die die':Path('muffin.mp4')}), \
-             patch.object(main,'load_project_profile_summaries',return_value=[]), \
+             patch('lib.shared_media.runtime_profiles.load_project_profile_summaries',return_value=[]), \
              patch.object(main,'subscribe_global_hotkeys',side_effect=lambda callback:callbacks.append(callback) or 1), \
              patch.object(main,'unsubscribe_global_hotkeys'), \
-             patch.object(main.coordinator,'request_to_play',side_effect=lambda name,on_ready:on_ready()), \
-             patch.object(main.coordinator,'announce_finished'), \
+             patch.object(main.coordinator,'request',side_effect=lambda name,on_ready: (on_ready(Mock(cancelled=threading.Event())), Mock(done=threading.Event()))[1]), \
+             patch.object(main.coordinator,'cancel'), \
              patch.object(main.hub_events,'subscribe'),patch.object(main.hub_events,'unsubscribe'), \
              patch.dict(main._live,{},clear=True):
             thread=threading.Thread(target=main.run,args=(queue.Queue(),stop),kwargs={'startup_event':ready})

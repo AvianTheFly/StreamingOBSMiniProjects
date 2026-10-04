@@ -30,5 +30,17 @@ class SnapshotTests(unittest.TestCase):
                 with self.assertRaises((LiveClientUnavailable,ValueError,AttributeError)): client.fetch()
                 self.assertIsNone(client.snapshot)
 
+    def test_disconnected_client_coalesces_retries_without_delaying_reconnect(self):
+        now=[0]; opener=Mock()
+        opener.open.side_effect=[OSError('offline'), io.BytesIO(b'{"gameData":{"gameTime":10}}')]
+        client=SnapshotClient(clock=lambda:now[0],opener=opener)
+        with self.assertRaises(LiveClientUnavailable): client.fetch()
+        now[0]=.4
+        with self.assertRaises(LiveClientUnavailable): client.fetch()
+        self.assertEqual(opener.open.call_count,1)
+        now[0]=.51
+        self.assertEqual(client.fetch()['gameData']['gameTime'],10)
+        self.assertEqual(opener.open.call_count,2)
+
 
 if __name__=='__main__': unittest.main()

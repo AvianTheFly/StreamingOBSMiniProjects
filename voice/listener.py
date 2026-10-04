@@ -1,22 +1,8 @@
-"""
-voice/listener.py
-=================
-Push-to-talk recorder for obs_hub.
+"""Microphone and Whisper backend for voice.service.
 
-Workflow
---------
-1. A project calls start_recording(owner) when the user presses its trigger hotkey.
-   Only ONE project can record at a time.  If another is already recording, the
-   call is rejected and logs a warning.
-2. Mic accumulates raw float32 chunks into a growing buffer.
-3. The project calls stop_and_transcribe(send_fn, owner) when:
-   - The trigger hotkey is pressed again  (double-trigger)
-   - The user presses the 'C' stop key
-   - The 2-second auto-timeout fires
-4. Whisper transcribes the buffer and calls send_fn(text) from a background thread.
-
-The mic stream is always open (no startup delay).  Audio is only buffered when
-_recording is True — Whisper never sees audio until a trigger is pressed.
+One open input stream captures only the active session. This module owns audio
+buffers and inference; the service owns consumers, deadlines and result routing.
+Projects use voice.ptt or voice.service, never these recording primitives.
 """
 
 from __future__ import annotations
@@ -27,6 +13,7 @@ import time
 from typing import Callable
 
 import numpy as np
+from lib.performance_monitor import note_media_load
 
 from hub_config import (
     MIC_CHUNK_SAMPLES,
@@ -40,7 +27,6 @@ from hub_config import (
 )
 
 SendFn = Callable[[str], None]
-READY_WAIT_SECONDS = 30.0
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -49,9 +35,11 @@ READY_WAIT_SECONDS = 30.0
 
 _model  = None                          # WhisperModel — loaded once
 _stream = None                          # sounddevice InputStream — kept open always
-_audio_q: queue.Queue[np.ndarray] = queue.Queue(maxsize=128)
+_audio_q: queue.Queue[tuple[int, np.ndarray]] = queue.Queue(maxsize=128)
 _ready_event = threading.Event()
 _startup_error: str | None = None
+_start_lock = threading.Lock()
+_listener_thread: threading.Thread | None = None
 
 _recording       = False
 _recording_owner = ""                   # tag of the project that owns the current recording
@@ -60,6 +48,7 @@ _buffer: list[np.ndarray] = []
 _transcription_busy = False
 MAX_RECORDING_SECONDS = 10
 _recording_started = 0.0
+_recording_generation = 0
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -67,14 +56,20 @@ _recording_started = 0.0
 # ─────────────────────────────────────────────────────────────────────────────
 
 def start(stop_event: threading.Event) -> None:
-    """Load Whisper and open the microphone.  Call once at hub startup."""
-    t = threading.Thread(
-        target=_init_and_drain,
-        args=(stop_event,),
-        name="voice_listener",
-        daemon=True,
-    )
-    t.start()
+    """Start one microphone listener, reusing the model after a failed mic open."""
+    global _listener_thread
+    with _start_lock:
+        if _listener_thread is not None and _listener_thread.is_alive():
+            return
+        _listener_thread = threading.Thread(
+            target=_init_and_drain, args=(stop_event,),
+            name="voice_listener", daemon=True,
+        )
+        try:
+            _listener_thread.start()
+        except Exception:
+            _listener_thread = None
+            raise
 
 
 def start_recording(owner: str = "unknown") -> bool:
@@ -85,18 +80,9 @@ def start_recording(owner: str = "unknown") -> bool:
     Returns False if another project is already recording — the caller should
     abort its recording flow.  Nothing is modified in that case.
     """
-    global _recording, _buffer, _recording_owner, _recording_started
+    global _recording, _buffer, _recording_owner, _recording_started, _recording_generation
     if not _ready_event.is_set():
-        if _startup_error:
-            print(f"  [voice] Voice listener unavailable: {_startup_error}")
-            return False
-        print(f"  [voice] Waiting for Whisper/mic startup before recording [{owner}]...")
-        if not _ready_event.wait(timeout=READY_WAIT_SECONDS):
-            if _startup_error:
-                print(f"  [voice] Voice listener unavailable: {_startup_error}")
-                return False
-            print(f"  [voice] WARNING: '{owner}' could not record because the mic is not ready yet.")
-            return False
+        return False
 
     with _rec_lock:
         if _transcription_busy:
@@ -104,18 +90,19 @@ def start_recording(owner: str = "unknown") -> bool:
             return False
         if _recording:
             print(
-                f"  [voice] ⚠  '{owner}' tried to start recording, "
+                f"  [voice] '{owner}' tried to start recording, "
                 f"but '{_recording_owner}' is already active — ignored."
             )
             return False
         _clear_audio_queue()
         _buffer          = []
-        _recording       = True
+        _recording_generation += 1
         _recording_owner = owner
         _recording_started = time.monotonic()
+        _recording       = True
 
-    print(f"  [voice] 🎙️  Recording started [{owner}]. "
-          f"Press trigger again or 'C' to send, auto-stops in 2s.")
+    print(f"  [voice] Recording started [{owner}]. "
+          f"Waiting for the shared service to finish or cancel.")
     return True
 
 
@@ -124,7 +111,9 @@ def is_ready() -> bool:
     return _ready_event.is_set()
 
 
-def stop_and_transcribe(send_fn: SendFn, owner: str = "") -> None:
+def stop_and_transcribe(send_fn: SendFn, owner: str = "", *,
+                        on_complete: Callable[[], None] | None = None,
+                        on_error: Callable[[str], None] | None = None) -> None:
     """
     Stop recording and transcribe in a background thread.
 
@@ -132,49 +121,85 @@ def stop_and_transcribe(send_fn: SendFn, owner: str = "") -> None:
             current owner the call is silently rejected.  Pass "" to force-stop
             regardless of owner (e.g. on hub shutdown).
     send_fn — called with the transcribed string from a background thread.
-              Pass `lambda _: None` to discard (e.g. on cancel).
+              Use cancel_recording() to discard audio without inference.
     """
     global _recording, _recording_owner, _transcription_busy
+    rejected = False
     with _rec_lock:
         if not _recording:
             if owner:
                 print(f"  [voice] '{owner}' called stop_and_transcribe but nothing is recording.")
-            return
-        if owner and _recording_owner and owner != _recording_owner:
+            rejected = True
+        elif owner and _recording_owner and owner != _recording_owner:
             print(
-                f"  [voice] ⚠  '{owner}' tried to stop recording owned by "
+                f"  [voice] '{owner}' tried to stop recording owned by "
                 f"'{_recording_owner}' — ignored."
             )
-            return
-        _recording       = False
-        audio_snapshot   = list(_buffer)
-        _buffer.clear()
-        stopped_owner    = _recording_owner
-        _recording_owner = ""
-        _transcription_busy = bool(audio_snapshot)
+            rejected = True
+        else:
+            # Include audio already captured but not yet consumed by the
+            # drain thread. Session tags exclude late cancelled chunks.
+            _flush_audio_queue_locked()
+            _recording       = False
+            audio_snapshot   = list(_buffer)
+            _buffer.clear()
+            stopped_owner    = _recording_owner
+            _recording_owner = ""
+            _transcription_busy = bool(audio_snapshot)
+
+    if rejected:
+        if on_complete:
+            on_complete()
+        return
 
     chunk_count = len(audio_snapshot)
     duration    = chunk_count * MIC_CHUNK_SAMPLES / MIC_SAMPLE_RATE
-    print(f"  [voice] 🛑  Recording stopped [{stopped_owner}]. "
+    print(f"  [voice] Recording stopped [{stopped_owner}]. "
           f"{chunk_count} chunk(s) / {duration:.2f}s buffered.")
 
     if not audio_snapshot:
         print("  [voice] Nothing recorded — buffer was empty.")
+        if on_complete:
+            on_complete()
         return
 
     def run():
         global _transcription_busy
+        error = ""
         try:
             _transcribe_and_send(audio_snapshot, send_fn)
+        except Exception as exc:
+            error = str(exc)
+            print(f"  [voice] Transcription error: {error}")
         finally:
             with _rec_lock:
                 _transcription_busy = False
+            if error and on_error:
+                on_error(error)
+            if on_complete:
+                on_complete()
     try:
         threading.Thread(target=run, name="voice-transcribe", daemon=True).start()
     except Exception:
         with _rec_lock:
             _transcription_busy = False
+        if on_complete:
+            on_complete()
         raise
+
+
+def cancel_recording(owner: str = "") -> bool:
+    """Discard a recording without starting Whisper inference."""
+    global _recording, _recording_owner
+    with _rec_lock:
+        if not _recording or (owner and _recording_owner and owner != _recording_owner):
+            return False
+        _recording = False
+        _recording_owner = ""
+        _buffer.clear()
+        _clear_audio_queue()
+    print(f"  [voice] Recording cancelled [{owner}].")
+    return True
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -194,16 +219,24 @@ def _init_and_drain(stop_event: threading.Event) -> None:
             f"  [voice] Loading Whisper '{WHISPER_MODEL}' "
             f"on {WHISPER_DEVICE} ({WHISPER_COMPUTE})..."
         )
-        _model = WhisperModel(
-            WHISPER_MODEL,
-            device=WHISPER_DEVICE,
-            compute_type=WHISPER_COMPUTE,
-            cpu_threads=WHISPER_CPU_THREADS,
-        )
+        if _model is None:
+            note_media_load('voice:model', 'loading')
+            try:
+                _model = WhisperModel(
+                    WHISPER_MODEL,
+                    device=WHISPER_DEVICE,
+                    compute_type=WHISPER_COMPUTE,
+                    cpu_threads=WHISPER_CPU_THREADS,
+                )
+            finally:
+                note_media_load('voice:model', 'released')
         print("  [voice] Whisper ready.")
     except Exception as e:
         _startup_error = f"failed to load Whisper: {e}"
         print(f"  [voice] Failed to load Whisper: {e}")
+        return
+
+    if stop_event.is_set():
         return
 
     # ── Open microphone ───────────────────────────────────────────────────────
@@ -224,7 +257,6 @@ def _init_and_drain(stop_event: threading.Event) -> None:
     device_name = device_info["name"]
     native_rate = int(device_info["default_samplerate"])
 
-    chosen_rate = MIC_SAMPLE_RATE
     if native_rate != MIC_SAMPLE_RATE:
         print(
             f"  [voice] Note: device native rate is {native_rate} Hz, "
@@ -234,10 +266,7 @@ def _init_and_drain(stop_event: threading.Event) -> None:
     def _sd_callback(indata, frames, time_info, status):
         if status:
             print(f"  [voice] sounddevice status: {status}")
-        try:
-            _audio_q.put_nowait(indata[:, 0].copy())   # mono float32
-        except queue.Full:
-            pass  # Audio callbacks must not block or grow memory without bound.
+        _capture_audio(indata)
 
     for rate in ([MIC_SAMPLE_RATE] if native_rate == MIC_SAMPLE_RATE
                  else [MIC_SAMPLE_RATE, native_rate]):
@@ -252,7 +281,6 @@ def _init_and_drain(stop_event: threading.Event) -> None:
                 callback=_sd_callback,
             )
             _stream.start()
-            chosen_rate = rate
             print(f"  [voice] Mic open: [{device_idx if device_idx is not None else 'default'}] "
                   f"'{device_name}' @ {rate} Hz")
             if rate != MIC_SAMPLE_RATE:
@@ -263,6 +291,8 @@ def _init_and_drain(stop_event: threading.Event) -> None:
             break
         except Exception as e:
             print(f"  [voice] Could not open mic at {rate} Hz: {e}")
+            if _stream is not None:
+                _stream.close()
             _stream = None
 
     if _stream is None:
@@ -278,25 +308,58 @@ def _init_and_drain(stop_event: threading.Event) -> None:
     try:
         while not stop_event.is_set():
             try:
-                chunk = _audio_q.get(timeout=0.1)
+                captured = _audio_q.get(timeout=0.1)
             except queue.Empty:
                 continue
 
             with _rec_lock:
-                if _recording:
-                    if time.monotonic() - _recording_started > MAX_RECORDING_SECONDS:
-                        # A lost trigger/timer must not create a minutes-long
-                        # CUDA job. Normal commands auto-stop at two seconds.
-                        _recording = False
-                        _recording_owner = ""
-                        _buffer.clear()
-                        print("  [voice] Recording safety timeout; discarded stale command.")
-                    else:
-                        _buffer.append(chunk)
+                _append_audio_locked(captured)
     finally:
         _ready_event.clear()
-        _stream.stop()
-        _stream.close()
+        with _rec_lock:
+            _recording = False
+            _recording_owner = ""
+            _buffer.clear()
+            _clear_audio_queue()
+        try:
+            _stream.stop()
+        finally:
+            _stream.close()
+            _stream = None
+
+
+def _capture_audio(indata: np.ndarray) -> None:
+    """Keep the real-time callback nonblocking and tag its recording session."""
+    generation = _recording_generation
+    if not _recording:
+        return
+    try:
+        _audio_q.put_nowait((generation, indata[:, 0].copy()))
+    except queue.Full:
+        pass
+
+
+def _append_audio_locked(captured: tuple[int, np.ndarray]) -> None:
+    global _recording, _recording_owner
+    generation, chunk = captured
+    if not _recording or generation != _recording_generation:
+        return
+    if time.monotonic() - _recording_started > MAX_RECORDING_SECONDS:
+        _recording = False
+        _recording_owner = ""
+        _buffer.clear()
+        print("  [voice] Recording safety timeout; discarded stale command.")
+    else:
+        _buffer.append(chunk)
+
+
+def _flush_audio_queue_locked() -> None:
+    while True:
+        try:
+            captured = _audio_q.get_nowait()
+        except queue.Empty:
+            return
+        _append_audio_locked(captured)
 
 
 def _clear_audio_queue() -> None:
@@ -318,23 +381,15 @@ def _transcribe_and_send(chunks: list[np.ndarray], send_fn: SendFn) -> None:
     print(f"  [voice] Transcribing {duration:.2f}s of audio…")
 
     try:
-        segments, _ = _model.transcribe(
-            audio,
-            language=WHISPER_LANGUAGE,
-            beam_size=5,
-            vad_filter=True,
-            vad_parameters={"min_silence_duration_ms": 300},
-        )
-        text = " ".join(s.text for s in segments).strip()
+        text = _infer_text(audio)
     except Exception as e:
-        print(f"  [voice] Transcription error: {e}")
-        return
+        raise RuntimeError(f"Transcription error: {e}") from e
 
     if not text:
         print("  [voice] Transcription empty — VAD filtered everything (silence or noise).")
         return
 
-    print(f"  [voice] 🎤  Transcribed: \"{text}\"")
+    print(f"  [voice] Transcribed: \"{text}\"")
     send_fn(text)
 
 
@@ -342,4 +397,38 @@ def diagnostics() -> dict:
     with _rec_lock:
         return {"ready": is_ready(), "recording": _recording,
                 "transcribing": _transcription_busy, "model": WHISPER_MODEL,
-                "device": WHISPER_DEVICE, "compute": WHISPER_COMPUTE}
+                "device": WHISPER_DEVICE, "compute": WHISPER_COMPUTE,
+                "startup_error": _startup_error}
+
+
+def _infer_text(audio) -> str:
+    """Both uploads and microphone commands consume lazy inference here."""
+    note_media_load('voice:inference', 'running')
+    try:
+        segments, _ = _model.transcribe(audio, language=WHISPER_LANGUAGE,
+            beam_size=5, vad_filter=True,
+            vad_parameters={"min_silence_duration_ms": 300})
+        return " ".join(s.text for s in segments).strip()
+    finally:
+        note_media_load('voice:inference', 'released')
+
+
+def transcribe_file(path: str, *, word_timestamps=False):
+    """Use the loaded model for an editor upload, excluding microphone inference."""
+    global _transcription_busy
+    with _rec_lock:
+        if _model is None or _recording or _transcription_busy:
+            raise RuntimeError("Voice model is starting or busy")
+        _transcription_busy = True
+    try:
+        if not word_timestamps:
+            return _infer_text(path)
+        from .transcription import timed_words
+        note_media_load('voice:inference', 'running')
+        try:
+            return timed_words(_model, path, WHISPER_LANGUAGE)
+        finally:
+            note_media_load('voice:inference', 'released')
+    finally:
+        with _rec_lock:
+            _transcription_busy = False

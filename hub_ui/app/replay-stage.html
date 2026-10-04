@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Replay</title>
+<link rel="stylesheet" href="/replay-stage/stage.css">
+</head>
+<body>
+<main id="stage" aria-label="Recorded clip presentation">
+  <div class="world static"></div><div class="top-line static"></div>
+  <header class="masthead static">
+    <svg class="emblem" viewBox="0 0 48 48" aria-hidden="true"><path d="M14 12a17 17 0 1 1-6 12M14 4v13H2" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="m22 15 12 9-12 9z" fill="currentColor"/></svg>
+    <h1 id="heading">REPLAY</h1><span class="recording-badge"><i></i> RECORDED</span>
+  </header>
+  <div class="screen-window static media-box"><div class="corner top-left"></div><div class="corner bottom-right"></div></div>
+  <div class="frame-effect media-box"></div>
+  <div class="live-window feed-window static"><span class="feed-name">LIVE SCREEN</span></div>
+  <div class="camera-window feed-window static"><span class="feed-name">CAM</span></div>
+  <div class="live-status feed-status dynamic" id="liveStatus">No signal</div>
+  <div class="camera-status feed-status dynamic" id="cameraStatus"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="13" width="27" height="23" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="m32 20 11-6v21l-11-6M8 5l32 38" fill="none" stroke="currentColor" stroke-width="2"/></svg><span>Camera offline</span></div>
+  <div class="side-session dynamic" id="sideSession"><span class="eyebrow">NEXT</span><div id="nextTitle"></div><div id="sequence"></div></div>
+  <div class="progress-track dynamic"><div id="progress"></div></div>
+  <footer class="clip-footer dynamic"><div class="clip-copy"><strong id="clipTitle"></strong><span id="clipContext"></span></div><div class="timecode" id="timecode"></div></footer>
+  <div class="chapter dynamic" id="chapter"></div>
+  <div class="loading media-box dynamic"><div class="loading-orbit"></div><span class="eyebrow" id="phaseLabel">Loading</span><h2 id="phaseTitle"></h2></div>
+  <div class="handoff media-box dynamic" id="handoff" aria-hidden="true"><div class="blade left"></div><div class="blade right"></div><div class="iris-disc"></div><div class="veil"></div><div class="handoff-ring"></div><div class="handoff-copy"><span id="handoffIndex"></span><strong id="handoffTitle"></strong></div></div>
+  <div class="preview-footage media-box"><div class="preview-grid"></div><svg viewBox="0 0 48 48"><path d="m17 10 22 14-22 14z" fill="currentColor"/></svg></div>
+  <div class="preview-live">SCREEN</div><div class="preview-camera"><svg viewBox="0 0 48 48"><circle cx="24" cy="17" r="8" fill="currentColor"/><path d="M8 41c0-17 32-17 32 0" fill="currentColor"/></svg></div>
+</main>
+<script type="module" src="/replay-stage/stage.js"></script>
+</body></html>

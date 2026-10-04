@@ -1,0 +1,83 @@
+{
+  "module": {
+    "id": "twitch_commands",
+    "label": "Chat commands",
+    "group": "Inputs",
+    "icon": "chat",
+    "description": "Personalized viewer replies through the shared Hub sender.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "twitch_commands.reply",
+      "label": "A viewer uses a chat command",
+      "topic": "Chat & stats",
+      "trigger": {
+        "label": "Fresh Twitch chat arrives",
+        "event": "twitch.chat.message",
+        "kind": "event"
+      },
+      "detail": "One subscriber matches enabled commands and trusted roles. Aliases share cooldowns; duplicate/stale messages are rejected. The bounded Hub reply queue rechecks settings generation, channel and lifetime before sending. Private previews never enqueue messages.",
+      "steps": [
+        {
+          "id": "match",
+          "label": "Match enabled command and permission",
+          "owner": "twitch_commands",
+          "kind": "gate",
+          "detail": "Only this channel, recent trusted message IDs and enabled command groups."
+        },
+        {
+          "id": "cooldown",
+          "label": "Check alias-shared and per-viewer cooldowns",
+          "owner": "twitch_commands",
+          "kind": "gate",
+          "detail": "Bounded caches; failed admission consumes no cooldown."
+        },
+        {
+          "id": "queue",
+          "label": "Queue a revision-guarded reply",
+          "owner": "twitch_commands",
+          "kind": "action",
+          "detail": "The callback returns promptly; settings edits and shutdown revoke pending intent."
+        },
+        {
+          "id": "send",
+          "label": "Deliver through the Hub chat sender",
+          "owner": "chat_transport",
+          "kind": "end",
+          "detail": "One authorized, bounded Helix delivery worker. No second socket, credential store, or retry of uncertain writes."
+        }
+      ],
+      "edges": [
+        {
+          "from": "match",
+          "to": "cooldown"
+        },
+        {
+          "from": "cooldown",
+          "to": "queue"
+        },
+        {
+          "from": "queue",
+          "to": "send"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/twitch_commands/service.py",
+          "symbol": "Commands.receive",
+          "hash": "2abfe64baa0299c36113d260a49bf63d64ef8756f4201b4ddfed3807a1c8fe69"
+        },
+        {
+          "path": "mini projects/twitch_commands/main.py",
+          "symbol": "run",
+          "hash": "63a883ac4fe960ab93856c0f3d24e82237a134b498fd923fd81de8db68b475da"
+        }
+      ],
+      "owner_hashes": {
+        "chat_transport": "0935a6133944e3e1e86d0907df4ab370f44fc52849f30badeccb42826fcda23d",
+        "twitch_commands": "507386cdeb467edccd2c8d9cab79f20da90d4cbfb0fdc29d13bd95cfe6173c5c"
+      }
+    }
+  ]
+}

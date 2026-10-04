@@ -15,7 +15,6 @@ from ..config import (
     DEATH_SCENE, DEATH_SOURCE,
     RESPAWN_SCENE, RESPAWN_SOURCE,
     CHAMPION_KILL_BORDER_SCENE, CHAMPION_KILL_BORDER_SOURCE,
-    UDYR_ANIMATION_SCENE, UDYR_ANIMATION_SOURCE,
 )
 from ..utils import show_overlay
 
@@ -25,11 +24,6 @@ def make_game_start_handler():
         print("[league] Game detected — notifying hub.")
         # Notify other projects (scene_voice_switcher will switch to game scene).
         hub_events.emit("game.connected")
-
-        try:
-            obs.show_source(UDYR_ANIMATION_SCENE, UDYR_ANIMATION_SOURCE)
-        except Exception as e:
-            print(f"[league] Game start error (Udyr animation): {e}")
 
         if not GAME_START_ENABLED or GAME_START_SOURCE is None:
             return
@@ -51,11 +45,6 @@ def make_game_end_handler():
                 obs.hide_source(DEATH_SCENE, source)
             except Exception as e:
                 print(f"[league] Failed to hide {source}: {e}")
-
-        try:
-            obs.hide_source(UDYR_ANIMATION_SCENE, UDYR_ANIMATION_SOURCE)
-        except Exception as e:
-            print(f"[league] Game end error (Udyr animation): {e}")
 
         # Notify other projects (scene_voice_switcher will switch back to lobby).
         hub_events.emit("game.disconnected")

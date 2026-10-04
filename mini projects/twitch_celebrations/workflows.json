@@ -1,0 +1,538 @@
+{
+  "module": {
+    "id": "twitch_celebrations",
+    "label": "Twitch celebrations",
+    "group": "Community",
+    "icon": "spark",
+    "description": "Queues subscriber, raid, follow and cheer shows.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "twitch_celebrations.raid",
+      "label": "A raid arrives",
+      "topic": "Twitch events",
+      "trigger": {
+        "label": "A raid arrives",
+        "event": "twitch:raid",
+        "kind": "event"
+      },
+      "detail": "Eight-second native crab flotilla, lantern dragons, occupied cat train or frog musicians. Existing cue clock, audio and server expiry; transparent gameplay center.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Enabled & new event?",
+          "owner": "twitch_celebrations",
+          "kind": "gate",
+          "detail": "",
+          "setting": {
+            "path": "mini projects/twitch_celebrations/settings.json",
+            "key": "enabled"
+          }
+        },
+        {
+          "id": "1",
+          "label": "Queue by event priority",
+          "owner": "twitch_celebrations",
+          "kind": "wait",
+          "detail": "Raids lead; stale items expire. Follow bursts cannot bury other events."
+        },
+        {
+          "id": "2",
+          "label": "OBS overlay ready?",
+          "owner": "twitch_celebrations",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Run the selected show",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        },
+        {
+          "id": "4",
+          "label": "Release for the next show",
+          "owner": "twitch_celebrations",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "twitch_celebrations": "2102fc1c30b84682f68fe7a6555cbda77e316f6183b083a049c394061cadb8f7",
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/twitch_celebrations/engine.py",
+          "symbol": "Engine.submit",
+          "hash": "a1796f8919ebd803d2c9de27483d6008fd836eeb8671afcf1705853642850d4e"
+        },
+        {
+          "path": "mini projects/twitch_celebrations/engine.py",
+          "symbol": "Engine.snapshot",
+          "hash": "ed0085aa946d3b6c2227c1439c5fe7ae0dc6865b3c3cf58baaba21bf8c052066"
+        }
+      ]
+    },
+    {
+      "id": "twitch_celebrations.subscribe",
+      "label": "A subscription arrives",
+      "topic": "Twitch events",
+      "trigger": {
+        "label": "A subscription arrives",
+        "event": "twitch:subscribe",
+        "kind": "event"
+      },
+      "detail": "Runtime names/facts at the top with native den, grove, workshop or phoenix scenes. Gifts have separately staged delivery acts. Approved follower renderer and its feature-owned original sprites are preserved.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Enabled & new event?",
+          "owner": "twitch_celebrations",
+          "kind": "gate",
+          "detail": "",
+          "setting": {
+            "path": "mini projects/twitch_celebrations/settings.json",
+            "key": "enabled"
+          }
+        },
+        {
+          "id": "1",
+          "label": "Queue by event priority",
+          "owner": "twitch_celebrations",
+          "kind": "wait",
+          "detail": "Raids lead; stale items expire. Follow bursts cannot bury other events."
+        },
+        {
+          "id": "2",
+          "label": "OBS overlay ready?",
+          "owner": "twitch_celebrations",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Run the selected show",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        },
+        {
+          "id": "4",
+          "label": "Release for the next show",
+          "owner": "twitch_celebrations",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "twitch_celebrations": "2102fc1c30b84682f68fe7a6555cbda77e316f6183b083a049c394061cadb8f7",
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/twitch_celebrations/engine.py",
+          "symbol": "Engine.submit",
+          "hash": "a1796f8919ebd803d2c9de27483d6008fd836eeb8671afcf1705853642850d4e"
+        },
+        {
+          "path": "mini projects/twitch_celebrations/engine.py",
+          "symbol": "Engine.snapshot",
+          "hash": "ed0085aa946d3b6c2227c1439c5fe7ae0dc6865b3c3cf58baaba21bf8c052066"
+        }
+      ]
+    },
+    {
+      "id": "twitch_celebrations.gift",
+      "label": "Gifted subscriptions",
+      "topic": "Twitch events",
+      "trigger": {
+        "label": "Gifted subscriptions",
+        "event": "twitch:gift",
+        "kind": "event"
+      },
+      "detail": "Distinct 3.8-second thunder gifts/cubs, seed flotilla/turtles, crown carriage/rams or ember envelopes/fledglings. Names and actual gift counts remain at the top; the existing engine owns priority, expiry and media preferences.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Enabled & new event?",
+          "owner": "twitch_celebrations",
+          "kind": "gate",
+          "detail": "",
+          "setting": {
+            "path": "mini projects/twitch_celebrations/settings.json",
+            "key": "enabled"
+          }
+        },
+        {
+          "id": "1",
+          "label": "Queue by event priority",
+          "owner": "twitch_celebrations",
+          "kind": "wait",
+          "detail": "Raids lead; stale items expire. Follow bursts cannot bury other events."
+        },
+        {
+          "id": "2",
+          "label": "OBS overlay ready?",
+          "owner": "twitch_celebrations",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Run the selected show",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        },
+        {
+          "id": "4",
+          "label": "Release for the next show",
+          "owner": "twitch_celebrations",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "twitch_celebrations": "2102fc1c30b84682f68fe7a6555cbda77e316f6183b083a049c394061cadb8f7",
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/twitch_celebrations/engine.py",
+          "symbol": "Engine.submit",
+          "hash": "a1796f8919ebd803d2c9de27483d6008fd836eeb8671afcf1705853642850d4e"
+        },
+        {
+          "path": "mini projects/twitch_celebrations/engine.py",
+          "symbol": "Engine.snapshot",
+          "hash": "ed0085aa946d3b6c2227c1439c5fe7ae0dc6865b3c3cf58baaba21bf8c052066"
+        }
+      ]
+    },
+    {
+      "id": "twitch_celebrations.cheer",
+      "label": "A cheer arrives",
+      "topic": "Twitch events",
+      "trigger": {
+        "label": "A cheer arrives",
+        "event": "twitch:cheer",
+        "kind": "event"
+      },
+      "detail": "Seven-second pearl chest, alchemy retort, observatory or botanical wind-instrument act. Actual usernames and Bit counts remain at the top, gameplay center stays transparent, and the existing show owns custom media and cleanup.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Enabled & new event?",
+          "owner": "twitch_celebrations",
+          "kind": "gate",
+          "detail": "",
+          "setting": {
+            "path": "mini projects/twitch_celebrations/settings.json",
+            "key": "enabled"
+          }
+        },
+        {
+          "id": "1",
+          "label": "Queue by event priority",
+          "owner": "twitch_celebrations",
+          "kind": "wait",
+          "detail": "Raids lead; stale items expire. Follow bursts cannot bury other events."
+        },
+        {
+          "id": "2",
+          "label": "OBS overlay ready?",
+          "owner": "twitch_celebrations",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Run the selected show",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        },
+        {
+          "id": "4",
+          "label": "Release for the next show",
+          "owner": "twitch_celebrations",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "twitch_celebrations": "2102fc1c30b84682f68fe7a6555cbda77e316f6183b083a049c394061cadb8f7",
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/twitch_celebrations/engine.py",
+          "symbol": "Engine.submit",
+          "hash": "a1796f8919ebd803d2c9de27483d6008fd836eeb8671afcf1705853642850d4e"
+        },
+        {
+          "path": "mini projects/twitch_celebrations/engine.py",
+          "symbol": "Engine.snapshot",
+          "hash": "ed0085aa946d3b6c2227c1439c5fe7ae0dc6865b3c3cf58baaba21bf8c052066"
+        }
+      ]
+    },
+    {
+      "id": "twitch_celebrations.follow",
+      "label": "A follow arrives",
+      "topic": "Twitch events",
+      "trigger": {
+        "label": "A follow arrives",
+        "event": "twitch:follow",
+        "kind": "event"
+      },
+      "detail": "Approved 2.2-second spirit cameo and corner name retain their original renderer/layout. Four original images are feature-owned, so transition-art cleanup cannot remove a live follower dependency.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Enabled & new event?",
+          "owner": "twitch_celebrations",
+          "kind": "gate",
+          "detail": "",
+          "setting": {
+            "path": "mini projects/twitch_celebrations/settings.json",
+            "key": "enabled"
+          }
+        },
+        {
+          "id": "1",
+          "label": "Queue by event priority",
+          "owner": "twitch_celebrations",
+          "kind": "wait",
+          "detail": "Raids lead; stale items expire. Follow bursts cannot bury other events."
+        },
+        {
+          "id": "2",
+          "label": "OBS overlay ready?",
+          "owner": "twitch_celebrations",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Run the selected show",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        },
+        {
+          "id": "4",
+          "label": "Release for the next show",
+          "owner": "twitch_celebrations",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "twitch_celebrations": "2102fc1c30b84682f68fe7a6555cbda77e316f6183b083a049c394061cadb8f7",
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/twitch_celebrations/engine.py",
+          "symbol": "Engine.submit",
+          "hash": "a1796f8919ebd803d2c9de27483d6008fd836eeb8671afcf1705853642850d4e"
+        },
+        {
+          "path": "mini projects/twitch_celebrations/engine.py",
+          "symbol": "Engine.snapshot",
+          "hash": "ed0085aa946d3b6c2227c1439c5fe7ae0dc6865b3c3cf58baaba21bf8c052066"
+        }
+      ]
+    },
+    {
+      "id": "twitch_celebrations.chat_authorization",
+      "label": "Chat writing is requested",
+      "topic": "Chat & stats",
+      "trigger": {
+        "label": "Chat writing is requested",
+        "kind": "control"
+      },
+      "detail": "Existing celebration tokens remain valid without chat writing; no provider starts at import.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Request optional chat scope on reconnect",
+          "owner": "twitch_celebrations",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Validate broadcaster and application identity",
+          "owner": "twitch_celebrations",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Login matches chat channel and scope granted?",
+          "owner": "twitch_celebrations",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Publish scoped authorization callbacks",
+          "owner": "twitch_celebrations",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "4",
+          "label": "Refresh token through its existing owner",
+          "owner": "twitch_celebrations",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "5",
+          "label": "Unregister callbacks on stop or startup failure",
+          "owner": "twitch_celebrations",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/twitch_celebrations/twitch.py",
+          "symbol": "Twitch.chat_authorization",
+          "hash": "6e866b44745706268501b519b656a28dfea51c7cf09489443df3d35ba2878315"
+        },
+        {
+          "path": "mini projects/twitch_celebrations/twitch.py",
+          "symbol": "Twitch.chat_status",
+          "hash": "c34e99f819699e6ac9e80672f2fb2f90770f49bfe375c0e78ed43dbff64dfed1"
+        },
+        {
+          "path": "mini projects/twitch_celebrations/main.py",
+          "symbol": "run",
+          "hash": "9aedf3deb8416efffe5ad956ace4ed33186bb58857c2312bb9e6482139201bdf"
+        }
+      ],
+      "owner_hashes": {
+        "twitch_celebrations": "c88aa390bec7755d9289615ce4b87c7822aef54d0dd836f202e3462a368a74eb"
+      }
+    }
+  ]
+}

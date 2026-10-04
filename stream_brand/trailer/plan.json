@@ -1,0 +1,70 @@
+{
+  "title": "Four spirits. One lane.",
+  "fps": 60,
+  "width": 1920,
+  "height": 1080,
+  "output_dir": "C:/StreamingMedia/ChannelPresentation/2026-10-02",
+  "segments": [
+    {
+      "id": "cold-open",
+      "kind": "video",
+      "source": "C:/StreamingMedia/Replays/clips/Game 1115 2026-09-23/Replay 2026-09-23 12-26-45_ir_trimmed.mkv",
+      "start": 0,
+      "duration": 4,
+      "purpose": "Start in real Udyr combat and keep the visible payoff and camera reaction."
+    },
+    {
+      "id": "the-premise",
+      "kind": "still",
+      "source": "stream_brand/exports/welcome.png",
+      "duration": 2,
+      "purpose": "Explain the unusual lane before asking a newcomer to follow anything."
+    },
+    {
+      "id": "the-world",
+      "kind": "video",
+      "source": "output/intro-mvp-2026-10-01/udyris-intro-1080p60.mp4",
+      "start": 1,
+      "duration": 4,
+      "purpose": "Briefly show the existing cinematic intro, including its closing title."
+    },
+    {
+      "id": "bot-lane-play",
+      "kind": "video",
+      "source": "C:/StreamingMedia/Replays/clips/Game 1122 2026-09-26/Replay 2026-09-26 02-09-45_ir_trimmed.mkv",
+      "start": 6.4,
+      "duration": 7,
+      "purpose": "Retain approach, combat and aftermath from a genuine bot-lane clip."
+    },
+    {
+      "id": "the-turnaround",
+      "kind": "video",
+      "source": "C:/StreamingMedia/Replays/clips/Game 1098 2026-09-21/Replay 2026-09-21 22-13-53_ir_trimmed.mkv",
+      "start": 10.4,
+      "duration": 7,
+      "purpose": "Show the chase and return from a replay personally tagged escape."
+    },
+    {
+      "id": "questionable-decisions",
+      "kind": "video",
+      "source": "C:/StreamingMedia/Replays/clips/Game 1130 2026-09-29/Replay 2026-09-29 00-36-37_ir_trimmed.mkv",
+      "start": 20.2,
+      "duration": 6,
+      "purpose": "A real death and the existing theatrical overlay give the edit a self-aware reversal."
+    },
+    {
+      "id": "chat-has-a-role",
+      "kind": "still",
+      "source": "stream_brand/exports/court.png",
+      "duration": 2,
+      "purpose": "Introduce the host-operated Bot Lane Court replay segment."
+    },
+    {
+      "id": "invitation",
+      "kind": "still",
+      "source": "stream_brand/exports/trailer-ending.png",
+      "duration": 4,
+      "purpose": "Finish on the channel name and invitation without inventing a schedule, rank or perks."
+    }
+  ]
+}

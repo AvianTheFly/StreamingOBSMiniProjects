@@ -14,9 +14,19 @@ def repair_overlay(service, existing_only=False):
         return False
     if existing and existing['inputKind']!='browser_source':
         raise ValueError('The League input name belongs to another source type')
-    SettingsBackups().snapshot()
     settings={'url':'http://127.0.0.1:7431/overlay','width':1920,'height':1080,
               'fps':30,'fps_custom':True,'shutdown':False,'restart_when_active':False}
+    if existing_only:
+        # Refresh the page. Repair only a stale URL; repeated heartbeats must
+        # not rewrite source settings or snapshot personalized files.
+        current = client.send('GetInputSettings',{'inputName':SOURCE},raw=True)['inputSettings']
+        if current.get('url') != settings['url']:
+            SettingsBackups().snapshot()
+            client.send('SetInputSettings',{'inputName':SOURCE,
+                        'inputSettings':{'url':settings['url']},'overlay':True},raw=True)
+        client.send('PressInputPropertiesButton',{'inputName':SOURCE,'propertyName':'refreshnocache'},raw=True)
+        return True
+    SettingsBackups().snapshot()
     if not existing:
         obs.create_scene_if_missing('League API')
         client.send('CreateInput',{'sceneName':'League API','inputName':SOURCE,'inputKind':'browser_source',
@@ -33,8 +43,17 @@ def repair_overlay(service, existing_only=False):
 
 
 def recover_overlay(service):
+    retry_seconds = 30
+    last_attempt = -float('inf')
     while not service.parent_stop.is_set() and not service.stop_event.is_set():
-        if time.monotonic()-service.last_overlay>12:
-            try: repair_overlay(service,existing_only=True)
-            except Exception: pass
+        now = time.monotonic()
+        if now-service.last_overlay <= 12:
+            retry_seconds = 30
+        elif now-last_attempt >= retry_seconds:
+            last_attempt = now
+            try:
+                repair_overlay(service,existing_only=True)
+            except Exception:
+                pass
+            retry_seconds = min(120, retry_seconds * 2)
         service.stop_event.wait(15)

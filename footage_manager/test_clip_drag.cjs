@@ -1,0 +1,25 @@
+"use strict";
+const assert=require('node:assert/strict');
+const Drag=require('./web/clip_drag.js');
+assert.equal(Drag.at({start:100,end:160},-2),100);
+assert.equal(Drag.at({start:100,end:160},2),160);
+assert.deepEqual(Drag.selection(14400,14390,28800),{start:14390,end:14400});
+assert.deepEqual(Drag.pan({start:100,end:160},-200,28800),{start:0,end:60});
+assert.deepEqual(Drag.pan({start:28700,end:28760},1000,28800),{start:28740,end:28800});
+let source=1,released=0,range={start:110,end:150},window={start:100,end:160},calls=[];
+global.document={addEventListener(){}};
+const targets={start:{},end:{},rail:{}};
+for(const input of Object.values(targets))Object.assign(input,{disabled:false,focus(){},getBoundingClientRect:()=>({left:0,width:100}),setPointerCapture(){},hasPointerCapture:()=>true,releasePointerCapture(){released++;}});
+const handle=Drag.mount({rail:targets.rail,input:edge=>targets[edge],snapshot:()=>({source,window,duration:28800,range,usable:true}),change:(edge,value)=>calls.push(['edge',edge,value]),select:(value,isNew)=>{range=value;calls.push(['select',value,isNew]);},scrub:value=>calls.push(['scrub',value]),pan:value=>{window=value;calls.push(['pan',value]);}});
+const event=(x,shiftKey=false)=>({button:0,pointerId:7,clientX:x,shiftKey,target:{tagName:'DIV'},preventDefault(){},stopPropagation(){}});
+targets.end.onpointerdown(event(80));targets.end.onpointermove(event(90));assert.deepEqual(calls.at(-1),['edge','end',156]);
+assert.deepEqual(window,{start:100,end:160}); // No scale drift or timed expansion.
+targets.end.onpointermove(event(120));assert.deepEqual(calls.at(-1),['edge','end',174]);targets.end.onpointerup(event(120));assert.equal(handle.active(),false);assert.equal(released,1);
+targets.rail.onpointerdown(event(25));targets.rail.onpointerup(event(25));assert.deepEqual(calls.at(-1),['scrub',115]);
+const original={...range};targets.rail.onpointerdown(event(20));targets.rail.onpointermove(event(50));targets.rail.onpointermove(event(60));targets.rail.onpointerup(event(60));
+assert.deepEqual(range,{start:112,end:136});assert.deepEqual(calls.filter(c=>c[0]==='select').map(c=>c[2]),[true,false]);
+assert.notDeepEqual(range,original);
+targets.rail.onpointerdown(event(50,true));targets.rail.onpointermove(event(70,true));targets.rail.onpointerup(event(70,true));assert.deepEqual(window,{start:88,end:148});assert.deepEqual(range,{start:112,end:136});
+targets.start.onpointerdown(event(5));source=2;targets.start.onpointermove(event(15));assert.equal(handle.active(),false);
+targets.end.onpointerdown(event(90));targets.end.onpointercancel();assert.equal(handle.active(),false);
+console.log('Fixed-scale handles, bidirectional drawing, click-only browsing, pan, eight-hour limits and stale-source cleanup passed.');

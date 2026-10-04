@@ -123,6 +123,9 @@ def _set_transform(item_id: int, x: float, y: float) -> None:
 def make_level_up_handler():
     def handle_level_up(player_data, old_level, new_level):
         print(f"[league] Level up detected — {old_level} -> {new_level}.")
+        from ..utils import production_borders_active
+        if production_borders_active():
+            return
         try:
             threading.Thread(target=_run_effect, args=(new_level,), daemon=True).start()
         except Exception as e:

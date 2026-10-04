@@ -12,9 +12,12 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from lib.paths import ensure_import_paths, load_project_env
 ensure_import_paths(); load_project_env()
-from hub_ui import replay_trim
+from instant_replay import editing as replay_trim
 from instant_replay import library
 from lib.asset_fader import AssetFader
+from lib.media_jobs import MediaJobBudget, MediaJobCancelled
+import threading
+import time
 
 
 @unittest.skipUnless(shutil.which("ffmpeg") and shutil.which("ffprobe"), "FFmpeg required")
@@ -77,9 +80,38 @@ class ReplayTrimTests(unittest.TestCase):
 
     def test_encoder_failure_does_not_publish_partial_clip(self):
         with patch.object(replay_trim, "_duration", return_value=4), \
-             patch.object(replay_trim.subprocess, "run", return_value=subprocess.CompletedProcess([], 1)):
+             patch.object(replay_trim.jobs, "run", return_value=subprocess.CompletedProcess([], 1)):
             self.assertEqual(self.cut()["status"], "error")
         self.assertEqual(len(library.disk_rows(self.root)), 1)
+
+    def test_cut_waits_for_shared_conversion_capacity(self):
+        budget = MediaJobBudget(capacity=3)
+        with patch.object(replay_trim, "jobs", budget):
+            with budget.slot("other-conversions", weight=3):
+                request = replay_trim.start_trim(dict(path=str(self.source), start=1.3, end=2.8), self.root)
+                deadline = time.monotonic() + 3
+                while budget.status()["queued"] == 0 and time.monotonic() < deadline:
+                    time.sleep(.01)
+                self.assertEqual(budget.status()["queued"], 1)
+                self.assertEqual(replay_trim.trim_status(request["job"])["status"], "saving")
+                self.assertEqual(len(library.disk_rows(self.root)), 1)
+            replay_trim._jobs[request["job"]].result(timeout=30)
+            self.assertEqual(replay_trim.trim_status(request["job"])["status"], "ready")
+
+    def test_shutdown_cancels_queued_cut_without_creating_output(self):
+        budget = MediaJobBudget(capacity=3)
+        stop = threading.Event(); budget.bind(stop)
+        with patch.object(replay_trim, "jobs", budget), budget.slot("other-conversions", weight=3):
+            request = replay_trim.start_trim(dict(path=str(self.source), start=1.3, end=2.8), self.root)
+            deadline = time.monotonic() + 3
+            while budget.status()["queued"] == 0 and time.monotonic() < deadline:
+                time.sleep(.01)
+            self.assertEqual(budget.status()["queued"], 1)
+            stop.set()
+            with self.assertRaises(MediaJobCancelled):
+                replay_trim._jobs[request["job"]].result(timeout=3)
+            self.assertEqual(replay_trim.trim_status(request["job"])["status"], "error")
+            self.assertEqual(len(library.disk_rows(self.root)), 1)
 
     def test_cut_uses_source_volume_until_adjusted_independently(self):
         result = self.cut()

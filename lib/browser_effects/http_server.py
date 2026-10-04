@@ -2,12 +2,13 @@
 import json
 import mimetypes
 from pathlib import Path
-import re
+from lib.http_files import serve_file
+from .presentations import resolve as presentation_file
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlparse
 
 WEB = Path(__file__).parent/'web'
-STATIC = {'overlay.html', 'playback.js', 'muffins.js', 'borders.js', 'renderers.js', 'overlay.css'}
+STATIC = {'overlay.html', 'playback.js', 'muffins.js', 'borders.js', 'renderers.js', 'production.js', 'rave.js', 'subtle.js', 'overlay.css', 'mash-dance.png'}
 
 
 def handler(find_channel, port):
@@ -19,7 +20,8 @@ def handler(find_channel, port):
             return self.headers.get('Host') in {f'127.0.0.1:{port}', f'localhost:{port}'}
 
         def send(self, value, status=200, content_type='application/json'):
-            data = json.dumps(value).encode() if content_type == 'application/json' else value
+            # Published files are already encoded bytes, including JSON manifests.
+            data = json.dumps(value).encode() if content_type == 'application/json' and not isinstance(value,bytes) else value
             self.send_response(status)
             self.send_header('Content-Type', content_type)
             self.send_header('Content-Length', str(len(data)))
@@ -36,7 +38,12 @@ def handler(find_channel, port):
                 channel = find_channel(path.removeprefix('/api/state/'))
                 return self.send(channel.snapshot(poll=True) if channel else {'active':None, 'ready':False})
             if path.startswith('/overlay/'):
-                file = WEB/'overlay.html'
+                file = presentation_file(path.removeprefix('/overlay/')) or WEB/'overlay.html'
+            elif path.startswith('/presentation/'):
+                parts = path.split('/')
+                file = presentation_file(parts[2], parts[3]) if len(parts) == 4 else None
+                if file is None or not file.is_file():
+                    return self.send({'error':'Not found'}, 404)
             elif path.removeprefix('/') in STATIC:
                 file = WEB/path.removeprefix('/')
             elif path.startswith('/audio/'):
@@ -56,34 +63,8 @@ def handler(find_channel, port):
             self.send(file.read_bytes(), content_type=mimetypes.guess_type(file.name)[0] or 'application/octet-stream')
 
         def media(self, file):
-            size = file.stat().st_size
-            first, last = 0, size-1
-            ranged = self.headers.get('Range')
-            if ranged:
-                match = re.fullmatch(r'bytes=(\d*)-(\d*)', ranged)
-                if not match or not any(match.groups()):
-                    return self.send({'error':'Invalid range'}, 416)
-                a, b = match.groups()
-                first, last = (int(a), min(int(b), last) if b else last) if a else (max(0, size-int(b)), last)
-                if first > last or first >= size:
-                    return self.send({'error':'Unsatisfiable range'}, 416)
-            self.send_response(206 if ranged else 200)
-            self.send_header('Content-Type', mimetypes.guess_type(file.name)[0] or 'audio/wav')
-            self.send_header('Content-Length', str(last-first+1))
-            self.send_header('Accept-Ranges', 'bytes')
-            self.send_header('Cache-Control', 'no-store')
-            if ranged:
-                self.send_header('Content-Range', f'bytes {first}-{last}/{size}')
-            self.end_headers()
-            with file.open('rb') as stream:
-                stream.seek(first)
-                remaining = last-first+1
-                while remaining:
-                    chunk = stream.read(min(65536, remaining))
-                    if not chunk:
-                        break
-                    self.wfile.write(chunk)
-                    remaining -= len(chunk)
+            serve_file(self, file, content_type=mimetypes.guess_type(file.name)[0] or 'audio/wav',
+                       headers={'Cache-Control': 'no-store'})
 
         def do_POST(self):
             origin = self.headers.get('Origin')

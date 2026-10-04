@@ -67,6 +67,7 @@ class _SubprocessHotkeyBus:
         self._queue: queue.Queue[object] = queue.Queue(maxsize=1024)
         self._drop_count = 0
         self._last_drop_log = 0.0
+        atexit.register(self.shutdown)
 
     def subscribe(self, callback: KeyCallback) -> int:
         self._ensure_started()
@@ -83,24 +84,32 @@ class _SubprocessHotkeyBus:
             self._callbacks.pop(token, None)
 
     def shutdown(self) -> None:
-        proc = self._proc
+        with self._lock:
+            proc, self._proc = self._proc, None
         if proc is None:
             return
-        self._proc = None
+        self._stop_process(proc)
+
+    @staticmethod
+    def _stop_process(proc: subprocess.Popen) -> None:
         try:
+            if proc.stdin is not None:
+                proc.stdin.close()
             if proc.poll() is None:
-                proc.terminate()
                 try:
                     proc.wait(timeout=2.0)
                 except subprocess.TimeoutExpired:
                     proc.kill()
-        except Exception:
-            pass
+                    proc.wait(timeout=2.0)
+        except (OSError, subprocess.SubprocessError) as exc:
+            print(f"[hotkeys] Could not stop keyboard worker: {exc}")
 
     def _ensure_started(self) -> None:
         with self._lock:
             if self._proc is not None and self._proc.poll() is None:
                 return
+            if self._proc is not None and self._proc.stdin is not None:
+                self._proc.stdin.close()
 
             worker_path = os.path.join(os.path.dirname(__file__), "keyboard_worker.py")
             creationflags = 0
@@ -124,65 +133,83 @@ class _SubprocessHotkeyBus:
                 raise RuntimeError(f"failed to start keyboard worker: {exc}") from exc
 
             self._proc = proc
-            atexit.register(self.shutdown)
+            # Each worker owns its queue. An old dispatch thread must never
+            # compete for a replacement worker's key presses.
+            inbox = self._queue = queue.Queue(maxsize=1024)
 
-            threading.Thread(
-                target=self._reader_loop,
-                args=(proc,),
-                name="global-hotkeys-reader",
-                daemon=True,
-            ).start()
-            threading.Thread(
-                target=self._stderr_loop,
-                args=(proc,),
-                name="global-hotkeys-stderr",
-                daemon=True,
-            ).start()
-            threading.Thread(
-                target=self._dispatch_loop,
-                name="global-hotkeys-dispatch",
-                daemon=True,
-            ).start()
+            workers = (
+                ("dispatch", self._dispatch_loop, (proc, inbox)),
+                ("stderr", self._stderr_loop, (proc,)),
+                ("reader", self._reader_loop, (proc, inbox)),
+            )
+            started = set()
+            try:
+                for name, target, args in workers:
+                    threading.Thread(target=target, args=args,
+                                     name=f"global-hotkeys-{name}", daemon=True).start()
+                    started.add(name)
+            except Exception:
+                self._proc = None
+                self._stop_process(proc)
+                if "reader" not in started:
+                    if proc.stdout is not None:
+                        proc.stdout.close()
+                    inbox.put(None)
+                if "stderr" not in started and proc.stderr is not None:
+                    proc.stderr.close()
+                raise
 
             print(f"[hotkeys] Keyboard worker started (pid {proc.pid}).")
 
-    def _reader_loop(self, proc: subprocess.Popen) -> None:
+    def _reader_loop(self, proc: subprocess.Popen, inbox: queue.Queue) -> None:
         if proc.stdout is None:
+            inbox.put(None)
             return
-        for line in proc.stdout:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                data = json.loads(line)
-                event = KeyEvent(char=data.get("char"), name=data.get("name") or "")
-            except Exception:
-                continue
-            try:
-                self._queue.put_nowait(event)
-            except queue.Full:
-                now = time.monotonic()
-                self._drop_count += 1
-                if now - self._last_drop_log >= 5.0:
-                    self._last_drop_log = now
-                    print(
-                        f"[hotkeys] Dispatch queue full; dropping key presses "
-                        f"(total dropped: {self._drop_count})."
-                    )
-        print("[hotkeys] Keyboard worker stdout closed.")
+        try:
+            for line in proc.stdout:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    data = json.loads(line)
+                    event = KeyEvent(char=data.get("char"), name=data.get("name") or "")
+                except (ValueError, AttributeError):
+                    continue
+                try:
+                    inbox.put_nowait(event)
+                except queue.Full:
+                    now = time.monotonic()
+                    self._drop_count += 1
+                    if now - self._last_drop_log >= 5.0:
+                        self._last_drop_log = now
+                        print(
+                            f"[hotkeys] Dispatch queue full; dropping key presses "
+                            f"(total dropped: {self._drop_count})."
+                        )
+        finally:
+            proc.stdout.close()
+            inbox.put(None)
+            print("[hotkeys] Keyboard worker stdout closed.")
 
     def _stderr_loop(self, proc: subprocess.Popen) -> None:
         if proc.stderr is None:
             return
-        for line in proc.stderr:
-            line = line.rstrip()
-            if line:
-                print(f"[hotkeys] worker: {line}")
+        try:
+            for line in proc.stderr:
+                line = line.rstrip()
+                if line:
+                    print(f"[hotkeys] worker: {line}")
+        finally:
+            proc.stderr.close()
 
-    def _dispatch_loop(self) -> None:
+    def _dispatch_loop(self, proc: subprocess.Popen, inbox: queue.Queue) -> None:
         while True:
-            event = self._queue.get()
+            event = inbox.get()
+            if event is None:
+                return
             with self._lock:
+                if self._proc is not proc:
+                    continue
                 callbacks = list(self._callbacks.values())
             for callback in callbacks:
                 try:

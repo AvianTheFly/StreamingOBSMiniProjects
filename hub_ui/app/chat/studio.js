@@ -1,0 +1,18 @@
+const form=document.querySelector('form'),preview=document.querySelector('#preview'),result=document.querySelector('#result');let saved;
+import {updateDictionary,updateCatalog} from './sticker_studio.js';
+const numeric=['font_size','emote_size','opacity','max_messages','fade_seconds','text_opacity','hover_opacity','max_stickers','message_gap','line_height'],flags=['motion','badges','hide_bots','show_header','natural_stickers','auto_start'];
+function values(){const data=Object.fromEntries(new FormData(form));for(const key of numeric)data[key]=Number(data[key]);for(const key of flags)data[key]=form.elements[key].checked;data.hidden_users=data.hidden_users.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);data.replacements=JSON.parse(data.replacements||'{}');return data;}
+function render(){for(const key of numeric){const suffix={font_size:' px',emote_size:' px',message_gap:' px',line_height:'%',opacity:'%',text_opacity:'%',hover_opacity:'%',fade_seconds:' sec'}[key]||'';form.querySelector(`output[for=${key}]`).textContent=form.elements[key].value+suffix;}try{const settings=values();preview.contentWindow.postMessage({chatSettings:settings},location.origin);updateDictionary(settings.replacements);result.textContent='';}catch{result.textContent='Sticker JSON is incomplete. Preview keeps the last valid settings.';}document.querySelector('#save-state').textContent='UNSAVED PREVIEW';}
+async function request(path,body){const response=await fetch(path,body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{});const data=await response.json();if(!response.ok)throw Error(data.error||'Request failed');return data;}
+try{saved=await request('/api/chat/settings');for(const [key,value] of Object.entries(saved)){const field=form.elements[key];if(!field)continue;if(flags.includes(key))field.checked=value;else if(key==='hidden_users')field.value=value.join(', ');else if(key==='replacements')field.value=JSON.stringify(value,null,2);else field.value=value;}render();document.querySelector('#save-state').textContent='SAVED';}catch(e){result.textContent=e.message;}
+form.addEventListener('input',render);preview.addEventListener('load',()=>{render();document.querySelector('#save-state').textContent='SAVED';});
+form.addEventListener('submit',async event=>{event.preventDefault();try{saved=await request('/api/chat/settings',values());document.querySelector('#save-state').textContent='SAVED';result.textContent='Saved. Your desktop overlay will update within 3 seconds.';}catch(e){result.textContent=e.message;}});
+document.querySelector('#sample').onclick=()=>preview.contentWindow.postMessage({chatSample:true},location.origin);
+document.querySelector('#test-sticker').onclick=()=>preview.contentWindow.postMessage({chatTest:document.querySelector('#test-message').value},location.origin);
+document.querySelector('#activate').onclick=async()=>{const button=document.querySelector('#activate');button.disabled=true;try{await request('/api/chat/settings',values());const data=await request('/api/chat/activate',{});result.textContent=data.message;document.querySelector('#save-state').textContent='SAVED';}catch(e){result.textContent=e.message;}finally{button.disabled=false;}};
+document.querySelector('#overlay-url').textContent=location.origin+'/chat/overlay.html';
+window.addEventListener('message',event=>{
+ if(event.origin!==location.origin||event.source!==preview.contentWindow)return;
+ if(event.data.chatEmotes)updateCatalog(event.data.chatEmotes,event.data.chatAliases||{});
+ if(event.data.chatCatalog)document.querySelector('#providers').textContent=Object.entries(event.data.chatCatalog).map(([name,status])=>name+': '+status).join(' · ');
+});

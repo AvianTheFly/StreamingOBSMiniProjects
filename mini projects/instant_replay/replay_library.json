@@ -1,5 +1,5 @@
 {
-  "revision": 117,
+  "revision": 133,
   "clips": {
     "b4599b300815a05841074ac3": {
       "path": "C:\\StreamingMedia\\Replays\\clips\\Game 1023 2026-09-14\\Replay 2026-09-14 15-32-21_ir_trimmed.mkv",
@@ -395,6 +395,110 @@
       "saved_at": 1790656620.658865,
       "kept": true,
       "game": "Game 1130 2026-09-29"
+    },
+    "09f4a3efa3c9050c16de0fd9": {
+      "path": "C:\\StreamingMedia\\Replays\\clips\\Game 1138 2026-09-29\\Replay 2026-09-29 15-45-24_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1790711135.0911462,
+      "kept": true,
+      "game": "Game 1138 2026-09-29"
+    },
+    "6e690bf38ff9bbddcb40db28": {
+      "path": "C:\\StreamingMedia\\Replays\\clips\\Ungrouped\\Replay 2026-10-02 01-10-14_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1790917837.7994967,
+      "kept": true,
+      "game": ""
+    },
+    "f2bb5517752e4745e8026e8c": {
+      "path": "C:\\StreamingMedia\\Replays\\Replay 2026-10-03 01-26-12.mp4",
+      "tag": "untagged",
+      "saved_at": 1791005172.9108584,
+      "kept": true,
+      "purpose": "replay_only"
+    },
+    "c858414b5150e9150295a09b": {
+      "path": "C:\\StreamingMedia\\Replays\\replay-only\\Replay 2026-10-03 01-26-12_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1791005173.358528,
+      "kept": true,
+      "purpose": "replay_only",
+      "capture_source": "C:\\StreamingMedia\\Replays\\Replay 2026-10-03 01-26-12.mp4"
+    },
+    "e5515ce616d45b568b26c52a": {
+      "path": "C:\\StreamingMedia\\Replays\\Replay 2026-10-03 01-33-44.mp4",
+      "tag": "untagged",
+      "saved_at": 1791005625.0422962,
+      "kept": true,
+      "purpose": "replay_only"
+    },
+    "fd43ece099f946fdc6ec772a": {
+      "path": "C:\\StreamingMedia\\Replays\\replay-only\\Replay 2026-10-03 01-33-44_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1791005625.4856515,
+      "kept": true,
+      "purpose": "replay_only",
+      "capture_source": "C:\\StreamingMedia\\Replays\\Replay 2026-10-03 01-33-44.mp4"
+    },
+    "2ff82d289fbfb3e34e675e94": {
+      "path": "C:\\StreamingMedia\\Replays\\Replay 2026-10-03 01-34-37.mp4",
+      "tag": "untagged",
+      "saved_at": 1791005677.24167,
+      "kept": true,
+      "purpose": "replay_only"
+    },
+    "10edcbcd6cf591b69ff1fed5": {
+      "path": "C:\\StreamingMedia\\Replays\\replay-only\\Replay 2026-10-03 01-34-37_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1791005677.5238397,
+      "kept": true,
+      "purpose": "replay_only",
+      "capture_source": "C:\\StreamingMedia\\Replays\\Replay 2026-10-03 01-34-37.mp4"
+    },
+    "b613bb07f89ee5d32c008b55": {
+      "path": "C:\\StreamingMedia\\Replays\\Replay 2026-10-03 01-35-32.mp4",
+      "tag": "untagged",
+      "saved_at": 1791005732.3199012,
+      "kept": true,
+      "purpose": "replay_only"
+    },
+    "65a09a82c9c739df688073ac": {
+      "path": "C:\\StreamingMedia\\Replays\\replay-only\\Replay 2026-10-03 01-35-32_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1791005732.7125525,
+      "kept": true,
+      "purpose": "replay_only",
+      "capture_source": "C:\\StreamingMedia\\Replays\\Replay 2026-10-03 01-35-32.mp4"
+    },
+    "367399153bb0dfdf9cc76603": {
+      "path": "C:\\StreamingMedia\\Replays\\Replay 2026-10-03 01-43-26.mp4",
+      "tag": "untagged",
+      "saved_at": 1791006207.2387455,
+      "kept": true,
+      "purpose": "replay_only"
+    },
+    "ad64491269e460fa6536b8e7": {
+      "path": "C:\\StreamingMedia\\Replays\\replay-only\\Replay 2026-10-03 01-43-26_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1791006208.5812619,
+      "kept": true,
+      "purpose": "replay_only",
+      "capture_source": "C:\\StreamingMedia\\Replays\\Replay 2026-10-03 01-43-26.mp4"
+    },
+    "4242420cd9dd5cfde418dfa8": {
+      "path": "C:\\StreamingMedia\\Replays\\Replay 2026-10-03 02-32-40.mp4",
+      "tag": "untagged",
+      "saved_at": 1791009160.7807348,
+      "kept": true,
+      "purpose": "replay_only"
+    },
+    "1c590b29303a31931527313f": {
+      "path": "C:\\StreamingMedia\\Replays\\replay-only\\Replay 2026-10-03 02-32-40_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1791009161.2661524,
+      "kept": true,
+      "purpose": "replay_only",
+      "capture_source": "C:\\StreamingMedia\\Replays\\Replay 2026-10-03 02-32-40.mp4"
     }
   },
   "groups": []

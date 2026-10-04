@@ -1,0 +1,89 @@
+{
+  "module": {
+    "id": "love_me",
+    "label": "Mood cues / Love Me",
+    "group": "Media",
+    "icon": "spark",
+    "description": "Original staged sequence and transparent, audio-timed mood variations.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "love_me.sequence",
+      "label": "Play an original stage or mood variation",
+      "topic": "Sound & video",
+      "trigger": {
+        "label": "Trigger Love Me",
+        "event": "hub_action",
+        "kind": "control"
+      },
+      "detail": "987 preserves the four-stage sequence and final toggle. Variation hotkeys toggle or replace a mood cue. A bounded intent queue schedules one serial worker; actual playback tickets own audio pauses and are finished after cleanup. The user can choose once, fixed total plays or continuous playback. OBS program scene is unchanged.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Match hotkey / public action",
+          "owner": "love_me",
+          "kind": "gate",
+          "detail": "One existing global keyboard subscription; newest bounded intent."
+        },
+        {
+          "id": "1",
+          "label": "Select stage or saved variation",
+          "owner": "love_me",
+          "kind": "action",
+          "detail": "Same variation toggles off; 987 advances original sequence. Lossless personal settings and audio selection stay with the feature."
+        },
+        {
+          "id": "2",
+          "label": "Admit ticket with audio pause policy",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": "Explicit feature audio targets and saved rules use ticket-scoped claims; callback schedules promptly."
+        },
+        {
+          "id": "3",
+          "label": "Play, pause, repeat and clean up",
+          "owner": "obs",
+          "kind": "output",
+          "detail": "Original source stages or ID-scoped browser show; first play refreshes the page after startup. All 35 distinct stills and bundled fonts decode before music starts. Rapid non-repeating cuts start immediately at the saved musical hit (9.719s), approximately 114ms through WHERE, then 200ms through HAVE YOU BEEN with rapid fade ending at 15s. Shorter catalogs hold their last image rather than loop. Larger worn lettering cycles 23 typefaces using a bounded 12-glyph cache; held words fade with independent word timings. Native audio clock respects trim, speed and lyric delay. Original montage transparency, faders, routing, program scene and cleanup ownership remain preserved."
+        }
+      ],
+      "owner_hashes": {
+        "coordination": "814adae04e82b0297ae5ea0abd0087bd677fb13461f21aa58c47ca365863864a",
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
+        "love_me": "175aeb29e19ea59e504a30307131411ad1cbf7a2214780e17f174f2b6190fd3b"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/love_me/main.py",
+          "symbol": "run",
+          "hash": "c2125b16659d47204a88436124667475b96acaa1938a3b6270b72d36e22e9b6b"
+        },
+        {
+          "path": "mini projects/love_me/service.py",
+          "symbol": "MoodService.trigger",
+          "hash": "2de872a05cd7298a455c229a46b157c34b5153883e4d10f5ad31b95efda9d4f5"
+        },
+        {
+          "path": "mini projects/love_me/presentation.py",
+          "symbol": "MoodPresentation.play",
+          "hash": "f9cea819f40f64d183dfd6f4928784aaf37e70bd8ff901ecf704b73fcca5d7a9"
+        }
+      ]
+    }
+  ]
+}

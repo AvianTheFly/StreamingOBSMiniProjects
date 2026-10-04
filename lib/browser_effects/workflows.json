@@ -1,0 +1,156 @@
+{
+  "module": {
+    "id": "browser_effects",
+    "label": "Browser effect channels",
+    "group": "Output",
+    "icon": "spark",
+    "description": "Isolated per-project audio and visual-effect handshakes.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "browser_effects.play",
+      "label": "A browser effect is played",
+      "topic": "Sound & video",
+      "trigger": {
+        "label": "A browser effect is played",
+        "event": "browser_effect.play",
+        "kind": "control"
+      },
+      "detail": "The browser draws from current audio position for the entire sound duration and clears on the owning audio's ended event. Pause and seek reconstruct the same frame; the stock renderer clips artwork to the gameplay perimeter; feature presentations own their own layout. Approved arena/racing/muffin owners remain. The 85 other cues have contextual subjects, individually arranged supporting casts and staggered entrances. Pedro has seven dancing raccoons and a DJ stage; sad violin has an orchestra, glass cameos, notes and a score. No worker, source controller or animation timer is added. Feature-owned presentations may publish explicitly named artwork under token-scoped registration during startup; teardown cannot unregister a newer owner. The shared HTTP owner serves original file bytes, including JSON manifests, while serializing state API objects separately, without importing feature policy. Hooray keeps original audio and current gain while a dedicated bounded native-alpha foil renderer draws corner bursts, sparse confetti across the picture and gold border ribbons; original chroma-filter and transform settings remain preserved.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Use the project browser channel",
+          "owner": "browser_effects",
+          "kind": "action",
+          "detail": "Mom Frog's extracted photographic views and pond props use the same channel and original croak duration; its finite offline audio cleanup preserves saved faders. The existing random hotkey 2 queue uses five independent three-pose character borders: Tom button/popcorn, Gary meow/snacks, duck desktop, Bonk mallet crew and Piuw space cadets. They follow each sound's actual position/duration; asset identities, random selection and saved audio settings remain unchanged. Piuw has traveling plasma ribbons, zaps and shock rings; Frog has flowing pond currents, splash fans and croak waves. Explicit finite Piuw/Frog audio cleanup preserves original and previous versions outside the checkout, reprocesses the original backup, validates candidates, copies Frog video and never normalizes or changes faders. Finite Chromium QA verifies actual audio playback, transparency, motion, pause determinism and cleanup."
+        },
+        {
+          "id": "1",
+          "label": "Wait for ready OBS browser",
+          "owner": "browser_effects",
+          "kind": "wait",
+          "detail": "The browser waits for metadata and atlas readiness, draws and clears a zero-time warm-up frame, then yields one presentation frame before starting the owning audio. A replaced or stopped audio identity cannot continue delayed startup."
+        },
+        {
+          "id": "2",
+          "label": "Apply current asset audio level",
+          "owner": "browser_effects",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Wait for current playback ID",
+          "owner": "browser_effects",
+          "kind": "wait",
+          "detail": "Current audio time drives every live border frame. Under-1.5-second BorderShow cues opt into 12-ms attack/18-ms release; other presentations retain their existing fades. Pause freezes audio and drawing together. Finite review exports use original audio, one A/V timeline, exact-duration frame sampling and external controls; looping belongs only to the review page."
+        },
+        {
+          "id": "4",
+          "label": "Stop or acknowledge cleanup",
+          "owner": "browser_effects",
+          "kind": "end",
+          "detail": "The owning audio ended event clears the live canvas and acknowledges its actual playback ID. Replaced IDs cannot finish a newer request. Decoded-frame review QA verifies visible onset, complete playback, one audible preview, pause, one-shot cleanup and A/V start/cutoff alignment."
+        }
+      ],
+      "owner_hashes": {
+        "browser_effects": "fc9699db4ebfb112cb8e38b787930aae7b4649bcb2b375d48516421cddbc3ce3"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "lib/browser_effects/player.py",
+          "symbol": "BrowserPlayer.play",
+          "hash": "feed9b6cbe6dc8cc30cd383cbf771f5ad1342180796ff3b5df2b10f26fabbad3"
+        },
+        {
+          "path": "lib/browser_effects/session.py",
+          "symbol": "Channel.acknowledge",
+          "hash": "b8e27bceca03e2c94b018b2272631f8b984695f0d6366417004dbc233f5ae945"
+        },
+        {
+          "path": "lib/browser_effects/presentations.py",
+          "symbol": "register",
+          "hash": "c7778bb7fa5a8f94187cce6bb4e77ac430fdd38a3442bdce3bc835f20c500185"
+        },
+        {
+          "path": "lib/browser_effects/http_server.py",
+          "symbol": "handler",
+          "hash": "b0260366bfd2e55e249725af8ef8ebf86f9f007848549712b2794700640a1c2d"
+        }
+      ]
+    },
+    {
+      "id": "browser_effects.world_motion",
+      "label": "Shared painted-world mechanics",
+      "topic": "Browser rendering",
+      "trigger": {
+        "label": "A feature loads the public mechanics",
+        "kind": "browser"
+      },
+      "detail": "AmbientClock plans finite weighted phrases with recent-guest weighting and soft pressure, retains at most four plans and starts no timer. PaintedPatch decodes a small crop once, deforms its cached triangle mesh using a feature-provided field, and releases its canvas explicitly. Shared helpers own no theme, cast, live display placement or scene policy. Finite build publication copies original mechanic bytes and records canonical hashes.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Accept feature-supplied data",
+          "owner": "browser_effects",
+          "kind": "gate",
+          "detail": "The caller owns palette, subjects, landmarks, cue weights and rendering lifecycle."
+        },
+        {
+          "id": "1",
+          "label": "Reuse bounded cached mechanics",
+          "owner": "browser_effects",
+          "kind": "action",
+          "detail": "No socket, audio channel, playback worker or independent animation timer is allocated."
+        },
+        {
+          "id": "2",
+          "label": "Dispose owned caches",
+          "owner": "browser_effects",
+          "kind": "end",
+          "detail": "The caller tears down clock history and decoded patch canvases."
+        }
+      ],
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "tools/build_lobby_motion.py",
+          "symbol": "build",
+          "hash": "125cf6525bda16b02e74aee9d599ac331abc57110d8ec61afe9f6703fa11c753"
+        }
+      ],
+      "owner_hashes": {
+        "browser_effects": "7cf91e257d9f5bcfdfd036ba677b0885ca53810756575ea879eee05fa4df3eff"
+      }
+    }
+  ]
+}

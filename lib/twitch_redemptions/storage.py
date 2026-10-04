@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from lib.json_store import write_json
 
 
 class RewardStorage:
@@ -20,10 +21,7 @@ class RewardStorage:
             default = Path(os.environ.get('LOCALAPPDATA', str(Path.home()))) / 'StreamingHub' / 'viewer-rewards'
             if self.root == default:
                 SettingsBackups().snapshot()
-        p = self.root / name
-        tmp = p.with_suffix(".tmp")
-        tmp.write_text(json.dumps(value, indent=2), encoding="utf-8")
-        tmp.replace(p)
+        write_json(self.root / name, value, ensure_ascii=True)
 
 
     def _result(self, rid, status):

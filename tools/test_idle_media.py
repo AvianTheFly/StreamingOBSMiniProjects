@@ -3,7 +3,7 @@ import copy
 import unittest
 from unittest.mock import patch
 
-from obs import interaction
+from obs import media as interaction
 from tools.repair_idle_obs_media import repair_idle_sources
 
 

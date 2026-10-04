@@ -1,0 +1,1481 @@
+{
+  "title": "Rift Stand \u2014 Storm and Stone",
+  "channel": "UdyrIsABotLaner",
+  "duration_seconds": 40,
+  "fps": 60,
+  "width": 1920,
+  "height": 1080,
+  "bpm": 128,
+  "beat_phase": 0.03,
+  "music_source": "C:/StreamingMedia/twitch downloads/CCR - Fortunate Son (MOONLGHT Remix).mp3",
+  "music_start_seconds": 0,
+  "output_dir": "C:/StreamingMedia/ChannelPresentation/2026-10-03/rift-continuity-v3",
+  "shots": [
+    {
+      "id": "01-approach",
+      "asset": "01-rift",
+      "start_frame": 0,
+      "end_frame": 58,
+      "zoom": [
+        1.04,
+        1.09
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": true,
+      "transition": "fade",
+      "story_beat": "approach",
+      "ending_smear": false
+    },
+    {
+      "id": "02-hero-introduced",
+      "asset": "02-awakening",
+      "start_frame": 58,
+      "end_frame": 114,
+      "zoom": [
+        1.07,
+        1.14
+      ],
+      "focus": [
+        0.55,
+        0.48
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "hero introduced",
+      "ending_smear": false
+    },
+    {
+      "id": "03-lightning-bear",
+      "asset": "80-bear-physical",
+      "start_frame": 114,
+      "end_frame": 142,
+      "zoom": [
+        1.025,
+        1.055
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "lightning bear",
+      "ending_smear": false
+    },
+    {
+      "id": "04-storm-transformation",
+      "asset": "81-bear-spirit",
+      "start_frame": 142,
+      "end_frame": 171,
+      "zoom": [
+        1.055,
+        1.085
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "storm transformation",
+      "ending_smear": false
+    },
+    {
+      "id": "05-armored-guardian",
+      "asset": "82-turtle-physical",
+      "start_frame": 171,
+      "end_frame": 199,
+      "zoom": [
+        1.025,
+        1.055
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "armored guardian",
+      "ending_smear": false
+    },
+    {
+      "id": "06-jade-transformation",
+      "asset": "83-turtle-spirit",
+      "start_frame": 199,
+      "end_frame": 227,
+      "zoom": [
+        1.055,
+        1.085
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "jade transformation",
+      "ending_smear": false
+    },
+    {
+      "id": "07-ram-introduced",
+      "asset": "05-ram",
+      "start_frame": 227,
+      "end_frame": 283,
+      "zoom": [
+        1.08,
+        1.14
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "ram introduced",
+      "ending_smear": false
+    },
+    {
+      "id": "08-phoenix-introduced",
+      "asset": "06-phoenix",
+      "start_frame": 283,
+      "end_frame": 339,
+      "zoom": [
+        1.06,
+        1.12
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "phoenix introduced",
+      "ending_smear": false
+    },
+    {
+      "id": "09-four-spirits-united",
+      "asset": "84-four-spirits",
+      "start_frame": 339,
+      "end_frame": 396,
+      "zoom": [
+        1.035,
+        1.06
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "four spirits united",
+      "ending_smear": false
+    },
+    {
+      "id": "10-villain-introduced",
+      "asset": "11-sion-reveal",
+      "start_frame": 396,
+      "end_frame": 452,
+      "zoom": [
+        1.04,
+        1.1
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "villain introduced",
+      "ending_smear": false
+    },
+    {
+      "id": "11-fighters-close-the-distance",
+      "asset": "60-faceoff",
+      "start_frame": 452,
+      "end_frame": 564,
+      "zoom": [
+        1.025,
+        1.065
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "fighters close the distance",
+      "ending_smear": false
+    },
+    {
+      "id": "12-punch-anticipation",
+      "asset": "85-bear-windup",
+      "start_frame": 564,
+      "end_frame": 621,
+      "zoom": [
+        1.035,
+        1.065
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "punch anticipation",
+      "ending_smear": false
+    },
+    {
+      "id": "13-punch-release",
+      "asset": "86-bear-release",
+      "start_frame": 621,
+      "end_frame": 642,
+      "zoom": [
+        1.035,
+        1.065
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "punch release",
+      "ending_smear": false,
+      "travel": [
+        0.025,
+        0
+      ],
+      "smear": true
+    },
+    {
+      "id": "14-punch-contact",
+      "asset": "87-bear-contact",
+      "start_frame": 642,
+      "end_frame": 649,
+      "zoom": [
+        1.05,
+        1.06
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "punch contact",
+      "ending_smear": false
+    },
+    {
+      "id": "15-electric-impact",
+      "asset": "24-bear-impact-insert",
+      "start_frame": 649,
+      "end_frame": 656,
+      "zoom": [
+        1.06,
+        1.075
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "impact",
+      "story_beat": "electric impact",
+      "ending_smear": false,
+      "impact_point": [
+        0.59,
+        0.5
+      ],
+      "impact_frames": 3,
+      "hit_stop_frames": 3,
+      "shockwave": true
+    },
+    {
+      "id": "16-punch-follow-through",
+      "asset": "87-bear-contact",
+      "start_frame": 656,
+      "end_frame": 705,
+      "zoom": [
+        1.06,
+        1.035
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "punch follow through",
+      "ending_smear": false
+    },
+    {
+      "id": "17-Sion-recoils",
+      "asset": "88-bear-recovery",
+      "start_frame": 705,
+      "end_frame": 761,
+      "zoom": [
+        1.035,
+        1.055
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "Sion recoils",
+      "ending_smear": false
+    },
+    {
+      "id": "18-Sion-retaliates",
+      "asset": "61-sion-retaliation",
+      "start_frame": 761,
+      "end_frame": 789,
+      "zoom": [
+        1.035,
+        1.055
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "Sion retaliates",
+      "ending_smear": false
+    },
+    {
+      "id": "19-shield-brace",
+      "asset": "89-shield-brace",
+      "start_frame": 789,
+      "end_frame": 831,
+      "zoom": [
+        1.035,
+        1.06
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "shield brace",
+      "ending_smear": false
+    },
+    {
+      "id": "20-shield-contact-lead",
+      "asset": "90-shield-contact",
+      "start_frame": 831,
+      "end_frame": 846,
+      "zoom": [
+        1.06,
+        1.07
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "shield contact lead",
+      "ending_smear": false
+    },
+    {
+      "id": "21-shield-collision",
+      "asset": "90-shield-contact",
+      "start_frame": 846,
+      "end_frame": 902,
+      "zoom": [
+        1.075,
+        1.035
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "impact",
+      "story_beat": "shield collision",
+      "ending_smear": false,
+      "impact_point": [
+        0.4,
+        0.49
+      ],
+      "impact_frames": 3,
+      "hit_stop_frames": 3,
+      "shockwave": true
+    },
+    {
+      "id": "22-shield-drives-Udyr-to-his-knee",
+      "asset": "91-shield-pushback",
+      "start_frame": 902,
+      "end_frame": 1014,
+      "zoom": [
+        1.035,
+        1.06
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "shield drives Udyr to his knee",
+      "ending_smear": false
+    },
+    {
+      "id": "23-ram-ignites-from-the-knee",
+      "asset": "63-ram-kneeling",
+      "start_frame": 1014,
+      "end_frame": 1071,
+      "zoom": [
+        1.035,
+        1.05
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "ram ignites from the knee",
+      "ending_smear": false
+    },
+    {
+      "id": "24-ram-lifts-Udyr",
+      "asset": "64-ram-rise-half",
+      "start_frame": 1071,
+      "end_frame": 1127,
+      "zoom": [
+        1.035,
+        1.05
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "ram lifts Udyr",
+      "ending_smear": false
+    },
+    {
+      "id": "25-Udyr-loads-the-charge",
+      "asset": "65-ram-rise-loaded",
+      "start_frame": 1127,
+      "end_frame": 1183,
+      "zoom": [
+        1.035,
+        1.05
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "Udyr loads the charge",
+      "ending_smear": false
+    },
+    {
+      "id": "26-charge-release",
+      "asset": "66-ram-charge",
+      "start_frame": 1183,
+      "end_frame": 1253,
+      "zoom": [
+        1.035,
+        1.07
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "charge release",
+      "ending_smear": false,
+      "travel": [
+        0.025,
+        0
+      ],
+      "smear": true
+    },
+    {
+      "id": "27-ram-impact",
+      "asset": "42-ram-contact",
+      "start_frame": 1253,
+      "end_frame": 1260,
+      "zoom": [
+        1.045,
+        1.06
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "impact",
+      "story_beat": "ram impact",
+      "ending_smear": false,
+      "impact_point": [
+        0.6,
+        0.51
+      ],
+      "impact_frames": 3,
+      "hit_stop_frames": 3,
+      "shockwave": true
+    },
+    {
+      "id": "28-ram-follow-through",
+      "asset": "42-ram-contact",
+      "start_frame": 1260,
+      "end_frame": 1296,
+      "zoom": [
+        1.06,
+        1.035
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "ram follow through",
+      "ending_smear": false
+    },
+    {
+      "id": "29-Sion-falls-onto-his-back",
+      "asset": "67-sion-fall-back",
+      "start_frame": 1296,
+      "end_frame": 1352,
+      "zoom": [
+        1.035,
+        1.05
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "Sion falls onto his back",
+      "ending_smear": false
+    },
+    {
+      "id": "30-Sion-remains-down",
+      "asset": "68-sion-grounded",
+      "start_frame": 1352,
+      "end_frame": 1408,
+      "zoom": [
+        1.035,
+        1.05
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "Sion remains down",
+      "ending_smear": false
+    },
+    {
+      "id": "31-phoenix-forms-over-fallen-Sion",
+      "asset": "69-phoenix-summon-grounded",
+      "start_frame": 1408,
+      "end_frame": 1521,
+      "zoom": [
+        1.035,
+        1.065
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "phoenix forms over fallen Sion",
+      "ending_smear": false
+    },
+    {
+      "id": "32-finisher-rises",
+      "asset": "70-phoenix-rise-grounded",
+      "start_frame": 1521,
+      "end_frame": 1577,
+      "zoom": [
+        1.035,
+        1.05
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "finisher rises",
+      "ending_smear": false
+    },
+    {
+      "id": "33-finisher-dives",
+      "asset": "71-phoenix-dive-grounded",
+      "start_frame": 1577,
+      "end_frame": 1591,
+      "zoom": [
+        1.035,
+        1.065
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "finisher dives",
+      "ending_smear": false,
+      "travel": [
+        0.025,
+        0.018
+      ],
+      "smear": true
+    },
+    {
+      "id": "34-frost-impact",
+      "asset": "72-phoenix-finish-grounded",
+      "start_frame": 1591,
+      "end_frame": 1598,
+      "zoom": [
+        1.045,
+        1.06
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "impact",
+      "story_beat": "frost impact",
+      "ending_smear": false,
+      "impact_point": [
+        0.44,
+        0.74
+      ],
+      "impact_frames": 3,
+      "hit_stop_frames": 3,
+      "shockwave": true
+    },
+    {
+      "id": "35-frost-expands-across-the-ground",
+      "asset": "72-phoenix-finish-grounded",
+      "start_frame": 1598,
+      "end_frame": 1689,
+      "zoom": [
+        1.06,
+        1.035
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "frost expands across the ground",
+      "ending_smear": false
+    },
+    {
+      "id": "36-Udyr-holds-the-landing",
+      "asset": "73-phoenix-touchdown",
+      "start_frame": 1689,
+      "end_frame": 1802,
+      "zoom": [
+        1.035,
+        1.05
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "Udyr holds the landing",
+      "ending_smear": false
+    },
+    {
+      "id": "37-Udyr-rises-from-the-landing",
+      "asset": "74-victory-rise",
+      "start_frame": 1802,
+      "end_frame": 1914,
+      "zoom": [
+        1.035,
+        1.05
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "Udyr rises from the landing",
+      "ending_smear": false
+    },
+    {
+      "id": "38-victory-settles",
+      "asset": "53-aftermath",
+      "start_frame": 1914,
+      "end_frame": 2139,
+      "zoom": [
+        1.035,
+        1.085
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "breath",
+      "story_beat": "victory settles",
+      "ending_smear": false
+    },
+    {
+      "id": "39-channel-reveal",
+      "asset": "84-four-spirits",
+      "start_frame": 2139,
+      "end_frame": 2400,
+      "zoom": [
+        1.08,
+        1.025
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.003,
+      "hero": false,
+      "transition": "finale",
+      "story_beat": "channel reveal",
+      "ending_smear": false
+    }
+  ],
+  "export_stem": "udyr-sion-continuity-intro",
+  "technique": "26 new cinematic keyframes, matching physical/spirit animal designs, continuous recovery poses, depth camera motion, moving weather, hit stops and procedural impact effects",
+  "review_frames": [
+    14,
+    72,
+    128,
+    156,
+    185,
+    213,
+    241,
+    297,
+    353,
+    410,
+    466,
+    578,
+    631,
+    645,
+    652,
+    670,
+    719,
+    775,
+    803,
+    838,
+    860,
+    916,
+    1028,
+    1085,
+    1141,
+    1197,
+    1256,
+    1274,
+    1310,
+    1366,
+    1422,
+    1535,
+    1584,
+    1594,
+    1612,
+    1703,
+    1816,
+    1928,
+    2153
+  ],
+  "assets": {
+    "60-faceoff": {
+      "style": "01-rift",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "80-bear-physical": {
+      "style": "03-bear",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.49,
+          0.52,
+          0.4,
+          0.4,
+          0.82
+        ]
+      ]
+    },
+    "81-bear-spirit": {
+      "style": "03-bear",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.49,
+          0.52,
+          0.4,
+          0.4,
+          0.82
+        ]
+      ]
+    },
+    "85-bear-windup": {
+      "style": "03-bear",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "86-bear-release": {
+      "style": "03-bear",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "87-bear-contact": {
+      "style": "03-bear",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "88-bear-recovery": {
+      "style": "03-bear",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "24-bear-impact-insert": {
+      "style": "03-bear",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.48,
+          0.54,
+          0.46,
+          0.48,
+          0.86
+        ]
+      ]
+    },
+    "82-turtle-physical": {
+      "style": "04-turtle",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.49,
+          0.52,
+          0.4,
+          0.4,
+          0.82
+        ]
+      ]
+    },
+    "83-turtle-spirit": {
+      "style": "04-turtle",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.49,
+          0.52,
+          0.4,
+          0.4,
+          0.82
+        ]
+      ]
+    },
+    "89-shield-brace": {
+      "style": "04-turtle",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "90-shield-contact": {
+      "style": "04-turtle",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "91-shield-pushback": {
+      "style": "04-turtle",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "11-sion-reveal": {
+      "style": "05-ram",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "61-sion-retaliation": {
+      "style": "05-ram",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "63-ram-kneeling": {
+      "style": "05-ram",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "64-ram-rise-half": {
+      "style": "05-ram",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "65-ram-rise-loaded": {
+      "style": "05-ram",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "66-ram-charge": {
+      "style": "05-ram",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "42-ram-contact": {
+      "style": "05-ram",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "67-sion-fall-back": {
+      "style": "05-ram",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "68-sion-grounded": {
+      "style": "05-ram",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "69-phoenix-summon-grounded": {
+      "style": "06-phoenix",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "70-phoenix-rise-grounded": {
+      "style": "06-phoenix",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "71-phoenix-dive-grounded": {
+      "style": "06-phoenix",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "72-phoenix-finish-grounded": {
+      "style": "06-phoenix",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "73-phoenix-touchdown": {
+      "style": "06-phoenix",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "74-victory-rise": {
+      "style": "06-phoenix",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "53-aftermath": {
+      "style": "06-phoenix",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "84-four-spirits": {
+      "style": "07-convergence",
+      "lightning": false,
+      "ward": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    }
+  },
+  "pose_groups": {
+    "spirit-designs": [
+      "80-bear-physical",
+      "81-bear-spirit",
+      "82-turtle-physical",
+      "83-turtle-spirit"
+    ],
+    "bear": [
+      "85-bear-windup",
+      "86-bear-release",
+      "87-bear-contact",
+      "88-bear-recovery"
+    ],
+    "shield": [
+      "61-sion-retaliation",
+      "89-shield-brace",
+      "90-shield-contact",
+      "91-shield-pushback"
+    ],
+    "ram-recovery": [
+      "63-ram-kneeling",
+      "64-ram-rise-half",
+      "65-ram-rise-loaded",
+      "66-ram-charge"
+    ],
+    "ram-knockdown": [
+      "42-ram-contact",
+      "67-sion-fall-back",
+      "68-sion-grounded"
+    ],
+    "phoenix": [
+      "69-phoenix-summon-grounded",
+      "70-phoenix-rise-grounded",
+      "71-phoenix-dive-grounded",
+      "72-phoenix-finish-grounded"
+    ],
+    "victory": [
+      "73-phoenix-touchdown",
+      "74-victory-rise",
+      "53-aftermath"
+    ]
+  }
+}

@@ -7,8 +7,8 @@ Records the wall-clock time (time.time()) the moment each qualifying kill is
 first detected.  The instant_replay main loop reads last_kill_wall_time to
 calculate how far back in the replay buffer to reach.
 
-This module polls the same endpoint as the league/ mini-project but is
-completely independent — no shared state, no cross-project imports.
+The kill state remains independent of other modules. HTTP snapshots come from
+the shared, short-lived League client cache so modules do not duplicate fetches.
 """
 
 from __future__ import annotations
@@ -16,12 +16,9 @@ from __future__ import annotations
 import threading
 import time
 
-import requests
-import urllib3
+from lib.league_live_client import LiveClientUnavailable, fetch_snapshot
 
-from .config import LEAGUE_API_URL, LEAGUE_POLL_INTERVAL, LEAGUE_REQUEST_TIMEOUT, DEATH_PRE_ROLL_SECONDS
-
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+from .config import LEAGUE_POLL_INTERVAL, DEATH_PRE_ROLL_SECONDS
 
 
 class KillTracker:
@@ -105,13 +102,7 @@ class KillTracker:
 
         while not self._stop_event.is_set():
             try:
-                resp = requests.get(
-                    LEAGUE_API_URL,
-                    verify=False,
-                    timeout=LEAGUE_REQUEST_TIMEOUT,
-                )
-                resp.raise_for_status()
-                data = resp.json()
+                data = fetch_snapshot()
 
                 # riotIdGameName matches KillerName in events exactly and
                 # is unambiguous even if two players share the same game name
@@ -135,7 +126,7 @@ class KillTracker:
                 self._process_events(data.get("events", {}).get("Events", []), summoner)
                 self._stop_event.wait(LEAGUE_POLL_INTERVAL)
 
-            except requests.exceptions.ConnectionError:
+            except LiveClientUnavailable:
                 if self._game_connected:
                     self._game_connected = False
                     with self._lock:

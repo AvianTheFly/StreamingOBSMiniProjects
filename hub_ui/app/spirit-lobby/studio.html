@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Spirit Afterparty · Lobby studio</title><link rel="stylesheet" href="studio.css"></head>
+<body><main>
+  <header><div><p class="eyebrow">THE CLUB, AFTER HOURS</p><h1>The afterparty.</h1><p>A little world to hang out in when the game is over.</p></div><a id="open" href="index.html" target="_blank" rel="noopener">Open full screen ↗</a></header>
+  <div class="workspace"><section class="preview"><iframe id="preview" title="Animated spirit lobby preview" src="index.html"></iframe><div class="party"><h2>The room has a life of its own</h2><p>Surprises wander in on their own. Set the rhythm beside the preview, or use these buttons for an extra moment. Repeat presses and different actions play together.</p><div id="party-buttons" class="party-buttons"></div><div class="party-options"><label><input id="party-live" type="checkbox" checked> Also play buttons in OBS</label><button id="party-clear" type="button">Clear preview accents</button></div><p id="party-status" role="status" aria-live="polite"></p></div></section>
+  <form id="controls"><h2>Set the mood</h2>
+    <label>Use it for<select name="mode"><option value="outro">Stream ending</option><option value="break">A quick break</option><option value="lobby">Just hanging out</option></select></label>
+    <label>The party runs itself<select name="party"><option value="gentle">Easygoing</option><option value="lively" selected>Lively</option><option value="wild">Extra lively</option><option value="off">Manual only</option></select></label>
+    <label>The sign<input name="title" maxlength="52" value="GOOD NIGHT"></label>
+    <label>A little message<input name="subtitle" maxlength="76" value="THANKS FOR HANGING OUT"></label>
+    <label>Lights<span class="range"><input name="energy" type="range" min="0" max="1" step=".01" value=".68"><output id="energy-value">68%</output></span></label>
+    <label>Colors<select name="palette"><option value="electric">Electric candy</option><option value="aurora">Aurora</option><option value="sunset">Velvet sunset</option></select></label>
+    <label>On the big screen<select name="background"><option value="cosmos">Infinite galaxy</option><option value="liquid">Liquid light show</option><option value="spirit">Crystal kaleidoscope</option></select></label>
+    <label>Penguin opacity<span class="range"><input name="penguinOpacity" type="range" min=".35" max="1" step=".01" value=".68"><output id="opacity-value">68%</output></span></label>
+    <details><summary>Wall signs and booth display</summary>
+      <label>Left screen<select name="leftScreen"><option value="text">Sign text</option></select></label>
+      <label>Left top line<input name="leftTitle" maxlength="28" value="THE"></label>
+      <label>Left bottom line<input name="leftSubtitle" maxlength="28" value="AFTERPARTY"></label>
+      <label>Right screen<select name="rightScreen"><option value="text">Sign text</option></select></label>
+      <label>Right top line<input name="rightTitle" maxlength="28" value="STAY"></label>
+      <label>Right bottom line<input name="rightSubtitle" maxlength="28" value="WEIRD"></label>
+      <label>Booth screen<select name="boothScreen"><option value="text">Sign text</option></select></label>
+    </details>
+    <label>Motion<span class="range"><input name="speed" type="range" min=".35" max="1.7" step=".05" value="1"><output id="speed-value">1×</output></span></label>
+    <label>Rendering<select name="quality"><option value="low">810p · 24 fps</option><option value="standard" selected>1080p · 30 fps</option></select></label>
+    <button id="pause" type="button" aria-pressed="false">Pause motion</button>
+  </form></div>
+  <section class="screen-library"><div class="library-heading"><div><h2>What’s on the screens?</h2><p>Keep an evolving galaxy, use a light show, or bring in your own art and looping video.</p></div><button id="apply-screens" type="button">Apply screens to OBS</button></div>
+    <div class="library-tools"><label>Choose a screen<select id="screen-target"><option value="main">Main screen</option><option value="left">Left wall</option><option value="right">Right wall</option><option value="booth">Booth sign</option></select></label><label class="upload">Add screen media<input id="screen-upload" type="file" accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm"></label><button id="refresh-library" type="button">Refresh library</button></div>
+    <div id="screen-assets" class="asset-grid"></div><p id="screen-status" role="status" aria-live="polite"></p><p class="fine">PNG, JPEG, WebP, GIF, MP4 or WebM · Up to 80 MB · Video plays silently and repeats<br>Library folder: <span id="screen-storage"></span></p>
+  </section>
+  <section class="use"><div><h2>Bring the room into OBS</h2><p>The installed scene is <strong>Spirit Afterparty</strong>. Your live face cam sits behind the console. Put the scenery link in Hub Spirit Afterparty and the matching foreground link in Hub Spirit Afterparty Foreground. Both links follow saved screens: use Apply screens to OBS for messages and media. Copy new links when changing colors, penguin opacity, motion or rendering. The preview guide marks your camera; OBS shows your actual feed.</p><p class="fine">1920 × 1080 · Shutdown source when not visible · Custom frame rate 30<br>Keep your Hub running. Your existing music and microphone controls still apply.</p></div><div class="link-box"><label for="url">Your lobby link</label><textarea id="url" readonly rows="3"></textarea><button id="copy" type="button">Copy lobby link</button><label for="foreground-url">Matching console foreground</label><textarea id="foreground-url" readonly rows="3"></textarea><button id="copy-front" type="button">Copy foreground link</button><p id="feedback" role="status" aria-live="polite"></p></div></section>
+  <footer>In the studio or OBS’s Interact window: W waves · Space confetti · B bubbles · U UFO · V records · S shooting stars · N flowers · D ducks. Extra waves queue up and alternate hands.</footer>
+</main><script type="module" src="studio.js"></script></body></html>

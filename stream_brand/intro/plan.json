@@ -1,0 +1,372 @@
+{
+  "title": "Four spirits. One lane.",
+  "channel": "UdyrIsABotLaner",
+  "duration_seconds": 40,
+  "fps": 60,
+  "width": 1920,
+  "height": 1080,
+  "bpm": 128,
+  "beat_phase": 0.03,
+  "music_source": "C:/StreamingMedia/twitch downloads/CCR - Fortunate Son (MOONLGHT Remix).mp3",
+  "music_start_seconds": 0,
+  "output_dir": "C:/StreamingMedia/ChannelPresentation/2026-10-03/rift-awakening",
+  "shots": [
+    {
+      "id": "01-rift",
+      "asset": "01-rift",
+      "start_frame": 0,
+      "end_frame": 227,
+      "zoom": [
+        1.04,
+        1.16
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": -0.018,
+      "hero": true,
+      "transition": "fade"
+    },
+    {
+      "id": "02-awakening",
+      "asset": "02-awakening",
+      "start_frame": 227,
+      "end_frame": 339,
+      "zoom": [
+        1.07,
+        1.17
+      ],
+      "focus": [
+        0.56,
+        0.49
+      ],
+      "orbit": 0.016,
+      "hero": false,
+      "transition": "cut"
+    },
+    {
+      "id": "03-awakening",
+      "asset": "02-awakening",
+      "start_frame": 339,
+      "end_frame": 452,
+      "zoom": [
+        1.33,
+        1.49
+      ],
+      "focus": [
+        0.43,
+        0.64
+      ],
+      "orbit": -0.016,
+      "hero": false,
+      "transition": "snap"
+    },
+    {
+      "id": "04-bear",
+      "asset": "03-bear",
+      "start_frame": 452,
+      "end_frame": 677,
+      "zoom": [
+        1.17,
+        1.04
+      ],
+      "focus": [
+        0.52,
+        0.5
+      ],
+      "orbit": -0.028,
+      "hero": false,
+      "transition": "impact"
+    },
+    {
+      "id": "05-bear",
+      "asset": "03-bear",
+      "start_frame": 677,
+      "end_frame": 789,
+      "zoom": [
+        1.35,
+        1.52
+      ],
+      "focus": [
+        0.56,
+        0.43
+      ],
+      "orbit": 0.014,
+      "hero": false,
+      "transition": "snap"
+    },
+    {
+      "id": "06-turtle",
+      "asset": "04-turtle",
+      "start_frame": 789,
+      "end_frame": 1014,
+      "zoom": [
+        1.15,
+        1.04
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.026,
+      "hero": false,
+      "transition": "impact"
+    },
+    {
+      "id": "07-turtle",
+      "asset": "04-turtle",
+      "start_frame": 1014,
+      "end_frame": 1127,
+      "zoom": [
+        1.33,
+        1.42
+      ],
+      "focus": [
+        0.56,
+        0.54
+      ],
+      "orbit": -0.014,
+      "hero": false,
+      "transition": "snap"
+    },
+    {
+      "id": "08-ram",
+      "asset": "05-ram",
+      "start_frame": 1127,
+      "end_frame": 1352,
+      "zoom": [
+        1.18,
+        1.04
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": -0.024,
+      "hero": false,
+      "transition": "impact"
+    },
+    {
+      "id": "09-ram",
+      "asset": "05-ram",
+      "start_frame": 1352,
+      "end_frame": 1464,
+      "zoom": [
+        1.39,
+        1.5
+      ],
+      "focus": [
+        0.41,
+        0.41
+      ],
+      "orbit": 0.012,
+      "hero": false,
+      "transition": "snap"
+    },
+    {
+      "id": "10-phoenix",
+      "asset": "06-phoenix",
+      "start_frame": 1464,
+      "end_frame": 1689,
+      "zoom": [
+        1.13,
+        1.04
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.023,
+      "hero": false,
+      "transition": "impact"
+    },
+    {
+      "id": "11-phoenix",
+      "asset": "06-phoenix",
+      "start_frame": 1689,
+      "end_frame": 1802,
+      "zoom": [
+        1.32,
+        1.43
+      ],
+      "focus": [
+        0.5,
+        0.38
+      ],
+      "orbit": -0.016,
+      "hero": false,
+      "transition": "snap"
+    },
+    {
+      "id": "12-rift",
+      "asset": "01-rift",
+      "start_frame": 1802,
+      "end_frame": 1914,
+      "zoom": [
+        1.12,
+        1.25
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.01,
+      "hero": true,
+      "transition": "breath"
+    },
+    {
+      "id": "13-bear",
+      "asset": "03-bear",
+      "start_frame": 1914,
+      "end_frame": 1971,
+      "zoom": [
+        1.15,
+        1.27
+      ],
+      "focus": [
+        0.53,
+        0.49
+      ],
+      "orbit": -0.012,
+      "hero": false,
+      "transition": "impact"
+    },
+    {
+      "id": "14-turtle",
+      "asset": "04-turtle",
+      "start_frame": 1971,
+      "end_frame": 2027,
+      "zoom": [
+        1.16,
+        1.3
+      ],
+      "focus": [
+        0.53,
+        0.49
+      ],
+      "orbit": 0.012,
+      "hero": false,
+      "transition": "cut"
+    },
+    {
+      "id": "15-ram",
+      "asset": "05-ram",
+      "start_frame": 2027,
+      "end_frame": 2083,
+      "zoom": [
+        1.2,
+        1.38
+      ],
+      "focus": [
+        0.45,
+        0.49
+      ],
+      "orbit": -0.012,
+      "hero": false,
+      "transition": "impact"
+    },
+    {
+      "id": "16-phoenix",
+      "asset": "06-phoenix",
+      "start_frame": 2083,
+      "end_frame": 2139,
+      "zoom": [
+        1.16,
+        1.3
+      ],
+      "focus": [
+        0.5,
+        0.44
+      ],
+      "orbit": 0.01,
+      "hero": false,
+      "transition": "cut"
+    },
+    {
+      "id": "17-awakening",
+      "asset": "02-awakening",
+      "start_frame": 2139,
+      "end_frame": 2167,
+      "zoom": [
+        1.26,
+        1.38
+      ],
+      "focus": [
+        0.61,
+        0.41
+      ],
+      "orbit": -0.008,
+      "hero": false,
+      "transition": "snap"
+    },
+    {
+      "id": "18-bear",
+      "asset": "03-bear",
+      "start_frame": 2167,
+      "end_frame": 2196,
+      "zoom": [
+        1.42,
+        1.5
+      ],
+      "focus": [
+        0.59,
+        0.41
+      ],
+      "orbit": 0.006,
+      "hero": false,
+      "transition": "cut"
+    },
+    {
+      "id": "19-ram",
+      "asset": "05-ram",
+      "start_frame": 2196,
+      "end_frame": 2224,
+      "zoom": [
+        1.41,
+        1.52
+      ],
+      "focus": [
+        0.41,
+        0.41
+      ],
+      "orbit": -0.006,
+      "hero": false,
+      "transition": "cut"
+    },
+    {
+      "id": "20-phoenix",
+      "asset": "06-phoenix",
+      "start_frame": 2224,
+      "end_frame": 2252,
+      "zoom": [
+        1.39,
+        1.49
+      ],
+      "focus": [
+        0.51,
+        0.37
+      ],
+      "orbit": 0.006,
+      "hero": false,
+      "transition": "snap"
+    },
+    {
+      "id": "21-convergence",
+      "asset": "07-convergence",
+      "start_frame": 2252,
+      "end_frame": 2400,
+      "zoom": [
+        1.15,
+        1.03
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": -0.01,
+      "hero": false,
+      "transition": "finale"
+    }
+  ]
+}

@@ -1,0 +1,1365 @@
+{
+  "title": "Rift Stand \u2014 Udyr vs Sion",
+  "channel": "UdyrIsABotLaner",
+  "duration_seconds": 40,
+  "fps": 60,
+  "width": 1920,
+  "height": 1080,
+  "bpm": 128,
+  "beat_phase": 0.03,
+  "music_source": "C:/StreamingMedia/twitch downloads/CCR - Fortunate Son (MOONLGHT Remix).mp3",
+  "music_start_seconds": 0,
+  "output_dir": "C:/StreamingMedia/ChannelPresentation/2026-10-03/rift-story-v2",
+  "shots": [
+    {
+      "id": "01-approach",
+      "asset": "01-rift",
+      "start_frame": 0,
+      "end_frame": 114,
+      "zoom": [
+        1.04,
+        1.12
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.008,
+      "hero": true,
+      "transition": "fade",
+      "story_beat": "approach"
+    },
+    {
+      "id": "02-footfall",
+      "asset": "10-footfall",
+      "start_frame": 114,
+      "end_frame": 171,
+      "zoom": [
+        1.06,
+        1.17
+      ],
+      "focus": [
+        0.47,
+        0.58
+      ],
+      "orbit": -0.008,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "footfall"
+    },
+    {
+      "id": "03-threat-revealed",
+      "asset": "11-sion-reveal",
+      "start_frame": 171,
+      "end_frame": 283,
+      "zoom": [
+        1.04,
+        1.11
+      ],
+      "focus": [
+        0.57,
+        0.49
+      ],
+      "orbit": 0.008,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "threat revealed"
+    },
+    {
+      "id": "04-hero-sees-threat",
+      "asset": "02-awakening",
+      "start_frame": 283,
+      "end_frame": 339,
+      "zoom": [
+        1.08,
+        1.18
+      ],
+      "focus": [
+        0.55,
+        0.48
+      ],
+      "orbit": -0.008,
+      "hero": false,
+      "transition": "snap",
+      "story_beat": "hero sees threat"
+    },
+    {
+      "id": "05-axe-anticipation",
+      "asset": "12-axe-windup",
+      "start_frame": 339,
+      "end_frame": 452,
+      "zoom": [
+        1.025,
+        1.06
+      ],
+      "focus": [
+        0.5,
+        0.49
+      ],
+      "orbit": 0.008,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "axe anticipation"
+    },
+    {
+      "id": "06-axe-release",
+      "asset": "14-axe-swing",
+      "start_frame": 452,
+      "end_frame": 466,
+      "zoom": [
+        1.05,
+        1.075
+      ],
+      "focus": [
+        0.5,
+        0.52
+      ],
+      "orbit": -0.002,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "axe release",
+      "travel": [
+        0.035,
+        0
+      ],
+      "smear": true
+    },
+    {
+      "id": "07-dodge-and-stone-hit",
+      "asset": "13-axe-dodge",
+      "start_frame": 466,
+      "end_frame": 508,
+      "zoom": [
+        1.09,
+        1.035
+      ],
+      "focus": [
+        0.48,
+        0.55
+      ],
+      "orbit": 0.008,
+      "hero": false,
+      "transition": "impact",
+      "story_beat": "dodge and stone hit",
+      "impact_point": [
+        0.48,
+        0.76
+      ],
+      "impact_frames": 3,
+      "hit_stop_frames": 3,
+      "shockwave": true
+    },
+    {
+      "id": "08-storm-spirit-awakens",
+      "asset": "03-bear",
+      "start_frame": 508,
+      "end_frame": 564,
+      "zoom": [
+        1.17,
+        1.29
+      ],
+      "focus": [
+        0.53,
+        0.49
+      ],
+      "orbit": -0.008,
+      "hero": false,
+      "transition": "snap",
+      "story_beat": "storm spirit awakens"
+    },
+    {
+      "id": "09-punch-anticipation",
+      "asset": "20-bear-windup",
+      "start_frame": 564,
+      "end_frame": 649,
+      "zoom": [
+        1.045,
+        1.09
+      ],
+      "focus": [
+        0.49,
+        0.51
+      ],
+      "orbit": 0.008,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "punch anticipation"
+    },
+    {
+      "id": "10-punch-release",
+      "asset": "21-bear-release",
+      "start_frame": 649,
+      "end_frame": 670,
+      "zoom": [
+        1.04,
+        1.085
+      ],
+      "focus": [
+        0.51,
+        0.52
+      ],
+      "orbit": -0.002,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "punch release",
+      "travel": [
+        0.035,
+        0
+      ],
+      "smear": true
+    },
+    {
+      "id": "11-punch-contact",
+      "asset": "22-bear-contact",
+      "start_frame": 670,
+      "end_frame": 677,
+      "zoom": [
+        1.065,
+        1.075
+      ],
+      "focus": [
+        0.55,
+        0.48
+      ],
+      "orbit": 0.002,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "punch contact"
+    },
+    {
+      "id": "12-electric-impact-insert",
+      "asset": "24-bear-impact-insert",
+      "start_frame": 677,
+      "end_frame": 684,
+      "zoom": [
+        1.06,
+        1.1
+      ],
+      "focus": [
+        0.55,
+        0.49
+      ],
+      "orbit": -0.002,
+      "hero": false,
+      "transition": "impact",
+      "story_beat": "electric impact insert",
+      "impact_point": [
+        0.59,
+        0.5
+      ],
+      "impact_frames": 3,
+      "hit_stop_frames": 3,
+      "shockwave": true
+    },
+    {
+      "id": "13-punch-follow-through",
+      "asset": "22-bear-contact",
+      "start_frame": 684,
+      "end_frame": 733,
+      "zoom": [
+        1.09,
+        1.04
+      ],
+      "focus": [
+        0.52,
+        0.49
+      ],
+      "orbit": 0.008,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "punch follow through"
+    },
+    {
+      "id": "14-enemy-recoil",
+      "asset": "23-bear-recovery",
+      "start_frame": 733,
+      "end_frame": 789,
+      "zoom": [
+        1.045,
+        1.085
+      ],
+      "focus": [
+        0.52,
+        0.51
+      ],
+      "orbit": -0.008,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "enemy recoil"
+    },
+    {
+      "id": "15-guardian-spirit",
+      "asset": "04-turtle",
+      "start_frame": 789,
+      "end_frame": 846,
+      "zoom": [
+        1.15,
+        1.28
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.008,
+      "hero": false,
+      "transition": "snap",
+      "story_beat": "guardian spirit"
+    },
+    {
+      "id": "16-shield-anticipation",
+      "asset": "30-turtle-brace",
+      "start_frame": 846,
+      "end_frame": 888,
+      "zoom": [
+        1.04,
+        1.075
+      ],
+      "focus": [
+        0.49,
+        0.51
+      ],
+      "orbit": -0.008,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "shield anticipation"
+    },
+    {
+      "id": "17-shield-contact-lead",
+      "asset": "31-turtle-contact",
+      "start_frame": 888,
+      "end_frame": 902,
+      "zoom": [
+        1.07,
+        1.08
+      ],
+      "focus": [
+        0.49,
+        0.51
+      ],
+      "orbit": 0.002,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "shield contact lead"
+    },
+    {
+      "id": "18-shield-collision",
+      "asset": "31-turtle-contact",
+      "start_frame": 902,
+      "end_frame": 958,
+      "zoom": [
+        1.1,
+        1.04
+      ],
+      "focus": [
+        0.49,
+        0.51
+      ],
+      "orbit": -0.008,
+      "hero": false,
+      "transition": "impact",
+      "story_beat": "shield collision",
+      "impact_point": [
+        0.4,
+        0.49
+      ],
+      "impact_frames": 3,
+      "hit_stop_frames": 3,
+      "shockwave": true
+    },
+    {
+      "id": "19-hero-pushed-back",
+      "asset": "32-shield-pushback",
+      "start_frame": 958,
+      "end_frame": 1014,
+      "zoom": [
+        1.04,
+        1.085
+      ],
+      "focus": [
+        0.47,
+        0.55
+      ],
+      "orbit": 0.008,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "hero pushed back"
+    },
+    {
+      "id": "20-setback",
+      "asset": "33-udyr-down",
+      "start_frame": 1014,
+      "end_frame": 1127,
+      "zoom": [
+        1.04,
+        1.12
+      ],
+      "focus": [
+        0.44,
+        0.51
+      ],
+      "orbit": -0.008,
+      "hero": false,
+      "transition": "breath",
+      "story_beat": "setback"
+    },
+    {
+      "id": "21-resolve",
+      "asset": "34-resolve",
+      "start_frame": 1127,
+      "end_frame": 1239,
+      "zoom": [
+        1.04,
+        1.13
+      ],
+      "focus": [
+        0.49,
+        0.48
+      ],
+      "orbit": 0.008,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "resolve"
+    },
+    {
+      "id": "22-ram-spirit",
+      "asset": "05-ram",
+      "start_frame": 1239,
+      "end_frame": 1296,
+      "zoom": [
+        1.2,
+        1.3
+      ],
+      "focus": [
+        0.45,
+        0.48
+      ],
+      "orbit": -0.008,
+      "hero": false,
+      "transition": "snap",
+      "story_beat": "ram spirit"
+    },
+    {
+      "id": "23-charge-anticipation",
+      "asset": "40-ram-coil",
+      "start_frame": 1296,
+      "end_frame": 1338,
+      "zoom": [
+        1.04,
+        1.08
+      ],
+      "focus": [
+        0.49,
+        0.54
+      ],
+      "orbit": 0.008,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "charge anticipation"
+    },
+    {
+      "id": "24-charge-release",
+      "asset": "41-ram-release",
+      "start_frame": 1338,
+      "end_frame": 1352,
+      "zoom": [
+        1.04,
+        1.085
+      ],
+      "focus": [
+        0.5,
+        0.54
+      ],
+      "orbit": -0.002,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "charge release",
+      "travel": [
+        0.035,
+        0
+      ],
+      "smear": true
+    },
+    {
+      "id": "25-ram-contact-accent",
+      "asset": "42-ram-contact",
+      "start_frame": 1352,
+      "end_frame": 1359,
+      "zoom": [
+        1.055,
+        1.065
+      ],
+      "focus": [
+        0.54,
+        0.51
+      ],
+      "orbit": 0.002,
+      "hero": false,
+      "transition": "impact",
+      "story_beat": "ram contact accent",
+      "impact_point": [
+        0.6,
+        0.51
+      ],
+      "impact_frames": 3,
+      "hit_stop_frames": 3,
+      "shockwave": true
+    },
+    {
+      "id": "26-ram-follow-through",
+      "asset": "42-ram-contact",
+      "start_frame": 1359,
+      "end_frame": 1408,
+      "zoom": [
+        1.07,
+        1.035
+      ],
+      "focus": [
+        0.52,
+        0.51
+      ],
+      "orbit": -0.008,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "ram follow through"
+    },
+    {
+      "id": "27-enemy-lands",
+      "asset": "43-ram-fall",
+      "start_frame": 1408,
+      "end_frame": 1464,
+      "zoom": [
+        1.04,
+        1.075
+      ],
+      "focus": [
+        0.51,
+        0.52
+      ],
+      "orbit": 0.008,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "enemy lands"
+    },
+    {
+      "id": "28-phoenix-spirit",
+      "asset": "06-phoenix",
+      "start_frame": 1464,
+      "end_frame": 1521,
+      "zoom": [
+        1.14,
+        1.25
+      ],
+      "focus": [
+        0.51,
+        0.43
+      ],
+      "orbit": -0.008,
+      "hero": false,
+      "transition": "snap",
+      "story_beat": "phoenix spirit"
+    },
+    {
+      "id": "29-final-attack-rises",
+      "asset": "50-phoenix-rise",
+      "start_frame": 1521,
+      "end_frame": 1563,
+      "zoom": [
+        1.035,
+        1.06
+      ],
+      "focus": [
+        0.5,
+        0.48
+      ],
+      "orbit": 0.008,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "final attack rises"
+    },
+    {
+      "id": "30-final-attack-dives",
+      "asset": "51-phoenix-dive",
+      "start_frame": 1563,
+      "end_frame": 1577,
+      "zoom": [
+        1.045,
+        1.07
+      ],
+      "focus": [
+        0.51,
+        0.49
+      ],
+      "orbit": -0.002,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "final attack dives",
+      "travel": [
+        0.035,
+        0.008
+      ],
+      "smear": true
+    },
+    {
+      "id": "31-frost-contact-accent",
+      "asset": "52-phoenix-contact",
+      "start_frame": 1577,
+      "end_frame": 1584,
+      "zoom": [
+        1.055,
+        1.06
+      ],
+      "focus": [
+        0.54,
+        0.55
+      ],
+      "orbit": 0.002,
+      "hero": false,
+      "transition": "impact",
+      "story_beat": "frost contact accent",
+      "impact_point": [
+        0.46,
+        0.76
+      ],
+      "impact_frames": 3,
+      "hit_stop_frames": 3,
+      "shockwave": true
+    },
+    {
+      "id": "32-frost-wave-expands",
+      "asset": "52-phoenix-contact",
+      "start_frame": 1584,
+      "end_frame": 1689,
+      "zoom": [
+        1.07,
+        1.025
+      ],
+      "focus": [
+        0.51,
+        0.52
+      ],
+      "orbit": -0.008,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "frost wave expands"
+    },
+    {
+      "id": "33-victory-wide",
+      "asset": "53-aftermath",
+      "start_frame": 1689,
+      "end_frame": 1802,
+      "zoom": [
+        1.035,
+        1.075
+      ],
+      "focus": [
+        0.5,
+        0.51
+      ],
+      "orbit": 0.008,
+      "hero": false,
+      "transition": "breath",
+      "story_beat": "victory wide"
+    },
+    {
+      "id": "34-hero-victory-portrait",
+      "asset": "53-aftermath",
+      "start_frame": 1802,
+      "end_frame": 1914,
+      "zoom": [
+        1.53,
+        1.65
+      ],
+      "focus": [
+        0.31,
+        0.43
+      ],
+      "orbit": -0.008,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "hero victory portrait"
+    },
+    {
+      "id": "35-storm-recall",
+      "asset": "22-bear-contact",
+      "start_frame": 1914,
+      "end_frame": 1971,
+      "zoom": [
+        1.2,
+        1.32
+      ],
+      "focus": [
+        0.57,
+        0.48
+      ],
+      "orbit": 0.008,
+      "hero": false,
+      "transition": "snap",
+      "story_beat": "storm recall"
+    },
+    {
+      "id": "36-guardian-recall",
+      "asset": "31-turtle-contact",
+      "start_frame": 1971,
+      "end_frame": 2027,
+      "zoom": [
+        1.17,
+        1.28
+      ],
+      "focus": [
+        0.46,
+        0.49
+      ],
+      "orbit": -0.008,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "guardian recall"
+    },
+    {
+      "id": "37-ram-recall",
+      "asset": "42-ram-contact",
+      "start_frame": 2027,
+      "end_frame": 2083,
+      "zoom": [
+        1.15,
+        1.29
+      ],
+      "focus": [
+        0.55,
+        0.52
+      ],
+      "orbit": 0.008,
+      "hero": false,
+      "transition": "snap",
+      "story_beat": "ram recall"
+    },
+    {
+      "id": "38-phoenix-recall",
+      "asset": "52-phoenix-contact",
+      "start_frame": 2083,
+      "end_frame": 2139,
+      "zoom": [
+        1.15,
+        1.27
+      ],
+      "focus": [
+        0.52,
+        0.54
+      ],
+      "orbit": -0.008,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "phoenix recall"
+    },
+    {
+      "id": "39-resolve-recall",
+      "asset": "34-resolve",
+      "start_frame": 2139,
+      "end_frame": 2167,
+      "zoom": [
+        1.17,
+        1.27
+      ],
+      "focus": [
+        0.48,
+        0.48
+      ],
+      "orbit": 0.002,
+      "hero": false,
+      "transition": "snap",
+      "story_beat": "resolve recall"
+    },
+    {
+      "id": "40-storm-insert",
+      "asset": "24-bear-impact-insert",
+      "start_frame": 2167,
+      "end_frame": 2196,
+      "zoom": [
+        1.12,
+        1.23
+      ],
+      "focus": [
+        0.54,
+        0.49
+      ],
+      "orbit": -0.002,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "storm insert"
+    },
+    {
+      "id": "41-ram-insert",
+      "asset": "05-ram",
+      "start_frame": 2196,
+      "end_frame": 2224,
+      "zoom": [
+        1.36,
+        1.43
+      ],
+      "focus": [
+        0.43,
+        0.4
+      ],
+      "orbit": 0.002,
+      "hero": false,
+      "transition": "cut",
+      "story_beat": "ram insert"
+    },
+    {
+      "id": "42-phoenix-insert",
+      "asset": "06-phoenix",
+      "start_frame": 2224,
+      "end_frame": 2252,
+      "zoom": [
+        1.32,
+        1.4
+      ],
+      "focus": [
+        0.51,
+        0.37
+      ],
+      "orbit": -0.002,
+      "hero": false,
+      "transition": "snap",
+      "story_beat": "phoenix insert"
+    },
+    {
+      "id": "43-channel-reveal",
+      "asset": "07-convergence",
+      "start_frame": 2252,
+      "end_frame": 2400,
+      "zoom": [
+        1.14,
+        1.03
+      ],
+      "focus": [
+        0.5,
+        0.5
+      ],
+      "orbit": 0.008,
+      "hero": false,
+      "transition": "finale",
+      "story_beat": "channel reveal"
+    }
+  ],
+  "export_stem": "udyr-sion-story-intro",
+  "technique": "23 new connected action keyframes plus reused spirit artwork; pose cuts, impact inserts, hit stops, depth camera motion, moving weather and procedural effects",
+  "review_frames": [
+    14,
+    128,
+    185,
+    297,
+    353,
+    459,
+    480,
+    522,
+    578,
+    659,
+    673,
+    680,
+    698,
+    747,
+    803,
+    860,
+    895,
+    916,
+    972,
+    1028,
+    1141,
+    1253,
+    1310,
+    1345,
+    1355,
+    1373,
+    1422,
+    1478,
+    1535,
+    1570,
+    1580,
+    1598,
+    1703,
+    1816,
+    1928,
+    1985,
+    2041,
+    2097,
+    2153,
+    2181,
+    2210,
+    2238,
+    2266
+  ],
+  "assets": {
+    "10-footfall": {
+      "style": "01-rift",
+      "lightning": false,
+      "depth": [
+        [
+          0.48,
+          0.54,
+          0.46,
+          0.48,
+          0.86
+        ]
+      ]
+    },
+    "12-axe-windup": {
+      "style": "01-rift",
+      "lightning": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "14-axe-swing": {
+      "style": "01-rift",
+      "lightning": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "13-axe-dodge": {
+      "style": "01-rift",
+      "lightning": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "11-sion-reveal": {
+      "style": "05-ram",
+      "lightning": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "34-resolve": {
+      "style": "05-ram",
+      "lightning": false,
+      "depth": [
+        [
+          0.48,
+          0.54,
+          0.46,
+          0.48,
+          0.86
+        ]
+      ]
+    },
+    "40-ram-coil": {
+      "style": "05-ram",
+      "lightning": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "41-ram-release": {
+      "style": "05-ram",
+      "lightning": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "42-ram-contact": {
+      "style": "05-ram",
+      "lightning": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "43-ram-fall": {
+      "style": "05-ram",
+      "lightning": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "20-bear-windup": {
+      "style": "03-bear",
+      "lightning": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "21-bear-release": {
+      "style": "03-bear",
+      "lightning": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "22-bear-contact": {
+      "style": "03-bear",
+      "lightning": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "23-bear-recovery": {
+      "style": "03-bear",
+      "lightning": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "24-bear-impact-insert": {
+      "style": "03-bear",
+      "lightning": false,
+      "depth": [
+        [
+          0.48,
+          0.54,
+          0.46,
+          0.48,
+          0.86
+        ]
+      ]
+    },
+    "30-turtle-brace": {
+      "style": "04-turtle",
+      "lightning": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "31-turtle-contact": {
+      "style": "04-turtle",
+      "lightning": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "32-shield-pushback": {
+      "style": "04-turtle",
+      "lightning": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ],
+      "ward": false
+    },
+    "33-udyr-down": {
+      "style": "04-turtle",
+      "lightning": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ],
+      "ward": false
+    },
+    "50-phoenix-rise": {
+      "style": "06-phoenix",
+      "lightning": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "51-phoenix-dive": {
+      "style": "06-phoenix",
+      "lightning": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "52-phoenix-contact": {
+      "style": "06-phoenix",
+      "lightning": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    },
+    "53-aftermath": {
+      "style": "06-phoenix",
+      "lightning": false,
+      "depth": [
+        [
+          0.3,
+          0.53,
+          0.2,
+          0.43,
+          0.82
+        ],
+        [
+          0.72,
+          0.49,
+          0.22,
+          0.44,
+          0.77
+        ]
+      ]
+    }
+  },
+  "pose_groups": {
+    "axe": [
+      "12-axe-windup",
+      "14-axe-swing",
+      "13-axe-dodge"
+    ],
+    "bear": [
+      "20-bear-windup",
+      "21-bear-release",
+      "22-bear-contact",
+      "23-bear-recovery"
+    ],
+    "shield": [
+      "30-turtle-brace",
+      "31-turtle-contact",
+      "32-shield-pushback",
+      "33-udyr-down"
+    ],
+    "ram": [
+      "40-ram-coil",
+      "41-ram-release",
+      "42-ram-contact",
+      "43-ram-fall"
+    ],
+    "phoenix": [
+      "50-phoenix-rise",
+      "51-phoenix-dive",
+      "52-phoenix-contact",
+      "53-aftermath"
+    ]
+  }
+}

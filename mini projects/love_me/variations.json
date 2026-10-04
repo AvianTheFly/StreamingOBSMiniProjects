@@ -1,0 +1,106 @@
+{
+  "variations": {
+    "signal_found": {
+      "id": "signal_found",
+      "name": "Signal found",
+      "hotkey": "986",
+      "style": "signal",
+      "feeling": "Longing → recognition → release",
+      "spirit": "ram",
+      "description": "35 emotional film and TV stills start changing immediately on the musical hit, without repeating. Rapid cuts slow slightly through HAVE YOU BEEN while imagery fades by 15s. Larger worn lettering cycles 23 typefaces.",
+      "reference": "Rihanna — Where Have You Been (orchestral edit)",
+      "reference_url": "https://www.capcut.com/template-detail/WHERE-HAVE-YOU-BEEN/7567318045627092277",
+      "audio_hint": "Use the orchestral vocal-build excerpt. Trim start to the first held vocal; place the first big orchestral lift at the cue anchor.",
+      "bpm": 96,
+      "duration": 30.65,
+      "anchor": 6,
+      "cuts": [
+        0,
+        1.5,
+        3,
+        4.5,
+        6,
+        6.55,
+        7.1,
+        7.65,
+        8.2,
+        8.75,
+        9.3,
+        9.85,
+        10.4,
+        10.95,
+        11.5,
+        12.05,
+        12.6,
+        13.15,
+        13.7,
+        14.5,
+        15.2
+      ],
+      "words": [
+        "WHERE HAVE YOU BEEN?",
+        "A LIGHT IN THE DARK",
+        "THERE YOU ARE"
+      ],
+      "palette": [
+        "#84e5ec",
+        "#bdabff",
+        "#fff6dc"
+      ],
+      "mode": "once",
+      "repeats": 2,
+      "opacity": 0.72,
+      "scale": 0.85,
+      "position": "top",
+      "reduced_motion": false,
+      "audio_file": "C:/StreamingMedia/twitch downloads/Rihanna - Where Have You Been (Orchestra remix) #music #edm #sleepy.mp3",
+      "audio_start": 0,
+      "audio_anchor": 9.65,
+      "audio_rate": 1,
+      "volume_db": 0,
+      "record_audio": false,
+      "timeline_duration": 16,
+      "image_onset": 9.719,
+      "lyric_cues": [
+        {
+          "start": 10,
+          "end": 12,
+          "text": "WHERE"
+        },
+        {
+          "start": 12,
+          "end": 12.75,
+          "text": "HAVE"
+        },
+        {
+          "start": 12.75,
+          "end": 13.35,
+          "text": "YOU"
+        },
+        {
+          "start": 13.35,
+          "end": 15,
+          "text": "BEEN"
+        },
+        {
+          "start": 15,
+          "end": 15.8,
+          "text": "ALL"
+        },
+        {
+          "start": 15.8,
+          "end": 16.35,
+          "text": "MY"
+        },
+        {
+          "start": 16.35,
+          "end": 18,
+          "text": "LIFE"
+        }
+      ],
+      "lyric_offset": 0,
+      "font_interval": 0.12,
+      "hold_fade": 0.75
+    }
+  }
+}

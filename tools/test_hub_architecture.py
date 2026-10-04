@@ -16,6 +16,19 @@ from hub_ui import audio, commands, hotkeys, project_status, server, settings, u
 
 
 class HubArchitectureTests(unittest.TestCase):
+    def test_unwatched_events_skip_serialization(self):
+        with patch.object(updates, '_sse_clients', []), patch.object(updates.json, 'dumps') as encode:
+            updates.broadcast('hub_event', {'event': 'game.connected'})
+        encode.assert_not_called()
+
+    def test_idle_status_poll_skips_unwatched_ui_work(self):
+        stop = Mock()
+        stop.is_set.side_effect = [False, True]
+        with patch.object(updates.audio_service, 'sync_audio_memory_from_obs', return_value=set()), \
+             patch.object(updates.project_status, 'all_statuses') as statuses:
+            updates.poll_loop(stop)
+        statuses.assert_not_called()
+
     def test_importing_ui_has_no_runtime_side_effects(self):
         result = subprocess.run([sys.executable, '-c', '''
 import threading, socket, unittest.mock as mock
@@ -66,7 +79,7 @@ assert not any(t.name.startswith('hub_ui:') for t in threading.enumerate())
             self.assertEqual(hotkeys.parse_hotkey_sequence('a+b'), ['a', 'b'])
 
     def test_bind_failure_starts_no_ui_workers_or_subscriptions(self):
-        with patch.object(server.http.server, 'ThreadingHTTPServer', side_effect=OSError('busy')), \
+        with patch.object(server, '_HubHTTPServer', side_effect=OSError('busy')), \
              patch.object(server.threading, 'Thread') as thread, \
              patch.object(updates, 'forward_domain_events') as forward:
             with self.assertRaises(OSError):
@@ -89,7 +102,7 @@ assert not any(t.name.startswith('hub_ui:') for t in threading.enumerate())
             return worker
 
         with updates.subscription() as inbox, \
-             patch.object(server.http.server, 'ThreadingHTTPServer', return_value=http_server), \
+             patch.object(server, '_HubHTTPServer', return_value=http_server), \
              patch.object(server.threading, 'Thread', side_effect=thread_factory):
             with self.assertRaisesRegex(RuntimeError, 'worker startup failed'):
                 server.HubUIServer(port=0).serve(threading.Event())
@@ -129,7 +142,8 @@ assert not any(t.name.startswith('hub_ui:') for t in threading.enumerate())
                 except Exception as exc:
                     errors.append(exc)
 
-            with patch.object(server.http.server, 'ThreadingHTTPServer', return_value=http_server), \
+            with patch.object(server, '_HubHTTPServer', return_value=http_server), \
+                   patch('hub_ui.workflow_map.journal', __import__('lib.workflow_map.journal', fromlist=['WorkflowJournal']).WorkflowJournal(Path(folder)/'history')), \
                  patch.object(settings, '_SETTINGS_FILE', saved_path), \
                  patch.object(updates, 'poll_loop', side_effect=lambda s: worker(s, poll_started)), \
                  patch.object(hotkeys, 'hub_hotkey_loop', side_effect=lambda s: worker(s, keys_started)), \

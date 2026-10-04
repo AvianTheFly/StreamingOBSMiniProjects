@@ -10,6 +10,7 @@ import time
 from pathlib import Path
 from typing import Any
 from lib.paths import PROJECT_ROOT
+from lib.json_store import write_json
 from lib.project_settings import audio_settings_transaction
 
 _audio_sync_suppressed_until: dict[str, float] = {}
@@ -50,7 +51,7 @@ def read_json_object(path: Path | None) -> dict[str, Any]:
 def write_json_object(path: Path | None, data: dict[str, Any]) -> None:
     if path is None:
         return
-    path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    write_json(path, data)
 
 
 def love_me_audio_items() -> list[dict[str, str]]:
@@ -116,7 +117,7 @@ def load_love_me_audio_state() -> dict[str, Any]:
 
 
 def save_love_me_audio_state(state: dict[str, Any]) -> None:
-    _LOVE_ME_AUDIO_FILE.write_text(json.dumps(state, indent=2, ensure_ascii=False), encoding="utf-8")
+    write_json(_LOVE_ME_AUDIO_FILE, state)
 
 
 def apply_love_me_audio_state(state: dict[str, Any]) -> None:
@@ -136,6 +137,11 @@ def apply_love_me_audio_state(state: dict[str, Any]) -> None:
             obs.set_input_volume_db(stem, effective_db)
         except Exception:
             continue
+    from lib.project_runtime import project_registry
+    interface=project_registry.get('love_me')
+    apply=getattr(interface,'apply_audio_state',None)
+    if callable(apply):
+        apply(state)
 
 
 def love_me_audio_payload() -> dict[str, Any] | None:
@@ -377,11 +383,13 @@ def sync_audio_memory_from_obs(project_key: str | None = None) -> set[str]:
 
         # The source is shared, but its fader belongs to the currently loaded
         # asset. Never turn an asset edit into a project-wide volume shift.
-        if not obs_source_matches_runtime_stem(source_name, current_stem):
-            continue
         next_offset = round(float(live_db) - project_db - profile_db - category_db(profile, current_stem), 2)
         prev_offset = float(stem_value(offsets, current_stem))
         if abs(prev_offset - next_offset) <= 0.05:
+            continue
+        # Recheck file swaps only when a changed fader would be saved. Idle
+        # passes need no second OBS settings request.
+        if not obs_source_matches_runtime_stem(source_name, current_stem):
             continue
 
         for old_key in list(offsets):

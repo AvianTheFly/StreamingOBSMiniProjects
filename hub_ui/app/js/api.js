@@ -18,6 +18,11 @@ export const api = {
   // ── Status & project list ──────────────────────────────────────────────
   getStatus:   () => _req("GET",  "/api/status"),
   getProjects: () => _req("GET",  "/api/projects"),
+  getCoordination: () => _req('GET', '/api/coordination'),
+  getWorkflowMap: () => _req('GET', '/api/workflow-map'),
+  getWorkflowLive: () => _req('GET', '/api/workflow-map/live'),
+  getWorkflowHistory: (filters={}) => _req('GET', '/api/workflow-map/history?' + new URLSearchParams(Object.entries(filters).filter(([,v])=>v!==null&&v!==undefined))),
+  getWorkflowSource: (path,symbol) => _req('GET', '/api/workflow-map/source?' + new URLSearchParams({path,symbol})),
 
   // ── Rules ─────────────────────────────────────────────────────────────
   getRules:    () => _req("GET",  "/api/rules"),
@@ -42,10 +47,15 @@ export const api = {
 
   // ── Instant replay ────────────────────────────────────────────────────
   getReplayClips: () => _req("GET", "/api/projects/instant_replay/clips"),
-  playReplayClip: (path) => _req("POST", "/api/projects/instant_replay/play", { path }),
-  playReplayGroup: (group_id) => _req("POST", "/api/projects/instant_replay/play", { group_id }),
+  captureQuickReplay: (seconds = 15) => _req('POST', '/api/projects/instant_replay/capture', {seconds}),
+  playReplayClip: (path, mode) => _req("POST", "/api/projects/instant_replay/play", { path, mode }),
+  playReplayGroup: (group_id, mode = 'showcase') => _req("POST", "/api/projects/instant_replay/play", { group_id, mode }),
   saveReplayLibrary: (data) => _req("POST", "/api/projects/instant_replay/library", data),
   skipReplayClip: () => _req("POST", "/api/projects/instant_replay/skip", {}),
+  setReplayCompanion: (enabled) => _req("POST", "/api/projects/instant_replay/companion", { enabled }),
+  getReplayStage: () => _req("GET", "/api/projects/instant_replay/stage"),
+  setReplayView: (view) => _req("POST", "/api/projects/instant_replay/companion", { view }),
+  saveReplayPresentation: (data) => _req("POST", "/api/projects/instant_replay/presentation", data),
   replayPreview: (path) => _req("GET", `/api/projects/instant_replay/preview?path=${encodeURIComponent(path)}`),
   trimReplay: (data) => _req("POST", "/api/projects/instant_replay/trim", data),
   replayTrimStatus: (job) => _req("GET", `/api/projects/instant_replay/trim?job=${encodeURIComponent(job)}`),
@@ -63,6 +73,9 @@ export const api = {
 
   // ── Scene switcher ────────────────────────────────────────────────────
   getLobbies:    () => _req("GET",  "/api/projects/scene_voice_switcher/lobbies"),
+  selectLobby:  (source = null, screenVisible) => _req("POST", "/api/projects/scene_voice_switcher/select_lobby", { source, ...(screenVisible === undefined ? {} : {screen_visible: screenVisible}) }),
+  configureLobby: (source, changes) => _req('POST', '/api/projects/scene_voice_switcher/configure_lobby', {source, changes}),
+  restoreLobby: (source) => _req('POST', '/api/projects/scene_voice_switcher/restore_lobby', {source}),
   switchScene:   (scene) => _req("POST", "/api/projects/scene_voice_switcher/switch_scene", { scene }),
 
   // ── Sound effects ─────────────────────────────────────────────────────

@@ -1,0 +1,594 @@
+{
+  "module": {
+    "id": "scene_voice_switcher",
+    "label": "Scenes & lobbies",
+    "group": "Game",
+    "icon": "scene",
+    "description": "Chooses gameplay or a conversation view.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "scene_voice_switcher.start",
+      "label": "Game starts",
+      "topic": "Game starts",
+      "trigger": {
+        "label": "Game starts",
+        "event": "game.connected",
+        "kind": "event"
+      },
+      "detail": "Game connection queues a manual-revision-scoped intent. The bounded feature loop cancels its older return and asks SceneDirector for gameplay. Newer deliberate choices reject stale work; a temporary owner defers accepted automatic intent.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Queue the scene intent",
+          "owner": "scene_voice_switcher",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Newer choice still valid?",
+          "owner": "coordination",
+          "kind": "gate",
+          "detail": "Reject delayed intent after a newer manual scene."
+        },
+        {
+          "id": "2",
+          "label": "Ask for gameplay",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "OBS gameplay scene",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "coordination": "9719a70125356a757d7dd8d4ef1fd4f079a6b403628d6c6088c434b8d230b5a6",
+        "obs": "01af456db45e144826db3dff034567f08dc604214b8bb866f0173b47fe4ee7a4",
+        "scene_voice_switcher": "80d37aca1bdfbd392b1aab211a6ef3acd41886638a182ec1b8440f415f4ad2a6"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/scene_voice_switcher/main.py",
+          "symbol": "run",
+          "hash": "c899307d4d19b164454bee4d9fe91d15d9bf8e2aa6ce38817e1766be328866fe"
+        },
+        {
+          "path": "mini projects/scene_voice_switcher/routing.py",
+          "symbol": "show_game",
+          "hash": "a6d0f2d814e8a24875195d32f74e2be1c35c7e9fb9d138026239c5e7cff20236"
+        }
+      ],
+      "effects": [
+        {
+          "resource": "scene",
+          "intent": "Show gameplay",
+          "role": "write",
+          "protection": "SceneDirector serializes requests. A temporary reservation blocks automatic writes; a newer manual revision rejects delayed intent.",
+          "cases": {
+            "normal": {
+              "status": "ready",
+              "text": "Can request its destination if its captured manual revision is still current."
+            },
+            "result": {
+              "status": "ready",
+              "text": "Game start requests gameplay; the postgame result hold belongs to lobby return."
+            },
+            "temporary": {
+              "status": "wait",
+              "text": "Automatic routing cannot take a reserved scene. The switcher stores one deferred destination; client automation keeps its own pending target and retries."
+            },
+            "manual": {
+              "status": "skip",
+              "text": "If this intent was captured before your scene choice, it is stale and cannot overwrite that choice. A genuinely new trigger may create new intent."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "scene_voice_switcher.end",
+      "label": "Game ends",
+      "topic": "Game ends",
+      "trigger": {
+        "label": "Game ends",
+        "event": "game.disconnected",
+        "kind": "event"
+      },
+      "detail": "Game disconnect records the shared hold and queues a manual-revision-scoped intent. A registered enabled client provider owns automatic lobbies; otherwise the switcher waits for the hold, chooses a rotation location inside SceneDirector preparation and hides the shared desktop. Deferred requests retain the revision guard. Shutdown withdraws only this owner’s pending intent. The accepted lobby is repaired from the complete published layer snapshot before it appears. Each chat browser has its own board dimensions; the existing camera and desktop resources are reused.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Request lobby return",
+          "owner": "scene_voice_switcher",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Client automation owns return?",
+          "owner": "scene_voice_switcher",
+          "kind": "gate",
+          "detail": "When enabled, League client phases choose the next location."
+        },
+        {
+          "id": "2",
+          "label": "Wait for match-result show",
+          "owner": "scene_voice_switcher",
+          "kind": "wait",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Check latest manual choice",
+          "owner": "coordination",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "4",
+          "label": "Ask for a lobby",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "5",
+          "label": "OBS lobby view",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "coordination": "9719a70125356a757d7dd8d4ef1fd4f079a6b403628d6c6088c434b8d230b5a6",
+        "obs": "01af456db45e144826db3dff034567f08dc604214b8bb866f0173b47fe4ee7a4",
+        "scene_voice_switcher": "80d37aca1bdfbd392b1aab211a6ef3acd41886638a182ec1b8440f415f4ad2a6"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/scene_voice_switcher/main.py",
+          "symbol": "run",
+          "hash": "c899307d4d19b164454bee4d9fe91d15d9bf8e2aa6ce38817e1766be328866fe"
+        },
+        {
+          "path": "mini projects/scene_voice_switcher/routing.py",
+          "symbol": "show_lobby",
+          "hash": "9fb481785f97a7b90111db82eacc2e20a8cf9f593f9823a21e108301e59ff402"
+        }
+      ],
+      "effects": [
+        {
+          "resource": "scene",
+          "intent": "Return to a selected lobby",
+          "role": "write",
+          "protection": "SceneDirector serializes requests. A temporary reservation blocks automatic writes; a newer manual revision rejects delayed intent.",
+          "stand_down_when": {
+            "flow": "league_api.idle",
+            "step": "0",
+            "value": true,
+            "text": "When the client provider is running and enabled, it owns automatic lobby routing. The switcher stands down."
+          },
+          "cases": {
+            "normal": {
+              "status": "ready",
+              "text": "Can request its destination if its captured manual revision is still current."
+            },
+            "result": {
+              "status": "wait",
+              "text": "Waits for the real result presentation or the bounded finish grace to expire. A preview does not hold automatic routing."
+            },
+            "temporary": {
+              "status": "wait",
+              "text": "Automatic routing cannot take a reserved scene. The switcher stores one deferred destination; client automation keeps its own pending target and retries."
+            },
+            "manual": {
+              "status": "skip",
+              "text": "If this intent was captured before your scene choice, it is stale and cannot overwrite that choice. A genuinely new trigger may create new intent."
+            }
+          },
+          "watch": "The enable setting alone does not prove the client provider is running. If it is not registered, the switcher remains the fallback."
+        }
+      ]
+    },
+    {
+      "id": "scene_voice_switcher.manual",
+      "label": "Choose a scene or lobby",
+      "topic": "Scene choice",
+      "trigger": {
+        "label": "Choose a scene or lobby",
+        "event": "hub_action",
+        "kind": "control"
+      },
+      "detail": "Gallery, Live desk and voice choices prepare the selected world before SceneDirector shows it. Explicit entry with screen visible updates the existing desktop gate inside that accepted request. Normal entry keeps desktop visibility; automatic returns hide it. Disabled-rotation worlds remain manually selectable. Newer choices during inventory reads reject stale selection before repair. The gallery searches labels, edits per-world rectangles and reports actual OBS status. Native direct scene entries repair the published layers through the shared observation owner without another program-scene write.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Match game or lobby name",
+          "owner": "scene_voice_switcher",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Cancel the older return",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Request deliberate scene",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "OBS chosen view",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "coordination": "9719a70125356a757d7dd8d4ef1fd4f079a6b403628d6c6088c434b8d230b5a6",
+        "obs": "01af456db45e144826db3dff034567f08dc604214b8bb866f0173b47fe4ee7a4",
+        "scene_voice_switcher": "80d37aca1bdfbd392b1aab211a6ef3acd41886638a182ec1b8440f415f4ad2a6"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/scene_voice_switcher/main.py",
+          "symbol": "_handle_command",
+          "hash": "3d86a90726ad7adedb4baaba152aea971144e85ac85170e29f2a3dc2d1166e85"
+        }
+      ],
+      "effects": [
+        {
+          "resource": "scene",
+          "intent": "Show your deliberate scene choice",
+          "role": "write",
+          "protection": "A deliberate request revokes the temporary lease and clears older deferred destinations.",
+          "cases": {
+            "normal": {
+              "status": "ready",
+              "text": "A manual choice can take the screen. Revoked temporary cleanup cannot restore an older scene."
+            },
+            "result": {
+              "status": "ready",
+              "text": "A manual choice can take the screen. Revoked temporary cleanup cannot restore an older scene."
+            },
+            "temporary": {
+              "status": "ready",
+              "text": "A manual choice can take the screen. Revoked temporary cleanup cannot restore an older scene."
+            },
+            "manual": {
+              "status": "ready",
+              "text": "A manual choice can take the screen. Revoked temporary cleanup cannot restore an older scene."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "scene_voice_switcher.passage",
+      "label": "Native lobby passage",
+      "topic": "Scene ownership",
+      "trigger": {
+        "label": "A lobby location changes visibility",
+        "event": "scene.decision",
+        "kind": "event"
+      },
+      "detail": "The finite off-air installer adds only the feature’s OBS script entry. OBS owns one frontend subscription, native show/hide transitions and style/duration controls, with no timer, socket or Hub worker. Show/hide pairs use the same mask and duration. Existing personal item transitions take priority. Unload releases its callback and removes only its own named item transitions. No camera, chat, filters, transforms, global transition or output path is changed.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Preserve collection and personal controls",
+          "owner": "scene_voice_switcher",
+          "kind": "gate",
+          "detail": "Snapshot before a finite inactive-collection update. Verify the selected filename/name; duplicate names require the observed filename."
+        },
+        {
+          "id": "1",
+          "label": "Install native location handoffs",
+          "owner": "scene_voice_switcher",
+          "kind": "action",
+          "detail": "Only add the OBS script entry; preserve other scripts and personal style/duration on repeated installs."
+        },
+        {
+          "id": "2",
+          "label": "Animate complete lobby layers",
+          "owner": "obs",
+          "kind": "output",
+          "detail": "OBS show/hide transition instances follow scene-item visibility chosen by existing scene routing."
+        }
+      ],
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/scene_voice_switcher/passage_installation.py",
+          "symbol": "patch_collection",
+          "hash": "86765235022f9289930ee9d2c3ecf60d5c11f177a62eeda4ab673d8334b68406"
+        },
+        {
+          "path": "tools/install_lobby_passages.py",
+          "symbol": "install",
+          "hash": "f4a3d6996c6066ca0506394175b2f158e5780bd86eb326e87eecf4dff0dae136"
+        }
+      ],
+      "owner_hashes": {
+        "obs": "01af456db45e144826db3dff034567f08dc604214b8bb866f0173b47fe4ee7a4",
+        "scene_voice_switcher": "80d37aca1bdfbd392b1aab211a6ef3acd41886638a182ec1b8440f415f4ad2a6"
+      }
+    },
+    {
+      "id": "scene_voice_switcher.layout",
+      "label": "Prepare the chosen lobby",
+      "topic": "Lobby presentation",
+      "trigger": {
+        "label": "A lobby entry is accepted",
+        "event": "scene.decision",
+        "kind": "event"
+      },
+      "detail": "The feature publishes complete per-world source and placement data. Shared mechanics resolve required resources, snapshot before the first repair, and update only named layers when their settings, visibility, placement or relative stacking differ. The publication/presentation lock keeps a saved edit from racing an older layout. Image settings, nested camera filters, personal CSS and unowned overlays survive; only active chat browsers remain loaded. Deferred and stale scene intents do not repair anything until accepted. Ready worlds optionally publish a transparent living-world layer after its original foreground (or camera for a flat painting) and before dedicated chat, with all three saved live apertures passed explicitly. Other worlds retain their authored layers.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Publish a complete layer snapshot",
+          "owner": "scene_voice_switcher",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Reject stale or deferred intent",
+          "owner": "coordination",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Resolve camera, screen and owned layers",
+          "owner": "coordination",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Snapshot before any repair",
+          "owner": "settings_history",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "4",
+          "label": "Apply only changed owned presentation",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "5",
+          "label": "Present the selected world",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        }
+      ],
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/scene_voice_switcher/presentation.py",
+          "symbol": "plan",
+          "hash": "fb79d895bf515f5cf41fa9fcc39865e6b976eaefe361784934c21fe92ed3d3ed"
+        },
+        {
+          "path": "mini projects/scene_voice_switcher/inventory.py",
+          "symbol": "publish_inventory",
+          "hash": "fd5130c8d6cbc01d7fa2ee082f8e29ab812b7d211e0ca7c63d275e91120808f8"
+        },
+        {
+          "path": "lib/coordination/lobby_layout.py",
+          "symbol": "apply_layout",
+          "hash": "acd4eec647f49e866353a2c1dd572442acb40acf9b164407f6d42d0a1dd6babb"
+        },
+        {
+          "path": "lib/coordination/lobbies.py",
+          "symbol": "_prepare_lobby",
+          "hash": "63fdd8ddf01545119cac09c714cc6a3527355950efcf64edcb81146860efa8e9"
+        }
+      ],
+      "owner_hashes": {
+        "coordination": "9719a70125356a757d7dd8d4ef1fd4f079a6b403628d6c6088c434b8d230b5a6",
+        "obs": "01af456db45e144826db3dff034567f08dc604214b8bb866f0173b47fe4ee7a4",
+        "scene_voice_switcher": "80d37aca1bdfbd392b1aab211a6ef3acd41886638a182ec1b8440f415f4ad2a6",
+        "settings_history": "c0de7909c62939f1fd4a5e9801a1e697f7ce5ce1ec4dd05940d65e2224805cd6"
+      },
+      "effects": [
+        {
+          "resource": "scene",
+          "intent": "Restore the selected world layers",
+          "role": "write",
+          "protection": "SceneDirector admission precedes all preparation. Shared mechanical layer writes cannot select the program scene or edit nested camera/device settings."
+        }
+      ]
+    },
+    {
+      "id": "scene_voice_switcher.motion",
+      "label": "A lobby becomes a living world",
+      "topic": "Lobby presentation",
+      "trigger": {
+        "label": "A ready living lobby is visible",
+        "kind": "browser"
+      },
+      "detail": "The original painting stays beneath a transparent world layer. Eleven ready worlds (Reef, Forge, Sanctuary, Sky Harbor, Storm Coast, Phoenix Observatory, Spirit Railway, Tavern, Future Lounge, Spirit Arcade and Aurora Camp) each supply their own painted landmark motion, ambience and finite themed guests. New invitations retain existing instances, automatic entrances use novelty and soft pressure, and switching the studio world replaces its single document while rejecting stale selections. Complete saved desktop, camera and chat rectangles are cleared after all accents. Hidden documents pause; native OBS unloads inactive sources; teardown releases clocks, instances and cached canvases. Finite off-air installation preserves original inputs, filters, transforms and the program scene. No audio, new Hub worker, socket or program-scene writer is introduced.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Publish saved live apertures",
+          "owner": "scene_voice_switcher",
+          "kind": "action",
+          "detail": "Optional layer data comes from motion.layer and presentation.plan; original Base and any Foreground remain image sources."
+        },
+        {
+          "id": "1",
+          "label": "Cache painting and plan finite entrances",
+          "owner": "browser_effects",
+          "kind": "action",
+          "detail": "Public mechanics take feature-provided deformation and cue data; plan history and instances remain bounded."
+        },
+        {
+          "id": "2",
+          "label": "Animate the world and its visitors",
+          "owner": "scene_voice_switcher",
+          "kind": "action",
+          "detail": "Feature artists own palette, physical occlusion, landmark motion and guest performances on one document clock."
+        },
+        {
+          "id": "3",
+          "label": "Keep live display areas clear",
+          "owner": "scene_voice_switcher",
+          "kind": "gate",
+          "detail": "Clear complete saved rectangles after every accent; optional preview paints empty artwork behind the transparent layer."
+        },
+        {
+          "id": "4",
+          "label": "Pause or release document resources",
+          "owner": "scene_voice_switcher",
+          "kind": "end",
+          "detail": "Hidden documents suspend drawing; OBS shutdown and pagehide release clocks, guests and canvases."
+        }
+      ],
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/scene_voice_switcher/motion.py",
+          "symbol": "layer",
+          "hash": "0861af4df715f8c4dac7682b4329cfe629cfd3373cd2a9fabebaef4e1cf93169"
+        },
+        {
+          "path": "mini projects/scene_voice_switcher/presentation.py",
+          "symbol": "plan",
+          "hash": "fb79d895bf515f5cf41fa9fcc39865e6b976eaefe361784934c21fe92ed3d3ed"
+        },
+        {
+          "path": "tools/build_lobby_motion.py",
+          "symbol": "build",
+          "hash": "125cf6525bda16b02e74aee9d599ac331abc57110d8ec61afe9f6703fa11c753"
+        },
+        {
+          "path": "tools/install_lobby_motion.py",
+          "symbol": "install",
+          "hash": "daf0b439e0f7910a3f9aac13e55f87e9038b8a6954a0571569614123f9985ff5"
+        }
+      ],
+      "owner_hashes": {
+        "scene_voice_switcher": "80d37aca1bdfbd392b1aab211a6ef3acd41886638a182ec1b8440f415f4ad2a6",
+        "browser_effects": "7cf91e257d9f5bcfdfd036ba677b0885ca53810756575ea879eee05fa4df3eff"
+      }
+    }
+  ]
+}

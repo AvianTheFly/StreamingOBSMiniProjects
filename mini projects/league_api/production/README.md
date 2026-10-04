@@ -12,11 +12,83 @@ Canvas: 1920 × 1080, 30 fps. Border effects are silent; the existing League mod
 continues to own kill audio, death/respawn cues and session recording. Mom Frog,
 Hooray, soundboard trigger rules and per-asset settings are untouched.
 
-## Shows and controls
+## Auxiliary art direction
 
-Mountain ambience uses beveled stone tiles around the edges. An observed friendly
-Mountain kill breaks the tiles into jagged chips. Enemy or unresolved kills quietly
-release an established border. Infernal uses flames, Ocean flowing ribbons, Cloud
+All 58 built-in event keys have compositions; the current collection refresh is
+tracked in `docs/BORDER-REFRESH-20261002.md`. `web/event-art.js` owns dispatch,
+captions and entrances; `art/event-scenes.js` assembles artwork owners. Native
+`element-performances.js`, `void-performances.js` and `structure-performances.js`
+own renewed objective and structure compositions. Separate combat, vital,
+progression, economy, lifecycle and inference performance files complete the
+built-in catalog; custom rules use the vital instrument composition, with a
+health motif for the existing health-threshold example. `soul-performance.js`
+owns continuous death, `event-ink.js` local paint tools, and `event-props.js`
+reusable subject silhouettes. Build `web/event-relics.js` with
+`py -3.11 tools/build_border_art.py`. The self-contained native bundle is about
+67 KB instead of 7.6 MB. Original atlases and sanctuary art remain preserved on
+disk and are no longer embedded or decoded by the live presentation.
+
+The renewed elemental casts use a mineral dragon and growing seams, an obsidian
+dragon with ember silk, a coiled sea-dragon and water lenses, a feathered wind
+dragon, botanical chambers around a segmented Chemtech creature, and a silver
+skeletal Elder wing. Hextech retains its approved crystal-wing circuit show.
+Baron has a moving jaw, three eyes and serpentine body; Herald blinks inside a
+segmented shell; three grubs have independently marching little Voidmites.
+A hooked light carries a stolen jewel into a glove. Turret masonry dismantles,
+the first turret reveals a reward treasury, and inhibitors have separate
+fracture, dormant-clock and reassembly acts. Combat has blade duets, little helmet
+banners, clutch-heart stitches and armored support hands. Health has protective
+glass, a healing garden and revival gate; progression has books, spell panels and
+a mana instrument. Economy uses satchels, drawers, harvest props and a ward lens.
+Lifecycle has a minion march, summoning pillars, a victory cup, a torn defeat
+standard and closing folio. Each optional inferred cue has contextual props
+without upgrading its tentative confidence.
+
+Light trails have a visible head and a continuously fading tail. Solid relics anchor
+the composition; selective glass, vapor and soft glints give it depth. The shared
+mask preserves solid details and feathers only the boundary toward gameplay. There is
+no full-screen flash or opaque title card. Each cue eases in and out relative to its
+saved duration. The existing opacity, impact, event enable/cooldown and pacing
+settings are retained. Strength applies once to the composed frame so overlapping
+layers cannot overpower the saved opacity. The sound-effect borders use the same boundary mechanics
+with their own themed scenery, motion and transparent atmospheric fields.
+
+The sustained death presentation has four independently swinging etched soul
+lanterns, glass silk, an hourglass using the observed remaining timer, hanging
+charms, charged constellations and drifting moths. Particle births use an
+absolute serial so successive passages have different positions. Light heads
+leave slowly disappearing tails.
+The arrangement develops over the death interval rather than resetting a short loop. It remains
+only while the local player is actually dead, clears on respawn/disconnect/game
+end, and does not rotate videos. A remaining-time caption uses only the API's
+actual respawnTimer; missing or invalid timers get a neutral caption. Confirmed
+personal payoff softly changes the accent. Reconnection can establish a quiet
+border from current isDead evidence without inventing a trade or old death event.
+The death event's duration controls its entrance cue; the sustained presentation
+follows live player state. Pausing alerts or disabling production borders also hides it. The clip-overlay
+toggle remains independent, so clip cards can stay off while borders remain on.
+
+With production enabled, automatic clip cards, rotating death memes, old border
+flashes and level sprites yield to the new artwork. The saved clip banks, original
+sources, transforms, filters, audio gains and explicit clip previews are retained.
+Personal kill audio and kill-streak triangles remain owned by the League module.
+The existing inferred recall callback retains its legacy presentation.
+
+Context references: [Riot Live Client Data API](https://developer.riotgames.com/docs/lol#game-client-api_live-client-data-api),
+[Riot's 2026 objective update](https://www.leagueoflegends.com/en-us/news/game-updates/patch-26-1-notes/),
+and [Void ecosystem context](https://www.leagueoflegends.com/en-au/news/game-updates/2024-gameplay-preview/).
+These inform art, not new detection claims or assumed buff timers.
+
+For silent review, run `tools/preview_league_art.cjs` with the bundled Playwright
+runtime. It uses an isolated service, draws over a schematic game backdrop, and
+writes `league-auxiliary-designs.png`, `league-all-event-borders.png`, and
+`league-auxiliary-motion.webm` to `tmp_obs_debug`. It never operates live OBS.
+
+## Original implementation and controls
+
+Mountain ambience uses mineral cliffs and narrow fault engravings. An observed friendly
+Mountain kill illuminates the mineral paths. Enemy or unresolved kills quietly
+release an established border. Infernal uses flames, Ocean tidal caustics, Cloud
 wind trails, Hextech circuit geometry, and Chemtech vapor/bubbles. Elder has a short
 kill celebration, without a predicted spawn atmosphere.
 
@@ -24,7 +96,7 @@ The catalog covers all **58 built-in detector keys**. The 47 observed keys inclu
 kills, assists, multikills, objectives, structures, health/resource changes,
 respawn, levels, abilities, inventory, CS, vision score, game start and endings.
 Baron grows curling Void tentacles; Herald opens glowing eyes; Void Grubs march
-around the edges. Multikills unfold metallic wings around crowned seals. Towers
+around the edges. Multikills develop distinct blade, orbit, compass and crown compositions. Towers
 crack and collapse, level-ups summon rune rings, purchases scatter gems, and
 victory adds gold laurels and stars. Ordinary kills and frequent stat changes
 have smaller, shorter cues. Existing personal audio and death behavior remains.
@@ -35,7 +107,7 @@ the detector does not know whether those inferred causes actually occurred.
 Resource spend, item removal and legacy Atakhan also default off individually.
 Custom detector rules receive a rune effect when enabled in their event card.
 
-Only one ambient objective and one short celebration exist at once. Defaults:
+Only one ambient objective and one short celebration exist at once, alongside a sustained death state when applicable. Defaults:
 56 px edge depth, 80% strength, 2.7 second celebrations, four second minimum gap.
 Each event also has its own cooldown. Smaller effects respect the global gap;
 major plays can interrupt lower-priority cues and multikills upgrade immediately.
@@ -104,6 +176,8 @@ missing an uncertain effect over displaying the wrong element.
 | `web/objectives.js` | Baron, Herald, Grubs, structures and crowned finishes |
 | `web/progression.js` | Runes, portals, treasure, harvest, vision and minion march |
 | `web/scene.js` | Canvas composition and strength controls |
+| `web/event-art.js` | Event dispatch, contextual captions, entrance and death lifetime |
+| `web/event-relics.js` | Per-key foreground subjects, selective materials and soul-sanctuary hardware |
 | `web/overlay.js` | Poll-state interpolation, bounded RAF, visibility and stale-transport cleanup |
 | `web/control.*` | Independent settings, preview, clear, readiness and silent monitor |
 
@@ -184,3 +258,37 @@ Raids/follows/subs/gifts/cheers and Channel Points both reported connected with
 healthy overlay heartbeats. The temporary expansion plan was removed after these
 checks. Isolated Chrome's slowest effect averaged 1.97 ms per frame on this machine;
 this is a renderer measurement, not an OBS/game FPS guarantee.
+
+The current artwork sources are `art/event-scenes.js` and `art/event-frames.js`.
+Each event family owns its silhouette, surface treatment and transition. They
+compile with `tools/build_border_art.py` into the existing `web/event-relics.js`
+static route. Shared material shading and edge transparency remain in the public
+browser-effects mechanics; no event policy or source lifecycle moved.
+
+Hextech uses `elements.js::hextechAtmosphere` for sustained atmosphere and the
+capture entrance: oversized translucent hexagonal cells, cyan/violet charges
+with fading tails, asymmetric circuit paths and small etched dragon sigils.
+The capture opens a faceted crystal and swept dragon wings, then discharges a
+sequence of illuminated scales down both sides. Ambient geometry stays on its
+own elapsed time during the capture, so the same border is never drawn twice.
+Fine branching scale-work, nested facets, diamond inlays and broken crown
+circuits add detail within narrow edge margins. The capture charge forks into
+smaller satellite scales, preserving the original clear gameplay centre.
+Layered luminous trails and travelling glass refractions give the edges more
+presence. Open-path heads fade at both endpoints, while the wing spread and
+capture envelope ease in and out with smooth tangents.
+Open circuit charges leave completely before reentering; their tails never
+connect the endpoints with a stray diagonal. Passing glows fade at their wrap.
+All positions derive from scene elapsed time, with no additional timer or worker.
+The existing scene edge mask preserves the clear gameplay centre, and saved
+master opacity still applies once to the composition. The event dispatcher
+bypasses relic artwork only for `dragon_hextech`; match-screen precedence is
+unchanged.
+Finite visual reviews default to four seconds at 60 fps; `BORDER_HEXTECH_SEQUENCE=1`
+shows the capture at its actual speed over the continuing ambient clock.
+
+Transient League responses are clamped to 2–5 seconds by the production catalog;
+the control input uses the same lower bound. Historical saved overrides below
+two seconds remain intact as user data and are clamped only when presented.
+Sustained dragon ambience and the actual death-to-respawn lifetime retain their
+existing owners. Soundboard borders instead follow the complete audio duration.

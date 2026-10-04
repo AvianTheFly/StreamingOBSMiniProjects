@@ -4,14 +4,18 @@ import { state } from "../state.js";
 import { toast } from "../toast.js";
 import { esc } from "../utils.js";
 import { mountTrim } from "./replay-trim.js";
+import { mountPresentation } from './replay-presentation.js';
 
 let root, unwatch, refreshTimer, previewTimer, generation = 0;
 let clips = [], groups = [], revision = 0, selected = new Set();
-let query = "", scope = "all", page = 0, tab = "clip", clipPath = "", draft = null;
+let query = "", scope = "highlight", page = 0, tab = "clip", clipPath = "", draft = null;
 let dirty = false, saving = false, busy = false, loading = false, ready = false;
+let companion = false;
 let draftRevision = 0;
 let renderedClips = "";
 let disposeTrim;
+let disposePresentation;
+let playbackMode = 'showcase';
 const PAGE_SIZE = 30;
 const $ = selector => root?.querySelector(selector);
 const title = clip => clip?.title || clip?.name || "Missing clip";
@@ -20,29 +24,29 @@ const button = (id, label, primary = false) => `<button class="btn btn-${primary
 
 export function mount(container) {
   root = container; generation++; clips = []; groups = []; selected = new Set();
-  query = ""; scope = "all"; page = 0; tab = "clip"; clipPath = ""; draft = null;
-  dirty = false; saving = false; loading = false; ready = false; renderedClips = "";
+  query = ""; scope = "highlight"; page = 0; tab = "clip"; clipPath = ""; draft = null;
+  dirty = false; saving = false; loading = false; ready = false; companion = false; renderedClips = "";
   root.innerHTML = `
-    <div class="page-header"><div><div class="page-title">Instant Replay</div>
-      <div class="page-subtitle">Find a moment. Build an intro. Play it on stream.</div></div>
-      <div class="page-actions">${button("irRandom", "Play random in OBS", true)}${button("irLatest", "Play latest in OBS")}</div></div>
+    <div class="page-header"><div><div class="page-title">Replay &amp; Clips</div>
+      <div class="page-subtitle">Replay a moment now. Save your best clips for later.</div></div></div>
+    <section id="irPresentation" aria-label="Replay presentation studio"></section>
     <div class="ir-live card">
       <div><span class="state-indicator" id="irIndicator"></span> <strong id="irStatus">Connecting…</strong><span id="irActivity" class="ir-muted"></span></div>
-      <div class="ir-actions">${button("irPause", "Pause")}${button("irResume", "Resume")}${button("irSkip", "Next clip")}${button("irStop", "Stop replay")}</div>
+      <div class="ir-actions">${button("irPause", "Pause")}${button("irResume", "Resume")}${button("irSkip", "Next clip")}${button("irStop", "Return to live")}</div>
     </div>
-    <details class="card ir-help mt-16"><summary>Live shortcuts &amp; how replays work <span class="ir-muted">— press |, say “random”</span></summary>
+    <details class="card ir-help mt-16"><summary>Capture and voice commands <span class="ir-muted">— press |, then speak</span></summary>
       <div class="ir-help-grid">
-        <div><h3>Capture a moment</h3><p>Press <kbd>|</kbd>, then say <code>save</code>, <code>save win</code>, <code>save fail</code>, <code>save escape</code>, or <code>save 30</code>. Say <code>mark</code> to set the start of your next save; <code>save full</code> saves the full buffer.</p><div class="ir-actions">${button("irSaveBuffer", "Save replay buffer")}${button("irMark", "Mark start")}</div></div>
-      <div><h3>Play live</h3><p><code>random</code> keeps choosing saved replays until you stop it. <code>play last</code> plays the latest. <code>play highlights</code> plays this game's clips (with previous-game fallback). <code>play game 3</code> plays its reel; <code>play win 2</code> picks a tagged clip.</p></div>
-        <div><h3>Run an intro</h3><p>Create a compilation below, add clips, and arrange them. Save it, then use <b>Play compilation in OBS</b> or say <code>play intro [name]</code>. Clips play once in the order you chose.</p></div>
-      </div><p>Voice sends after two seconds, or press <kbd>C</kbd> sooner. During a sequence, <kbd>|</kbd> skips a clip; during a single replay it stops playback. Stop replay ends the whole sequence. Browser previews never switch your OBS scene.</p>
+        <div><h3>Capture</h3><p><code>mark</code> sets the start. <code>save</code> uses it or the game moment; <code>save 30</code> saves 30 seconds; <code>save full</code> keeps the whole buffer. Add a tag with <code>save win</code>. Quick replay is faster and may include a little extra lead-in.</p><div class="ir-actions">${button("irSaveBuffer", "Save highlight")}${button("irMark", "Mark start")}</div></div>
+      <div><h3>Play</h3><p><code>quick replay</code> captures the last 15 seconds for replay only. <code>quick replay 30</code> changes the duration. <code>save and replay</code> saves a highlight candidate and requests a Twitch clip. <code>replay</code> plays the latest capture. <code>showcase</code> and <code>random</code> use highlight candidates.</p></div>
+        <div><h3>Control</h3><p>Choose the side view above. <b>Live gameplay view</b> follows your gameplay capture. <b>Gated desktop</b> follows the shared screen visibility control. Use <b>Next clip</b> or <b>Return to live</b> during playback.</p></div>
+      </div><p>Voice sends after two seconds, or press <kbd>C</kbd> sooner. During a sequence, <kbd>|</kbd> skips; during a single clip it stops. Browser preview stays off stream.</p>
     </details>
     <div class="ir-workspace mt-16">
       <section class="card ir-library" aria-label="Replay library">
         <div class="ir-heading"><h2>Clip library</h2>${button("irRefresh", "Refresh")}</div>
         <label class="ir-sr" for="irSearch">Search clips</label><input id="irSearch" type="search" placeholder="Search names, notes, tags or dates…">
-        <div class="ir-actions"><label class="ir-sr" for="irScope">Filter clips</label><select id="irScope"><option value="all">All clips</option><option value="favorites">Favorites</option><option value="kept">Kept clips</option><option value="current game">Current game</option><option value="previous game">Previous game</option><option value="highlight reel">Game reels</option></select><span id="irCount" class="ir-muted"></span></div>
-        <div class="ir-selection"><label><input type="checkbox" id="irSelectPage"> Select this page</label><span id="irSelected">0 selected</span>${button("irClear", "Clear")}${button("irAdd", "Add to compilation")}</div>
+        <div class="ir-actions"><label class="ir-sr" for="irScope">Filter clips</label><select id="irScope"><option value="highlight" selected>Highlight candidates</option><option value="replay_only">Replay only</option><option value="all">All clips</option><option value="favorites">Favorites</option><option value="kept">Kept clips</option><option value="current game">Current game</option><option value="previous game">Previous game</option><option value="highlight reel">Game reels</option></select><span id="irCount" class="ir-muted"></span></div>
+        <div class="ir-selection"><label><input type="checkbox" id="irSelectPage"> Select this page</label><span id="irSelected">0 selected</span>${button("irClear", "Clear")}${button("irAdd", "Add to compilation")}${button("irMakeHighlight", "Keep for highlights")}${button("irMakeReplayOnly", "Replay only")}</div>
         <div id="irClips" class="ir-clip-list">Loading clips…</div>
         <div class="ir-pagination">${button("irPrev", "Previous")}<span id="irPage"></span>${button("irNext", "Next")}</div>
       </section>
@@ -51,8 +55,13 @@ export function mount(container) {
         <div id="irEditor"></div>
       </section>
     </div>`;
+  disposePresentation = mountPresentation($('#irPresentation'),{canCapture:()=>ready&&!busy});
   bind("#irRandom", () => live(() => api.runProjectAction("instant_replay", "play_random")));
-  bind("#irLatest", () => live(() => api.runProjectAction("instant_replay", "play_latest")));
+  bind("#irHighlights", () => live(() => api.runProjectAction("instant_replay", "play_highlights")));
+  bind("#irSaveReplay", () => live(() => api.runProjectAction("instant_replay", "save_replay"), 'Saving this moment, then replaying the finished clip'));
+  bind("#irReplay", () => live(() => api.runProjectAction("instant_replay", "play_replay")));
+  bind('#irQuickReplay', () => live(() => api.captureQuickReplay(Number($('#irQuickSeconds').value)), 'Capturing replay-only moment'));
+  bind("#irLatest", () => live(() => api.runProjectAction("instant_replay", "play_showcase")));
   bind("#irPause", () => perform(() => api.pauseProject("instant_replay")));
   bind("#irResume", () => perform(() => api.resumeProject("instant_replay")));
   bind("#irSkip", () => perform(() => api.skipReplayClip()));
@@ -67,6 +76,11 @@ export function mount(container) {
   bind("#irClear", () => { selected.clear(); renderClips(); });
   bind("#irSelectPage", e => { visiblePage().forEach(c => e.target.checked ? selected.add(c.path) : selected.delete(c.path)); renderClips(); }, "change");
   bind("#irAdd", () => addPaths([...selected]));
+  for(const [id,purpose] of [['irMakeHighlight','highlight'],['irMakeReplayOnly','replay_only']])bind(`#${id}`,async()=>{
+    if(!selected.size||!canLeave())return;
+    dirty=false;draftRevision=revision;
+    if(await save({action:'purpose',paths:[...selected],purpose})){await load(true);renderEditor();}
+  });
   bind("#irClipTab", () => switchTab("clip"));
   bind("#irGroupTab", () => switchTab("group"));
   renderEditor(); load(); refreshTimer = setInterval(() => load(), 10000);
@@ -75,6 +89,7 @@ export function mount(container) {
 }
 
 export function unmount() {
+  disposePresentation?.(); disposePresentation = null;
   disposeTrim?.(); disposeTrim = null;
   generation++; clearInterval(refreshTimer); clearTimeout(previewTimer); unwatch?.();
   $("video")?.pause(); root = null;
@@ -89,11 +104,11 @@ async function perform(fn, message) {
   try { const data = await fn(); if (data?.ok === false) throw Error(data.error || "Action unavailable"); if (message) toast.success(message); return data; }
   catch (e) { toast.error(e.message); return null; }
 }
-async function live(fn) {
+async function live(fn, message = 'Playback requested in OBS') {
   $("video")?.pause();
   if (!ready) { toast.error("Replay playback is offline. Open OBS to enable playback."); return; }
   if (busy) { toast.error("Stop the current replay before starting another."); return; }
-  await perform(fn, "Playback requested in OBS");
+  await perform(fn, message);
 }
 async function load(force = false) {
   if (!root || loading) return;
@@ -137,7 +152,7 @@ async function load(force = false) {
   finally { if (token === generation) loading = false; }
 }
 function filtered() {
-  return clips.filter(c => (scope === "all" || (scope === "favorites" ? c.favorite : scope === "kept" ? c.kept : c.scope === scope)) &&
+  return clips.filter(c => (scope === "all" || (scope === 'highlight'?c.purpose!=='replay_only':scope==='replay_only'?c.purpose==='replay_only':scope === "favorites" ? c.favorite : scope === "kept" ? c.kept : c.scope === scope)) &&
     `${title(c)} ${c.name} ${c.notes} ${c.tag} ${new Date(c.saved_at * 1000).toLocaleString()}`.toLowerCase().includes(query));
 }
 function visiblePage() { return filtered().slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE); }
@@ -148,6 +163,7 @@ function renderClips() {
   $("#irSelected").textContent = `${selected.size} selected`;
   $("#irAdd").disabled = !selected.size || saving;
   $("#irClear").disabled = !selected.size;
+  $('#irMakeHighlight').disabled=!selected.size||saving;$('#irMakeReplayOnly').disabled=!selected.size||saving;
   $("#irSelectPage").checked = !!visible.length && visible.every(c => selected.has(c.path));
   $("#irSelectPage").indeterminate = visible.some(c => selected.has(c.path)) && !$("#irSelectPage").checked;
   $("#irPrev").disabled = page === 0;
@@ -155,7 +171,7 @@ function renderClips() {
   $("#irPage").textContent = matches.length ? `${page * PAGE_SIZE + 1}–${Math.min((page + 1) * PAGE_SIZE, matches.length)} of ${matches.length}` : "";
   const clipHTML = visible.map(c => `<div class="ir-clip ${clipPath === c.path ? "is-selected" : ""}" draggable="true" data-id="${c.id}">
     <input type="checkbox" aria-label="Select ${esc(title(c))}" ${selected.has(c.path) ? "checked" : ""}>
-    <button class="ir-clip-open" title="Preview and edit ${esc(title(c))}"><strong>${c.favorite ? "★ " : ""}${esc(title(c))}</strong><span>${esc(c.scope)} · ${esc(new Date(c.saved_at * 1000).toLocaleDateString())} · ${(c.size_bytes / 1048576).toFixed(0)} MB${c.kept ? " · Kept" : ""}</span></button>
+    <button class="ir-clip-open" title="Preview and edit ${esc(title(c))}"><strong>${c.favorite ? "★ " : ""}${esc(title(c))}</strong><span>${c.purpose==='replay_only'?'Replay only':'Highlight candidate'} · ${esc(c.scope)} · ${esc(new Date(c.saved_at * 1000).toLocaleDateString())} · ${(c.size_bytes / 1048576).toFixed(0)} MB</span></button>
     <button class="btn btn-secondary btn-sm ir-clip-add" aria-label="Add ${esc(title(c))} to compilation">+</button></div>`).join("") || `<div class="ir-empty">${clips.length ? "No matching clips. Try another search or filter." : "Your saved clips will appear here. Open Live shortcuts above to save your first replay."}</div>`;
   if (tab === "group" && $("#irAddSelected")) groupState();
   if (clipHTML === renderedClips) return;
@@ -181,23 +197,26 @@ function renderEditor() {
   if (tab === "group") return renderGroup();
   const c = findClip(clipPath);
   if (!c) { $("#irEditor").innerHTML = `<div class="ir-empty"><h3>Pick a clip to see what’s inside</h3><p>Click its name to preview it here, edit its display name, or add notes.</p><p>Making an intro? Select clips on the left, then choose <b>Add to compilation</b>.</p></div>`; return; }
-  $("#irEditor").innerHTML = `<div class="ir-heading"><h2>Clip details</h2>${button("irPlayClip", "Play in OBS", true)}</div>
+  $("#irEditor").innerHTML = `<div class="ir-heading"><h2>Clip details</h2><div class="ir-actions"><select id="irClipMode" class="ir-preview-mode" aria-label="Clip presentation"><option value="showcase">Clip Showcase</option><option value="replay">Quick Replay</option></select>${button("irPlayClip", "Play in OBS", true)}</div></div>
     <div class="ir-preview" id="irPreview"><span>Preview stays in this browser.</span>${button("irPreviewStart", "Load preview")}</div>
     <p id="irPreviewHint" class="ir-muted">A small preview is prepared on demand. Your original stays unchanged.</p>
     <div id="irTrim"><p class="ir-muted">Load the preview to trim a moment and save it as a new clip.</p></div>
     <form id="irClipForm" class="ir-form"><label>Display name<input id="irTitle" maxlength="160" value="${esc(title(c))}" required></label>
     <label>Notes<textarea id="irNotes" rows="3" maxlength="4000" placeholder="What happens in this clip?">${esc(c.notes)}</textarea></label>
     <label class="ir-check"><input id="irFavorite" type="checkbox" ${c.favorite ? "checked" : ""}> Favorite</label>
+    <label>Use this clip for<select id="irPurpose"><option value="highlight" ${c.purpose!=='replay_only'?'selected':''}>Highlight candidate</option><option value="replay_only" ${c.purpose==='replay_only'?'selected':''}>Replay only</option></select></label>
     <p class="ir-muted">Saving details or adding to a compilation keeps this clip through automatic game-reel cleanup. This edits library labels, not the source filename or voice tag.</p>
     <div class="ir-actions"><button class="btn btn-primary btn-sm" id="irSaveDetails" type="submit" disabled>Save details</button><span id="irSaveState" role="status" class="ir-muted">Saved</span></div></form>
     <details class="ir-file"><summary>Original file</summary><p>${esc(c.path)}</p>${c.tag ? `<p>Voice tag: ${esc(c.tag)}</p>` : ""}</details>`;
-  bind("#irPlayClip", () => live(() => api.playReplayClip(c.path)));
+  $('#irClipMode').value = playbackMode;
+  bind('#irClipMode', e => { playbackMode=e.target.value; }, 'change');
+  bind("#irPlayClip", () => live(() => api.playReplayClip(c.path, playbackMode)));
   $("#irPlayClip").disabled = !ready || busy;
   bind("#irPreviewStart", () => startPreview(c.path));
   bind("#irClipForm", () => { dirty = true; $("#irSaveDetails").disabled = false; $("#irSaveState").textContent = "Unsaved changes"; }, "input");
   bind("#irClipForm", async e => {
     e.preventDefault();
-    if (await save({action: "clip", path: c.path, title: $("#irTitle").value, notes: $("#irNotes").value, favorite: $("#irFavorite").checked})) {
+    if (await save({action: "clip", path: c.path, title: $("#irTitle").value, notes: $("#irNotes").value, favorite: $("#irFavorite").checked, purpose:$('#irPurpose').value})) {
       $("#irSaveDetails").disabled = true; $("#irSaveState").textContent = "Saved · clip kept";
     }
   }, "submit");
@@ -336,14 +355,18 @@ async function save(payload) {
 }
 function updateStatus(projects = []) {
   if (!root) return;
-  const p = projects?.find(p => p.name === "instant_replay"); busy = !!p?.is_active;
+  const p = projects?.find(p => p.name === "instant_replay");
+  const waiting = p?.current_activity === 'saving for replay';
+  busy = !!p?.is_active || waiting;
   const paused = busy && (p.current_activity || "").includes("paused");
-  $("#irStatus").textContent = !ready ? "Playback offline" : paused ? "Paused in OBS" : busy ? "Playing in OBS" : "Ready for replay";
+  $("#irStatus").textContent = !ready ? "Playback offline" : waiting ? 'Saving for replay' : paused ? "Paused in OBS" : busy ? "Playing in OBS" : "Ready for replay";
   $("#irActivity").textContent = !ready ? " · Preview, trim and organize clips here. Open OBS to enable playback." : busy ? ` · ${p.current_activity || "replay"}` : " · Preview and organize clips below";
   $("#irIndicator").className = `state-indicator state-indicator--${busy ? "active" : "idle"}`;
-  $("#irPause").disabled = !busy || paused; $("#irResume").disabled = !paused;
-  $("#irSkip").disabled = !busy; $("#irStop").disabled = !busy;
-  $("#irRandom").disabled = !ready || busy; $("#irLatest").disabled = !ready || busy;
+  $("#irPause").disabled = !busy || paused || waiting; $("#irResume").disabled = !paused;
+  $("#irSkip").disabled = !busy || waiting; $("#irStop").disabled = !busy;
+  $("#irRandom").disabled = !ready || busy; $("#irLatest").disabled = !ready || busy; $("#irReplay").disabled = !ready || busy;
+  $('#irHighlights').disabled = !ready || busy; $('#irSaveReplay').disabled = !ready || busy;
+  $('#irQuickReplay').disabled = !ready || busy;
   $("#irSaveBuffer").disabled = !ready; $("#irMark").disabled = !ready;
   if ($("#irPlayClip")) $("#irPlayClip").disabled = !ready || busy || saving;
   if (tab === "group" && $("#irPlayGroup")) groupState();

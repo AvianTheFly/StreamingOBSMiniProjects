@@ -4,6 +4,7 @@ import mimetypes
 import secrets
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlparse, unquote
+from lib.http_files import serve_file
 
 
 def handler(service, root, port):
@@ -30,6 +31,20 @@ def handler(service, root, port):
                 return self.send(service.state(overlay=path.endswith('overlay')))
             if path == '/api/library':
                 return self.send([p.name for p in (root/'media').iterdir() if service.asset(p.name)])
+            if path == '/subtle.js':
+                return self.send((root.parents[1]/'lib/browser_effects/web/subtle.js').read_bytes(),content_type='text/javascript')
+            if path == '/optics.js':
+                return self.send((root.parents[1]/'lib/browser_effects/web/production.js').read_bytes(),content_type='text/javascript')
+            if path in ('/raid_art.js', '/cheer_show.js'):
+                return self.send((root/path[1:]).read_bytes(),content_type='text/javascript')
+            if path in ('/supporter_show.js', '/supporter_show.css'):
+                p = root/path[1:]
+                return self.send(p.read_bytes(),content_type='text/javascript' if p.suffix=='.js' else 'text/css')
+            if path.startswith('/spirit/assets/'):
+                name = path.removeprefix('/spirit/assets/')
+                allowed = {'bear-attack.png','turtle.png','ram-charge.png','phoenix-hero.png'}
+                if name in allowed:
+                    return self.send((root/'spirit_assets'/name).read_bytes(),content_type='image/png')
             files = {'/':'control.html','/overlay':'overlay.html','/overlay.js':'overlay.js','/overlay.css':'overlay.css','/control.js':'control.js','/characters.js':'characters.js','/raid_sequence.js':'raid_sequence.js','/raid_sequence.css':'raid_sequence.css'}
             if path in files:
                 p = root/files[path]
@@ -37,7 +52,7 @@ def handler(service, root, port):
                 return self.send(data,content_type=mimetypes.guess_type(p.name)[0] or 'application/octet-stream')
             if path.startswith('/media/'):
                 p = service.asset(unquote(path[len('/media/'):]))
-                if p: return self.send(p.read_bytes(),content_type=mimetypes.guess_type(p.name)[0] or 'application/octet-stream')
+                if p: return serve_file(self,p,headers={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'})
             self.send({'error':'Not found'},404)
 
         def do_POST(self):
@@ -50,7 +65,7 @@ def handler(service, root, port):
                 if not isinstance(body,dict): raise ValueError('Expected object')
                 path = urlparse(self.path).path
                 if path == '/api/test':
-                    if not service.receive(body.get('kind','raid'),body.get('name','Your next favorite streamer'),body.get('count',42),theme=body.get('theme') or None):
+                    if not service.receive(body.get('kind','raid'),body.get('name','Your next favorite streamer'),body.get('count',42),theme=body.get('theme') or None,details=body.get('details')):
                         raise ValueError('Celebrations paused or queue full')
                 elif path == '/api/settings': service.save(body)
                 elif path == '/api/stop':

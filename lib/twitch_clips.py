@@ -4,6 +4,7 @@ import threading
 import time
 
 import requests
+from lib.twitch_clip_session import clip_sessions
 
 _lock = threading.Lock()
 _state = {'status': 'idle', 'message': '', 'url': ''}
@@ -17,6 +18,8 @@ def status():
 def _set(state, message, url=''):
     with _lock:
         _state.update(status=state, message=message, url=url)
+    from events import inspect_event
+    inspect_event('twitch.clip', owner='twitch_clips', phase=state)
 
 
 def request_clip():
@@ -24,6 +27,8 @@ def request_clip():
         if _state['status'] == 'pending':
             return
         _state.update(status='pending', message='Creating a 60-second Twitch clip…', url='')
+    from events import inspect_event
+    inspect_event('twitch.clip', owner='twitch_clips', phase='pending')
     try:
         threading.Thread(target=_worker, daemon=True, name='twitch-clip').start()
     except Exception:
@@ -32,18 +37,16 @@ def request_clip():
 
 def _worker():
     try:
-        from twitch_celebrations.interface import _live
-        service = _live.get('service')
-        if not service or not service.twitch.tokens:
+        twitch = clip_sessions.get()
+        if twitch is None or not twitch.available():
             _set('error', 'Connect Twitch in Twitch Celebrations to enable clips. The OBS save is unaffected.')
             return
-        twitch = service.twitch
         headers = {'Client-Id': os.environ['TWITCH_CLIENT_ID'],
                    'Authorization': 'Bearer ' + twitch.token()}
         # No replay timestamps or durations: Twitch owns the capture window.
         response = requests.post('https://api.twitch.tv/helix/clips', headers=headers,
                                  params={'broadcaster_id': os.environ['TWITCH_BROADCASTER_ID'],
-                                         'duration': 60}, timeout=15)
+                                         'duration': 60, 'title': 'Instant Replay'}, timeout=15)
         if response.status_code == 401:
             _set('error', 'Reconnect Twitch in Twitch Celebrations to allow clip creation. The OBS save is unaffected.')
             return

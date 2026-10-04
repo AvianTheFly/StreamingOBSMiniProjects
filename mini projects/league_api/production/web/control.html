@@ -18,6 +18,34 @@
       <a href="/">Clip alerts & media →</a>
     </header>
     <p id="notice" role="status" aria-live="polite"></p>
+    <section>
+      <div class="section-head"><h2>League client scenes</h2><span id="clientStatus">Connecting…</span></div>
+      <label><input type="checkbox" id="clientEnabled" /> Automatically switch queue and champion select scenes</label>
+      <label>Between games
+        <select id="clientIdle">
+          <option value="lobby">Rotate through chatting lobbies</option>
+          <option value="scene">Use my configured idle scene</option>
+        </select>
+      </label>
+      <div class="actions"><button type="button" id="clientHideNow">Hide screen now</button><button type="button" id="clientShowScreen">Show screen</button></div>
+      <p class="muted">Hide screen now enters a private lobby before Find Match. Queue, ready checks and bans keep that location; after bans, champion select appears. Between games, the selected idle mode appears after the result animation finishes. New lobby entries hide the desktop; Show screen reveals it in the same lobby. Replays and temporary presentations finish first. A newer scene choice stays in place until the next phase transition. If the client disconnects, the current view stays in place.</p>
+      <p id="clientError" role="status"></p>
+    </section>
+    <section>
+      <div class="section-head"><h2>Champion select worlds</h2><a href="/champ-select?demo=1&theme=astral" target="_blank" rel="noopener">Open full-size preview ↗</a></div>
+      <p class="muted">Five picks and five bans per team. Allies stay left; opponents stay right. The existing FaceCamWithProps scene stays in the upper center, with League team chat below it. The custom screen appears only after both teams finish banning.</p>
+      <label>Theme each draft
+        <select id="clientTheme">
+          <option value="random">Random from all five</option>
+          <option value="astral">Astral Observatory</option>
+          <option value="tidal">Tidal Vault</option>
+          <option value="neon">Neon Concourse</option>
+          <option value="frost">Frost Sanctum</option>
+          <option value="verdant">Verdant Engine</option>
+        </select>
+      </label>
+      <div class="theme-gallery" id="themeGallery"></div>
+    </section>
     <section class="controls">
       <div class="section-head">
         <h2>Production borders</h2>
@@ -34,10 +62,14 @@
           <label><input type="checkbox" name="progression" />Levels & ability upgrades</label>
           <label><input type="checkbox" name="economy" />Items, farming & vision</label>
           <label><input type="checkbox" name="lifecycle" />Match entrance & ending</label>
+          <label><input type="checkbox" name="match_screens" />Cinematic game-start, victory & defeat artwork</label>
           <label><input type="checkbox" name="custom_rules" />Enabled custom border rules</label>
           <label><input type="checkbox" name="inferred" />Optional unconfirmed signals</label>
         </div>
         <div class="ranges">
+          <label>Result delay (seconds)<input type="number" name="result_delay_seconds" min="0" max="5" step="0.1" /></label>
+          <label>Result screen hold (seconds)<input type="number" name="result_hold_seconds" min="2" max="15" step="0.5" /></label>
+          <label>Game-start screen hold (seconds)<input type="number" name="start_hold_seconds" min="2" max="10" step="0.5" /></label>
           <label
             >Show impact <output id="intensityValue"></output
             ><input type="range" name="intensity" min="0.5" max="1.6" step="0.05"
@@ -74,6 +106,11 @@
         </div>
       </form>
       <p class="muted">
+        Cinematic match screens fill the game canvas without words. Victory and defeat wait for
+        the result delay, then hold the automatic lobby transition until the artwork finishes.
+        Manual scene changes remain available.
+      </p>
+      <p class="muted">
         One objective atmosphere and one short celebration at a time. Major plays can take over;
         frequent events have their own cooldowns. These visuals are silent and leave your existing
         kill, death and respawn sounds alone.
@@ -86,6 +123,9 @@
       </div>
       <p id="ready">Checking OBS overlay…</p>
       <div class="previews">
+        <button data-preview="game_start"><strong>Game start · storm temple</strong><span>The warrior and his guardians, ready for battle.</span></button>
+        <button data-preview="victory"><strong>Victory · spirits awakened</strong><span>Gold and cyan light, a hard-earned triumph.</span></button>
+        <button data-preview="defeat"><strong>Defeat · temple in ruins</strong><span>Shattered stone, rain and dying embers.</span></button>
         <button data-preview="earth_cycle" class="featured">
           <strong>Mountain dragon · full cycle</strong
           ><span>Stone rises along the edges, then breaks into tumbling chips.</span>

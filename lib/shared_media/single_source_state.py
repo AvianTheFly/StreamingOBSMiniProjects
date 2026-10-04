@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 import obs
+from lib.json_store import write_json
 
 
 _TRANSFORM_KEYS = {
@@ -182,10 +183,7 @@ class SingleSourceStateStore:
         return raw
 
     def _save(self) -> None:
-        self.path.write_text(
-            json.dumps(self._data, indent=2, ensure_ascii=False),
-            encoding="utf-8",
-        )
+        write_json(self.path, self._data)
 
 
 def _snapshot_transform(scene: str, source_name: str) -> dict[str, Any]:
@@ -333,38 +331,67 @@ def _apply_filters(source_name: str, desired_filters: list[dict[str, Any]]) -> N
     seen_names: set[str] = set()
     for item in desired_filters:
         name = str(item.get("name", "")).strip()
+        kind = str(item.get("kind", "")).strip()
         key = name.casefold()
-        if not name or key in seen_names:
+        if not name or not kind or key in seen_names:
             continue
         seen_names.add(key)
-        unique_filters.append(item)
+        unique_filters.append({**item, "name": name, "kind": kind})
 
     current = _snapshot_filters(source_name)
-    # Read OBS each time so manual edits are visible, but avoid tearing down
-    # and rebuilding an identical GPU filter chain on every asset playback.
+    # Read OBS each time so manual edits are visible. Keep existing filter
+    # instances when only settings/enable state changed; recreating all of them
+    # can reopen shader/image resources during a shared-source asset swap.
     if _filters_equal(current, unique_filters):
         return
+    desired_by_name = {item["name"]: item for item in unique_filters}
+    retained = {}
+    structural_change = False
     for item in current:
+        desired = desired_by_name.get(item["name"])
+        if desired and desired["kind"] == item["kind"]:
+            retained[item["name"]] = item
+            continue
         try:
             obs.remove_source_filter(source_name, item["name"])
+            structural_change = True
         except Exception:
             pass
 
     for item in unique_filters:
         name = str(item.get("name", "")).strip()
         kind = str(item.get("kind", "")).strip()
-        if not name or not kind:
-            continue
         settings = item.get("settings") if isinstance(item.get("settings"), dict) else {}
         try:
-            obs.create_source_filter(source_name, name, kind, settings)
-            obs.set_source_filter_enabled(source_name, name, bool(item.get("enabled", True)))
-            if settings:
-                obs.set_source_filter_settings(source_name, name, settings)
+            previous = retained.get(name)
+            enabled = bool(item.get("enabled", True))
+            if previous is None:
+                obs.create_source_filter(source_name, name, kind, settings)
+                structural_change = True
+                if not enabled:  # Newly created OBS filters are enabled by default.
+                    obs.set_source_filter_enabled(source_name, name, False)
+            else:
+                if not _objects_equal(previous.get("settings") or {}, settings):
+                    obs.set_source_filter_settings(source_name, name, settings, overlay=False)
+                if bool(previous.get("enabled", True)) != enabled:
+                    obs.set_source_filter_enabled(source_name, name, enabled)
         except Exception as exc:
             # A cosmetic filter failure must not prevent the asset itself from
             # being loaded and played through the shared OBS media source.
             print(f"[single-source] Could not apply filter '{name}' to '{source_name}': {exc}")
+
+    order = ([item["name"] for item in _snapshot_filters(source_name)]
+             if structural_change else [item["name"] for item in current])
+    for index, item in enumerate(unique_filters):
+        name = item["name"]
+        if name not in order or order.index(name) == index:
+            continue
+        try:
+            obs.get_obs().set_source_filter_index(source_name, name, index)
+            order.remove(name)
+            order.insert(index, name)
+        except Exception as exc:
+            print(f"[single-source] Could not order filter '{name}' on '{source_name}': {exc}")
 
 
 def _snapshot_diff(baseline: dict[str, Any], current: dict[str, Any]) -> dict[str, Any]:

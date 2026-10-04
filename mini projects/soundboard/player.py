@@ -106,13 +106,19 @@ class SoundboardPlayer:
         volume_db: float,
         categories: list[str],
         on_finish=None,
+        wait_for_turn=None,
+        allowed=None,
     ) -> threading.Event:
-        return self._requests.submit(
-            lambda cancel: self.play(
+        def run(cancel):
+            if wait_for_turn is not None and not wait_for_turn(cancel):
+                if on_finish:
+                    on_finish()
+                return
+            self.play(
                 stem=stem, filepath=filepath, volume_db=volume_db,
-                categories=categories, on_finish=on_finish, cancelled=cancel,
+                categories=categories, on_finish=on_finish, cancelled=cancel, allowed=allowed,
             )
-        )
+        return self._requests.submit(run)
 
     def play(
         self,
@@ -123,6 +129,7 @@ class SoundboardPlayer:
         categories: list[str],
         on_finish=None,
         cancelled: threading.Event | None = None,
+        allowed=None,
     ) -> None:
         with self._lock:
             if self._is_busy:
@@ -144,7 +151,8 @@ class SoundboardPlayer:
                 return
             if self._using_browser:
                 self._stop_and_hide_source()
-                self._browser.play(stem, filepath, volume_db, self._cancelled, CONFIG.media_total_timeout)
+                self._browser.play(stem, filepath, volume_db, self._cancelled, CONFIG.media_total_timeout,
+                                   allowed=lambda: not self.is_paused and (allowed is None or allowed()))
                 return
             print(f"{_TAG} Playing: '{SINGLE_SOURCE_NAME}'")
 
@@ -172,7 +180,7 @@ class SoundboardPlayer:
                     return
                 if not changed:
                     obs.restart_media(SINGLE_SOURCE_NAME)
-            started = self._poll_until_done(expected_file=filepath)
+            started = self._poll_until_done(expected_file=filepath, allowed=allowed)
             if not started and not self._abort_flag:
                 raise RuntimeError(f"Playback did not start cleanly for '{filepath.name}'.")
         except Exception as exc:
@@ -361,13 +369,15 @@ class SoundboardPlayer:
             time.sleep(0.05)
         return False
 
-    def _poll_until_done(self, *, expected_file: Path) -> bool:
+    def _poll_until_done(self, *, expected_file: Path, allowed=None) -> bool:
         started = False
         play_streak = 0
         end_streak = 0
         provisional_playing_since: float | None = None
         playing_since: float | None = None
         started_at = time.time()
+        suspended = False
+        previous_poll = started_at
 
         while True:
             with self._lock:
@@ -375,9 +385,19 @@ class SoundboardPlayer:
                     return True
                 paused = self._paused
 
-            if paused:
+            now = time.time()
+            if paused or (allowed is not None and not allowed()):
+                if not suspended:
+                    obs.pause_media(SINGLE_SOURCE_NAME)
+                    suspended = True
+                started_at += now - previous_poll
+                previous_poll = now
                 time.sleep(0.05)
                 continue
+            if suspended:
+                obs.play_media(SINGLE_SOURCE_NAME)
+                suspended = False
+            previous_poll = now
 
             current_file = self._current_media_file()
             if current_file is not None:

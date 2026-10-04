@@ -1,109 +1,66 @@
-// pages/soundboard.js - Soundboard / TikTok project page (shared layout)
+// Soundboard and short-video controls. Saved bindings stay with the editor owner.
+import { api } from '../api.js';
+import { state } from '../state.js';
+import { esc } from '../utils.js';
+import { feature, icon } from '../catalog.js';
+import { runWithFeedback } from '../action-feedback.js';
+import { mountProjectHotkeyPanel, unmountProjectHotkeyPanel } from '../project-hotkeys.js';
 
-import { api } from "../api.js";
-import { state } from "../state.js";
-import { toast } from "../toast.js";
-import { esc, displayName } from "../utils.js";
-import { mountProjectHotkeyPanel, unmountProjectHotkeyPanel } from "../project-hotkeys.js";
-
-let _unwatch = null;
-let _projectName = "soundboard";
-let _hotkeyHost = null;
-
-export function setProject(name) { _projectName = name; }
-
-export function mount(container, projectName) {
-  if (projectName) _projectName = projectName;
-  const proj = state.getProject(_projectName);
-  const display = displayName(_projectName);
-
-  container.innerHTML = `
-    <div class="page-header">
-      <div>
-        <div class="page-title">${esc(display)}</div>
-        <div class="page-subtitle">High-level controls for voice, hotkeys, playback, and OBS routing</div>
-      </div>
-      <div class="page-actions">
-        <a href="/editor" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">Open Editor</a>
-        <a href="#profiles" class="btn btn-secondary btn-sm">Profiles</a>
-        ${proj?.can_revert ? `<button class="btn btn-danger btn-sm" data-project-action="revert">Revert</button>` : ""}
-      </div>
-    </div>
-    <div class="state-banner" id="sbBanner">
-      <span class="state-indicator state-indicator--idle" id="sbIndicator"></span>
-      <span class="state-label" id="sbLabel">Loading...</span>
-      <span class="state-detail" id="sbDetail"></span>
-    </div>
-    <div class="project-control-grid">
-      <div class="card project-command-card"><div class="card-title">Live Controls</div><div class="project-command-grid" id="sbActionGrid">${_actionButtons(proj)}</div></div>
-      <div class="card project-summary-card"><div class="card-title">Routing</div><div class="project-summary-list"><div><span>Scene</span><strong id="sbScenes">${esc(proj?.controlled_scenes?.join(", ") || "Not reported")}</strong></div><div><span>Audio</span><strong id="sbAudio">${proj?.produces_audio ? "Enabled" : "Not reported"}</strong></div><div><span>Volume</span><strong id="sbVolume">Not reported</strong></div><div><span>Activity</span><strong id="sbActivity">Idle</strong></div></div><div class="project-link-row"><a href="/editor" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">Hotkeys and OBS Canvas</a><a href="#profiles" class="btn btn-secondary btn-sm">Profile Triggers</a></div></div>
-    </div>
-    <div id="sbHotkeys" class="mt-16"></div>
-    ${_projectName === 'soundboard' ? '<p class="text-muted mt-16">The muffin song now plays an animated border show. Use Test Muffin Dance above to try it in OBS.</p>' : ''}
-  `;
-
-  _hotkeyHost = container.querySelector("#sbHotkeys");
-  if (_hotkeyHost) {
-    mountProjectHotkeyPanel(_hotkeyHost, _projectName).catch(error => toast.error(`Could not load project hotkeys: ${error.message}`));
-  }
-
-  container.querySelectorAll("[data-project-action]").forEach(btn => {
-    btn.addEventListener("click", () => _runAction(btn.dataset.projectAction));
+let _dispose = null;
+const LABELS = { start_listen: 'Listen for a sound', stop_listen: 'Finish listening', abort_listen: 'Cancel listening', random: 'Play random', next: 'Next item', stop: 'Stop playback', pause: 'Pause', resume: 'Resume', reload: 'Reload library', test_muffins: 'Preview Muffin Dance' };
+const GROUPS = [
+  { label: 'Play something', help: 'Let the Hub choose, or speak the name of a saved sound.', keys: ['random', 'start_listen'] },
+  { label: 'Playback', help: 'Control the current item.', keys: ['pause', 'resume', 'next', 'stop'] },
+  { label: 'Voice capture', help: 'Finish to send your voice request, or cancel it.', keys: ['stop_listen', 'abort_listen'] },
+];
+export function mount(container, projectName = 'soundboard') {
+  const f = feature(projectName);
+  let disposed = false;
+  let signature = '';
+  let hotkeysMounted = false;
+  container.innerHTML = `<div class="page-header"><div><div class="desk-eyebrow">${projectName === 'soundboard' ? 'Sounds for the moment' : 'Short clips, ready to play'}</div><h1 class="page-title">${esc(f.label)}</h1><p class="page-subtitle">Play, pause and listen. Your saved sounds and keys stay in your library.</p></div><div class="page-actions"><a href="/editor" target="_blank" rel="noopener" class="btn btn-primary">${icon('library')}Edit sounds &amp; keys ↗</a><a href="#audio" class="btn btn-secondary">Audio levels</a></div></div><div class="soundboard-status"><span class="feature-icon">${icon(f.icon)}</span><div><strong id="sbLabel">Loading controls…</strong><p id="sbActivity">Connecting to the Hub</p></div><span class="feature-state" id="sbProfile"></span></div><div class="soundboard-controls" id="sbActionGrid"></div><details class="feature-disclosure"><summary>Hotkeys &amp; profiles <span>Review or edit your saved bindings</span></summary><div id="sbHotkeys" class="mt-16"></div></details><details class="feature-disclosure"><summary>Routing &amp; maintenance <span>OBS scene, levels and library refresh</span></summary><div class="card mt-16"><div class="project-summary-list"><div><span>OBS scene</span><strong id="sbScenes">—</strong></div><div><span>Project level</span><strong id="sbVolume">—</strong></div></div><div class="mood-actions mt-16" id="sbMaintenance"></div><p class="field-help mt-12">For individual sounds, use Saved media in Audio. Placement, filters and voice phrases are in the media editor.</p></div></details>`;
+  const hotkeyDrawer = container.querySelector('.feature-disclosure');
+  hotkeyDrawer.addEventListener('toggle', () => {
+    if (hotkeyDrawer.open && !hotkeysMounted) {
+      hotkeysMounted = true;
+      mountProjectHotkeyPanel(container.querySelector('#sbHotkeys'), projectName);
+    }
   });
-
-  _unwatch = state.watch("projects", _update);
-  _update(state.get("projects"));
-}
-
-export function unmount() {
-  unmountProjectHotkeyPanel();
-  _hotkeyHost = null;
-  if (_unwatch) { _unwatch(); _unwatch = null; }
-}
-
-function _update(projects) {
-  const p = projects.find(project => project.name === _projectName);
-  const indicator = document.getElementById("sbIndicator");
-  const label = document.getElementById("sbLabel");
-  const detail = document.getElementById("sbDetail");
-  const scenes = document.getElementById("sbScenes");
-  const audio = document.getElementById("sbAudio");
-  const volume = document.getElementById("sbVolume");
-  const activity = document.getElementById("sbActivity");
-  const actionGrid = document.getElementById("sbActionGrid");
-  if (!indicator) return;
-  if (!p) {
-    indicator.className = "state-indicator state-indicator--idle";
-    label.textContent = "Not running";
-    detail.textContent = "";
-    return;
+  function actionButton(a, primary = false) {
+    const label = projectName === 'tik_tok' && a.key === 'start_listen' ? 'Listen for a clip' : LABELS[a.key] || a.label || a.key;
+    return `<button class="btn ${a.key === 'stop' ? 'btn-danger' : primary ? 'btn-primary' : 'btn-secondary'}" data-project-action="${esc(a.key)}" title="${esc(a.description || '')}">${esc(label)}</button>`;
   }
-  indicator.className = `state-indicator ${p.is_active ? "state-indicator--active" : "state-indicator--idle"}`;
-  label.textContent = p.is_active ? "Active" : "Idle";
-  detail.textContent = p.current_activity ? `- ${p.current_activity}` : "";
-  if (scenes) scenes.textContent = p.controlled_scenes?.join(", ") || "Not reported";
-  if (audio) audio.textContent = p.produces_audio ? "Enabled" : "Not reported";
-  if (activity) activity.textContent = p.current_activity || "Idle";
-  if (volume) {
-    const v = p.volume || {};
-    volume.textContent = Number.isFinite(Number(v.project_volume_db)) ? `Project ${Number(v.project_volume_db).toFixed(1)} dB / Profile ${Number(v.profile_volume_db || 0).toFixed(1)} dB` : "Not reported";
+  function update() {
+    if (disposed) return;
+    const p = state.getProject(projectName);
+    const actions = p?.actions || [];
+    container.querySelector('#sbLabel').textContent = p ? (p.is_active ? 'Active' : 'Ready to play') : 'Feature unavailable';
+    container.querySelector('#sbActivity').textContent = p?.current_activity || (p ? 'Nothing playing right now.' : 'Waiting for the feature to connect.');
+    container.querySelector('#sbProfile').textContent = p?.volume?.profile ? `Profile: ${p.volume.profile}` : '';
+    container.querySelector('#sbScenes').textContent = p?.controlled_scenes?.join(', ') || 'No scene reported';
+    const db = p?.volume?.project_volume_db;
+    container.querySelector('#sbVolume').textContent = db != null && Number.isFinite(Number(db)) ? `${Number(db).toFixed(1)} dB` : 'See Audio for saved levels';
+    const nextSignature = actions.map(a => a.key).join(',');
+    if (signature !== nextSignature || !container.querySelector('#sbActionGrid').children.length) {
+      signature = nextSignature;
+      container.querySelector('#sbActionGrid').innerHTML = actions.length ? GROUPS.map(g => `<section class="card"><h2>${g.label}</h2><p>${g.help}</p><div class="mood-actions">${g.keys.map((key, i) => actions.find(a => a.key === key)).filter(Boolean).map((a, i) => actionButton(a, g.label === 'Play something' && i === 0)).join('')}</div></section>`).join('') : '<p class="desk-empty">Controls will appear when this feature is available.</p>';
+      const primaryKeys = GROUPS.flatMap(g => g.keys);
+      container.querySelector('#sbMaintenance').innerHTML = actions.filter(a => !primaryKeys.includes(a.key)).map(a => actionButton(a)).join('');
+    }
+    container.querySelectorAll('[data-project-action]').forEach(btn => {
+      btn.dataset.available = String(state.get('connected') && !!p);
+      if (!btn.hasAttribute('aria-busy')) btn.disabled = btn.dataset.available === 'false';
+    });
   }
-  if (actionGrid) {
-    actionGrid.innerHTML = _actionButtons(p);
-    actionGrid.querySelectorAll("[data-project-action]").forEach(btn => btn.addEventListener("click", () => _runAction(btn.dataset.projectAction)));
-  }
+  container.addEventListener('click', async e => {
+    const btn = e.target.closest('[data-project-action]');
+    if (!btn) return;
+    const action = btn.dataset.projectAction;
+    await runWithFeedback(btn, () => api.runProjectAction(projectName, action), `${LABELS[action] || action} requested`);
+    update();
+  });
+  const stops = [state.watch('projects', update), state.watch('connected', update)];
+  update();
+  _dispose = () => { disposed = true; stops.forEach(fn => fn()); if (hotkeysMounted) unmountProjectHotkeyPanel(); };
 }
-
-function _actionButtons(project) {
-  const actions = Array.isArray(project?.actions) && project.actions.length ? project.actions : [{ key: "start_listen", label: "Start Listen" }, { key: "abort_listen", label: "Abort Listen" }, { key: "stop", label: "Stop" }, { key: "pause", label: "Pause" }, { key: "resume", label: "Resume" }, ...(project?.can_revert ? [{ key: "revert", label: "Revert" }] : [])];
-  return actions.map(action => `<button class="btn ${action.key === "stop" || action.key === "revert" || action.key.includes("abort") ? "btn-danger" : "btn-secondary"}" data-project-action="${esc(action.key)}" title="${esc(action.description || "")}">${esc(action.label || action.key)}</button>`).join("");
-}
-
-async function _runAction(action) {
-  try {
-    await api.runProjectAction(_projectName, action);
-    toast.success(`${displayName(_projectName)}: ${action}`);
-  } catch (error) {
-    toast.error(error.message);
-  }
-}
+export function unmount() { _dispose?.(); _dispose = null; }

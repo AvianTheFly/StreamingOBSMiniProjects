@@ -12,6 +12,7 @@ from json import JSONDecodeError
 
 import obsws_python as obs
 from obsws_python.error import OBSSDKRequestError, OBSSDKTimeoutError
+from obsws_python.util import as_dataclass
 from websocket import WebSocketException
 
 from .obs_config import OBS_HOST, OBS_PORT, OBS_PASSWORD
@@ -69,8 +70,28 @@ class _ThreadSafeReqClient:
         object.__setattr__(self, "_client", client)
         object.__setattr__(self, "_no_audio", {})
 
+    def _send(self, param, data=None, raw=False):
+        client = object.__getattribute__(self, "_client")
+        if param != 'GetCurrentProgramScene':
+            return client.send(param, data, raw=raw)
+        # OBS 32.1.1's dedicated getter can dereference a missing program scene
+        # during Studio Mode/collection changes. GetSceneList guards that case.
+        # Never fall back to the unsafe getter, a cached scene, or the preview.
+        snapshot = client.send('GetSceneList', raw=True)
+        scene = snapshot.get('currentProgramSceneName')
+        if not isinstance(scene, str) or not scene:
+            raise OBSUnavailable('OBS has no current program scene yet')
+        uuid = snapshot.get('currentProgramSceneUuid')
+        response = dict(sceneName=scene, sceneUuid=uuid,
+                        currentProgramSceneName=scene, currentProgramSceneUuid=uuid)
+        return response if raw else as_dataclass(param, response)
+
     def __getattr__(self, name):
         target = getattr(object.__getattribute__(self, "_client"), name)
+        if name == 'get_current_program_scene':
+            target = lambda: self._send('GetCurrentProgramScene')
+        elif name == 'send':
+            target = self._send
         if not callable(target):
             return target
 

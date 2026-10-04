@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import threading
+from lib.hub_runtime.editor import _start_hotkey_editor
 
 
 def _parse_args() -> argparse.Namespace:
@@ -30,115 +31,87 @@ def _parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def _start_hotkey_editor(port: int, stop_event: threading.Event) -> int | None:
-    """Start the hotkey editor server in a background thread. Returns the port used, or None."""
-    try:
-        from lib.project_registry import discover_editor_projects
-        from lib.hotkey_editor.server import run_editor, _find_free_port
-
-        projects = discover_editor_projects()
-        available = [
-            (key, p) for key, p in projects.items()
-            if not p.error and p.asset_dir and p.hotkeys_file and p.extensions
-        ]
-        if not available:
-            print("  [editor] No editor-compatible projects found — skipping editor server.")
-            return None
-
-        _, primary = available[0]
-
-        def _payload(key, p):
-            return {
-                "key": key, "name": p.display,
-                "asset_dir": p.asset_dir, "hotkeys_file": p.hotkeys_file,
-                "phrases_file": p.phrases_file, "extensions": p.extensions,
-                "config_defaults": p.config_defaults or {},
-                "features": p.features or {},
-                "profile_store_file": p.profile_store_file,
-                "can_create_profiles": p.can_create_profiles,
-            }
-
-        actual_port = _find_free_port(port)
-
-        def _run():
-            try:
-                run_editor(
-                    asset_dir=primary.asset_dir,
-                    hotkeys_file=primary.hotkeys_file,
-                    valid_extensions=primary.extensions,
-                    project_name=primary.display,
-                    port=actual_port,
-                    all_projects=[_payload(k, p) for k, p in available],
-                    open_browser=False,
-                    stop_event=stop_event,
-                )
-            except Exception as exc:
-                print(f"  [editor] Server error: {exc}")
-
-        t = threading.Thread(target=_run, daemon=True, name="hotkey_editor")
-        t.start()
-        return actual_port
-
-    except Exception as exc:
-        print(f"  [editor] Could not start hotkey editor: {exc}")
-        return None
-
-
 def main() -> None:
     args = _parse_args()
+    from pathlib import Path
+    from lib.single_instance import hub_instance
+    with hub_instance(Path(__file__).parent) as acquired:
+        if not acquired:
+            print('The Hub is already running for this checkout. Open its existing Hub window.')
+            return
+        _run(args)
+
+
+def _run(args) -> None:
+    import os
+    os.environ['HUB_UI_PORT'] = str(args.port)
 
     print("=" * 62)
     print("  OBS Hub + UI")
     print("=" * 62)
 
     stop_event = threading.Event()
-    # ── Start mini-project threads ─────────────────────────────────────────────
     from main import run_hub, _join_projects, _wait_for_shutdown
-    projects = run_hub(
-        stop_event,
-        only=args.only,
-        skip=args.skip,
-        debug=args.debug,
-    )
-    from lib.performance_monitor import start_performance_monitor
-    start_performance_monitor(stop_event)
+    from lib.runtime_cleanup import run_cleanup
+    from lib.global_hotkeys import shutdown_global_hotkeys
+    from coordinator import coordinator
+    from lib.coordination.scene_events import join_scene_events
+    projects = []
+    from lib.twitch_stream_settings import service as twitch_settings
+    from lib.chat_overlay.startup import startup as chat_overlay_startup
+    performance_thread = preparation_thread = ui_thread = browser_timer = None
+    chat_reader = None
+    try:
+        projects = run_hub(stop_event, only=args.only, skip=args.skip, debug=args.debug)
+        from lib import twitch_chat
+        chat_reader = twitch_chat.start(stop_event)
+        twitch_settings.start(stop_event, port=args.port)
+        from lib.performance_monitor import start_performance_monitor
+        performance_thread = start_performance_monitor(stop_event)
+        from lib.asset_preparation import preparation
+        preparation_thread = preparation.start(stop_event)
 
-    # ── Start Hotkey Editor server ─────────────────────────────────────────────
-    editor_port = None
-    if not args.no_editor:
-        editor_port = _start_hotkey_editor(args.editor_port, stop_event)
+        editor_port = None
+        if not args.no_editor:
+            editor_port = _start_hotkey_editor(args.editor_port, stop_event)
 
-    # ── Start Hub UI server ────────────────────────────────────────────────────
-    from hub_ui.server import HubUIServer
-    ui_server = HubUIServer(port=args.port, editor_port=editor_port or args.editor_port)
-    ui_thread = threading.Thread(
-        target=ui_server.serve,
-        args=(stop_event,),
-        daemon=True,
-        name="hub_ui",
-    )
-    ui_thread.start()
+        from hub_ui.server import HubUIServer
+        ui_server = HubUIServer(port=args.port, editor_port=editor_port or args.editor_port)
+        ui_thread = threading.Thread(target=ui_server.serve, args=(stop_event,),
+                                     daemon=True, name="hub_ui")
+        ui_thread.start()
+        chat_overlay_startup.start(stop_event, ui_server.ready, port=args.port)
 
-    # Narrow, opt-in Channel Points effects, separate from personalized media.
-    from lib.twitch_redemptions import start_viewer_rewards
-    start_viewer_rewards(stop_event)
+        from lib.twitch_redemptions import start_viewer_rewards
+        start_viewer_rewards(stop_event)
 
-    url = f"http://localhost:{args.port}"
-    print(f"\n  Hub UI      : {url}")
-    if editor_port:
-        print(f"  Hotkey Editor: http://localhost:{editor_port}")
-    print("  Shutdown    : Ctrl+C\n")
+        url = f"http://localhost:{args.port}"
+        print(f"\n  Hub UI      : {url}")
+        if editor_port:
+            print(f"  Hotkey Editor: http://localhost:{editor_port}")
+        print("  Shutdown    : Ctrl+C\n")
 
-    if not args.no_browser:
-        import webbrowser
-        threading.Timer(0.8, lambda: webbrowser.open(url)).start()
+        if not args.no_browser:
+            import webbrowser
+            browser_timer = threading.Timer(0.8, lambda: webbrowser.open(url))
+            browser_timer.start()
 
-    # ── Wait for shutdown ──────────────────────────────────────────────────────
-    _wait_for_shutdown(stop_event)
-
-    print("  Shutting down...")
-    stop_event.set()
-    _join_projects(projects)
+        _wait_for_shutdown(stop_event)
+    finally:
+        print("  Shutting down...")
+        stop_event.set()
+        def join_thread(thread, timeout):
+            if thread is not None and thread.is_alive():
+                thread.join(timeout=timeout)
+        run_cleanup('hub', lambda: browser_timer.cancel() if browser_timer is not None else None,
+                    lambda: _join_projects(projects),
+                    lambda: join_thread(ui_thread, 5),
+                    lambda: join_thread(performance_thread, 3), shutdown_global_hotkeys)
+        run_cleanup('hub', coordinator.shutdown, join_scene_events)
+        run_cleanup('hub', lambda: join_thread(preparation_thread, 4))
+        run_cleanup('hub', lambda: chat_reader.join() if chat_reader else None)
+        run_cleanup('hub', twitch_settings.join)
+        run_cleanup('hub', chat_overlay_startup.join)
     print("  Goodbye.")
 
 

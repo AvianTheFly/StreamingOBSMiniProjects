@@ -1,5 +1,45 @@
 # League API alerts
 
+## Cinematic match screens
+
+The production page has a cinematic match-screen checkbox, three preview buttons,
+and timing controls. The matching, text-free Udyr temple artwork is stored in
+`media/match-screens/`: `game-start.png`, `victory.png`, and `defeat.png`.
+These are silent still images covering the 1920×1080 game canvas through the
+existing League API browser source. They do not change saved clip banks, audio
+levels, OBS filters, source transforms, or lobby content.
+
+The picture and its restrained matching border are one composed presentation.
+`production/web/match-screens.js` owns their shared clock, delay, fade and expiry;
+it uses `ProductionScene` for caption-free edge artwork above the picture.
+Other production layers, clip slots and level sprites yield during the entire
+match-screen sequence, including the result delay. Successful clears/replacements
+win immediately; transport failure retains only the original finite deadline.
+
+GameStart displays the original storm temple for five seconds. A fresh observed
+GameEnd with Result Win or Lose selects victory or defeat, waits 1.5 seconds,
+then displays the corresponding artwork for five seconds before automatic
+post-game routing proceeds. Both client scene automation and the fallback
+game-disconnected lobby return respect that deadline. Ordinary game API loss
+does not clear the result; the browser also expires it if its HTTP service fails.
+
+If the client end phase arrives first, routing reserves at most two seconds for
+an in-flight result. Without a known result it resumes without inventing victory
+or defeat. Joining/reconnecting to old game history does not replay artwork.
+Duplicate results never extend the deadline. Instant Replay retains its existing
+client-router protection. Previews do not change scenes or delay live routing;
+Clear cancels the art and releases its hold. Timing is configurable in production
+settings with `result_delay_seconds`, `result_hold_seconds`, and
+`start_hold_seconds`; `match_screens` enables the feature. The production and
+match-lifecycle toggles apply, as does the global pause control. The clip-alert
+visibility switch is independent and can stay off while production art is on.
+
+Implementation: `match_screens.py` owns deadlines and result state; the Service
+feeds it fresh detector candidates; `production/web/match-screens.js` displays the
+plates. `test_match_screens.py` exercises API-loss, result-before/after-client
+ordering, deadline, deduplication, and fallback return cancellation.
+`tools/test_match_screens.cjs` verifies the actual browser output and expiry.
+
 Production borders are now the default Hub page. See [production/README.md](production/README.md)
 for dragon atmosphere, short objective celebrations, controls, code ownership and
 the API review. The sections below describe the optional clip editor, linked from
@@ -191,3 +231,68 @@ disables the separate rotating death cards. Each rule's optional `autoplay=false
 suppresses automatic cards while retaining its non-card behavior and previews.
 The older death classifier remains available but is off in the saved setup:
 one ordinary death clip replaces the sequence of guessed payoff reactions.
+## League client scene automation
+
+`client_scenes.json` enables a separate, read-only client watcher. It discovers the
+League installation's lockfile, subscribes to the local gameflow and champion
+selection event stream, and refreshes the active draft once per second as well as
+on relevant events. Credentials remain in memory and refresh from the lockfile
+on reconnect. No Riot API key or game actions are required.
+
+Matchmaking, ready checks, planning and incomplete bans select one available
+location in `Lobbies` from the shared published catalog, hiding the central
+desktop capture and Tavern's separate `league client` view. The location stays
+fixed through ready checks and bans; each new entry avoids the previous location.
+When all bans complete (or a queue has no bans and picks begin), it selects
+`League Champion Select World`, a separate scene with the custom browser source
+and the existing `FaceCamWithProps` scene source behind a camera-shaped opening
+in the artwork. The original `LOL champ select`
+group and all its transforms remain available. **Between games** selects either
+a fresh chatting lobby (this checkout's configured mode) or the preserved
+`idle_scene`, such as `just screen`. Leaving queue, dodging, or ending a game
+uses that mode; post-game routing waits for the cinematic result hold.
+Game loading, play and reconnect are left to the
+existing game scene automation. The watcher keeps the private scene if the
+League client connection temporarily fails. A confirmed idle transition never
+exposes the desktop in chatting-lobby mode. Show screen reveals the shared
+desktop in the current lobby; it remains visible through unchanged idle updates.
+
+The production page's **Hide screen now** button enters a private location before
+clicking Find Match, eliminating any lead-time exposure. It holds that view until
+queue starts or **Show screen** is clicked. Routing applies once per target
+transition; periodic updates never reclaim an unchanged queue, draft or idle
+view. A newer deliberate scene choice invalidates a pending return, including
+choices made during slow client reads, cinematic holds, or temporary playback.
+An owned replay/temporary return does not invalidate the workflow; the route
+waits until playback ends. Failed OBS updates retry while the intent is current.
+Source transforms, filters, audio levels and other lobby content are preserved.
+The page includes a separate client automation checkbox and live status. Pausing
+it leaves the current OBS scene in place. Scene/source names can be customized
+in `client_scenes.json`; `idle_presentation` chooses `lobby` or `scene` while
+retaining `idle_scene`. Settings backups include that file. Existing configs
+without the new field keep their configured scene mode.
+
+### Custom champion select world
+
+The live browser scene is `http://127.0.0.1:7431/champ-select`. URLs with
+`?demo=1` show fixed sample champions and chat for preview only. The League production
+controls at `/production` show previews of five worlds and a theme selector;
+`random` chooses a new world per draft. The local team is always left, the enemy
+team right. Each has five portrait picks and five small bans. Champion portraits,
+ban icons, and names are cached from Riot Data Dragon in `media/champion-portraits`,
+`media/champions`, and `champion_catalog.json`. Refresh the cache after a League
+patch with `py -3.11 tools/cache_league_champions.py` from the repository root.
+
+The watcher uses the already connected `/lol-champ-select/v1/session` stream to
+render tentative and completed picks, completed bans, and the client's countdown
+using its millisecond timer and turn timestamp. It
+reads only the active champion-select chat conversation; direct messages are not
+shown. The browser page receives no lockfile credentials or chat room password.
+During planning and bans the overlay state omits picks, bans, and chat. The OBS
+scene still switches only when the existing ban-completion route permits it.
+`tools/preview_champ_select.cjs` renders all five demo themes without a League
+client and checks the 5+5 picks, 5+5 bans, portraits, and reveal transitions.
+If the OBS scene is removed, run `py -3.11 tools/install_champ_select_scene.py`
+from the repository root while OBS is open to recreate the browser and facecam
+scene items. It snapshots settings first and leaves the older champ-select group
+untouched.

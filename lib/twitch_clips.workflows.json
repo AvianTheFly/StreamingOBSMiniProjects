@@ -1,0 +1,77 @@
+{
+  "module": {
+    "id": "twitch_clips",
+    "label": "Twitch companion clips",
+    "group": "Community",
+    "icon": "replay",
+    "description": "Creates a Twitch clip independently of the local OBS save.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "twitch_clips.capture",
+      "label": "OBS saves a replay",
+      "topic": "Save a replay",
+      "trigger": {
+        "label": "OBS saves a replay",
+        "event": "twitch.clip",
+        "kind": "event"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Twitch session available?",
+          "owner": "twitch_clips",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Request a 60-second Twitch clip",
+          "owner": "twitch_clips",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Wait for confirmation",
+          "owner": "twitch_clips",
+          "kind": "wait",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Ready or failed independently",
+          "owner": "twitch_clips",
+          "kind": "end",
+          "detail": "Never holds up or invalidates the local OBS clip."
+        }
+      ],
+      "owner_hashes": {
+        "twitch_clips": "6cb4d1a0bfd46acfcee2107dc15ef18af573b5c472fa2821ac55c09974be6e37"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "lib/twitch_clips.py",
+          "symbol": "_worker",
+          "hash": "5a92b3669431f0f4bc129e77afc7ce88620aad6fba2a19670f5b6faa0e091d09"
+        }
+      ]
+    }
+  ]
+}

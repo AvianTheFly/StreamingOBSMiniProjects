@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Streaming Hub Twitch Startup Check",
+  "version": "1.0.1",
+  "description": "Enable and verify your Twitch VOD and rewind switches when your local Streaming Hub starts.",
+  "host_permissions": ["http://127.0.0.1/*"],
+  "background": {"service_worker": "background.js"},
+  "content_scripts": [{
+    "matches": ["https://dashboard.twitch.tv/u/*/settings/stream*"],
+    "js": ["content.js"],
+    "run_at": "document_idle"
+  }]
+}

@@ -1,0 +1,30 @@
+{
+  "duration": 6.6,
+  "fps": 60,
+  "cut": 4.0,
+  "coveredFrom": 3.85,
+  "coveredUntil": 4.25,
+  "tailGuard": 6.85,
+  "animations": {
+    "bear": {
+      "cut": 4.05,
+      "coveredFrom": 3.85,
+      "coveredUntil": 4.25
+    },
+    "turtle": {
+      "cut": 4.05,
+      "coveredFrom": 3.85,
+      "coveredUntil": 4.25
+    },
+    "ram": {
+      "cut": 4.05,
+      "coveredFrom": 3.85,
+      "coveredUntil": 4.25
+    },
+    "phoenix": {
+      "cut": 4.05,
+      "coveredFrom": 3.85,
+      "coveredUntil": 4.25
+    }
+  }
+}

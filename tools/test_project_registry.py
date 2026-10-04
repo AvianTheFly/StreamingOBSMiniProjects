@@ -13,6 +13,20 @@ from lib.editor_config import editor_defaults
 
 
 class EditorDiscoveryTests(unittest.TestCase):
+    def test_supported_discovery_keeps_root_precedence_without_scanning_other_folders(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            mini = root / 'mini projects'
+            mini.mkdir()
+            for folder in (root / 'soundboard', mini / 'soundboard', mini / 'league', mini / 'unused'):
+                folder.mkdir()
+            with patch.object(project_registry, 'PROJECT_ROOT', root), \
+                 patch.object(project_registry, 'MINI_PROJECTS_DIR', mini), \
+                 patch.object(Path, 'iterdir', side_effect=AssertionError('whole directory scan')):
+                self.assertEqual(project_registry.iter_project_dirs(), [root / 'soundboard', mini / 'league'])
+                self.assertEqual(project_registry.iter_project_dirs(include_root=False),
+                                 [mini / 'league', mini / 'soundboard'])
+
     def discover(self, folder, config_module):
         with patch.object(project_registry, 'iter_project_dirs', return_value=[folder]), \
              patch.object(project_registry, 'ensure_import_paths'), \

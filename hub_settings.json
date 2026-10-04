@@ -1,0 +1,28 @@
+{
+  "hub_hotkeys": {
+    "abort_all_audio": {
+      "enabled": false,
+      "sequence": "",
+      "max_interval": 0.8
+    },
+    "show_screen": {
+      "enabled": true,
+      "sequence": "*-",
+      "max_interval": 0.8
+    },
+    "hide_screen": {
+      "enabled": true,
+      "sequence": "-*",
+      "max_interval": 0.8
+    }
+  },
+  "hub_workflows": [],
+  "project_trigger_modes": {},
+  "whisper_model": "small.en",
+  "whisper_device": "cuda",
+  "whisper_compute": "int8_float16",
+  "whisper_language": "en",
+  "mic_device": 1,
+  "mic_sample_rate": 16000,
+  "rms_threshold": 0.01
+}

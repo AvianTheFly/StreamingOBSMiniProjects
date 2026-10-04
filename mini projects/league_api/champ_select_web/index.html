@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>League · Champion Select</title>
+  <link rel="stylesheet" href="/champ-select/style.css">
+</head>
+<body>
+  <main id="stage" class="stage" aria-label="Champion select broadcast scene">
+    <div class="world"></div>
+    <div class="vignette"></div>
+    <div class="topline"><span>YOUR TEAM</span><span id="phase">CHAMPION SELECT</span><span>OPPONENTS</span></div>
+    <div class="bans bans-left" id="ally-bans"></div>
+    <div class="bans bans-right" id="enemy-bans"></div>
+    <div class="facecam-guide"><span>FACE CAM</span></div>
+    <div class="draft-title"><small>THE DRAFT</small><strong id="timer">PICKS</strong></div>
+    <div class="picks picks-left" id="allies"></div>
+    <div class="picks picks-right" id="enemies"></div>
+    <section class="chat" aria-label="Champion select chat">
+      <div class="chat-head"><span class="chat-dot"></span><span>TEAM COMMS</span><span>LIVE</span></div>
+      <div id="chat-messages" class="chat-messages"></div>
+    </section>
+    <div class="footer"><span>ALLIES · PICK 5 / BAN 5</span><span id="theme-name"></span><span>OPPONENTS · PICK 5 / BAN 5</span></div>
+  </main>
+  <script src="/champ-select/app.js"></script>
+</body>
+</html>

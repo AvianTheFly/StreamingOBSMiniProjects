@@ -1,0 +1,105 @@
+{
+  "module": {
+    "id": "rewards",
+    "label": "Channel rewards",
+    "group": "Community",
+    "icon": "spark",
+    "description": "Verifies viewer redemptions and waits for overlay acknowledgement.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "rewards.redeem",
+      "label": "A viewer redeems points",
+      "topic": "Channel rewards",
+      "trigger": {
+        "label": "A viewer redeems points",
+        "event": "twitch:reward",
+        "kind": "event"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Trusted, new redemption?",
+          "owner": "rewards",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Reward enabled & overlay online?",
+          "owner": "rewards",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Busy / cooldown check",
+          "owner": "rewards",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Deliver effect to OBS",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        },
+        {
+          "id": "4",
+          "label": "Wait for browser acknowledgement",
+          "owner": "rewards",
+          "kind": "wait",
+          "detail": ""
+        },
+        {
+          "id": "5",
+          "label": "Fulfill or require refund review",
+          "owner": "rewards",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
+        "rewards": "5de38d8d7bcce50c517efaec29a676c8cc569fa8f98933e2586336d2be8cbf2d"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "lib/twitch_redemptions/engine.py",
+          "symbol": "RewardBridge.receive",
+          "hash": "3ca74fe35d6dd43a6de8c52d421895e99e1b604bde89052d36e84d397f70a691"
+        },
+        {
+          "path": "lib/twitch_redemptions/engine.py",
+          "symbol": "RewardBridge.acknowledge",
+          "hash": "3915c340a6f66211284cd1d671c5d98118acb0e2b02253e22f8e14f5b87cc7f6"
+        }
+      ]
+    }
+  ]
+}

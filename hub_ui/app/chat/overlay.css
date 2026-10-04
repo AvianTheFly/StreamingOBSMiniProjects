@@ -1,0 +1,49 @@
+:root{--accent:#76e4cf;--card-alpha:.38;--font-size:16px;--emote-size:30px;--font:'Segoe UI';color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;background:transparent!important;overflow:hidden}
+body{font-family:var(--font),sans-serif;color:#f3f6fb;padding:8px;text-shadow:0 1px 2px #000b;-webkit-font-smoothing:antialiased}
+header{display:none;align-items:center;gap:8px;font-size:9px;letter-spacing:1.5px;height:26px;padding:0 9px;font-weight:650}
+header .dot{width:4px;height:4px;border-radius:50%;background:var(--accent)}
+#connection{margin-left:auto;font-size:8px;color:#cbd4e2}
+#messages{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:var(--message-gap,5px);overflow:hidden;padding:4px 2px}
+body.with-header #messages{height:calc(100% - 26px)}
+body.with-header header{display:flex}
+.message{position:relative;flex-shrink:0;width:fit-content;max-width:100%;min-width:116px;border:1px solid #ffffff12;border-top-color:#ffffff22;border-radius:3px 10px 10px 10px;background:linear-gradient(115deg,#ffffff05,transparent 65%),rgba(9,17,26,var(--card-alpha));padding:6px 10px 7px;font-size:var(--font-size);line-height:var(--line-height,1.35);overflow-wrap:anywhere;box-shadow:0 2px 7px #0002;animation:arrive .18s ease-out both;transition:opacity .55s ease}
+/* Short speaker-color inlays keep the personality without large glowing borders. */
+.message::before{content:'';position:absolute;top:8px;left:-1px;width:2px;height:14px;border-radius:2px;background:var(--user-color,var(--accent))}
+.message{--age:1;--ink:var(--text-alpha,.68)}
+.message:nth-last-child(n+4){--age:.85}
+.message:nth-last-child(3){--age:.9}
+.message:nth-last-child(2){--age:.95}
+.message:last-child{border-top-color:color-mix(in srgb,var(--accent) 32%,#ffffff16)}
+.message:last-child::after{content:'';position:absolute;right:9px;top:9px;height:3px;width:3px;transform:rotate(45deg);background:var(--accent);opacity:.8}
+.name{display:block;color:var(--user-color,var(--accent));font-weight:700;font-size:max(11px,calc(var(--font-size)*.7));letter-spacing:.25px;line-height:1.3;padding-right:8px;margin-bottom:2px}
+.badge{height:12px;width:12px;vertical-align:-2px;margin-right:4px;object-fit:contain}
+.role{font-size:10px;margin-right:4px}
+.body{font-weight:600}
+.emote{height:var(--emote-size);max-width:calc(var(--emote-size)*3);vertical-align:middle;object-fit:contain;margin:0 2px}
+.emote-stack{position:relative;display:inline-block;vertical-align:middle}
+.emote-stack>.emote{display:block}
+.emote-stack>.zero{position:absolute;inset:0;margin:auto;max-width:100%}
+.emote-only .emote{height:calc(var(--emote-size)*1.1)}
+.mention{border-left-color:var(--accent)}
+.mention::before{background:var(--accent);height:calc(100% - 16px)}
+.message.leaving{opacity:0}
+body[data-theme=minimal] .message{background:none;border:0;border-radius:0;box-shadow:none;padding:3px 7px 4px}
+body[data-theme=minimal] .name{display:inline;font-size:.78em;margin-right:7px}
+body[data-theme=minimal] .message::before,body[data-theme=minimal] .message::after{display:none}
+body[data-theme=neon] .message{border-left-color:var(--accent);box-shadow:inset 0 0 12px #76e4cf06,0 2px 8px #0003}
+body.no-motion .message{animation:none;transition:none}
+#notice{position:absolute;bottom:10px;left:12px;right:12px;font-size:11px;color:#cbd4e2}
+#notice:empty{display:none}
+@keyframes arrive{from{opacity:0;transform:translateY(3px)}to{transform:none}}
+@media(prefers-reduced-motion:reduce){.message{animation:none;transition:none}}
+/* Opacity belongs to content, never the card: passing over chat cannot create
+   a larger or darker gameplay obstruction. There is no hover scale or motion. */
+.name,.body{opacity:calc(var(--ink)*var(--age));transition:opacity .14s ease}
+.message.reading{--age:1;--ink:var(--hover-alpha,.94)}
+.message.desktop-reading{--age:1;--ink:1}
+body.no-motion .name,body.no-motion .body{transition:none}
+body[data-lobby=true] .message{--age:1;--ink:1}
+body[data-lobby=true] .name{display:block;font-size:.8em;margin-bottom:2px}
+@media(prefers-reduced-motion:reduce){.name,.body{transition:none}}

@@ -154,16 +154,31 @@ class ProductionTests(unittest.TestCase):
         for patch_value in [{'opacity':True}, {'edge_width':float('nan')}, {'burst_seconds':60}, {'enabled':'yes'}]:
             with self.assertRaises(ValueError): validate({**DEFAULTS, **patch_value})
 
+    def test_all_event_acts_last_two_to_five_seconds_without_rewriting_old_overrides(self):
+        from .production.catalog import CATALOG, manifest, show_for
+        settings = {**self.settings, 'burst_seconds': 1,
+                    'event_options': {'kill': {'duration': .6}, 'baron': {'duration': 5}}}
+        saved = copy.deepcopy(settings)
+        for key in [*CATALOG, 'custom_my_signal']:
+            show = show_for({'key': key}, settings, preview=True)
+            self.assertGreaterEqual(show['duration'], 2, key)
+            self.assertLessEqual(show['duration'], 5, key)
+        self.assertEqual(show_for({'key': 'kill'}, settings)['duration'], 2)
+        self.assertEqual(show_for({'key': 'baron'}, settings)['duration'], 5)
+        self.assertTrue(all(2 <= show['default_duration'] <= 5 for show in manifest(settings)))
+        self.assertEqual(settings, saved)
+        self.assertEqual(validate(settings)['event_options']['kill']['duration'], .6)
+
     def test_obs_repair_preserves_existing_transform_filters_and_audio(self):
         from .production.obs_source import repair_overlay
-        client = Mock(); client.send.return_value = {'inputs':[{'inputName':'League API Alerts','inputKind':'browser_source'}]}
-        with patch('league_api.production.obs_source.obs.get_obs',return_value=client), patch('lib.settings_backups.SettingsBackups.snapshot'):
+        client = Mock(); client.send.side_effect = [
+            {'inputs':[{'inputName':'League API Alerts','inputKind':'browser_source'}]},
+            {'inputSettings':{'url':'http://127.0.0.1:7431/overlay'}},None]
+        with patch('league_api.production.obs_source.obs.get_obs',return_value=client), patch('lib.settings_backups.SettingsBackups.snapshot') as backup:
             repair_overlay(Mock(),existing_only=True)
         requests = [(call.args[0], call.args[1]) for call in client.send.call_args_list]
-        self.assertEqual([name for name,_ in requests], ['GetInputList','SetInputSettings','PressInputPropertiesButton'])
-        settings = requests[1][1]['inputSettings']
-        self.assertNotIn('reroute_audio',settings)
-        self.assertNotIn('volume',settings)
+        self.assertEqual([name for name,_ in requests], ['GetInputList','GetInputSettings','PressInputPropertiesButton'])
+        backup.assert_not_called()
     def test_explicit_obs_repair_links_missing_item_without_repositioning(self):
         from .production.obs_source import repair_overlay
         client=Mock();client.send.return_value={'inputs':[{'inputName':'League API Alerts','inputKind':'browser_source'}], 'sceneItems':[]}

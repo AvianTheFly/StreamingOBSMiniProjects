@@ -1,0 +1,67 @@
+{
+  "module": {
+    "id": "keyboard",
+    "label": "Keyboard shortcuts",
+    "group": "Inputs",
+    "icon": "keyboard",
+    "description": "One shared keyboard child forwards registered keys.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "keyboard.keys",
+      "label": "A registered key is pressed",
+      "topic": "Shortcuts",
+      "trigger": {
+        "label": "A registered key is pressed",
+        "event": "keyboard.key",
+        "kind": "control"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "One shared keyboard process",
+          "owner": "keyboard",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Match registered key queue",
+          "owner": "keyboard",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Feature / Hub handles key",
+          "owner": "hub",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "hub": "2651a208dfe2c15d06a55506164c7fc7795423742dfa750511fa1a7762484d50",
+        "keyboard": "3fba196652662536ecdbaff76d81ebd980f2ccd5e5f753db5f0d845ac0f98e6a"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "lib/global_hotkeys.py",
+          "symbol": "<module>",
+          "hash": "08b7287e097dae8e785a3f91836c3f97e71701af2fb927759b24742fc782ac6a"
+        }
+      ]
+    }
+  ]
+}

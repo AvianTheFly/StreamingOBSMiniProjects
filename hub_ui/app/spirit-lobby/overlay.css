@@ -1,0 +1,6 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #090918; }
+canvas { display: block; width: 100%; height: 100%; object-fit: contain; }
+#loading { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); color: #c8e8eb; font: 16px 'Segoe UI', sans-serif; }
+#loading[hidden] { display: none; }
+html.foreground, html.foreground body { background: transparent; }

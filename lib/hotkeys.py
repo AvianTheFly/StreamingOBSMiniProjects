@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
+from lib.json_store import write_json
 
 from lib.project_settings import load_project_settings
 
@@ -28,7 +28,4 @@ def load_hotkeys(hotkeys_file: Path, project_name: str = "") -> dict[str, str | 
 
 def save_hotkeys(hotkeys_file: Path, data: dict[str, str | list[str]]) -> None:
     """Write the legacy {key -> stem | [stem, ...]} compatibility file."""
-    hotkeys_file.write_text(
-        json.dumps(data, indent=2, ensure_ascii=False),
-        encoding="utf-8",
-    )
+    write_json(hotkeys_file, data)

@@ -1,21 +1,23 @@
 {
   "die die die": {
     "renderer": "muffins",
-    "bpm": 126
+    "bpm": 126,
+    "rave": true
   },
   "oh no": {
     "renderer": "borders",
     "style": "oops",
     "bpm": 100,
     "color": "#a9a1ff",
-    "label": "OH NO\u2026"
+    "label": "OH NO…"
   },
   "JOHN CENA": {
     "renderer": "borders",
     "style": "arena",
     "bpm": 100,
     "color": "#ffe08c",
-    "label": "THE CHAMP IS HERE"
+    "label": "THE CHAMP IS HERE",
+    "rave": true
   },
   "bonk_7zPAD7C": {
     "renderer": "borders",
@@ -29,83 +31,610 @@
     "style": "sparkles",
     "bpm": 126,
     "color": "#97ecff",
-    "label": "WOW!"
+    "label": "WOW!",
+    "rave": true
   },
   "dancing music": {
     "renderer": "borders",
     "style": "disco",
     "bpm": 120,
     "color": "#d99bff",
-    "label": "DANCE!"
+    "label": "DANCE!",
+    "rave": true
   },
   "coffin dnace": {
     "renderer": "borders",
     "style": "coffin",
     "bpm": 128,
     "color": "#bd9aff",
-    "label": "FINAL ENCORE"
+    "label": "FINAL ENCORE",
+    "rave": true
   },
   "celebrate": {
     "renderer": "borders",
-    "style": "party",
-    "bpm": 124,
+    "style": "mash",
+    "bpm": 157,
     "color": "#ffd470",
-    "label": "CELEBRATE!"
+    "label": "BLING BANG BANG BORN",
+    "rave": true
   },
   "crab rave": {
     "renderer": "borders",
     "style": "crabs",
     "bpm": 125,
     "color": "#ff886e",
-    "label": "CRAB RAVE"
+    "label": "CRAB RAVE",
+    "rave": true
   },
   "fun celebration": {
     "renderer": "borders",
     "style": "balloons",
     "bpm": 132,
     "color": "#ff9bd4",
-    "label": "PARTY TIME"
+    "label": "PARTY TIME",
+    "rave": true
   },
   "rat dance": {
     "renderer": "borders",
     "style": "rats",
     "bpm": 130,
     "color": "#c8b5ff",
-    "label": "RAT DANCE"
+    "label": "RAT DANCE",
+    "rave": true
   },
   "Pedro": {
     "renderer": "borders",
     "style": "raccoon",
     "bpm": 128,
     "color": "#7ae3dd",
-    "label": "PEDRO!"
+    "label": "PEDRO!",
+    "rave": true
   },
   "Sigma Boy": {
     "renderer": "borders",
     "style": "shades",
     "bpm": 130,
     "color": "#91baff",
-    "label": "SIGMA BOY"
+    "label": "SIGMA BOY",
+    "rave": true
   },
   "Deja Vu": {
     "renderer": "borders",
     "style": "racing",
     "bpm": 154,
     "color": "#ff657c",
-    "label": "DEJA VU"
+    "label": "DEJA VU",
+    "rave": true
   },
   "hype up music": {
     "renderer": "borders",
     "style": "equalizer",
     "bpm": 140,
     "color": "#95ffbd",
-    "label": "HYPE!"
+    "label": "HYPE!",
+    "rave": true
   },
   "meow meow": {
     "renderer": "borders",
-    "style": "cats",
+    "style": "nyan",
     "bpm": 126,
-    "color": "#ffc0dc",
-    "label": "MEOW MEOW"
+    "color": "#ff9cd5",
+    "label": "NYAN CAT",
+    "rave": true
+  },
+  "dang it": {
+    "renderer": "borders",
+    "style": "tantrum",
+    "label": "DANG IT!",
+    "bpm": 138,
+    "rave": true
+  },
+  "im cooked": {
+    "renderer": "borders",
+    "style": "kitchen",
+    "label": "I’M COOKED",
+    "bpm": 132,
+    "rave": true
+  },
+  "OH NO NO NO NO": {
+    "renderer": "borders",
+    "style": "meltdown",
+    "label": "NO NO NO!",
+    "bpm": 140,
+    "rave": true
+  },
+  "I shouldve seen that coming": {
+    "renderer": "borders",
+    "style": "rewind",
+    "label": "SAW THAT COMING",
+    "bpm": 124,
+    "rave": true
+  },
+  "sad violin": {
+    "renderer": "borders",
+    "style": "violin",
+    "label": "TINY VIOLIN",
+    "bpm": 110,
+    "rave": true
+  },
+  "woops": {
+    "renderer": "borders",
+    "style": "spill",
+    "label": "WOOPS!",
+    "bpm": 128,
+    "rave": true
+  },
+  "How could this happen to me": {
+    "renderer": "borders",
+    "style": "heartbreak",
+    "label": "WHY ME?",
+    "bpm": 116,
+    "rave": true
+  },
+  "roblox-old-winning-sound-effect": {
+    "renderer": "borders",
+    "style": "arcade",
+    "label": "YOU WIN!",
+    "bpm": 144,
+    "rave": true
+  },
+  "check-mark_oPG7Xo5": {
+    "renderer": "borders",
+    "style": "approval",
+    "label": "NAILED IT!",
+    "bpm": 130,
+    "rave": true
+  },
+  "a-few-moments-later-sponge-bob-sfx-fun": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "later",
+    "bpm": 100,
+    "rave": true
+  },
+  "among-us-role-reveal-sound": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "airlock",
+    "bpm": 100,
+    "rave": true
+  },
+  "anime brainrot opening": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "opening",
+    "bpm": 100,
+    "rave": true
+  },
+  "another-one_dPvHt2Z": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "another",
+    "bpm": 100,
+    "rave": true
+  },
+  "apple-pay-sound": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "payment",
+    "bpm": 100,
+    "rave": true
+  },
+  "bone-crack": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "fracture",
+    "bpm": 100,
+    "rave": true
+  },
+  "brother-ewwwwwww": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "revulsion",
+    "bpm": 100,
+    "rave": true
+  },
+  "bruh-sound-effect_WstdzdM": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "bruh",
+    "bpm": 100,
+    "rave": true
+  },
+  "cant touch this": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "untouchable",
+    "bpm": 100,
+    "rave": true
+  },
+  "chill guy": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "chill",
+    "bpm": 100,
+    "rave": true
+  },
+  "confetti-pop-sound": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "confetti",
+    "bpm": 100,
+    "rave": true
+  },
+  "dayum-friday": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "dayum",
+    "bpm": 100,
+    "rave": true
+  },
+  "ding-sound-effect_1_CVUaI0C": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "ding-one",
+    "bpm": 100,
+    "rave": true
+  },
+  "ding-sound-effect_2": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "ding-two",
+    "bpm": 100,
+    "rave": true
+  },
+  "discord-leave-noise": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "disconnect",
+    "bpm": 100,
+    "rave": true
+  },
+  "disney-applause": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "applause",
+    "bpm": 100,
+    "rave": true
+  },
+  "dont be suspicious": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "suspicious",
+    "bpm": 100,
+    "rave": true
+  },
+  "downer_noise": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "downer",
+    "bpm": 100,
+    "rave": true
+  },
+  "dry-fart": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "airburst",
+    "bpm": 100,
+    "rave": true
+  },
+  "dun-dun-dun-sound-effect-brass_8nFBccR": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "brass",
+    "bpm": 100,
+    "rave": true
+  },
+  "epic newt newt": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "newt",
+    "bpm": 100,
+    "rave": true
+  },
+  "error-glitch": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "glitch",
+    "bpm": 100,
+    "rave": true
+  },
+  "fahhhhhhhhhhhhhh": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "scream",
+    "bpm": 100,
+    "rave": true
+  },
+  "fuck": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "swear",
+    "bpm": 100,
+    "rave": true
+  },
+  "galaxy-meme": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "galaxy",
+    "bpm": 100,
+    "rave": true
+  },
+  "gambling": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "casino",
+    "bpm": 100,
+    "rave": true
+  },
+  "gangsta paradise": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "paradise",
+    "bpm": 100,
+    "rave": true
+  },
+  "gary_meow": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "gary",
+    "bpm": 100,
+    "rave": true
+  },
+  "goofy running": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "goofy",
+    "bpm": 100,
+    "rave": true
+  },
+  "heavenly-music-gaming-sound-effect-hd-mp3cut": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "heaven",
+    "bpm": 100,
+    "rave": true
+  },
+  "hub-intro-sound": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "intro",
+    "bpm": 100,
+    "rave": true
+  },
+  "i love you": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "love",
+    "bpm": 100,
+    "rave": true
+  },
+  "im falling in love": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "falling",
+    "bpm": 100,
+    "rave": true
+  },
+  "iphone-charge-sound": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "charge",
+    "bpm": 100,
+    "rave": true
+  },
+  "kaching-sound-fx": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "cash",
+    "bpm": 100,
+    "rave": true
+  },
+  "leave me alone": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "isolation",
+    "bpm": 100,
+    "rave": true
+  },
+  "lizzard-1": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "lizard",
+    "bpm": 100,
+    "rave": true
+  },
+  "loading-lost-connection-green-screen-with-sound-effect-2_K8HORkT": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "loading",
+    "bpm": 100,
+    "rave": true
+  },
+  "look-behind-you-gorilla-tag": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "behind",
+    "bpm": 100,
+    "rave": true
+  },
+  "love cat song": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "catlove",
+    "bpm": 100,
+    "rave": true
+  },
+  "mac-quack": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "quack",
+    "bpm": 100,
+    "rave": true
+  },
+  "metal-gear-alert-sound-effect_XKoHReZ": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "alert",
+    "bpm": 100,
+    "rave": true
+  },
+  "oh-hell-naw-man-wtf-man": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "refusal",
+    "bpm": 100,
+    "rave": true
+  },
+  "piuw": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "piuw",
+    "bpm": 100,
+    "rave": true
+  },
+  "prowler": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "prowler",
+    "bpm": 100,
+    "rave": true
+  },
+  "record-scratch-2": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "scratch",
+    "bpm": 100,
+    "rave": true
+  },
+  "rizz-sound-effect": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "rizz",
+    "bpm": 100,
+    "rave": true
+  },
+  "romanceeeeeeeeeeeeee": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "romance",
+    "bpm": 100,
+    "rave": true
+  },
+  "run": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "run",
+    "bpm": 100,
+    "rave": true
+  },
+  "sponge-bob-disgusting": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "disgust",
+    "bpm": 100,
+    "rave": true
+  },
+  "spongebob-fail": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "fail",
+    "bpm": 100,
+    "rave": true
+  },
+  "studio-audience-awwww-sound-fx": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "awww",
+    "bpm": 100,
+    "rave": true
+  },
+  "that was smart": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "smart",
+    "bpm": 100,
+    "rave": true
+  },
+  "the-weeknd-rizzz": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "weeknd",
+    "bpm": 100,
+    "rave": true
+  },
+  "thisissparta.swf": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "sparta",
+    "bpm": 100,
+    "rave": true
+  },
+  "troll lol": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "troll",
+    "bpm": 100,
+    "rave": true
+  },
+  "vine-boom": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "boom",
+    "bpm": 100,
+    "rave": true
+  },
+  "what just happened": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "confusion",
+    "bpm": 100,
+    "rave": true
+  },
+  "who is she": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "mystery",
+    "bpm": 100,
+    "rave": true
+  },
+  "yee-haw": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "western",
+    "bpm": 100,
+    "rave": true
+  },
+  "you saved me": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "rescue",
+    "bpm": 100,
+    "rave": true
+  },
+  "zvuk-fotoapparata": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "camera",
+    "bpm": 100,
+    "rave": true
+  },
+  "Halo Respawn sound effect": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "respawn",
+    "bpm": 100,
+    "rave": true
+  },
+  "mom frog": {
+    "renderer": "borders",
+    "style": "sparkles",
+    "scene": "mom-frog",
+    "bpm": 110,
+    "rave": true
+  },
+  "hooray": {
+    "renderer": "hooray",
+    "bpm": 126
   }
 }

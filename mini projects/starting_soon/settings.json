@@ -1,0 +1,144 @@
+{
+  "title": "STREAM STARTING SOON",
+  "subtitle": "Gather by the fire. The next adventure is almost here.",
+  "rotation_seconds": 35,
+  "artwork": [
+    "fjord.png",
+    "forest.png",
+    "mountain.png",
+    "lantern-tide.png",
+    "ember-caravan.png",
+    "jade-refuge.png",
+    "starfall.png",
+    "drowned-cathedral.png",
+    "stormglass.png",
+    "cinder-express.png"
+  ],
+  "playlist": [],
+  "loop": true,
+  "shuffle": false,
+  "gap_seconds": 5,
+  "rotate_artwork": true,
+  "layout": "preserve",
+  "custom_box": {
+    "x": 690,
+    "y": 320,
+    "width": 1144
+  },
+  "clip_layouts": {},
+  "active_playlist_id": "main",
+  "revision": 18,
+  "show_message": true,
+  "show_footer": true,
+  "highlights_enabled": false,
+  "transition_style": "portal",
+  "motion": "drift",
+  "saved_looks": [
+    {
+      "id": "spirit-opening",
+      "name": "Spirit-world opening",
+      "settings": {
+        "title": "STREAM STARTING SOON",
+        "subtitle": "Gather by the fire. The next adventure is almost here.",
+        "show_message": true,
+        "show_footer": true,
+        "artwork": [
+          "fjord.png",
+          "forest.png",
+          "mountain.png",
+          "lantern-tide.png",
+          "ember-caravan.png",
+          "jade-refuge.png",
+          "starfall.png",
+          "drowned-cathedral.png",
+          "stormglass.png",
+          "cinder-express.png"
+        ],
+        "rotation_seconds": 35,
+        "rotate_artwork": true,
+        "highlights_enabled": false,
+        "transition_style": "portal",
+        "motion": "drift",
+        "layout": "preserve",
+        "custom_box": {
+          "x": 690,
+          "y": 320,
+          "width": 1144
+        }
+      }
+    },
+    {
+      "id": "spirit-break",
+      "name": "Be right back",
+      "settings": {
+        "title": "BE RIGHT BACK",
+        "subtitle": "Rest by the fire. The adventure continues shortly.",
+        "show_message": true,
+        "show_footer": true,
+        "artwork": [
+          "fjord.png",
+          "forest.png",
+          "mountain.png",
+          "lantern-tide.png",
+          "ember-caravan.png",
+          "jade-refuge.png",
+          "starfall.png",
+          "drowned-cathedral.png",
+          "stormglass.png",
+          "cinder-express.png"
+        ],
+        "rotation_seconds": 35,
+        "rotate_artwork": true,
+        "highlights_enabled": false,
+        "transition_style": "gates",
+        "motion": "drift",
+        "layout": "preserve",
+        "custom_box": {
+          "x": 690,
+          "y": 320,
+          "width": 1144
+        }
+      }
+    },
+    {
+      "id": "spirit-scenery",
+      "name": "Clean cinematic worlds",
+      "settings": {
+        "title": "STREAM STARTING SOON",
+        "subtitle": "Gather by the fire. The next adventure is almost here.",
+        "show_message": false,
+        "show_footer": false,
+        "artwork": [
+          "fjord.png",
+          "forest.png",
+          "mountain.png",
+          "lantern-tide.png",
+          "ember-caravan.png",
+          "jade-refuge.png",
+          "starfall.png",
+          "drowned-cathedral.png",
+          "stormglass.png",
+          "cinder-express.png"
+        ],
+        "rotation_seconds": 35,
+        "rotate_artwork": true,
+        "highlights_enabled": false,
+        "transition_style": "embers",
+        "motion": "drift",
+        "layout": "preserve",
+        "custom_box": {
+          "x": 690,
+          "y": 320,
+          "width": 1144
+        }
+      }
+    }
+  ],
+  "playlists": [
+    {
+      "id": "main",
+      "name": "My waiting room",
+      "paths": []
+    }
+  ]
+}

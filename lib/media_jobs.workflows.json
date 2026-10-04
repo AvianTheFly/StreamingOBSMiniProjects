@@ -1,0 +1,93 @@
+{
+  "module": {
+    "id": "conversion",
+    "label": "Conversion budget",
+    "group": "Shared resources",
+    "icon": "replay",
+    "description": "Shares CPU between finite media jobs.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "conversion.jobs",
+      "label": "A trim or conversion is requested",
+      "topic": "Background work",
+      "trigger": {
+        "label": "A trim or conversion is requested",
+        "event": "conversion.job",
+        "kind": "event"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Queue weighted CPU claim",
+          "owner": "conversion",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "User work ahead of previews",
+          "owner": "conversion",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Wait for shared capacity",
+          "owner": "conversion",
+          "kind": "wait",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Run bounded conversion",
+          "owner": "conversion",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "4",
+          "label": "Release CPU / reap child",
+          "owner": "conversion",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "conversion": "b714ec8a6641880ed03bdde834c87c760b5b902d357ffd74361bc6101d768e07"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "lib/media_jobs.py",
+          "symbol": "MediaJobBudget.slot",
+          "hash": "8087e0b621ca16506ee5d6a3645cfb1027bd13ff876a1d73db689adf22230d7c"
+        },
+        {
+          "path": "lib/media_jobs.py",
+          "symbol": "MediaJobBudget.run",
+          "hash": "19c38feacfd3239cd8ec3667fe16a02a4beff5f14249790743fbd62303c97d96"
+        }
+      ]
+    }
+  ]
+}

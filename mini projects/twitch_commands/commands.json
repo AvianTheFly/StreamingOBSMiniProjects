@@ -1,0 +1,1099 @@
+{
+  "channel": "udyrisabotlaner",
+  "enabled": true,
+  "commands": [
+    {
+      "command": "!opgg",
+      "aliases": [
+        "!op",
+        "!op.gg",
+        "!profile",
+        "!account",
+        "!summoner",
+        "!riotid",
+        "!ign"
+      ],
+      "response": "The receipts: UdyrIsABotLaner#Inter (NA) | https://op.gg/lol/summoners/na/UdyrIsABotLaner-Inter",
+      "category": "League",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!rank",
+      "aliases": [
+        "!elo",
+        "!lp",
+        "!winrate",
+        "!wr"
+      ],
+      "response": "Current rank, LP and win rate are on my profile: https://op.gg/lol/summoners/na/UdyrIsABotLaner-Inter",
+      "category": "League",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "Profile link, not a live numeric lookup.",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!lastgame",
+      "aliases": [
+        "!matchhistory",
+        "!history",
+        "!recentgames"
+      ],
+      "response": "Recent games, builds and results: https://op.gg/lol/summoners/na/UdyrIsABotLaner-Inter",
+      "category": "League",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!region",
+      "aliases": [
+        "!server"
+      ],
+      "response": "North America (NA). Riot ID: UdyrIsABotLaner#Inter.",
+      "category": "League",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!build",
+      "aliases": [
+        "!items",
+        "!itembuild",
+        "!udyrbuild",
+        "!guide",
+        "!udyrguide"
+      ],
+      "response": "My lane Udyr guide: https://www.reddit.com/r/Udyrmains/comments/1r43rdr/the_objectively_best_lane_udyr_build/ | Recent builds: https://op.gg/lol/summoners/na/UdyrIsABotLaner-Inter",
+      "category": "League",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "Existing channel panel destination. Guide may describe an older patch.",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!runes",
+      "aliases": [
+        "!rune",
+        "!runepage"
+      ],
+      "response": "Rune setup and reasoning: https://www.reddit.com/r/Udyrmains/comments/1r43rdr/the_objectively_best_lane_udyr_build/ | Check recent games on !opgg for changes.",
+      "category": "League",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!skillorder",
+      "aliases": [
+        "!max",
+        "!abilities"
+      ],
+      "response": "Skill order and stance reasoning are in the lane Udyr guide: https://www.reddit.com/r/Udyrmains/comments/1r43rdr/the_objectively_best_lane_udyr_build/",
+      "category": "League",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!summoners",
+      "aliases": [
+        "!summs",
+        "!spells"
+      ],
+      "response": "My published lane guide uses Ghost + Flash. Current choices can vary: https://www.reddit.com/r/Udyrmains/comments/1r43rdr/the_objectively_best_lane_udyr_build/",
+      "category": "League",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!whyudyr",
+      "aliases": [
+        "!whybot",
+        "!udyrbot",
+        "!botudyr",
+        "!offmeta"
+      ],
+      "response": "Why fight Garen, Darius or Mordekaiser top when you can destroy bot lane? Four spirits. One questionable lane.",
+      "category": "League",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "Adapted from your existing About panel.",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!udyr",
+      "aliases": [
+        "!champion",
+        "!champ"
+      ],
+      "response": "Four spirits. One lane. Meet Udyr: https://www.leagueoflegends.com/en-us/champions/udyr/",
+      "category": "League",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!udyrclub",
+      "aliases": [
+        "!club",
+        "!otps",
+        "!botlaners"
+      ],
+      "response": "The Udyr bot club. There are dozens of us. Maybe. https://www.deeplol.gg/champions/udyr/mastery/bot",
+      "category": "League",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!receipts",
+      "aliases": [
+        "!proof"
+      ],
+      "response": "Udyr bot. The proof is in the games: https://imgur.com/a/bQmhmxD | Current history: https://op.gg/lol/summoners/na/UdyrIsABotLaner-Inter",
+      "category": "League",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!matchup",
+      "aliases": [
+        "!matchups",
+        "!counters"
+      ],
+      "response": "Matchup questions? Include the enemy bot lane and support. My general lane plan: https://www.reddit.com/r/Udyrmains/comments/1r43rdr/the_objectively_best_lane_udyr_build/",
+      "category": "League",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!boots",
+      "aliases": [],
+      "response": "My published guide favors Boots of Swiftness. Build for the game you are actually in: https://www.reddit.com/r/Udyrmains/comments/1r43rdr/the_objectively_best_lane_udyr_build/",
+      "category": "League",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!patch",
+      "aliases": [
+        "!patchnotes"
+      ],
+      "response": "Latest official League patch notes: https://www.leagueoflegends.com/en-us/news/tags/patch-notes/",
+      "category": "League",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!discord",
+      "aliases": [
+        "!disc",
+        "!dc",
+        "!community"
+      ],
+      "response": "Join the bot-lane believers: https://discord.gg/h7VnXukx98",
+      "category": "Links",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!socials",
+      "aliases": [
+        "!links",
+        "!social"
+      ],
+      "response": "Discord: https://discord.gg/h7VnXukx98 | X: https://x.com/udyrisabotlaner | League: https://op.gg/lol/summoners/na/UdyrIsABotLaner-Inter",
+      "category": "Links",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!twitter",
+      "aliases": [
+        "!x"
+      ],
+      "response": "Find me on X: https://x.com/udyrisabotlaner",
+      "category": "Links",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "Existing channel panel destination.",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!clips",
+      "aliases": [
+        "!highlights"
+      ],
+      "response": "The good decisions (and the other ones): https://www.twitch.tv/udyrisabotlaner/clips",
+      "category": "Links",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!vod",
+      "aliases": [
+        "!vods",
+        "!videos",
+        "!paststreams"
+      ],
+      "response": "Past streams and videos, when available: https://www.twitch.tv/udyrisabotlaner/videos",
+      "category": "Links",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!sub",
+      "aliases": [
+        "!subscribe"
+      ],
+      "response": "Support the four-spirit experiment: https://www.twitch.tv/subs/udyrisabotlaner | Thanks for being here either way.",
+      "category": "Links",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!lurk",
+      "aliases": [
+        "!lurking"
+      ],
+      "response": "Entering turtle stance. Thanks for hanging out, lurker.",
+      "category": "Community",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!unlurk",
+      "aliases": [
+        "!back"
+      ],
+      "response": "Turtle stance disengaged. Welcome back to the bot lane.",
+      "category": "Community",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!hello",
+      "aliases": [
+        "!hi",
+        "!hey",
+        "!welcome"
+      ],
+      "response": "Welcome to the bot lane. Udyr. Questionable decisions. Make yourself at home.",
+      "category": "Community",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!gg",
+      "aliases": [
+        "!ggwp"
+      ],
+      "response": "GG. Four spirits. One lane. Thanks for being part of the chaos.",
+      "category": "Community",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!hype",
+      "aliases": [
+        "!letsgo",
+        "!lfg"
+      ],
+      "response": "FOUR SPIRITS. ZERO HESITATION. BOT LANE BELIEVERS RISE.",
+      "category": "Community",
+      "cooldown": 45,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!hydrate",
+      "aliases": [
+        "!water"
+      ],
+      "response": "Even the spirits need water. Take a sip and unclench your shoulders.",
+      "category": "Community",
+      "cooldown": 60,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!stretch",
+      "aliases": [
+        "!posture"
+      ],
+      "response": "Quick reset: relax your jaw, lower your shoulders, stretch between games.",
+      "category": "Community",
+      "cooldown": 60,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!thanks",
+      "aliases": [
+        "!ty",
+        "!thankyou"
+      ],
+      "response": "Thanks for being here. You make the bot-lane experiment more fun.",
+      "category": "Community",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!faq",
+      "aliases": [],
+      "response": "League: !opgg !build !runes !whyudyr | Community: !discord !socials | Watch: !clips !vods | Chaos: !spirits !copium !court",
+      "category": "Help",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!streamhelp",
+      "aliases": [
+        "!commandlist"
+      ],
+      "response": "Try !faq, !opgg, !rank, !build, !runes, !discord, !socials, !clips, !vods, !lurk, !spirits, !court, !pineapple.",
+      "category": "Help",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "Preserves bot-owned !commands, !help and !cmd.",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!spirits",
+      "aliases": [
+        "!fourspirits"
+      ],
+      "response": "Bear. Ram. Turtle. Phoenix. All four voted for bot lane. Allegedly.",
+      "category": "Custom",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!bear",
+      "aliases": [
+        "!bearstance"
+      ],
+      "response": "Bear stance: the personal-space department has closed.",
+      "category": "Custom",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!ram",
+      "aliases": [
+        "!ramstance"
+      ],
+      "response": "Ram stance: walking is optional. Running at them is policy.",
+      "category": "Custom",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!turtle",
+      "aliases": [
+        "!turtlestance"
+      ],
+      "response": "Turtle stance: I did not hear a bell.",
+      "category": "Custom",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!phoenix",
+      "aliases": [
+        "!phoenixstance"
+      ],
+      "response": "Phoenix stance: the floor is now a weather event.",
+      "category": "Custom",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!copium",
+      "aliases": [
+        "!cope",
+        "!surely"
+      ],
+      "response": "The build is scaling. The lane is playable. The next game is free. Pass the COPIUM.",
+      "category": "Custom",
+      "cooldown": 45,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!tilt",
+      "aliases": [
+        "!mental",
+        "!reset"
+      ],
+      "response": "Reset the mental. Next wave. Next decision. The spirits are still clocked in.",
+      "category": "Custom",
+      "cooldown": 45,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!calculated",
+      "aliases": [
+        "!genius",
+        "!bigbrain"
+      ],
+      "response": "Every questionable decision was peer-reviewed by four imaginary animals.",
+      "category": "Custom",
+      "cooldown": 45,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!int",
+      "aliases": [
+        "!inting",
+        "!threw",
+        "!throw"
+      ],
+      "response": "The Court of Questionable Decisions would like a word with the defendant.",
+      "category": "Custom",
+      "cooldown": 45,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!court",
+      "aliases": [
+        "!allegations",
+        "!verdict"
+      ],
+      "response": "Bot Lane Court is in session. Genius or inting? Make your case in chat. This command does not start a poll.",
+      "category": "Custom",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!botdiff",
+      "aliases": [
+        "!botgap",
+        "!lanediff"
+      ],
+      "response": "Four spirits in bot lane. The math seems fair to me.",
+      "category": "Custom",
+      "cooldown": 45,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!ff",
+      "aliases": [
+        "!ff15",
+        "!surrender"
+      ],
+      "response": "The surrender vote has been forwarded to the spirits. They are currently unavailable.",
+      "category": "Custom",
+      "cooldown": 45,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!cooked",
+      "aliases": [
+        "!doomed"
+      ],
+      "response": "We are not cooked. We are being slow-roasted for the scaling.",
+      "category": "Custom",
+      "cooldown": 45,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!clutch",
+      "aliases": [
+        "!outplay"
+      ],
+      "response": "The spirits approved that one. Save the evidence with Twitch's Clip button.",
+      "category": "Custom",
+      "cooldown": 45,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!pineapple",
+      "aliases": [
+        "!pineapples",
+        "!fruit",
+        "!mango",
+        "!mangos"
+      ],
+      "response": "I like pineapples. Although mangos might be better. The fruit debate continues.",
+      "category": "Custom",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "Your existing About panel opinion.",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!pumpum",
+      "aliases": [
+        "!lilpumpum"
+      ],
+      "response": "I am just a lil pum pum. What is a pum pum? Your guess is as good as mine.",
+      "category": "Custom",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "Your existing About panel joke.",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!believers",
+      "aliases": [
+        "!believe"
+      ],
+      "response": "Welcome to the Udyr bot believers club. Membership requirement: questionable faith in the lane.",
+      "category": "Custom",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!report",
+      "aliases": [
+        "!reportbug",
+        "!bug",
+        "!feedback"
+      ],
+      "response": "Found a stream problem? Describe what happened in Discord: https://discord.gg/h7VnXukx98",
+      "category": "Community",
+      "cooldown": 30,
+      "permission": "everyone",
+      "status": "ready",
+      "note": "",
+      "enabled": true,
+      "kind": "text"
+    },
+    {
+      "command": "!schedule",
+      "aliases": [
+        "!when",
+        "!nextstream",
+        "!hours"
+      ],
+      "response": "",
+      "category": "Needs your details or integration",
+      "status": "disabled",
+      "note": "Your actual regular schedule or confirmation that it varies.",
+      "permission": "everyone",
+      "cooldown": 30,
+      "enabled": false,
+      "kind": "text"
+    },
+    {
+      "command": "!rules",
+      "aliases": [
+        "!chatrules"
+      ],
+      "response": "",
+      "category": "Needs your details or integration",
+      "status": "disabled",
+      "note": "Your approved chat rules; do not invent moderation policy.",
+      "permission": "everyone",
+      "cooldown": 30,
+      "enabled": false,
+      "kind": "text"
+    },
+    {
+      "command": "!duo",
+      "aliases": [
+        "!playwithme",
+        "!join",
+        "!queue"
+      ],
+      "response": "",
+      "category": "Needs your details or integration",
+      "status": "disabled",
+      "note": "Whether viewers can join, queue rules, and eligibility.",
+      "permission": "everyone",
+      "cooldown": 30,
+      "enabled": false,
+      "kind": "text"
+    },
+    {
+      "command": "!coaching",
+      "aliases": [
+        "!coach"
+      ],
+      "response": "",
+      "category": "Needs your details or integration",
+      "status": "disabled",
+      "note": "Whether coaching is offered and the real booking destination.",
+      "permission": "everyone",
+      "cooldown": 30,
+      "enabled": false,
+      "kind": "text"
+    },
+    {
+      "command": "!youtube",
+      "aliases": [
+        "!yt"
+      ],
+      "response": "",
+      "category": "Needs your details or integration",
+      "status": "disabled",
+      "note": "Your YouTube channel URL.",
+      "permission": "everyone",
+      "cooldown": 30,
+      "enabled": false,
+      "kind": "text"
+    },
+    {
+      "command": "!tiktok",
+      "aliases": [
+        "!tt"
+      ],
+      "response": "",
+      "category": "Needs your details or integration",
+      "status": "disabled",
+      "note": "Your TikTok profile URL.",
+      "permission": "everyone",
+      "cooldown": 30,
+      "enabled": false,
+      "kind": "text"
+    },
+    {
+      "command": "!instagram",
+      "aliases": [
+        "!insta",
+        "!ig"
+      ],
+      "response": "",
+      "category": "Needs your details or integration",
+      "status": "disabled",
+      "note": "Your Instagram profile URL.",
+      "permission": "everyone",
+      "cooldown": 30,
+      "enabled": false,
+      "kind": "text"
+    },
+    {
+      "command": "!donate",
+      "aliases": [
+        "!donation",
+        "!tip",
+        "!support"
+      ],
+      "response": "",
+      "category": "Needs your details or integration",
+      "status": "disabled",
+      "note": "Confirm the currently desired donation destination. Existing panels mention Venmo earthlydirt and PayPal avianfly.",
+      "permission": "everyone",
+      "cooldown": 30,
+      "enabled": false,
+      "kind": "text"
+    },
+    {
+      "command": "!merch",
+      "aliases": [
+        "!store"
+      ],
+      "response": "",
+      "category": "Needs your details or integration",
+      "status": "disabled",
+      "note": "A real merchandise store URL, if you have one.",
+      "permission": "everyone",
+      "cooldown": 30,
+      "enabled": false,
+      "kind": "text"
+    },
+    {
+      "command": "!pc",
+      "aliases": [
+        "!specs",
+        "!setup",
+        "!gear"
+      ],
+      "response": "",
+      "category": "Needs your details or integration",
+      "status": "disabled",
+      "note": "Your current PC specifications.",
+      "permission": "everyone",
+      "cooldown": 30,
+      "enabled": false,
+      "kind": "text"
+    },
+    {
+      "command": "!mouse",
+      "aliases": [
+        "!dpi",
+        "!sens",
+        "!sensitivity"
+      ],
+      "response": "",
+      "category": "Needs your details or integration",
+      "status": "disabled",
+      "note": "Your actual mouse, DPI and in-game sensitivity.",
+      "permission": "everyone",
+      "cooldown": 30,
+      "enabled": false,
+      "kind": "text"
+    },
+    {
+      "command": "!keyboard",
+      "aliases": [
+        "!headset",
+        "!mic",
+        "!camera",
+        "!monitor"
+      ],
+      "response": "",
+      "category": "Needs your details or integration",
+      "status": "disabled",
+      "note": "Your current peripherals.",
+      "permission": "everyone",
+      "cooldown": 30,
+      "enabled": false,
+      "kind": "text"
+    },
+    {
+      "command": "!settings",
+      "aliases": [
+        "!graphics",
+        "!resolution"
+      ],
+      "response": "",
+      "category": "Needs your details or integration",
+      "status": "disabled",
+      "note": "Your actual League graphics and display settings.",
+      "permission": "everyone",
+      "cooldown": 30,
+      "enabled": false,
+      "kind": "text"
+    },
+    {
+      "command": "!playlist",
+      "aliases": [
+        "!music",
+        "!spotify"
+      ],
+      "response": "",
+      "category": "Needs your details or integration",
+      "status": "disabled",
+      "note": "Your public music playlist URL.",
+      "permission": "everyone",
+      "cooldown": 30,
+      "enabled": false,
+      "kind": "text"
+    },
+    {
+      "command": "!delay",
+      "aliases": [
+        "!latency"
+      ],
+      "response": "",
+      "category": "Needs your details or integration",
+      "status": "disabled",
+      "note": "Your measured stream delay or configured latency mode.",
+      "permission": "everyone",
+      "cooldown": 30,
+      "enabled": false,
+      "kind": "text"
+    },
+    {
+      "command": "!peak",
+      "aliases": [
+        "!peakrank"
+      ],
+      "response": "",
+      "category": "Needs your details or integration",
+      "status": "disabled",
+      "note": "Your confirmed peak rank and season.",
+      "permission": "everyone",
+      "cooldown": 30,
+      "enabled": false,
+      "kind": "text"
+    },
+    {
+      "command": "!wl",
+      "aliases": [
+        "!wins",
+        "!losses",
+        "!record",
+        "!session"
+      ],
+      "response": "",
+      "category": "Needs your details or integration",
+      "status": "disabled",
+      "note": "A live session-statistics adapter; do not report fabricated totals.",
+      "permission": "everyone",
+      "cooldown": 30,
+      "enabled": false,
+      "kind": "text"
+    },
+    {
+      "command": "!song",
+      "aliases": [
+        "!np",
+        "!nowplaying",
+        "!currentsong"
+      ],
+      "response": "",
+      "category": "Needs your details or integration",
+      "status": "disabled",
+      "note": "A real current-song provider; preserve the existing bot music command.",
+      "permission": "everyone",
+      "cooldown": 30,
+      "enabled": false,
+      "kind": "text"
+    },
+    {
+      "command": "!clip",
+      "aliases": [],
+      "response": "",
+      "category": "Needs your details or integration",
+      "status": "disabled",
+      "note": "A working clip-creation integration; !clips above only opens the clip library.",
+      "permission": "everyone",
+      "cooldown": 30,
+      "enabled": false,
+      "kind": "text"
+    },
+    {
+      "command": "!emotes",
+      "aliases": [
+        "!7tv",
+        "!bttv",
+        "!ffz"
+      ],
+      "response": "",
+      "category": "Needs your details or integration",
+      "status": "disabled",
+      "note": "Your actual channel emote pages or a supported bot-native listing.",
+      "permission": "everyone",
+      "cooldown": 30,
+      "enabled": false,
+      "kind": "text"
+    },
+    {
+      "command": "!commands",
+      "aliases": [
+        "!help"
+      ],
+      "response": "",
+      "kind": "index",
+      "category": "Help",
+      "cooldown": 15,
+      "permission": "everyone",
+      "enabled": true
+    },
+    {
+      "command": "!time",
+      "aliases": [
+        "!clock"
+      ],
+      "response": "",
+      "kind": "time",
+      "category": "Community",
+      "cooldown": 15,
+      "permission": "everyone",
+      "enabled": true
+    },
+    {
+      "command": "!8ball",
+      "aliases": [
+        "!askspirits"
+      ],
+      "response": "",
+      "kind": "8ball",
+      "category": "Custom",
+      "cooldown": 30,
+      "permission": "everyone",
+      "enabled": true
+    }
+  ],
+  "research_sources": [
+    {
+      "title": "Sneaky: actual historical command usage",
+      "url": "https://stats.streamelements.com/c/sneakylol",
+      "finding": "OP.GG, rank/elo, build/runes, Discord, clips-related viewer habits, music, peripherals and community commands. Usage history is not proof of current enablement."
+    },
+    {
+      "title": "Elite500: public command list",
+      "url": "https://streamelements.com/elite500/commands",
+      "finding": "Discord, account links, rune explanations, equipment, community jokes. Personalized copy here is original, not copied responses."
+    },
+    {
+      "title": "Nightbot command management",
+      "url": "https://docs.nightbot.tv/commands/commands",
+      "finding": "Add, cooldown, permission and alias syntax."
+    },
+    {
+      "title": "StreamElements command management",
+      "url": "https://docs.streamelements.com/chatbot/commands/default/command",
+      "finding": "Add, alias and cooldown syntax."
+    },
+    {
+      "title": "Your published lane Udyr guide",
+      "url": "https://www.reddit.com/r/Udyrmains/comments/1r43rdr/the_objectively_best_lane_udyr_build/",
+      "finding": "Existing panel destination; identifies the same Riot ID and Twitch channel."
+    }
+  ]
+}

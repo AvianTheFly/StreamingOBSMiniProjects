@@ -98,7 +98,9 @@ def show_for(candidate, settings, preview=False):
     if key=='cs_milestone' and re.fullmatch(r'\d+ CS',str(candidate.get('detail',''))): title=candidate['detail']+' · HARVEST'
     return {**spec,'key':key,'title':title,
             'family':'ending' if key in {'victory','defeat','game_end'} else spec['family'],
-            'duration':max(.6,min(5,duration)), 'intensity':override.get('intensity',1),
+            # Legacy short overrides remain personal data; the presentation
+            # contract now gives every event a readable two-to-five-second act.
+            'duration':max(2,min(5,duration)), 'intensity':override.get('intensity',1),
             'confidence':'possible' if key.startswith('possible_') else 'observed'}
 
 
@@ -109,7 +111,7 @@ def manifest(settings, custom_rules=None):
         candidate={'key':key,'title':(custom_rules or {}).get(key,{}).get('title')}
         spec=show_for(candidate,settings,preview=True)
         spec['default_enabled']=CATALOG.get(key,{}).get('enabled',False)
-        spec['default_duration']=max(.6,min(5,CATALOG.get(key,{}).get('seconds',1.8)*settings['burst_seconds']/2.7))
+        spec['default_duration']=max(2,min(5,CATALOG.get(key,{}).get('seconds',1.8)*settings['burst_seconds']/2.7))
         spec['event_enabled']=settings.get('event_options',{}).get(key,{}).get('enabled',CATALOG.get(key,{}).get('enabled',False))
         spec['enabled']=bool(show_for(candidate,settings));result.append(spec)
     return result

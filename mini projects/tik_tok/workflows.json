@@ -1,0 +1,102 @@
+{
+  "module": {
+    "id": "tik_tok",
+    "label": "TikTok clips",
+    "group": "Media",
+    "icon": "play",
+    "description": "Matches keys or voice to short videos.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "tik_tok.trigger",
+      "label": "Trigger a TikTok clip",
+      "topic": "Sound & video",
+      "trigger": {
+        "label": "Trigger a TikTok clip",
+        "event": "source.request",
+        "kind": "control"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Match asset / active profile",
+          "owner": "tik_tok",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Exclusive or layered?",
+          "owner": "coordination",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "One worker per source",
+          "owner": "media_workers",
+          "kind": "wait",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Load personal level & placement",
+          "owner": "tik_tok",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "4",
+          "label": "OBS sound / video",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        },
+        {
+          "id": "5",
+          "label": "Finish the actual ticket",
+          "owner": "coordination",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "coordination": "5057221ec74a11ea01e1c0bcfeab93e331ec71244136a2611a9c0808591898a3",
+        "media_workers": "99a1a00f5854b87301b5e62b0837f5e035bf87e45a4552403c603e0e3de1f064",
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
+        "tik_tok": "378f778b4a6ab09e54b4eeb41d7fdd06cc588b5d023a6327d5062127d7b711e2"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "lib/shared_media/media_project.py",
+          "symbol": "run_media_project",
+          "hash": "186d06d32a7b8727dd359d8fe448e968f8a34d46afa939ce57f7e48d7678bdb7"
+        }
+      ]
+    }
+  ]
+}

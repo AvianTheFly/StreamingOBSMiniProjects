@@ -1,0 +1,154 @@
+{
+  "arcade-guests.js": {
+    "source": "mini projects/scene_voice_switcher/web/arcade-guests.js",
+    "sha256": "8dec7eb7a3f091a3cc531026385d3eef40c94e7df02fb7a5259c03e68251f0e2"
+  },
+  "arcade-world.js": {
+    "source": "mini projects/scene_voice_switcher/web/arcade-world.js",
+    "sha256": "7f75ee5c4a3a4723c5b274c09862af1f453b36bb0224324d1db326ff8972ad6c"
+  },
+  "aurora-camp-guests.js": {
+    "source": "mini projects/scene_voice_switcher/web/aurora-camp-guests.js",
+    "sha256": "921c9d19eefd60db301eaec6c42d82f89e220e4c180523cc3976f7ef06a510ef"
+  },
+  "aurora-camp-world.js": {
+    "source": "mini projects/scene_voice_switcher/web/aurora-camp-world.js",
+    "sha256": "74c06dfd348fab076400049648bbfc44f5cfb98963ee69c59e3d74737929a9a4"
+  },
+  "forge-atmosphere.js": {
+    "source": "mini projects/scene_voice_switcher/web/forge-atmosphere.js",
+    "sha256": "eff1a5bbb882ea42565bdaa943a5ce7afcb13971348ef014de35cc02a5fc495e"
+  },
+  "forge-guests.js": {
+    "source": "mini projects/scene_voice_switcher/web/forge-guests.js",
+    "sha256": "23d2349820bb26e58c55914ae2d8f8e717a6c89d3dd609f50fa3c0528de8a79c"
+  },
+  "forge-world.js": {
+    "source": "mini projects/scene_voice_switcher/web/forge-world.js",
+    "sha256": "653395929d2038c6a039d98340b00ffdf7bc09c7e008f95e1a63db3cb407b7de"
+  },
+  "future-guests.js": {
+    "source": "mini projects/scene_voice_switcher/web/future-guests.js",
+    "sha256": "0f86c3eb981d1dd6d230a2823d955485bbe655aff45d2ae4864c46a5c5367afa"
+  },
+  "future-world.js": {
+    "source": "mini projects/scene_voice_switcher/web/future-world.js",
+    "sha256": "c5c44c2269a99afaf67d9e5a0ae5952a2743e711739dbbdc6ea9680e472f4640"
+  },
+  "index.html": {
+    "source": "mini projects/scene_voice_switcher/web/index.html",
+    "sha256": "35b94cd5e7cc843132c035c89cc6431a710163f32387a6f5f99d3fd6dd7b6183"
+  },
+  "painted-world.js": {
+    "source": "mini projects/scene_voice_switcher/web/painted-world.js",
+    "sha256": "30f1e958756148e6bcd2df0bdf32983710e027e7d0613ae818775fc4ce6b9bd7"
+  },
+  "phoenix-observatory-guests.js": {
+    "source": "mini projects/scene_voice_switcher/web/phoenix-observatory-guests.js",
+    "sha256": "cae0b260e661fd72546347e4f68bac47810de4c6784ff6ceeae4a6a0239f2a42"
+  },
+  "phoenix-observatory-world.js": {
+    "source": "mini projects/scene_voice_switcher/web/phoenix-observatory-world.js",
+    "sha256": "096b838a290c1de85c47928ba8b92a9e2cca8ac25c7deeb379e8e3fed16cbe6e"
+  },
+  "reef-cues.js": {
+    "source": "mini projects/scene_voice_switcher/web/reef-cues.js",
+    "sha256": "7ea9e3021bd83823b708830629c281715992bfc5732b0eaa253032b6d0d046fd"
+  },
+  "reef-ink.js": {
+    "source": "mini projects/scene_voice_switcher/web/reef-ink.js",
+    "sha256": "aeeb84dbbf7dd74bca42269e2d6d0b9ec450b2473506991a2ab23397a87854b3"
+  },
+  "reef-room.js": {
+    "source": "mini projects/scene_voice_switcher/web/reef-room.js",
+    "sha256": "0bd491faee43de54c8ffa8e879c1b62b4ff015d5be2300b326909d11d4a98212"
+  },
+  "reef-scene.js": {
+    "source": "mini projects/scene_voice_switcher/web/reef-scene.js",
+    "sha256": "8111a7fd589fda630005865d035678a3967468ade3812ac9f33dfa9495a2c121"
+  },
+  "reef-visitors.js": {
+    "source": "mini projects/scene_voice_switcher/web/reef-visitors.js",
+    "sha256": "c76c4d2c75baa5e034511d4a85d5a9f9446409a5c4e722ee0145fb9e9e6e13b1"
+  },
+  "reef-world.js": {
+    "source": "mini projects/scene_voice_switcher/web/reef-world.js",
+    "sha256": "1950b0b4f4b771e2eec15e3769243dc2cf8d5dce38a9943431bf5cd8fb45cb11"
+  },
+  "sanctuary-atmosphere.js": {
+    "source": "mini projects/scene_voice_switcher/web/sanctuary-atmosphere.js",
+    "sha256": "d6aff2968eb887c55032a4776f6290e09da83d08185331234d3b525912cef339"
+  },
+  "sanctuary-guests.js": {
+    "source": "mini projects/scene_voice_switcher/web/sanctuary-guests.js",
+    "sha256": "64f885006812abf496ffd2a337760c7efb095c57ece4423482d881bd706056dd"
+  },
+  "sanctuary-world.js": {
+    "source": "mini projects/scene_voice_switcher/web/sanctuary-world.js",
+    "sha256": "acc87674a486d5de782bbfaa1d3ae59e3da421357619717d92c38f917331baab"
+  },
+  "sky-harbor-guests.js": {
+    "source": "mini projects/scene_voice_switcher/web/sky-harbor-guests.js",
+    "sha256": "03d77f8c1e4643ead26d1b793dec4180e782b8d01d3248281d26590bc5fa2b08"
+  },
+  "sky-harbor-world.js": {
+    "source": "mini projects/scene_voice_switcher/web/sky-harbor-world.js",
+    "sha256": "fe978a5b5c911a6a285c16f84b3414de58b89fa23f7506546ea479ab9b641726"
+  },
+  "spirit-rail-guests.js": {
+    "source": "mini projects/scene_voice_switcher/web/spirit-rail-guests.js",
+    "sha256": "66e0eefe01fdac19fe1b6c17827ac52a06285e0aacb7a9c266e16f7351e390b8"
+  },
+  "spirit-rail-world.js": {
+    "source": "mini projects/scene_voice_switcher/web/spirit-rail-world.js",
+    "sha256": "b106c2f935e2bc32139fc17089715d29a5d06152ac6d98f674a3101cb7d49358"
+  },
+  "stage.js": {
+    "source": "mini projects/scene_voice_switcher/web/stage.js",
+    "sha256": "470d18f773715e1820b1717145b561b262a2aefaf0580891a1fddee01608e28c"
+  },
+  "storm-coast-guests.js": {
+    "source": "mini projects/scene_voice_switcher/web/storm-coast-guests.js",
+    "sha256": "0fdd7ab8efd9bced2e34594a1188fe3eeddfff96b079b268ac56bf1be744d3b4"
+  },
+  "storm-coast-world.js": {
+    "source": "mini projects/scene_voice_switcher/web/storm-coast-world.js",
+    "sha256": "c3d46f0f1ac79264d7bfd6ad32616d26ca98f516247ae0ff4bbdc4a96ac6a5e7"
+  },
+  "studio.css": {
+    "source": "mini projects/scene_voice_switcher/web/studio.css",
+    "sha256": "822133a0b3e09b3fec859676f6e87c5ff2beea981b5c4e1a3faaea204cf8745f"
+  },
+  "studio.html": {
+    "source": "mini projects/scene_voice_switcher/web/studio.html",
+    "sha256": "ed6032b097898d742084f160981af8a944b85ff87f3fa38942a1c112eb746e2e"
+  },
+  "studio.js": {
+    "source": "mini projects/scene_voice_switcher/web/studio.js",
+    "sha256": "76d425b2866d763aba7a60dfd864e808ea2c120e7be1260eb0a0f8c9c903964d"
+  },
+  "tavern-guests.js": {
+    "source": "mini projects/scene_voice_switcher/web/tavern-guests.js",
+    "sha256": "b139a8417955835a1eb719d544f486a153976d107b6a2095c638800d8c18813c"
+  },
+  "tavern-world.js": {
+    "source": "mini projects/scene_voice_switcher/web/tavern-world.js",
+    "sha256": "18744191dcc3fd07dd39cf741584697f81e91ee7e022cf033c59cc17ade11edf"
+  },
+  "travel-ink.js": {
+    "source": "mini projects/scene_voice_switcher/web/travel-ink.js",
+    "sha256": "5f0acfedf55326960186708bfb2b6fd7ee8e98be8cda941419cf61ea43336ff8"
+  },
+  "world-ink.js": {
+    "source": "mini projects/scene_voice_switcher/web/world-ink.js",
+    "sha256": "d32598bef9cde6fd2fe4defa7994f608c498d8c0d925787ad3093c5aa745f36f"
+  },
+  "worlds.js": {
+    "source": "mini projects/scene_voice_switcher/web/worlds.js",
+    "sha256": "b07b3f7ef0af248a6fcd59872b5ec35a66ca7462c661366b44a1a0ab07485225"
+  },
+  "shared/world-motion.js": {
+    "source": "lib/browser_effects/web/world-motion.js",
+    "sha256": "183d151c12d4e67f8ee07b8c51ff94417c9ac7e4d417a4595633fdf5d92111da"
+  }
+}

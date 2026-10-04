@@ -1,0 +1,258 @@
+{
+  "module": {
+    "id": "lobby_screens",
+    "label": "Lobby screens",
+    "group": "Stream production",
+    "description": "Spirit Afterparty screens, eighteen surprises and organic autonomous choreography.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "lobby_screens.import",
+      "label": "Add screen media",
+      "topic": "Asset management",
+      "trigger": {
+        "kind": "control",
+        "label": "Add screen media"
+      },
+      "steps": [
+        {
+          "id": "receive",
+          "owner": "lobby_screens",
+          "label": "Copy a bounded upload and verify its format",
+          "kind": "action",
+          "detail": "Up to 80 MB; finite reads and cancellation use the existing HTTP request lifetime."
+        },
+        {
+          "id": "save",
+          "owner": "lobby_screens",
+          "label": "Snapshot history and publish the complete catalog atomically",
+          "kind": "action"
+        },
+        {
+          "id": "release",
+          "owner": "lobby_screens",
+          "label": "Preserve originals and remove incomplete copies",
+          "kind": "end"
+        }
+      ],
+      "edges": [
+        {
+          "from": "receive",
+          "to": "save"
+        },
+        {
+          "from": "save",
+          "to": "release"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "spirit_lobby/library.py",
+          "symbol": "Library.import_stream",
+          "hash": "71d497659188c10f1fc14a7b5d7bce34c893ca871902e1e141db8938e437ca99"
+        },
+        {
+          "path": "spirit_lobby/library.py",
+          "symbol": "Library._change",
+          "hash": "ccb61bfce7646ec46c72da2075dd86172c94f0065c66f6854c1d86b7726dddd8"
+        }
+      ],
+      "owner_hashes": {
+        "lobby_screens": "a36a0a9fab1c0312b4e1d6640e25a6d3cc5f4b6b5288b139145556ee3629a95c"
+      }
+    },
+    {
+      "id": "lobby_screens.display",
+      "label": "Apply display choices",
+      "topic": "Presentation",
+      "trigger": {
+        "kind": "control",
+        "label": "Apply screens to OBS"
+      },
+      "steps": [
+        {
+          "id": "validate",
+          "owner": "lobby_screens",
+          "label": "Validate each screen choice and message",
+          "kind": "action"
+        },
+        {
+          "id": "publish",
+          "owner": "lobby_screens",
+          "label": "Snapshot and merge into the latest catalog",
+          "kind": "action",
+          "detail": "Unknown fields and malformed personal entries are preserved; invalid files are not reset."
+        },
+        {
+          "id": "show",
+          "owner": "lobby_screens",
+          "label": "Active browser displays refresh the saved selection",
+          "kind": "end",
+          "detail": "The existing document loop owns bounded catalog refresh and four media slots; hidden documents pause media, abort refresh and release animation. No program-scene or audio changes."
+        }
+      ],
+      "edges": [
+        {
+          "from": "validate",
+          "to": "publish"
+        },
+        {
+          "from": "publish",
+          "to": "show"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "spirit_lobby/library.py",
+          "symbol": "Library.save",
+          "hash": "54b017abc91e2b580f883878538a9f3e7adb450257a259aca292d6378006816f"
+        },
+        {
+          "path": "hub_ui/routes/spirit_lobby.py",
+          "symbol": "SpiritLobbyRoutes._post_spirit_lobby",
+          "hash": "864bbaba9c05bdcca038f214a6b3d6653b2d922dda63046fa63946afe5c9c6b5"
+        }
+      ],
+      "owner_hashes": {
+        "lobby_screens": "a36a0a9fab1c0312b4e1d6640e25a6d3cc5f4b6b5288b139145556ee3629a95c"
+      }
+    },
+    {
+      "id": "lobby_screens.party",
+      "label": "Play overlapping party accents",
+      "topic": "Presentation",
+      "trigger": {
+        "kind": "control",
+        "label": "Wake up the room button or Interact key"
+      },
+      "steps": [
+        {
+          "id": "cue",
+          "owner": "lobby_screens",
+          "label": "Validate a named action and unique cue identity",
+          "kind": "action",
+          "detail": "The stateless feature catalog owns labels, keys, drawing stages and finite lifetimes."
+        },
+        {
+          "id": "relay",
+          "owner": "lobby_screens",
+          "label": "Relay the cue through existing Hub browser transport",
+          "kind": "action",
+          "detail": "No OBS writes, new bus or global worker. Visible documents own one SSE stream; hide and teardown close it."
+        },
+        {
+          "id": "admit",
+          "owner": "lobby_screens",
+          "label": "Add an independent accent without replacing accepted work",
+          "kind": "action",
+          "detail": "Deduplicate local/server echoes and discard delivery older than four seconds. Limit 24 instances and 1,600 drawing units; decline excess new work. Repeated waves queue and alternate hands."
+        },
+        {
+          "id": "release",
+          "owner": "lobby_screens",
+          "label": "Expire accents and release document-owned resources",
+          "kind": "end",
+          "detail": "One existing frame loop draws effects; foreground clips the camera opening. Teardown empties instances and cancels bounded HTTP requests."
+        }
+      ],
+      "edges": [
+        {
+          "from": "cue",
+          "to": "relay"
+        },
+        {
+          "from": "relay",
+          "to": "admit"
+        },
+        {
+          "from": "admit",
+          "to": "release"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "spirit_lobby/actions.py",
+          "symbol": "envelope",
+          "hash": "c346a271e7335a12cb1c9089908d18d5db540d39eaeb409088a8bfda2cff835f"
+        },
+        {
+          "path": "hub_ui/routes/spirit_lobby.py",
+          "symbol": "SpiritLobbyRoutes._post_spirit_lobby",
+          "hash": "864bbaba9c05bdcca038f214a6b3d6653b2d922dda63046fa63946afe5c9c6b5"
+        },
+        {
+          "path": "hub_ui/updates.py",
+          "symbol": "broadcast",
+          "hash": "d8bfab1d893f2bea1256f95c738fad062abb05c4c244073bcf4c9e9c86f8fe73"
+        }
+      ],
+      "owner_hashes": {
+        "lobby_screens": "a36a0a9fab1c0312b4e1d6640e25a6d3cc5f4b6b5288b139145556ee3629a95c"
+      }
+    },
+    {
+      "id": "lobby_screens.ambient",
+      "label": "Let the party run itself",
+      "topic": "Presentation",
+      "trigger": {
+        "kind": "control",
+        "label": "Open a visible lobby with automatic party enabled"
+      },
+      "steps": [
+        {
+          "id": "plan",
+          "owner": "lobby_screens",
+          "label": "Join varied shared-clock party phrases",
+          "kind": "action",
+          "detail": "The canonical action catalog supplies finite lifetime, novelty weight and visual impact. Gentle/lively/wild rhythm and Motion scale gaps; phrases never form a repeating playlist."
+        },
+        {
+          "id": "choose",
+          "owner": "lobby_screens",
+          "label": "Mix surprises using soft visual pressure and recent variety",
+          "kind": "action",
+          "detail": "Favor lighter accents during busy moments, sometimes add a companion, and suppress some new arrivals around manual bursts. No required visible count; original lights and penguins keep moving."
+        },
+        {
+          "id": "paint",
+          "owner": "lobby_screens",
+          "label": "Admit independent accents in the existing frame loop",
+          "kind": "action",
+          "detail": "Both OBS layers compute matching identities, seeds and ages locally. New ambient work cannot reset a manual animation. Camera opening stays clear."
+        },
+        {
+          "id": "release",
+          "owner": "lobby_screens",
+          "label": "Release work when hidden or closed",
+          "kind": "end",
+          "detail": "No new global timer, worker or broadcast. Hidden/paused documents do not schedule; resume joins the current party without backlog. Cache at most four phrases and 256 attempt IDs; teardown clears both."
+        }
+      ],
+      "edges": [
+        {
+          "from": "plan",
+          "to": "choose"
+        },
+        {
+          "from": "choose",
+          "to": "paint"
+        },
+        {
+          "from": "paint",
+          "to": "release"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "spirit_lobby/actions.py",
+          "symbol": "catalog",
+          "hash": "ec7c8a2aa53d97ac3a880233468788c3dd9ebb504ce7ad79063e6574b28eb304"
+        }
+      ],
+      "owner_hashes": {
+        "lobby_screens": "a36a0a9fab1c0312b4e1d6640e25a6d3cc5f4b6b5288b139145556ee3629a95c"
+      }
+    }
+  ]
+}

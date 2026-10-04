@@ -16,6 +16,15 @@ from lib.project_registry import (
 )
 
 
+from lib.hub_runtime.projects import _StartupSignal, _run_target, _join_projects, partition_obs_projects
+from lib.hub_runtime.projects import _start_projects as _start_project_workers
+
+
+def _start_projects(projects, stop_event):
+    return _start_project_workers(projects, stop_event,
+                                  ready_timeout=PROJECT_START_READY_TIMEOUT_SECONDS)
+
+
 PROJECT_START_READY_TIMEOUT_SECONDS = 20.0
 
 
@@ -50,22 +59,6 @@ def _configure_runtime(debug: bool) -> None:
         log.set_level(log.DEBUG)
     from lib.process_priority import raise_priority
     raise_priority()
-
-
-def _run_target(
-    run_fn,
-    project_queue: queue.Queue,
-    stop_event: threading.Event,
-    done_queue: queue.Queue,
-    startup_event: threading.Event,
-):
-    params = inspect.signature(run_fn).parameters
-    kwargs = {}
-    if "done_queue" in params:
-        kwargs["done_queue"] = done_queue
-    if "startup_event" in params:
-        kwargs["startup_event"] = startup_event
-    return lambda: run_fn(project_queue, stop_event, **kwargs)
 
 
 def _print_project_table(projects: list) -> None:
@@ -112,32 +105,9 @@ def _check_obs_connection() -> bool:
         return False
 
 
-def _start_projects(projects: list, stop_event: threading.Event) -> None:
-    done_queue: queue.Queue[str] = queue.Queue()
-
-    for project in projects:
-        startup_event = threading.Event()
-        target = _run_target(project.module.run, project.queue, stop_event, done_queue, startup_event)
-        thread = threading.Thread(target=target, name=project.name, daemon=True)
-        thread.start()
-        project.thread = thread
-        if startup_event.wait(timeout=PROJECT_START_READY_TIMEOUT_SECONDS):
-            print(f"  [{project.name}] Startup ready.")
-            continue
-        if not thread.is_alive():
-            print(f"  [{project.name}] Startup thread exited before ready signal.")
-        else:
-            print(
-                f"  [{project.name}] Startup ready signal timed out after "
-                f"{PROJECT_START_READY_TIMEOUT_SECONDS:.0f}s; continuing."
-            )
-
-    print("  Selected projects running.\n")
-
-
 def _start_voice(stop_event: threading.Event) -> None:
     try:
-        from voice import listener as voice_mod
+        from voice.service import service as voice_mod
 
         voice_mod.start(stop_event)
         print("  [voice] Whisper listener starting.")
@@ -158,15 +128,6 @@ def _wait_for_shutdown(stop_event: threading.Event) -> None:
         stop_event.set()
 
 
-def _join_projects(projects: list) -> None:
-    for project in projects:
-        thread = project.thread
-        if thread and thread.is_alive():
-            thread.join(timeout=3)
-            if thread.is_alive():
-                log.warn("hub", f"'{project.name}' did not stop within 3 s.")
-
-
 def run_hub(
     stop_event: threading.Event,
     *,
@@ -175,6 +136,21 @@ def run_hub(
     debug: bool = False,
     wait_for_obs: bool = True,
 ) -> list:
+    """Start the Hub and release partially started resources on failure."""
+    from lib.runtime_cleanup import run_cleanup
+    from lib.global_hotkeys import shutdown_global_hotkeys
+    projects = []
+    try:
+        return _run_hub(stop_event, only=only, skip=skip, debug=debug,
+                        wait_for_obs=wait_for_obs, started_projects=projects)
+    except BaseException:
+        stop_event.set()
+        from lib.coordination.scene_events import join_scene_events
+        run_cleanup('hub-startup', lambda: _join_projects(projects), shutdown_global_hotkeys, join_scene_events)
+        raise
+
+
+def _run_hub(stop_event, *, only, skip, debug, wait_for_obs, started_projects) -> list:
     """
     Start all hub mini-project threads and return the list of started projects.
 
@@ -184,6 +160,13 @@ def run_hub(
     waiting for OBS so it retains its fail-fast behavior when OBS is unavailable.
     """
     _configure_runtime(debug)
+    from lib.media_jobs import jobs
+    jobs.bind(stop_event)
+
+    from coordinator import coordinator
+    coordinator.bind(stop_event)
+    from lib.coordination.scene_events import start_scene_events
+    start_scene_events(stop_event)
 
     from lib.settings_backups import start_settings_backups
     start_settings_backups(stop_event)
@@ -197,11 +180,13 @@ def run_hub(
 
     projects = discover_runnable_projects(logger=log)
 
-    import hub_rules  # noqa: F401
+    import hub_rules
+    hub_rules.initialize()
 
     only_names = normalize_project_names(only)
     skip_names = normalize_project_names(skip)
     projects = filter_projects(projects, only=only_names, skip=skip_names, logger=log)
+    started_projects.extend(projects)
 
     if not projects:
         print("\n  [ERROR] No mini projects selected.")
@@ -213,11 +198,8 @@ def run_hub(
         _start_voice(stop_event)
         _start_projects(projects, stop_event)
     else:
-        # Keep the League editor available without opening OBS. Other modules
-        # initialize once OBS connects, using this same Hub and keyboard worker.
-        offline_names = {'league_api', 'twitch_celebrations'}
-        offline = [p for p in projects if p.name in offline_names]
-        pending = [p for p in projects if p.name not in offline_names]
+        # Features publish their dependency; deferred workers start once OBS connects.
+        offline, pending = partition_obs_projects(projects)
         _start_projects(offline, stop_event)
         def await_obs():
             from obs import get_obs
@@ -227,11 +209,15 @@ def run_hub(
                 except Exception:
                     continue
                 if stop_event.is_set(): return
-                _start_voice(stop_event)
-                _start_projects(pending, stop_event)
+                try:
+                    _start_voice(stop_event)
+                    _start_projects(pending, stop_event)
+                except BaseException:
+                    stop_event.set()
+                    raise
                 return
         threading.Thread(target=await_obs, name='hub_wait_for_obs', daemon=True).start()
-        print('  League editor and Twitch alerts available. Other modules will start when OBS connects.')
+        print('  OBS-independent modules available. Playback modules will start when OBS connects.')
 
     return projects
 

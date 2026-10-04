@@ -11,10 +11,10 @@ from urllib.parse import urlparse
 import requests
 
 SCOPES = 'moderator:read:followers channel:read:subscriptions bits:read'
-AUTH_SCOPES = SCOPES + ' clips:edit'
+AUTH_SCOPES = SCOPES + ' clips:edit user:write:chat'
 EVENTS = [('channel.raid','1','raid'), ('channel.follow','2','follow'),
           ('channel.subscribe','1','subscribe'), ('channel.subscription.gift','1','gift'),
-          ('channel.cheer','1','cheer')]
+          ('channel.cheer','1','cheer'), ('channel.subscription.message','1','resub')]
 
 
 class Twitch:
@@ -34,8 +34,11 @@ class Twitch:
         self.subscriptions = {}
         self.last_event = None
         self.last_validated = 0
+        self.chat_identity = None
 
     def validate_token(self, token):
+        with self.lock:
+            self.chat_identity = None
         response = requests.get('https://id.twitch.tv/oauth2/validate',
                                 headers={'Authorization':'OAuth '+token}, timeout=15)
         response.raise_for_status()
@@ -43,7 +46,33 @@ class Twitch:
         if info.get('user_id') != os.environ.get('TWITCH_BROADCASTER_ID') or info.get('client_id') != os.environ.get('TWITCH_CLIENT_ID'):
             raise ValueError('Saved Twitch authorization belongs to another account or application. Connect Twitch again.')
         self.last_validated = time.monotonic()
+        with self.lock:
+            self.chat_identity = dict(info, token=token)
         return info
+
+    def chat_status(self, channel):
+        with self.lock:
+            info = self.chat_identity or {}
+            ready = bool(self.tokens and info.get('token') == self.tokens.get('access_token') and
+                         time.monotonic()-self.last_validated < 3300 and
+                         info.get('login','').lower() == channel and 'user:write:chat' in info.get('scopes',[]))
+            message = ('Ready · replies from @'+channel if ready else
+                       'Connect Twitch to enable replies' if not self.tokens else
+                       'Checking Twitch authorization' if not info else
+                       'Chat channel must match the connected broadcaster' if info.get('login','').lower()!=channel else
+                       'Reconnect Twitch in Twitch Celebrations to allow chat replies')
+            return dict(ready=ready,message=message)
+
+    def chat_authorization(self, channel):
+        if not self.chat_status(channel)['ready']:
+            raise ValueError('Twitch chat authorization is unavailable')
+        token = self.token()
+        with self.lock:
+            if not self.chat_status(channel)['ready'] or self.stop.is_set():
+                raise ValueError('Twitch chat authorization changed')
+            identity = self.chat_identity
+            return dict(token=token,client_id=identity['client_id'],
+                        broadcaster_id=identity['user_id'],sender_id=identity['user_id'])
 
     def save_tokens(self, data):
         info = self.validate_token(data['access_token'])
@@ -202,5 +231,16 @@ class Twitch:
         if kind == 'subscribe' and event.get('is_gift'):
             return  # The aggregate gift event already celebrates this batch.
         name = event.get('from_broadcaster_user_name') if kind == 'raid' else event.get('user_name')
+        if kind == 'gift' and event.get('is_anonymous'):
+            name = 'Anonymous legend'
+        details = {'tier':event.get('tier')}
+        if kind == 'resub':
+            details.update(months=event.get('cumulative_months'), streak=event.get('streak_months'),
+                           message=(event.get('message') or {}).get('text'), renewal=True)
+            kind = 'subscribe'
         self.last_event = dict(kind=kind, name=name or 'Anonymous legend', received_at=time.time())
-        self.receive(kind, name or 'Anonymous legend', event.get('viewers',event.get('total',event.get('bits',1))), metadata['message_id'])
+        args = (kind, name or 'Anonymous legend', event.get('viewers',event.get('total',event.get('bits',1))), metadata['message_id'])
+        if kind in ('subscribe','gift'):
+            self.receive(*args, details=details)
+        else:
+            self.receive(*args)

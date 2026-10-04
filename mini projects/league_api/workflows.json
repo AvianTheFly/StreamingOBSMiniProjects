@@ -1,0 +1,1043 @@
+{
+  "module": {
+    "id": "league_api",
+    "label": "League production",
+    "group": "Game",
+    "icon": "spark",
+    "description": "Alerts, borders, client privacy and match-result shows.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "league_api.queue",
+      "label": "Queue or bans",
+      "topic": "Queue & bans",
+      "trigger": {
+        "label": "Queue or bans",
+        "event": "league_client.phase",
+        "kind": "poll"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Client automation enabled?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "",
+          "setting": {
+            "path": "mini projects/league_api/client_scenes.json",
+            "key": "enabled"
+          }
+        },
+        {
+          "id": "1",
+          "label": "Confirm queue or bans",
+          "owner": "league_api",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Wait for result / replay",
+          "owner": "league_api",
+          "kind": "wait",
+          "detail": "No source or scene handoff until its owner releases."
+        },
+        {
+          "id": "3",
+          "label": "Newer scene choice?",
+          "owner": "coordination",
+          "kind": "gate",
+          "detail": "An unchanged client phase cannot reclaim the screen."
+        },
+        {
+          "id": "4",
+          "label": "Request private lobby",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "5",
+          "label": "OBS chosen view",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "coordination": "5057221ec74a11ea01e1c0bcfeab93e331ec71244136a2611a9c0808591898a3",
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
+        "league_api": "058459ed8880d5b8f3a1adfb87c34fa2c8e1cff0aca51ded4d4e754f137b9b04"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/league_api/client_scenes.py",
+          "symbol": "ClientScenes.apply_pending",
+          "hash": "dc0b91d7d2323355492eccc00402e8b8f570d108513d7192c60b4974b696f7c0"
+        },
+        {
+          "path": "mini projects/league_api/client_scenes.py",
+          "symbol": "route",
+          "hash": "56184da343f20faec3f1a88d210e0289a2ed6e71c7cb63bc8e97eb4cf2569785"
+        }
+      ],
+      "effects": [
+        {
+          "resource": "scene",
+          "intent": "Show a private queue / bans lobby",
+          "role": "write",
+          "enabled_step": "0",
+          "protection": "SceneDirector serializes requests. A temporary reservation blocks automatic writes; a newer manual revision rejects delayed intent.",
+          "cases": {
+            "normal": {
+              "status": "ready",
+              "text": "Can request its destination if its captured manual revision is still current."
+            },
+            "result": {
+              "status": "wait",
+              "text": "Waits for the real result presentation or the bounded finish grace to expire. A preview does not hold automatic routing."
+            },
+            "temporary": {
+              "status": "wait",
+              "text": "Automatic routing cannot take a reserved scene. The switcher stores one deferred destination; client automation keeps its own pending target and retries."
+            },
+            "manual": {
+              "status": "skip",
+              "text": "If this intent was captured before your scene choice, it is stale and cannot overwrite that choice. A genuinely new trigger may create new intent."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "league_api.champions",
+      "label": "Champion picks",
+      "topic": "Champion picks",
+      "trigger": {
+        "label": "Champion picks",
+        "event": "league_client.phase",
+        "kind": "poll"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Client automation enabled?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "",
+          "setting": {
+            "path": "mini projects/league_api/client_scenes.json",
+            "key": "enabled"
+          }
+        },
+        {
+          "id": "1",
+          "label": "Confirm champion picks",
+          "owner": "league_api",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Wait for result / replay",
+          "owner": "league_api",
+          "kind": "wait",
+          "detail": "No source or scene handoff until its owner releases."
+        },
+        {
+          "id": "3",
+          "label": "Newer scene choice?",
+          "owner": "coordination",
+          "kind": "gate",
+          "detail": "An unchanged client phase cannot reclaim the screen."
+        },
+        {
+          "id": "4",
+          "label": "Request champion presentation",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "5",
+          "label": "OBS chosen view",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "coordination": "5057221ec74a11ea01e1c0bcfeab93e331ec71244136a2611a9c0808591898a3",
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
+        "league_api": "058459ed8880d5b8f3a1adfb87c34fa2c8e1cff0aca51ded4d4e754f137b9b04"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/league_api/client_scenes.py",
+          "symbol": "ClientScenes.apply_pending",
+          "hash": "dc0b91d7d2323355492eccc00402e8b8f570d108513d7192c60b4974b696f7c0"
+        },
+        {
+          "path": "mini projects/league_api/client_scenes.py",
+          "symbol": "route",
+          "hash": "56184da343f20faec3f1a88d210e0289a2ed6e71c7cb63bc8e97eb4cf2569785"
+        }
+      ],
+      "effects": [
+        {
+          "resource": "scene",
+          "intent": "Show the champion presentation",
+          "role": "write",
+          "enabled_step": "0",
+          "protection": "SceneDirector serializes requests. A temporary reservation blocks automatic writes; a newer manual revision rejects delayed intent.",
+          "cases": {
+            "normal": {
+              "status": "ready",
+              "text": "Can request its destination if its captured manual revision is still current."
+            },
+            "result": {
+              "status": "wait",
+              "text": "Waits for the real result presentation or the bounded finish grace to expire. A preview does not hold automatic routing."
+            },
+            "temporary": {
+              "status": "wait",
+              "text": "Automatic routing cannot take a reserved scene. The switcher stores one deferred destination; client automation keeps its own pending target and retries."
+            },
+            "manual": {
+              "status": "skip",
+              "text": "If this intent was captured before your scene choice, it is stale and cannot overwrite that choice. A genuinely new trigger may create new intent."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "league_api.idle",
+      "label": "Between games",
+      "topic": "Game ends",
+      "trigger": {
+        "label": "Between games",
+        "event": "league_client.phase",
+        "kind": "poll"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Client automation enabled?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "",
+          "setting": {
+            "path": "mini projects/league_api/client_scenes.json",
+            "key": "enabled"
+          }
+        },
+        {
+          "id": "1",
+          "label": "Confirm between games",
+          "owner": "league_api",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Wait for result / replay",
+          "owner": "league_api",
+          "kind": "wait",
+          "detail": "No source or scene handoff until its owner releases."
+        },
+        {
+          "id": "3",
+          "label": "Newer scene choice?",
+          "owner": "coordination",
+          "kind": "gate",
+          "detail": "An unchanged client phase cannot reclaim the screen."
+        },
+        {
+          "id": "4",
+          "label": "Request idle view",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "5",
+          "label": "OBS chosen view",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "coordination": "5057221ec74a11ea01e1c0bcfeab93e331ec71244136a2611a9c0808591898a3",
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
+        "league_api": "058459ed8880d5b8f3a1adfb87c34fa2c8e1cff0aca51ded4d4e754f137b9b04"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/league_api/client_scenes.py",
+          "symbol": "ClientScenes.apply_pending",
+          "hash": "dc0b91d7d2323355492eccc00402e8b8f570d108513d7192c60b4974b696f7c0"
+        },
+        {
+          "path": "mini projects/league_api/client_scenes.py",
+          "symbol": "route",
+          "hash": "56184da343f20faec3f1a88d210e0289a2ed6e71c7cb63bc8e97eb4cf2569785"
+        }
+      ],
+      "effects": [
+        {
+          "resource": "scene",
+          "intent": "Show the configured idle destination",
+          "role": "write",
+          "enabled_step": "0",
+          "protection": "SceneDirector serializes requests. A temporary reservation blocks automatic writes; a newer manual revision rejects delayed intent. An unchanged client target is not repeatedly applied.",
+          "cases": {
+            "normal": {
+              "status": "ready",
+              "text": "Can request its destination if its captured manual revision is still current."
+            },
+            "result": {
+              "status": "wait",
+              "text": "Waits for the real result presentation or the bounded finish grace to expire. A preview does not hold automatic routing."
+            },
+            "temporary": {
+              "status": "wait",
+              "text": "Automatic routing cannot take a reserved scene. The switcher stores one deferred destination; client automation keeps its own pending target and retries."
+            },
+            "manual": {
+              "status": "skip",
+              "text": "If this intent was captured before your scene choice, it is stale and cannot overwrite that choice. A genuinely new trigger may create new intent."
+            }
+          },
+          "watch": "A confirmed pending phase may still apply after the client closes. Manual revision is checked again before application."
+        }
+      ]
+    },
+    {
+      "id": "league_api.kill",
+      "label": "Your champion kill",
+      "topic": "Your kill",
+      "trigger": {
+        "label": "Your champion kill",
+        "event": "league_api:kill",
+        "kind": "poll"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Detect fresh evidence",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "Old snapshot events establish a baseline. Inferred signals remain inferred."
+        },
+        {
+          "id": "1",
+          "label": "Production borders enabled?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "",
+          "setting": {
+            "path": "mini projects/league_api/production.json",
+            "key": "enabled"
+          }
+        },
+        {
+          "id": "2",
+          "label": "Border / result presentation",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Otherwise: alert enabled?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "Clip rules have their own switches."
+        },
+        {
+          "id": "4",
+          "label": "Cooldown & priority allow?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "Spacing, family upgrades and bounded slots decide what appears."
+        },
+        {
+          "id": "5",
+          "label": "Clip alert in OBS",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
+        "league_api": "058459ed8880d5b8f3a1adfb87c34fa2c8e1cff0aca51ded4d4e754f137b9b04"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2",
+          "label": "on"
+        },
+        {
+          "from": "1",
+          "to": "3",
+          "label": "off"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/league_api/engine.py",
+          "symbol": "Engine.submit",
+          "hash": "7eef7f76c0b3798f0b80bd8142a76911f4f74ed1f048a7c533633a0072dadc62"
+        },
+        {
+          "path": "mini projects/league_api/production/director.py",
+          "symbol": "ProductionDirector.ingest",
+          "hash": "7a1c2a492e47a8d60285ebd0f98719f1685a2c90dfda65a416f4cfe3f24d0749"
+        }
+      ]
+    },
+    {
+      "id": "league_api.death",
+      "label": "You die",
+      "topic": "Death & respawn",
+      "trigger": {
+        "label": "You die",
+        "event": "league_api:death",
+        "kind": "poll"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Detect fresh evidence",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "Old snapshot events establish a baseline. Inferred signals remain inferred."
+        },
+        {
+          "id": "1",
+          "label": "Production borders enabled?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "",
+          "setting": {
+            "path": "mini projects/league_api/production.json",
+            "key": "enabled"
+          }
+        },
+        {
+          "id": "2",
+          "label": "Border / result presentation",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Otherwise: alert enabled?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "Clip rules have their own switches."
+        },
+        {
+          "id": "4",
+          "label": "Cooldown & priority allow?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "Spacing, family upgrades and bounded slots decide what appears."
+        },
+        {
+          "id": "5",
+          "label": "Clip alert in OBS",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
+        "league_api": "058459ed8880d5b8f3a1adfb87c34fa2c8e1cff0aca51ded4d4e754f137b9b04"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2",
+          "label": "on"
+        },
+        {
+          "from": "1",
+          "to": "3",
+          "label": "off"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/league_api/engine.py",
+          "symbol": "Engine.submit",
+          "hash": "7eef7f76c0b3798f0b80bd8142a76911f4f74ed1f048a7c533633a0072dadc62"
+        },
+        {
+          "path": "mini projects/league_api/production/director.py",
+          "symbol": "ProductionDirector.ingest",
+          "hash": "7a1c2a492e47a8d60285ebd0f98719f1685a2c90dfda65a416f4cfe3f24d0749"
+        }
+      ]
+    },
+    {
+      "id": "league_api.respawn",
+      "label": "You respawn",
+      "topic": "Death & respawn",
+      "trigger": {
+        "label": "You respawn",
+        "event": "league_api:respawn",
+        "kind": "poll"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Detect fresh evidence",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "Old snapshot events establish a baseline. Inferred signals remain inferred."
+        },
+        {
+          "id": "1",
+          "label": "Production borders enabled?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "",
+          "setting": {
+            "path": "mini projects/league_api/production.json",
+            "key": "enabled"
+          }
+        },
+        {
+          "id": "2",
+          "label": "Border / result presentation",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Otherwise: alert enabled?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "Clip rules have their own switches."
+        },
+        {
+          "id": "4",
+          "label": "Cooldown & priority allow?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "Spacing, family upgrades and bounded slots decide what appears."
+        },
+        {
+          "id": "5",
+          "label": "Clip alert in OBS",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
+        "league_api": "058459ed8880d5b8f3a1adfb87c34fa2c8e1cff0aca51ded4d4e754f137b9b04"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2",
+          "label": "on"
+        },
+        {
+          "from": "1",
+          "to": "3",
+          "label": "off"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/league_api/engine.py",
+          "symbol": "Engine.submit",
+          "hash": "7eef7f76c0b3798f0b80bd8142a76911f4f74ed1f048a7c533633a0072dadc62"
+        },
+        {
+          "path": "mini projects/league_api/production/director.py",
+          "symbol": "ProductionDirector.ingest",
+          "hash": "7a1c2a492e47a8d60285ebd0f98719f1685a2c90dfda65a416f4cfe3f24d0749"
+        }
+      ]
+    },
+    {
+      "id": "league_api.objectives",
+      "label": "An objective falls",
+      "topic": "Objectives",
+      "trigger": {
+        "label": "An objective falls",
+        "event": "league_api:*",
+        "kind": "poll"
+      },
+      "detail": "The director owns objective admission and elapsed time. Event acts last two to five seconds; legacy short saved overrides are retained and bounded only in presentation. Native elemental creatures, Void casts and structural acts develop from this existing elapsed clock. Hextech capture layers one approved crystal-wing discharge over the existing ambient border without restarting or duplicating it. Open light tails leave before their next entrance; all art stays within the gameplay edge mask, with no new timer or source owner.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Detect fresh evidence",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "Old snapshot events establish a baseline. Inferred signals remain inferred."
+        },
+        {
+          "id": "1",
+          "label": "Production borders enabled?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "",
+          "setting": {
+            "path": "mini projects/league_api/production.json",
+            "key": "enabled"
+          }
+        },
+        {
+          "id": "2",
+          "label": "Border / result presentation",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Otherwise: alert enabled?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "Clip rules have their own switches."
+        },
+        {
+          "id": "4",
+          "label": "Cooldown & priority allow?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "Spacing, family upgrades and bounded slots decide what appears."
+        },
+        {
+          "id": "5",
+          "label": "Clip alert in OBS",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "league_api": "5f47c337c39a13a2d8b64e2af9029c21bb1d2138cc3e0f8174fc9b15d4c4cc73",
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2",
+          "label": "on"
+        },
+        {
+          "from": "1",
+          "to": "3",
+          "label": "off"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/league_api/engine.py",
+          "symbol": "Engine.submit",
+          "hash": "7eef7f76c0b3798f0b80bd8142a76911f4f74ed1f048a7c533633a0072dadc62"
+        },
+        {
+          "path": "mini projects/league_api/production/director.py",
+          "symbol": "ProductionDirector.ingest",
+          "hash": "7a1c2a492e47a8d60285ebd0f98719f1685a2c90dfda65a416f4cfe3f24d0749"
+        }
+      ]
+    },
+    {
+      "id": "league_api.progress",
+      "label": "Level, items or health change",
+      "topic": "Player changes",
+      "trigger": {
+        "label": "Level, items or health change",
+        "event": "league_api:*",
+        "kind": "poll"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Detect fresh evidence",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "Old snapshot events establish a baseline. Inferred signals remain inferred."
+        },
+        {
+          "id": "1",
+          "label": "Production borders enabled?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "",
+          "setting": {
+            "path": "mini projects/league_api/production.json",
+            "key": "enabled"
+          }
+        },
+        {
+          "id": "2",
+          "label": "Border / result presentation",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Otherwise: alert enabled?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "Clip rules have their own switches."
+        },
+        {
+          "id": "4",
+          "label": "Cooldown & priority allow?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "Spacing, family upgrades and bounded slots decide what appears."
+        },
+        {
+          "id": "5",
+          "label": "Clip alert in OBS",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
+        "league_api": "058459ed8880d5b8f3a1adfb87c34fa2c8e1cff0aca51ded4d4e754f137b9b04"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2",
+          "label": "on"
+        },
+        {
+          "from": "1",
+          "to": "3",
+          "label": "off"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/league_api/engine.py",
+          "symbol": "Engine.submit",
+          "hash": "7eef7f76c0b3798f0b80bd8142a76911f4f74ed1f048a7c533633a0072dadc62"
+        },
+        {
+          "path": "mini projects/league_api/production/director.py",
+          "symbol": "ProductionDirector.ingest",
+          "hash": "7a1c2a492e47a8d60285ebd0f98719f1685a2c90dfda65a416f4cfe3f24d0749"
+        }
+      ]
+    },
+    {
+      "id": "league_api.result",
+      "label": "Victory or defeat",
+      "topic": "Game ends",
+      "trigger": {
+        "label": "Victory or defeat",
+        "event": "league_api:*",
+        "kind": "poll"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Detect fresh evidence",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "Old snapshot events establish a baseline. Inferred signals remain inferred."
+        },
+        {
+          "id": "1",
+          "label": "Production borders enabled?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "",
+          "setting": {
+            "path": "mini projects/league_api/production.json",
+            "key": "enabled"
+          }
+        },
+        {
+          "id": "2",
+          "label": "Border / result presentation",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Otherwise: alert enabled?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "Clip rules have their own switches."
+        },
+        {
+          "id": "4",
+          "label": "Cooldown & priority allow?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "Spacing, family upgrades and bounded slots decide what appears."
+        },
+        {
+          "id": "5",
+          "label": "Clip alert in OBS",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
+        "league_api": "058459ed8880d5b8f3a1adfb87c34fa2c8e1cff0aca51ded4d4e754f137b9b04"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2",
+          "label": "on"
+        },
+        {
+          "from": "1",
+          "to": "3",
+          "label": "off"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/league_api/engine.py",
+          "symbol": "Engine.submit",
+          "hash": "7eef7f76c0b3798f0b80bd8142a76911f4f74ed1f048a7c533633a0072dadc62"
+        },
+        {
+          "path": "mini projects/league_api/production/director.py",
+          "symbol": "ProductionDirector.ingest",
+          "hash": "7a1c2a492e47a8d60285ebd0f98719f1685a2c90dfda65a416f4cfe3f24d0749"
+        },
+        {
+          "path": "mini projects/league_api/match_screens.py",
+          "symbol": "MatchScreens.scene_hold",
+          "hash": "ff8dc29c6df6c21f6ff4817c26773d4f8e25b3a002d49077d7e7ecf542cc9884"
+        },
+        {
+          "path": "mini projects/league_api/match_screens.py",
+          "symbol": "MatchScreens._show",
+          "hash": "2e3492c5b6dcfbbb8fdaeac3a8c9e9d10874dec733bd8d69d48d89a31b1f88bb"
+        }
+      ],
+      "effects": [
+        {
+          "resource": "overlay",
+          "intent": "Show observed victory / defeat art",
+          "role": "write",
+          "protection": "Only fresh observed evidence selects result artwork. Production, lifecycle, match-screen and event switches plus available artwork gate this branch.",
+          "cases": {
+            "normal": {
+              "status": "check",
+              "text": "A real observed result and enabled artwork are needed. Losing the connection does not invent victory or defeat."
+            },
+            "result": {
+              "status": "effect",
+              "text": "The result presentation stays visible for its configured duration."
+            },
+            "temporary": {
+              "status": "check",
+              "text": "Artwork can be prepared independently. Its visibility depends on the current OBS scene and sources."
+            },
+            "manual": {
+              "status": "check",
+              "text": "Showing result artwork is separate from a program-scene request. Your scene may not include its source."
+            }
+          }
+        },
+        {
+          "resource": "scene",
+          "intent": "Hold automatic lobby return",
+          "role": "hold",
+          "protection": "Both automatic lobby routers consult the same game_scene_policy hold. This delays their return without owning a SceneSession.",
+          "cases": {
+            "normal": {
+              "status": "check",
+              "text": "Without an active result, a game-end transition may reserve a two-second grace if both result assets are available."
+            },
+            "result": {
+              "status": "hold",
+              "text": "A real result holds the return through its scheduled delay and duration. Preview artwork never holds the real client."
+            },
+            "temporary": {
+              "status": "wait",
+              "text": "Result timing and a temporary scene reservation are separate blockers. Both must clear before an automatic return."
+            },
+            "manual": {
+              "status": "effect",
+              "text": "This hold delays automatic returns. It does not block a deliberate scene choice."
+            }
+          },
+          "watch": "The hold controls cooperating automatic lobby routers, not every scene requester. Missing assets or disabled cinematic match screens remove it."
+        }
+      ]
+    }
+  ]
+}

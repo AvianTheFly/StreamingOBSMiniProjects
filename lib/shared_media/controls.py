@@ -129,3 +129,16 @@ def effective_volume_db(
         + volume_db(category_offset_db)
         + volume_db(file_offset_db)
     )
+
+
+def asset_volume_db(cfg, settings, stem: str) -> float:
+    """Resolve one asset's level from its current project/profile settings."""
+    categories = list(settings.sound_categories.get(stem, ())) if settings else []
+    category_db = settings.category_volume_db.get(categories[0], 0.0) if categories else 0.0
+    return effective_volume_db(
+        project_volume_db=cfg.project_volume_db + (settings.project_volume_db if settings else 0.0),
+        profile_volume_db=cfg.profile_volume_db + (settings.profile_volume_db if settings else 0.0),
+        category_offset_db=category_db,
+        file_offset_db=cfg.file_volume_offsets.get(stem, 0.0)
+            + (settings.file_volume_offsets.get(stem, 0.0) if settings else 0.0),
+    )

@@ -63,8 +63,22 @@ async function endpoint() {
     const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } }),
       errors = [];
     page.on('pageerror', (error) => errors.push(error.message));
+    await page.addInitScript(() => {
+      window.productionClears = 0;
+      const clear = CanvasRenderingContext2D.prototype.clearRect;
+      CanvasRenderingContext2D.prototype.clearRect = function (...args) {
+        if (this.canvas.id === 'production-effects') window.productionClears++;
+        return clear.apply(this, args);
+      };
+    });
     await page.goto(base + '/overlay?monitor=1');
-    await page.waitForFunction(() => window.leagueProduction);
+    await page.waitForFunction(() => window.leagueProduction).catch(error=>{
+      throw Error(error.message+'; overlay page errors: '+errors.join('; '));
+    });
+    const idleClears = await page.evaluate(() => window.productionClears);
+    await page.waitForTimeout(1100);
+    assert.equal(await page.evaluate(() => window.productionClears), idleClears,
+      'disabled production polling must not repeatedly clear the full canvas');
     await page.evaluate(async () => {
       const { ProductionScene } = await import('/production/scene.js');
       const canvas = document.createElement('canvas');
@@ -83,7 +97,7 @@ async function endpoint() {
           effect,
         });
         const pixels = window.testScene.c.getImageData(0, 0, 1920, 1080).data;
-        let edgeAlpha = 0,
+        let maxAlpha = 0, edgeAlpha = 0,
           centerAlpha = 0,
           filled = 0;
         for (let y = 0; y < 1080; y++)
@@ -91,11 +105,27 @@ async function endpoint() {
             const alpha = pixels[(y * 1920 + x) * 4 + 3];
             if (x >= 240 && x < 1680 && y >= 170 && y < 840) centerAlpha += alpha;
             else edgeAlpha += alpha;
-            if (alpha) filled++;
+            if (alpha) filled++;maxAlpha=Math.max(maxAlpha,alpha);
           }
-        return { edgeAlpha, centerAlpha, filled };
+        return { edgeAlpha, centerAlpha, filled, maxAlpha };
       };
     });
+    const hextechContinuity=await page.evaluate(async()=>{
+      const {hextechChargeSamples}=await import('/production/elements.js');
+      const open=[[0,0],[0,100],[100,100]],closed=[[0,0],[100,0],[100,100],[0,100],[0,0]];
+      let longest=0;
+      for(const path of [open,closed])for(let t=0;t<12;t+=.013){
+        for(const segment of hextechChargeSamples(path,t,100,0).segments){
+          const [a,b]=segment.points;longest=Math.max(longest,Math.hypot(a[0]-b[0],a[1]-b[1]));
+        }
+      }
+      const sample=t=>hextechChargeSamples(open,t,100,0);
+      return{longest,exiting:sample(2.4).head,finished:sample(2.9).segments.length,reentered:sample(3.4).head};
+    });
+    assert(hextechContinuity.longest<7,'Light trails cannot draw diagonal wraparound chords');
+    assert.equal(hextechContinuity.exiting,null,'Open circuit head exits before restarting');
+    assert.equal(hextechContinuity.finished,0,'Open circuit tail finishes before the next head');
+    assert(hextechContinuity.reentered,'Open circuit charge eventually reenters');
     for (const theme of ['earth', 'fire', 'water', 'air', 'hextech', 'chemtech', 'elder']) {
       const stats = await page.evaluate((theme) => window.renderProduction(theme), theme);
       assert.equal(stats.centerAlpha, 0, theme + ' center must be transparent');
@@ -138,6 +168,16 @@ async function endpoint() {
         });
     }
     const catalog = (await (await localRequest(base + '/production/settings')).json()).catalog;
+    const artCoverage=await page.evaluate(async()=>{const {EVENT_DESIGNS}=await import('/production/event-art.js');return {keys:Object.keys(EVENT_DESIGNS),unique:new Set(Object.values(EVENT_DESIGNS)).size};});
+    assert.deepEqual(artCoverage.keys.slice().sort(),catalog.map(e=>e.key).sort(),'Every built-in event must have an authored composition');
+    assert.equal(artCoverage.unique,catalog.length,'Every event has its own art direction');
+    const distinctArt=await page.evaluate(async catalog=>{
+      const {ProductionScene}=await import('/production/scene.js');const canvas=document.createElement('canvas');canvas.width=1920;canvas.height=1080;canvas.getContext('2d',{willReadFrequently:true});const scene=new ProductionScene(canvas);
+      const groups=new Map();for(const effect of catalog){scene.draw({enabled:true,opacity:.8,intensity:1.15,edge_width:56,effect:{...effect,title:'',elapsed:effect.duration*.5}});const hash=canvas.toDataURL();groups.set(hash,[...(groups.get(hash)||[]),effect.key]);}
+      return [...groups.values()].filter(keys=>keys.length>1);
+    },catalog);
+    assert.deepEqual(distinctArt,[],'Event artwork must differ even with all captions removed');
+
     let maxShowMs = 0;
     for (const effect of catalog) {
       for (const elapsed of [0.18, effect.duration * 0.5]) {
@@ -147,6 +187,7 @@ async function endpoint() {
         });
         assert.equal(stats.centerAlpha, 0, effect.key + ' must preserve gameplay center');
         assert(stats.filled > 500, effect.key + ' must have a visible border effect');
+        assert(stats.maxAlpha<=205,effect.key+' must honor the saved master strength');
       }
       if (
         [
@@ -180,6 +221,19 @@ async function endpoint() {
       maxShowMs = Math.max(maxShowMs, ms);
     }
     assert(maxShowMs < 30, 'Every show must fit a 30fps rendering budget');
+    const deathCheck=await page.evaluate(()=>{
+      const c=window.testScene.c;
+      const read=()=>{const pixels=c.getImageData(0,0,1920,1080).data;let filled=0,max=0;for(let i=3;i<pixels.length;i+=4){if(pixels[i])filled++;max=Math.max(max,pixels[i]);}return {filled,max};};
+      const draw=elapsed=>window.testScene.draw({enabled:true,opacity:.8,edge_width:56,death:{elapsed,remaining:18},effect:null,ambient:null});
+      draw(0);const entrance=read();draw(4);const visible=read();
+      const center=c.getImageData(240,170,1440,670).data.some((v,i)=>i%4===3&&v);
+      draw(15);const sustained=read();window.testScene.draw({enabled:true,opacity:.8});const ended=read();
+      return {entrance,visible,center,sustained,ended};
+    });
+    assert.equal(deathCheck.entrance.filled,0,'Death enters smoothly from clear');
+    assert(deathCheck.visible.filled>500&&deathCheck.sustained.filled>500,'Stasis persists through a real death');
+    assert(deathCheck.visible.max<=205);assert(deathCheck.visible.max>170);assert.equal(deathCheck.center,false);assert.equal(deathCheck.ended.filled,0);
+
     const timing = await page.evaluate(() => {
       const start = performance.now();
       for (let i = 0; i < 90; i++)
@@ -192,7 +246,7 @@ async function endpoint() {
         });
       return (performance.now() - start) / 90;
     });
-    assert(timing < 30, 'Cached stone rendering must stay within a 30fps frame budget');
+    assert(timing < 30, 'Ambient scenery must stay within a 30fps frame budget');
     // Polling/animation lifecycle with real production entry point.
     await page.evaluate(() => document.querySelector('#test-scene').remove());
     let live = {
@@ -216,19 +270,31 @@ async function endpoint() {
     const alpha = () =>
       page.evaluate(() => {
         const c = document.querySelector('#production-effects').getContext('2d');
-        return c.getImageData(120, 20, 1, 1).data[3];
+        return c.getImageData(0,0,1920,1080).data.some((v,i)=>i%4===3&&v) ? 1 : 0;
       });
     assert((await alpha()) > 0, 'Polling should start ambience');
     live = { ...live, ambient: null };
-    await page.waitForTimeout(650);
+    // Wait for the next 500ms poll and paint under load, bounded below the
+    // 2.5-second disconnected-source deadline; do not assume a 650ms wall clock.
+    await page.waitForFunction(() => !document.querySelector('#production-effects').getContext('2d').getImageData(0,0,1920,1080).data.some((v,i)=>i%4===3&&v),null,{timeout:2000});
     assert.equal(await alpha(), 0, 'Idle state clears canvas');
-    live = { ...live, ambient: { id: 'test2', theme: 'earth', elapsed: 2 } };
+    const painted = () => page.evaluate(() => {
+      const pixels=document.querySelector('#production-effects').getContext('2d').getImageData(0,0,1920,1080).data;
+      return pixels.some((value,index)=>index%4===3&&value>0);
+    });
+    live = { ...live, death: { elapsed: 4, remaining: 20 } };
     await page.waitForTimeout(650);
-    assert((await alpha()) > 0);
+    assert(await painted(), 'Death alone starts and sustains animation');
+    live = { ...live, death: null };
+    await page.waitForFunction(() => !document.querySelector('#production-effects').getContext('2d').getImageData(0,0,1920,1080).data.some((v,i)=>i%4===3&&v),null,{timeout:2000});
+    assert.equal(await painted(), false, 'Respawn clears persistent death frame');
+    live = { ...live, death: { elapsed: 6, remaining: 18 } };
+    await page.waitForTimeout(650);
+    assert(await painted());
     await page.unroute('**/state*');
     await page.route('**/state*', () => {});
     await page.waitForTimeout(2800);
-    assert.equal(await alpha(), 0, 'Lost transport clears persistent frame');
+    assert.equal(await painted(), false, 'Lost transport clears persistent death frame');
     await page.close();
     const editor = await browser.newPage();
     editor.on('pageerror', (error) => errors.push(error.message));
@@ -256,19 +322,20 @@ async function endpoint() {
     await editor.locator('#eventSearch').fill('takedown');
     const killCard = editor.locator('[data-effect=kill]');
     await killCard.getByLabel('TAKEDOWN Impact').fill('1.3');
-    await killCard.getByLabel('TAKEDOWN Seconds').fill('0.9');
+    assert.equal(await killCard.getByLabel('TAKEDOWN Seconds').getAttribute('min'), '2');
+    await killCard.getByLabel('TAKEDOWN Seconds').fill('2.3');
     await killCard.getByRole('checkbox').uncheck();
     await editor.locator('#eventGroup').selectOption('progression');
     await editor.locator('#eventSearch').fill('level');
     await editor.locator('#eventGroup').selectOption('all');
     await editor.locator('#eventSearch').fill('takedown');
-    assert.equal(await killCard.getByLabel('TAKEDOWN Seconds').inputValue(), '0.9');
+    assert.equal(await killCard.getByLabel('TAKEDOWN Seconds').inputValue(), '2.3');
     await editor.getByRole('button', { name: 'Save effect edits' }).click();
     await editor.locator('#eventSaveStatus').filter({ hasText: 'Effect edits saved.' }).waitFor();
     let controls = (await (await localRequest(base + '/production/settings')).json()).settings;
     assert.deepEqual(controls.event_options.kill, {
       intensity: 1.3,
-      duration: 0.9,
+      duration: 2.3,
       enabled: false,
     });
     await killCard.getByRole('button', { name: 'Preview', exact: true }).click();

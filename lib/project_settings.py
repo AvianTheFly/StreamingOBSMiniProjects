@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import json
+import math
 import threading
 from functools import wraps
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+from lib.json_store import write_json
 
 
 HotkeyValue = str | list[str]
@@ -172,7 +174,6 @@ def load_project_settings(
 @audio_settings_transaction
 def shift_asset_volume_db(project_dir: Path, stem: str, delta_db: float) -> bool:
     """Remember a fader adjustment only for the loaded asset in the live profile."""
-    import math
     delta = float(delta_db)
     if not math.isfinite(delta) or abs(delta) <= 0.05 or not stem:
         return False
@@ -185,12 +186,11 @@ def shift_asset_volume_db(project_dir: Path, stem: str, delta_db: float) -> bool
     offsets = profiles[selected].setdefault('file_volume_offsets', {})
     key = next((k for k in offsets if k.casefold() == stem.casefold()), stem)
     offsets[key] = round(float(offsets.get(key, 0.0)) + delta, 2)
-    temporary = path.with_suffix('.json.tmp')
-    temporary.write_text(json.dumps(state, indent=2, ensure_ascii=False), encoding='utf-8')
-    temporary.replace(path)
+    write_json(path, state)
     return True
 
 
+@audio_settings_transaction
 def shift_project_volume_db(
     project_dir: Path,
     delta_db: float,
@@ -204,7 +204,7 @@ def shift_project_volume_db(
     Per-file offsets remain intact; every profile's project level is shifted.
     """
     delta = float(delta_db)
-    if abs(delta) <= 0.05:
+    if not math.isfinite(delta) or abs(delta) <= 0.05:
         return False
 
     project_dir = Path(project_dir)
@@ -227,10 +227,7 @@ def shift_project_volume_db(
                 current = 0.0
             profile["project_volume_db"] = round(current + delta, 2)
             profiles[name] = profile
-        state_file.write_text(
-            json.dumps(state, indent=2, ensure_ascii=False),
-            encoding="utf-8",
-        )
+        write_json(state_file, state)
     return True
 
 

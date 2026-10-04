@@ -1,0 +1,168 @@
+{
+  "module": {
+    "id": "soundboard",
+    "label": "Soundboard",
+    "group": "Media",
+    "icon": "soundboard",
+    "description": "Matches keys or voice to personalized sounds.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "soundboard.trigger",
+      "label": "Trigger a sound",
+      "topic": "Sound & video",
+      "trigger": {
+        "label": "Trigger a sound",
+        "event": "source.request",
+        "kind": "control"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Match the active profile asset",
+          "owner": "soundboard",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Newest request wins",
+          "owner": "soundboard",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Apply your pause rules",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Old source cleans up first",
+          "owner": "media_workers",
+          "kind": "wait",
+          "detail": ""
+        },
+        {
+          "id": "4",
+          "label": "Load asset levels & layout",
+          "owner": "soundboard",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "5",
+          "label": "Sound and effect in OBS",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "soundboard": "c101fb0ea6fb1e7bb84232af22c3072a165a9bdefc8656574df2d5c40fb4fc3d",
+        "media_workers": "99a1a00f5854b87301b5e62b0837f5e035bf87e45a4552403c603e0e3de1f064",
+        "coordination": "5057221ec74a11ea01e1c0bcfeab93e331ec71244136a2611a9c0808591898a3",
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/soundboard/main.py",
+          "symbol": "run.play_asset",
+          "hash": "a72e931c6e4dd31f8d269c01b182c57a68d97956b896505daab15bcaa61ef2fe"
+        }
+      ]
+    },
+    {
+      "id": "soundboard.random",
+      "label": "Start random sounds",
+      "topic": "Sound & video",
+      "trigger": {
+        "label": "Start random sounds",
+        "event": "hub_action",
+        "kind": "control"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Choose category / profile",
+          "owner": "soundboard",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "One cancellable random loop",
+          "owner": "media_workers",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Next waits for cleanup",
+          "owner": "media_workers",
+          "kind": "wait",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Stop cancels the loop",
+          "owner": "soundboard",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "soundboard": "c101fb0ea6fb1e7bb84232af22c3072a165a9bdefc8656574df2d5c40fb4fc3d",
+        "media_workers": "99a1a00f5854b87301b5e62b0837f5e035bf87e45a4552403c603e0e3de1f064"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/soundboard/main.py",
+          "symbol": "run.start_random_mode",
+          "hash": "298443c0fdd53bb47f563376aa3a425feb2a3218c00a5008bc6dcb646f2a1c51"
+        }
+      ]
+    }
+  ]
+}

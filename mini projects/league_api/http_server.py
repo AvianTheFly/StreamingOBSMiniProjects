@@ -37,11 +37,54 @@ def make_handler(service, *, root: Path, port: int, load_config):
             if self.headers.get('Host') not in self.local_origins():
                 self.send_error(403); return
             path=unquote(urlparse(self.path).path)
+            if path == '/champ-select/state':
+                self.send_bytes(json.dumps(service.client_scenes.overlay_snapshot()).encode()); return
+            if path == '/champ-select':
+                self.send_bytes((root/'champ_select_web'/'index.html').read_bytes(), 'text/html; charset=utf-8'); return
+            if path in {'/champ-select/app.js', '/champ-select/style.css'}:
+                file = root/'champ_select_web'/path.rsplit('/', 1)[-1]
+                self.send_bytes(file.read_bytes(), 'text/css' if file.suffix == '.css' else 'text/javascript'); return
+            if path.startswith('/champ-select/backgrounds/'):
+                name = path.removeprefix('/champ-select/backgrounds/')
+                if not re.fullmatch(r'(astral|tidal|neon|frost|verdant)\.jpg', name):
+                    self.send_error(404); return
+                file = root/'media'/'champ-select'/name
+                if not file.is_file(): self.send_error(404); return
+                self.send_bytes(file.read_bytes(), 'image/jpeg'); return
+            if path.startswith('/champ-select/masks/'):
+                name = path.removeprefix('/champ-select/masks/')
+                if not re.fullmatch(r'(astral|tidal|neon|frost|verdant)\.svg', name):
+                    self.send_error(404); return
+                file = root/'champ_select_web'/'masks'/name
+                self.send_bytes(file.read_bytes(), 'image/svg+xml'); return
+            if path.startswith('/champ-select/icons/'):
+                name = path.removeprefix('/champ-select/icons/')
+                if not re.fullmatch(r'[1-9][0-9]{0,4}\.png', name):
+                    self.send_error(404); return
+                file = root/'media'/'champions'/name
+                if not file.is_file(): self.send_error(404); return
+                self.send_bytes(file.read_bytes(), 'image/png'); return
+            if path.startswith('/champ-select/portraits/'):
+                name = path.removeprefix('/champ-select/portraits/')
+                if not re.fullmatch(r'[1-9][0-9]{0,4}\.jpg', name):
+                    self.send_error(404); return
+                file = root/'media'/'champion-portraits'/name
+                if not file.is_file(): self.send_error(404); return
+                self.send_bytes(file.read_bytes(), 'image/jpeg'); return
+            if path.startswith('/match-art/'):
+                target=service.match_screens.asset(path.removeprefix('/match-art/'))
+                if not target:
+                    self.send_error(404); return
+                self.send_bytes(target.read_bytes(),'image/png'); return
+            if path=='/client-scenes':
+                self.send_bytes(json.dumps(service.client_scenes.snapshot()).encode()); return
             if path=='/production/settings':
                 self.send_bytes(json.dumps(service.production_settings()).encode()); return
             if path=='/production':
                 self.send_bytes((root/'production'/'web'/'control.html').read_bytes(),'text/html; charset=utf-8'); return
-            if path.startswith('/production/') and path.removeprefix('/production/') in {'overlay.js','scene.js','materials.js','terrain.js','bursts.js','control.js','control.css','palette.js','primitives.js','combat.js','elements.js','objectives.js','progression.js'}:
+            if path=='/production/subtle.js':
+                self.send_bytes((root.parents[1]/'lib'/'browser_effects'/'web'/'subtle.js').read_bytes(),'application/javascript'); return
+            if path.startswith('/production/') and path.removeprefix('/production/') in {'overlay.js','scene.js','materials.js','terrain.js','bursts.js','control.js','control.css','palette.js','primitives.js','combat.js','elements.js','objectives.js','progression.js','event-art.js','event-relics.js','match-screens.js'}:
                 file=root/'production'/'web'/path.removeprefix('/production/')
                 self.send_bytes(file.read_bytes(),'text/css' if file.suffix=='.css' else 'text/javascript'); return
             if path=='/sprite.png':
@@ -155,13 +198,26 @@ def make_handler(service, *, root: Path, port: int, load_config):
                 if not 0<size<=65536: raise ValueError('Invalid body size')
                 body=json.loads(self.rfile.read(size))
                 if not isinstance(body,dict): raise ValueError('Expected an object')
+                if path=='/client-scenes':
+                    self.send_bytes(json.dumps(service.client_scenes.configure(body)).encode()); return
+                if path=='/client-scenes/hide-now':
+                    self.send_bytes(json.dumps(service.client_scenes.hide_now()).encode()); return
+                if path=='/client-scenes/show-screen':
+                    self.send_bytes(json.dumps(service.client_scenes.show_screen()).encode()); return
                 if path=='/production/configure':
                     self.send_bytes(json.dumps(service.save_production(body)).encode()); return
                 if path=='/production/preview':
-                    with service.lock: service.engine.production.preview(body.get('key','earth_cycle'))
+                    with service.lock:
+                        key=body.get('key','earth_cycle')
+                        if service.match_screens.enabled and key in {'game_start','victory','defeat'}:
+                            service.match_screens.preview(key)
+                        else:
+                            service.engine.production.preview(key)
                     self.send_bytes(b'{}'); return
                 if path=='/production/clear':
-                    with service.lock: service.engine.production.clear()
+                    with service.lock:
+                        service.engine.production.clear()
+                        service.match_screens.clear()
                     self.send_bytes(b'{}'); return
                 if path=='/production/obs':
                     from .production.obs_source import repair_overlay
@@ -191,11 +247,12 @@ def make_handler(service, *, root: Path, port: int, load_config):
                         try:
                             service.engine.submit([{'key':k,'title':k.replace('_',' ').title(),'detail':'Hello World — preview','confidence':'preview'} for k in keys])
                         finally: service.engine.config=saved
-                    elif self.path=='/clear': service.engine.clear()
-                    elif self.path=='/stop': service.engine.clear(); service.stop_event.set()
+                    elif self.path=='/clear': service.engine.clear(); service.match_screens.clear()
+                    elif self.path=='/stop': service.engine.clear(); service.match_screens.clear(); service.stop_event.set()
                     elif self.path=='/reload':
                         service.engine.config=load_config()
                         service.engine.production.configure(service.production_store.load())
+                        service.match_screens.configure(service.engine.production.settings)
                     elif self.path=='/media-error': service.media_errors.append(str(body.get('key','unknown'))[:100])
                     else: self.send_error(404); return
                 self.send_bytes(b'{}')

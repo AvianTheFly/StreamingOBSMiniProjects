@@ -23,7 +23,7 @@ const FIELDS = [
     fields: [
       { key: "whisper_model",    label: "Model",    type: "text",   help: 'e.g. "large-v3" or a local path' },
       { key: "whisper_device",   label: "Device",   type: "text",   help: '"cuda" for GPU, "cpu" for CPU' },
-      { key: "whisper_compute",  label: "Compute",  type: "text",   help: '"float16" (GPU) or "int8" (CPU)' },
+      { key: "whisper_compute",  label: "Compute",  type: "text",   help: '"int8_float16" uses less GPU memory; "int8" for CPU' },
       { key: "whisper_language", label: "Language", type: "text",   help: '"en" for English' },
     ],
   },
@@ -48,7 +48,7 @@ export async function mount(container) {
     <div class="page-header">
       <div>
         <div class="page-title">Settings</div>
-        <div class="page-subtitle">Global hub configuration — restart required for some changes</div>
+        <div class="page-subtitle">Preferences, global shortcuts and advanced voice configuration.</div>
       </div>
       <div class="page-actions">
         <button class="btn btn-primary btn-sm" id="saveSettingsBtn">Save</button>
@@ -56,15 +56,11 @@ export async function mount(container) {
     </div>
 
     <div class="card mb-16" style="max-width:680px">
-      <p style="font-size:13px;color:var(--muted);line-height:1.6">
-        These settings override the values in <code>hub_config.py</code> and are persisted in
-        <code>hub_settings.json</code>. OBS connection settings are in <code>.env</code> (see <code>.env.example</code>).
-        Changes to Whisper/mic settings take effect after restarting the hub.
-      </p>
+      <p style="font-size:13px;color:var(--muted);line-height:1.6">Global shortcuts and trigger behavior are below. Voice and microphone changes take effect after restarting the Hub. <a href="#voice">Open voice controls</a> for microphone status.</p>
     </div>
 
-    <form id="settingsForm" class="settings-form" style="max-width:680px"></form>
     <div id="hubActionsForm" class="settings-form mt-12" style="max-width:900px"></div>
+    <details class="feature-disclosure" style="max-width:900px"><summary>Advanced voice &amp; microphone setup <span>Recognition model, audio device and silence detection</span></summary><form id="settingsForm" class="settings-form mt-16" style="max-width:680px"></form></details>
   `;
 
   container.querySelector("#saveSettingsBtn").addEventListener("click", _save);

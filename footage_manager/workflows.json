@@ -1,0 +1,135 @@
+{
+  "module": {
+    "id": "footage_desk",
+    "label": "Footage Desk",
+    "group": "Separate app",
+    "icon": "library",
+    "description": "Reviews recorded footage in its own application.",
+    "separate": true
+  },
+  "flows": [
+    {
+      "id": "footage_desk.review",
+      "label": "Recorded footage is opened",
+      "topic": "Footage review",
+      "trigger": {
+        "label": "Recorded footage is opened",
+        "event": "footage.review",
+        "kind": "separate"
+      },
+      "detail": "Scan, review, CSV and analysis pools omit explicit replay-only producer entries. Review recordings, save clips, extract remaining keepers and finish the recording in separate desk views. User decisions remain in the database. Removal is explicit: server checks current keeper exports and unresolved moments before reversible trash; permanent deletion is separately confirmed and rechecks retained media.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Select recording",
+          "owner": "footage_desk",
+          "kind": "action",
+          "detail": "Only eligible recordings enter automatic review; the replay catalog is read without importing its feature."
+        },
+        {
+          "id": "1",
+          "label": "Queue bounded analysis",
+          "owner": "footage_desk",
+          "kind": "wait",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Review proposed moments",
+          "owner": "footage_desk",
+          "kind": "action",
+          "detail": "Full-recording highlight, game and saved-clip tracks stay visible. The close-up timeline stays visible. Clicking the overview navigates and centers that viewport without replacing a clip. Clicking the close-up track previews; dragging across it draws a separate custom selection. Handles use a fixed scale throughout a drag. Cursor-anchored wheel zoom, zoom buttons, Shift-drag pan and Fit clip control the view without changing boundaries. Capture ends on release, source/window replacement or page hiding; frame seeks retain only the latest pending source-scoped target while a decoder is seeking. Game snapshots reject obsolete source responses. Selection preview stops at its end. Keep, Extract this clip, Remove clip and single-step Undo use the existing catalogue/media owners; notes and tags remain optional."
+        },
+        {
+          "id": "3",
+          "label": "Keep personal review markers",
+          "owner": "footage_desk",
+          "kind": "action",
+          "detail": "Existing personal markers are preserved. Resizing a selected saved clip updates that marker with its title, tags and notes. Remove clip changes the marker to not-kept while retaining notes and exported files. Undo restores the prior clip decision and bounds, or unkeeps a newly saved clip; a newer saved edit prevents stale undo. Saved clips lists current exports and cuts needing extraction after a boundary change."
+        },
+        {
+          "id": "4",
+          "label": "Extract remaining keepers",
+          "owner": "footage_desk",
+          "kind": "wait",
+          "detail": "One existing bounded media worker exports all audio tracks with portable source metadata. Pending UI feedback prevents duplicate extraction clicks."
+        },
+        {
+          "id": "5",
+          "label": "Choose what stays",
+          "owner": "footage_desk",
+          "kind": "action",
+          "detail": "Keep full, keep only clips or mark original for removal are explicit recording decisions; the last choice adds the original to Clear space without deleting it. Unresolved moments and unexported keepers block original removal."
+        },
+        {
+          "id": "6",
+          "label": "Check before original removal",
+          "owner": "footage_desk",
+          "kind": "end",
+          "detail": "User confirms reversible trash. Permanent deletion is separately confirmed and rechecks retained clips; extraction never automatically removes a source."
+        }
+      ],
+      "owner_hashes": {
+        "footage_desk": "cb6cab45f002800d9e7fac7d5f6377232a5f14852eff13910acbfacf37f66d7f"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        },
+        {
+          "from": "5",
+          "to": "6"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "footage_manager/jobs.py",
+          "symbol": "<module>",
+          "hash": "fc7f4c82a26d732c526835c56480f1d8f7ee114ac4e88e434ebd801f3cab6ec4"
+        },
+        {
+          "path": "footage_manager/review_pool.py",
+          "symbol": "<module>",
+          "hash": "c17dd7beb0108a2b569e92a77001fda6f2cd751c6fd874d64e743bee80385e95"
+        },
+        {
+          "path": "footage_manager/app.py",
+          "symbol": "scan",
+          "hash": "e934eb38e18337641aad1ed3dc8c019a79a6cf46e91bb12df446c4d2bc77016c"
+        },
+        {
+          "path": "footage_manager/media.py",
+          "symbol": "deletion_check",
+          "hash": "998429c4a4c6da6051b25d2a475b383a5a9bb215ec9c6c6209c5518911e7061f"
+        },
+        {
+          "path": "footage_manager/app.py",
+          "symbol": "trash_video",
+          "hash": "77fe9ca7285431c6b0d83d666a4195c09ac1ef057b30df37c46e7ed0df472454"
+        },
+        {
+          "path": "footage_manager/app.py",
+          "symbol": "purge_video",
+          "hash": "5f31ecdd95bfe447f448221a2e3b057abbd8794e83e002006710da13983c9deb"
+        }
+      ]
+    }
+  ]
+}

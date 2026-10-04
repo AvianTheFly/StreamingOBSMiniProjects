@@ -4,7 +4,9 @@ Paths and JSON formats stay stable; runtime project data belongs to each module.
 """
 from __future__ import annotations
 
+import copy
 import json
+from lib.json_store import write_json, update_json
 from lib.paths import PROJECT_ROOT
 
 RULES_FILE = PROJECT_ROOT / "hub_rules.json"
@@ -16,28 +18,13 @@ _DEFAULT_WORKFLOWS: list[dict] = []
 
 def load_settings() -> dict:
     defaults = {
-        "hub_hotkeys": json.loads(json.dumps(_DEFAULT_HUB_HOTKEYS)),
-        "hub_workflows": json.loads(json.dumps(_DEFAULT_WORKFLOWS)),
+        "hub_hotkeys": copy.deepcopy(_DEFAULT_HUB_HOTKEYS),
+        "hub_workflows": copy.deepcopy(_DEFAULT_WORKFLOWS),
         "project_trigger_modes": {},
     }
-    if _SETTINGS_FILE.exists():
-        try:
-            data = json.loads(_SETTINGS_FILE.read_text(encoding="utf-8"))
-            if isinstance(data, dict):
-                if not isinstance(data.get("hub_hotkeys"), dict):
-                    data["hub_hotkeys"] = json.loads(json.dumps(_DEFAULT_HUB_HOTKEYS))
-                for action_id, cfg in _DEFAULT_HUB_HOTKEYS.items():
-                    data["hub_hotkeys"].setdefault(action_id, dict(cfg))
-                if not isinstance(data.get("hub_workflows"), list):
-                    data["hub_workflows"] = []
-                if not isinstance(data.get("project_trigger_modes"), dict):
-                    data["project_trigger_modes"] = {}
-                return data
-        except Exception:
-            pass
     try:
         import hub_config as cfg
-        return {
+        defaults.update({
             "whisper_model":    cfg.WHISPER_MODEL,
             "whisper_device":   cfg.WHISPER_DEVICE,
             "whisper_compute":  cfg.WHISPER_COMPUTE,
@@ -45,16 +32,31 @@ def load_settings() -> dict:
             "mic_device":       cfg.MIC_DEVICE,
             "mic_sample_rate":  cfg.MIC_SAMPLE_RATE,
             "rms_threshold":    cfg.RMS_THRESHOLD,
-            **defaults,
-        }
-    except Exception:
-        return defaults
+        })
+    except (ImportError, ValueError):
+        pass
+    if _SETTINGS_FILE.exists():
+        try:
+            data = json.loads(_SETTINGS_FILE.read_text(encoding="utf-8"))
+            if isinstance(data, dict):
+                if not isinstance(data.get("hub_hotkeys"), dict):
+                    data["hub_hotkeys"] = copy.deepcopy(_DEFAULT_HUB_HOTKEYS)
+                for action_id, cfg in _DEFAULT_HUB_HOTKEYS.items():
+                    data["hub_hotkeys"].setdefault(action_id, dict(cfg))
+                if not isinstance(data.get("hub_workflows"), list):
+                    data["hub_workflows"] = []
+                if not isinstance(data.get("project_trigger_modes"), dict):
+                    data["project_trigger_modes"] = {}
+                return {**defaults, **data}
+        except Exception:
+            pass
+    return defaults
 
 
 def save_settings(data: dict) -> None:
-    _SETTINGS_FILE.write_text(
-        json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
-    )
+    from lib.settings_backups import SettingsBackups
+    SettingsBackups().snapshot()
+    update_json(_SETTINGS_FILE, lambda previous: {**(previous or {}), **data}, default={})
 
 
 def get_live_rules() -> list[dict]:
@@ -72,17 +74,25 @@ def get_live_rules() -> list[dict]:
         return []
 
 
+def parse_rules(rules: list[dict]):
+    from coordinator import CoordinationRule
+    if not isinstance(rules, list):
+        raise ValueError("Rules must be a list")
+    result = []
+    for rule in rules:
+        if not isinstance(rule, dict):
+            raise ValueError("Each rule must be an object")
+        requester = rule.get("requester", "")
+        pause = rule.get("pause", [])
+        if not isinstance(requester, str) or not isinstance(pause, list) or any(
+                not isinstance(name, str) for name in pause):
+            raise ValueError("Rule requester and pause targets must be project names")
+        if requester:
+            result.append(CoordinationRule(requester=requester, pause=list(pause),
+                                          resume_on_finish=bool(rule.get("resume_on_finish", True))))
+    return result
+
+
 def apply_rules_from_list(rules: list[dict]) -> None:
-    try:
-        from coordinator import coordinator, CoordinationRule
-        coordinator.clear_rules()
-        for r in rules:
-            if not r.get("requester"):
-                continue
-            coordinator.add_rule(CoordinationRule(
-                requester=r["requester"],
-                pause=list(r.get("pause", [])),
-                resume_on_finish=bool(r.get("resume_on_finish", True)),
-            ))
-    except Exception as exc:
-        print(f"[hub_ui] apply_rules error: {exc}")
+    from coordinator import coordinator
+    coordinator.replace_rules(parse_rules(rules))

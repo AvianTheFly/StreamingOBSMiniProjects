@@ -25,6 +25,8 @@ class PlaybackWorker:
     def submit(self, run: Callable[[threading.Event], None]) -> threading.Event:
         """Return a completion signal, also set if this request is superseded."""
         done = threading.Event()
+        from events import inspect_event
+        inspect_event('source.request', owner=self._name.split(':')[0], source=self._name, phase='queued')
         with self._lock:
             if self._active is not None:
                 self._active.set()
@@ -33,7 +35,13 @@ class PlaybackWorker:
             self._pending = (run, done)
             if self._thread is None:
                 self._thread = threading.Thread(target=self._drain, name=self._name, daemon=True)
-                self._thread.start()
+                try:
+                    self._thread.start()
+                except Exception:
+                    self._thread = None
+                    self._pending = None
+                    done.set()
+                    raise
         return done
 
     def cancel(self) -> None:
@@ -54,10 +62,15 @@ class PlaybackWorker:
                 self._pending = None
                 cancelled = self._active = threading.Event()
             try:
+                from events import inspect_event
+                inspect_event('source.playback', owner=self._name.split(':')[0], source=self._name, phase='started')
                 run(cancelled)
             except Exception as exc:
+                inspect_event('source.playback', owner=self._name.split(':')[0], source=self._name, phase='failed')
                 print(f"[{self._name}] Playback worker failed: {exc}")
             finally:
                 with self._lock:
                     self._active = None
                 done.set()
+                inspect_event('source.cleanup', owner=self._name.split(':')[0], source=self._name,
+                              phase='cancelled' if cancelled.is_set() else 'finished')

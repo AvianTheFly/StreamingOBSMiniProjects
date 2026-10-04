@@ -19,6 +19,8 @@ from ..config import (
 )
 from .league_events import LeagueEvents
 from .game_state_detector import GameStateDetector
+from .match_lifecycle import MatchLifecycle
+from ..hud_presentation import HudPresentation
 from ..kill_audio_player import LeagueKillAudioPlayer
 
 # ── Handlers ──────────────────────────────────────────────────────────────────
@@ -108,6 +110,9 @@ class LeagueAPIWatcher:
         self.events.register("ace",              make_ace_handler())
 
         self.detector       = GameStateDetector(self.events)
+        self.match_lifecycle = MatchLifecycle()
+        self.hud = HudPresentation()
+        self.hud.hide()
         self.game_connected = False
         self._game_start_iso: str | None    = None
         self._pending_save: threading.Timer | None = None  # delayed session saver
@@ -138,6 +143,7 @@ class LeagueAPIWatcher:
         """
         self._force_streak_reset()
         self.kill_audio_player.stop()
+        self.hud.hide()
 
         if not (self.game_connected or self._pending_save):
             return
@@ -169,24 +175,21 @@ class LeagueAPIWatcher:
         while not self.stop_event.is_set():
             try:
                 data = self._fetch()
+                running = self.match_lifecycle.observe(data)
                 me, riot_game_name = self._find_active_player(data)
-
-                if me is None:
-                    print("[league] Active player not found in game data.")
-                    self.stop_event.wait(DISCONNECTED_INTERVAL)
-                    continue
-
-                active = data.get("activePlayer", {})
-                self._last_active         = active
-                self._last_resource_value = (
-                    active.get("championStats", {}).get("resourceValue", 0.0)
-                )
-
-                self._on_connected()
-                if not getattr(self, "_name_logged", False):
-                    print(f"[league] Tracking as: '{riot_game_name}' (this is what KillerName events will match)")
-                    self._name_logged = True
-                self.detector.process(me, data, riot_game_name)
+                self.hud.update(running=running and me is not None,
+                                alive=me is not None and not me.get('isDead', False))
+                if running and me is not None:
+                    active = data.get("activePlayer", {})
+                    self._last_active = active
+                    self._last_resource_value = active.get("championStats", {}).get("resourceValue", 0.0)
+                    self._on_connected()
+                    if not getattr(self, "_name_logged", False):
+                        print(f"[league] Tracking as: '{riot_game_name}' (this is what KillerName events will match)")
+                        self._name_logged = True
+                    self.detector.process(me, data, riot_game_name)
+                else:
+                    self._on_disconnected()
                 self.stop_event.wait(POLL_INTERVAL)
 
             except (requests.exceptions.ConnectionError, requests.exceptions.Timeout, LiveClientUnavailable):
@@ -195,6 +198,7 @@ class LeagueAPIWatcher:
 
             except Exception as e:
                 print(f"[league] Unexpected error: {e}")
+                self._on_disconnected()
                 self.stop_event.wait(DISCONNECTED_INTERVAL)
 
         print("[league] Stopped.")
@@ -222,6 +226,7 @@ class LeagueAPIWatcher:
             self.events.emit("game_start")
 
     def _on_disconnected(self) -> None:
+        self.hud.hide()
         if not self.game_connected:
             return
         self.game_connected = False

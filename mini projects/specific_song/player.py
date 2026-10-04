@@ -122,6 +122,11 @@ class SongPlayer:
         return self._abort_flag or self._cancel_event.is_set()
 
     @property
+    def is_paused(self) -> bool:
+        with self._lock:
+            return self._paused
+
+    @property
     def current_source(self) -> str | None:
         with self._lock:
             return self._current_source

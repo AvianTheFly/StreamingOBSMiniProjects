@@ -3,6 +3,7 @@ import threading
 from http.server import ThreadingHTTPServer
 from .session import Channel
 from .obs_source import PORT
+from lib.runtime_cleanup import run_cleanup
 
 _channels = {}
 _lock = threading.RLock()
@@ -30,17 +31,33 @@ def start_browser_effects(stop):
         _server = ThreadingHTTPServer(('127.0.0.1', PORT), handler(find_channel, PORT))
         _server.daemon_threads = True
         server = _server
-    threading.Thread(target=server.serve_forever, name='browser-effects-http', daemon=True).start()
+        try:
+            threading.Thread(target=server.serve_forever, name='browser-effects-http', daemon=True).start()
+        except Exception:
+            server.server_close()
+            _server = None
+            raise
     print(f'[browser-effects] Ready: http://127.0.0.1:{PORT}', flush=True)
 
     def shutdown():
         global _server
         stop.wait()
+        close_server()
+
+    def close_server():
+        global _server
         with _lock:
-            for channel in _channels.values():
-                channel.stop()
-        server.shutdown()
-        server.server_close()
-        with _lock:
-            _server = None
-    threading.Thread(target=shutdown, name='browser-effects-shutdown', daemon=True).start()
+            channels = list(_channels.values())
+        try:
+            run_cleanup('browser-effects', *(channel.stop for channel in channels),
+                        server.shutdown, server.server_close)
+        finally:
+            with _lock:
+                if _server is server:
+                    _server = None
+
+    try:
+        threading.Thread(target=shutdown, name='browser-effects-shutdown', daemon=True).start()
+    except Exception:
+        close_server()
+        raise

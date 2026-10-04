@@ -23,6 +23,9 @@ reference but are disabled and are not discovered by the Hub.
 
 ## Start Here
 
+- Customize your compact desktop chat: **Hub → Chat Overlay**.
+  See [chat controls, emotes and desktop setup](docs/CHAT-OVERLAY.md).
+
 - Install Python packages: `py -3.11 -m pip install -r requirements.txt`
 - Install FFmpeg and make sure `ffmpeg` and `ffprobe` are on `PATH`.
 - Double-click `Run Hub.bat` from File Explorer.
@@ -36,6 +39,14 @@ sliders, enter times in seconds, or use **Start here / End here** while scrubbin
 **Preview selection** plays just that moment; enable **Loop selection** to refine it.
 **Save trimmed copy** adds a full-resolution cut to the library for OBS or a
 compilation, keeping the original and its saved audio level. Trimming works with OBS closed.
+
+The Instant Replay shortcut/voice **save** command and **Save Replay** button also
+request a 60-second Twitch clip titled **Instant Replay**. Twitch Celebrations must
+be connected with clip permission, and your Twitch channel must be live with clips
+enabled. The Hub confirms publication and shows the clip link in Instant Replay;
+you can rename it later in Twitch. Twitch captures its own stream window, so its
+clip can differ from your locally marked/trimmed replay. Twitch failures do not
+prevent the local OBS save. Saving a trimmed copy does not create another Twitch clip.
 
 ## Important Folders
 
@@ -130,3 +141,60 @@ playback contract and instructions for adding effects.
 Twitch Celebrations connects automatically with saved authorization. Its control
 page reports raid/follow/sub/gift/cheer subscription health and the last live event.
 An OBS-first startup now reloads the alert page once its local server is ready.
+
+## Lobby worlds and screen privacy
+
+The Scene Voice Switcher page selects Tavern, Future, Mountain Forge, Moonlit
+Sanctuary, Sky Harbor, Storm Coast or Phoenix Observatory. **Random lobby** and the backtick voice command
+**next lobby** choose another available location. Queue entries also vary the
+location; an unchanged queue cannot reclaim a scene after you choose another.
+Automatic requests respect temporary scene ownership, and stale post-game
+returns never change lobby visibility. Named voice commands include **forge**,
+**sanctuary**, **sky harbor**, **tavern**, **future**, and **game**.
+Also say **storm coast**, **coast**, **phoenix observatory**, or **desert**.
+
+League production's **Between games** setting chooses chatting lobbies or the
+saved custom idle scene. This checkout uses chatting lobbies. A confirmed idle
+phase, queue cancellation/dodge, or post-game return chooses another location,
+after the cinematic result hold finishes. Queue/ready-check/bans retain one
+location; completed bans enter the champion world, and game start enters Test.
+Repeated client updates do not rotate locations or reclaim manual scene choices.
+Pending returns wait for temporary playback and reject newer deliberate choices,
+including those made during the result hold or a slow client read. Startup and
+an unavailable client preserve the current program scene. Without League client
+automation, game-disconnected events provide the held lobby return instead.
+
+Type **asterisk then minus** (`*-`) within 0.8 seconds to show your desktop;
+type **minus then asterisk** (`-*`) to hide it. These are ordered sequences.
+They change the real Display Capture item inside **Hub Display Capture**.
+Parent scenes retain visible nested scene items, and **Test** retains its direct
+gameplay capture. Automatic queue and chatting-lobby entries hide the shared
+desktop; showing it explicitly afterward stays effective until another entry or
+hide command. League's Show screen button also reveals the desktop inside the
+current lobby when chatting-lobby mode is selected.
+The old Tavern 3D filter is preserved on **Hub Desktop Panel**. Replay's optional
+desktop viewport shares the same gate and is parked outside the canvas when unused.
+The unused legacy `youtube` window-capture item inside SpecificSongs is hidden
+to prevent unrelated browser windows bypassing screen-hide; its settings remain.
+
+New art is in `mini projects/scene_voice_switcher/art/`: each `*-base.png` has
+a matching `*-foreground-cutout.png` with identical RGB pixels and transparent
+background. OBS layers are background, nested desktop, **FaceCamWithProps**,
+foreground, then live **Hub Lobby Chat**. Camera filtering stays in your existing
+camera scene. Lobby chat uses your channel/settings, with larger OBS-only text;
+desktop chat settings are preserved. These are static scenes with the live
+camera/chat/desktop layers. Existing Tavern/Future artwork and placements remain.
+Adding locations retains already installed transforms, item order and visibility.
+The additional generation prompts are saved in `output/lobbies/expanded-generation-prompts.json`.
+
+Visual research: Peanut's [workshop](https://www.twitch.tv/theburntpeanut/clip/ToughPlacidAubergineTBTacoLeft-7UaFjTcpVDrtp3w5),
+[hideout](https://www.twitch.tv/theburntpeanut_247/clip/AmericanLaconicCourgetteHotPokket-NbGw1lEY1CRjsfX6),
+and [beach bar](https://streamscharts.com/channels/theburntpeanut/streams/322114724348)
+suggested the host-in-a-place composition. The new locations use this channel's
+fantasy materials and four-spirit imagery.
+
+`tools/install_lobby_scenes.py` installs native scenes with OBS open. The separate
+`tools/migrate_lobby_groups.py <active-collection.json>` only runs with OBS closed;
+WebSocket cannot add group members. Both snapshot settings first. Original raw
+inputs are retained, and history outside the repository provides recovery copies.
+Do not restore old module volumes when recovering only an OBS collection.

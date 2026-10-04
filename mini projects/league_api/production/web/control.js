@@ -20,6 +20,76 @@ async function request(path, body) {
   if (!response.ok) throw new Error(data.error || 'Could not reach the League service');
   return data;
 }
+let clientBusy = false;
+for (const [key, name] of [['astral','Astral Observatory'],['tidal','Tidal Vault'],['neon','Neon Concourse'],['frost','Frost Sanctum'],['verdant','Verdant Engine']]) {
+  const link = document.createElement('a'); link.className = 'theme-card';
+  link.href = `/champ-select?demo=1&theme=${key}`; link.target = '_blank'; link.rel = 'noopener';
+  const img = document.createElement('img'); img.src = `/champ-select/backgrounds/${key}.jpg`; img.alt = '';
+  const label = document.createElement('span'); label.textContent = name + ' · preview';
+  link.append(img,label); document.querySelector('#themeGallery').append(link);
+}
+async function pollClient() {
+  try {
+    const data = await request('/client-scenes');
+    document.querySelector('#clientStatus').textContent = data.status;
+    document.querySelector('#clientError').textContent = data.error || '';
+    if (!clientBusy) {
+      document.querySelector('#clientEnabled').checked = data.settings.enabled;
+      document.querySelector('#clientTheme').value = data.settings.theme || 'random';
+      document.querySelector('#clientIdle').value = data.settings.idle_presentation || 'scene';
+      document.querySelector('#clientHideNow').disabled = !data.settings.enabled || !['None', 'Lobby', 'Matchmaking', 'ReadyCheck', 'ChampSelect', 'EndOfGame', 'PreEndOfGame', 'WaitingForStats'].includes(data.phase);
+      document.querySelector('#clientShowScreen').disabled = !['None', 'Lobby', 'EndOfGame', 'PreEndOfGame', 'WaitingForStats', 'TerminatedInError'].includes(data.phase) && !data.status.startsWith('League client unavailable');
+    }
+  } catch {
+    document.querySelector('#clientStatus').textContent = 'League client service unavailable';
+  }
+  setTimeout(pollClient, 1500);
+}
+document.querySelector('#clientEnabled').addEventListener('change', async (event) => {
+  clientBusy = true;
+  event.target.disabled = true;
+  try {
+    await request('/client-scenes', { enabled: event.target.checked });
+    notice.textContent = event.target.checked ? 'League client scene automation enabled.' : 'League client scene automation paused.';
+  } catch (error) {
+    notice.textContent = error.message;
+    event.target.checked = !event.target.checked;
+  } finally {
+    clientBusy = false;
+    event.target.disabled = false;
+  }
+});
+document.querySelector('#clientTheme').addEventListener('change', async (event) => {
+  clientBusy = true; event.target.disabled = true;
+  try {
+    await request('/client-scenes', {theme:event.target.value});
+    notice.textContent = event.target.value === 'random' ? 'A new world will be chosen for each draft.' : 'Champion select theme saved.';
+  } catch (error) { notice.textContent = error.message; }
+  finally { clientBusy = false; event.target.disabled = false; pollClient(); }
+});
+document.querySelector('#clientIdle').addEventListener('change', async (event) => {
+  clientBusy = true; event.target.disabled = true;
+  try {
+    await request('/client-scenes', {idle_presentation: event.target.value});
+    notice.textContent = 'Between-games presentation saved.';
+  } catch (error) { notice.textContent = error.message; }
+  finally { clientBusy = false; event.target.disabled = false; }
+});
+for (const [id, path] of [['clientHideNow', '/client-scenes/hide-now'], ['clientShowScreen', '/client-scenes/show-screen']]) {
+  document.querySelector('#' + id).addEventListener('click', async (event) => {
+    event.target.disabled = true;
+    try {
+      const data = await request(path, {});
+      document.querySelector('#clientStatus').textContent = data.status;
+      notice.textContent = id === 'clientHideNow' ? 'Screen hidden. You can start queue now.' : 'Screen restored.';
+    } catch (error) {
+      notice.textContent = error.message;
+    } finally {
+      event.target.disabled = false;
+    }
+  });
+}
+pollClient();
 function labels() {
   document.querySelector('#intensityValue').textContent =
     Math.round(form.elements.intensity.value * 100) + '%';
@@ -173,10 +243,10 @@ function renderGallery() {
       [
         'duration',
         'Seconds',
-        0.6,
+        2,
         5,
         0.1,
-        patch.duration ?? (reset ? event.default_duration : event.duration),
+        Math.max(2, patch.duration ?? (reset ? event.default_duration : event.duration)),
       ],
     ]) {
       const wrap = element('label', label),

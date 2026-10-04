@@ -11,9 +11,9 @@ by subscribing to the `game.connected` / `game.disconnected` hub events.
 
 **Owns:** `Lobbies`, `Test`
 
-This is the ONLY project that may call `obs.switch_scene("Test")` or
-`obs.switch_scene("Lobbies")`. The `league` project does NOT switch scenes
-directly — it emits events and this project acts on them.
+`SceneDirector` is the sole OBS program-scene writer. This feature requests game
+and lobby destinations; League's client watcher requests its own phase routes
+through the same owner and shared lobby catalog. Features never import peers.
 
 ## Key files
 
@@ -21,17 +21,21 @@ directly — it emits events and this project acts on them.
 |---|---|
 | `main.py` | Hub entry point — lobby discovery, PTT, command dispatch, event subscriptions |
 | `config.py` | `GAME_SCENE`, `LOBBIES_SCENE`, `PTT_KEY`, `SOURCE_ALIASES` |
+| `routing.py` | Accepted scene transactions, lobby selection and held returns |
+| `inventory.py` | Real lobby groups/nested scenes and aliases |
+| `api.py` | Public location inventory and manual selection |
 | `interface.py` | `ProjectInterface` — `revert()` hides the active lobby source |
 
 ## Lobby discovery
 
-At startup, this project queries OBS for all sources/groups in the `Lobbies` scene.
+At startup, this project queries OBS for sources ending in `Lobby` in `Lobbies`.
 Each source name is split into voice aliases automatically:
-- `"FutureLobby"` → aliases `["future lobby", "future", "lobby", "futurelobby"]`
+- `"FutureLobby"` → aliases `["future lobby", "future", "futurelobby"]`
 - Extra aliases can be added in `config.py → SOURCE_ALIASES`
 
 New lobby backgrounds added to OBS appear automatically on next hub restart.
-No code or config change needed — just add the source in OBS and restart.
+No code or config change needed. Say "refresh lobbies" to republish the complete
+inventory without restarting. "Next lobby" chooses another available location.
 
 ## Hotkey flow
 
@@ -53,8 +57,15 @@ hub_events.subscribe("game.connected",    _on_game_connected)
 hub_events.subscribe("game.disconnected", _on_game_disconnected)
 ```
 
-- `game.connected` → hide lobby sources, switch to `GAME_SCENE`
-- `game.disconnected` → switch to `LOBBIES_SCENE`
+- `game.connected` → request `GAME_SCENE`, respecting temporary ownership.
+- `game.disconnected` → fallback lobby return after the shared result hold, only
+  when League client automation is disabled. League otherwise owns idle returns.
+
+Events capture the director's manual revision. Delayed returns survive owned
+temporary presentation/return, but cannot undo a newer deliberate or external
+choice. Automatic lobby entry hides the shared desktop; manual lobby selection
+preserves its visibility. Hotkey sequences `*-` / `-*` are Hub-owned and toggle
+only the actual input inside `Hub Display Capture`; Test retains direct capture.
 
 Both are unsubscribed in the `finally` block on shutdown.
 

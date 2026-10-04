@@ -1,0 +1,54 @@
+[
+  {
+    "name": "tidal-reef",
+    "path": "F:\\EVERYTHING STREAM RELATED\\Streaming Scripts v2\\lib\\browser_effects\\art\\tidal-reef.png",
+    "generator": "built-in image_gen.imagegen",
+    "original": "exec-5ec03c45-e0d8-4754-adff-6e1d20422d6c.png",
+    "prompt": "Use case: stylized-concept. Asset type: transparent cinematic stream border scenery for Crab Rave, widescreen 16:9. Create an exquisitely crafted bioluminescent tropical tidal reef BORDER with a genuinely transparent empty central 80% of the image. Only peripheral scenery: an asymmetrical left-edge sliver of wet coral reef, pearlescent shell fragments, tiny vivid orange crab nestled at the left lower-middle, turquoise seawater suspended in delicate curling sheets with beautiful refraction, a lighter sparse right-edge curling water ribbon with a few bubbles. Very thin flowing shoreline along bottom edge. Upper edge almost entirely empty except a small right-of-center luminous coral branch. Museum-quality photoreal CGI marine materials, subtle caustics, gorgeous wet highlights, deep dimensional detail, crystalline transparency, sophisticated teal/coral/pearl palette. Rich scenic silhouette with organic contours and wispy natural tapering endpoints. Every object confined to outer 9% of canvas width on sides or outer 5% height top/bottom; do not put objects in corners where game HUD is. NOT rectangular rails, no identical left/right structures, no futuristic panels, no text, no typography, no opaque background, no framed picture, no checkered fake transparency. This is finished high-budget broadcast environmental art, extremely refined and tactile, not cartoon, not a stock neon gaming frame.",
+    "transparent_background": true,
+    "size": [
+      1672,
+      941
+    ],
+    "sha256": "60911076fa168a4074c0796c25fbd68ca50e50bb687cfcef6b943486daadb42b"
+  },
+  {
+    "name": "velvet-theatre",
+    "path": "F:\\EVERYTHING STREAM RELATED\\Streaming Scripts v2\\lib\\browser_effects\\art\\velvet-theatre.png",
+    "generator": "built-in image_gen.imagegen",
+    "original": "exec-95b9b02f-236c-403c-a4d2-881419669f2b.png",
+    "prompt": "Use case: stylized-concept. Asset type: finished transparent widescreen stream edge scenery for Coffin Dance. Entire central 85% transparent and empty. High-budget dark theatrical spectacle: deep plum silk and black velvet sweeping across a SMALL section of upper left edge in beautifully detailed folds, a slender aged carved walnut proscenium descending only along far left edge, a sparse procession of tiny ivory candles on the extreme bottom edge, a beautifully ornate antique dark-gold coffin-shaped architectural arch barely entering from far right. A few suspended opalescent dust motes, delicate funereal violet atmosphere, elegant energetic theatricality rather than horror. Cinematic tangible fabrics and aged woods, exquisite museum-level decorative details, real translucency in drifting gauze. Asymmetrical composition. Do NOT use sci-fi rails, repeating rectangular plates, neon gaming frame, clip art, cartoon or typography. All scenic material must fit in outer 8% width or outer 5% height. No background image, no opaque center, actual transparent alpha. This is a subtle peripheral scenic environment made for animating its different layers over live gameplay.",
+    "transparent_background": true,
+    "size": [
+      1672,
+      941
+    ],
+    "sha256": "c970b67a830ebe3c341958900591496f48429ad4740763b9dfdb2e4293bb2c82"
+  },
+  {
+    "name": "night-circuit",
+    "path": "F:\\EVERYTHING STREAM RELATED\\Streaming Scripts v2\\lib\\browser_effects\\art\\night-circuit.png",
+    "generator": "built-in image_gen.imagegen",
+    "original": "exec-d375ce9d-7925-4fca-92cc-3a59bdffb20e.png",
+    "prompt": "Use case: stylized-concept. Asset type: exquisite cinematic transparent widescreen edge scenery for a racing music stream effect. Entire center transparent empty negative space, 85% of image. One banked stretch of wet Japanese mountain night road sweeps along the FAR LEFT edge in dramatic overhead perspective. The roadway is a very slender S-curve with photoreal textured asphalt, fine red/white kerb, tiny inset amber reflectors, subtle tire rubber, sparse low guardrail; its lights leave elegant fading photographic trails. Along the TOP RIGHT edge a very thin perspective glimpse of night-city elevated roadway with miniature red tail lights and cool blue headlights; bottom edge only tiny scattered wet reflections fading into alpha. Black carbon, asphalt silver, electric ice blue and warm brake-red accents. Sophisticated cinematic automotive advertising finish, breathtaking tangible detail, almost macro scale miniature. No cars larger than a tiny light, no text, no logos, no sci-fi UI, no repeating panels, no neon rectangular border, no background landscape. All scenery on outer 8% sides or outer 4% height. Asymmetrical with organic taper to transparency and real alpha. This is peripheral scene art for animation over live gameplay, not a full scene filling the canvas.",
+    "transparent_background": true,
+    "size": [
+      1672,
+      941
+    ],
+    "sha256": "d3efbd2ba233974c62178a87b94496f9b74d68e32b3e7e8518c1b77409103140"
+  },
+  {
+    "name": "soul-sanctuary",
+    "path": "F:\\EVERYTHING STREAM RELATED\\Streaming Scripts v2\\mini projects\\league_api\\production\\art\\soul-sanctuary.png",
+    "generator": "built-in image_gen.imagegen",
+    "original": "exec-24f5b608-d46d-4137-9766-d2014d4b98b9.png",
+    "prompt": "Use case: stylized-concept. Asset type: bespoke transparent 16:9 stream DEATH/RESPAWN peripheral scenery, a high-budget ethereal sanctuary, emotionally quiet but visually astonishing. Entire center 85% EMPTY TRANSPARENT. Along far left a very slender broken porcelain and weathered silver arch fragment, its inner edge disintegrating into translucent ivory silk and pale blue soul smoke, tiny gravitating fragments. Along far right a dramatically different sparse trail of suspended shards, thin curved pearl structures and one beautifully small empty hourglass nestled into the structure. Across the upper edge two slender faint auroral ink ribbons, across bottom a few incredibly fine silver sand grains. Realistic hand-crafted materials with painterly otherworldly light: subtle cool iridescence, silver blue, soft ivory, smoky lilac, a whisper of warm gold as life returns. No skulls, no gore, no giant wings, no words or UI, no rectangular outline, no neon gaming border, no matching symmetrical pillars. NO BACKGROUND whatsoever, actual alpha cutout, center fully transparent. Every element stays inside outer 7% of width or 4% of height; rich detail, physically credible translucent material, high-end cinematic VFX elegance.",
+    "transparent_background": true,
+    "size": [
+      1672,
+      941
+    ],
+    "sha256": "aeae6c7a089f49352106d9c05f636f55db94fd212014437adb7ae54c3628b921"
+  }
+]

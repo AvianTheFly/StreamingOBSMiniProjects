@@ -7,12 +7,13 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import Mock, patch
 
-from obs import media_decode, interaction
+from obs import media_decode, media as interaction
+from lib import media_metadata
 
 
 class DecodeTests(unittest.TestCase):
     def setUp(self):
-        media_decode._small_h264.cache_clear()
+        media_metadata.clear_metadata_cache()
 
     def test_small_h264_software_heavy_and_unknown_hardware(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -26,17 +27,17 @@ class DecodeTests(unittest.TestCase):
                 ('hevc', 640, 360, '30/1', True),
                 ('h264', 640, 360, '0/0', True),
             ]:
-                media_decode._small_h264.cache_clear()
+                media_metadata.clear_metadata_cache()
                 result = SimpleNamespace(returncode=0, stdout=json.dumps({'streams': [{
                     'codec_name': codec, 'width': width, 'height': height, 'avg_frame_rate': fps}]}))
                 with self.subTest(codec=codec, width=width, fps=fps), \
                      patch.dict(os.environ, {'HUB_MEDIA_DECODE_MODE': 'auto'}), \
-                     patch.object(media_decode.subprocess, 'run', return_value=result):
+                     patch.object(media_metadata.subprocess, 'run', return_value=result):
                     self.assertEqual(media_decode.hardware_decode_for(path), expected)
 
     def test_manual_mode_does_not_probe_or_override_checkbox(self):
         with patch.dict(os.environ, {'HUB_MEDIA_DECODE_MODE': 'preserve'}), \
-             patch.object(media_decode.subprocess, 'run') as probe:
+             patch.object(media_metadata.subprocess, 'run') as probe:
             self.assertIsNone(media_decode.hardware_decode_for('song.mp4'))
         probe.assert_not_called()
 

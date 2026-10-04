@@ -15,22 +15,20 @@ from ..config import (
     DEATH_SCENE, DEATH_SOURCE, DEATH_DISPLAY_DURATION,
     RESPAWN_SCENE, RESPAWN_SOURCE, RESPAWN_DISPLAY_DURATION,
     RESPAWN_SFX_SOURCE,
-    UDYR_ANIMATION_SCENE, UDYR_ANIMATION_SOURCE,
 )
-from ..utils import show_overlay
+from ..utils import show_overlay, production_borders_active
 
 
 def make_death_handler():
     def handle_death(player_data):
         print("[league] Died — showing death border, hiding Udyr animation.")
         try:
-            show_overlay(DEATH_SCENE, DEATH_SOURCE, DEATH_DISPLAY_DURATION)
+            if production_borders_active():
+                obs.hide_source(DEATH_SCENE, DEATH_SOURCE)
+            else:
+                show_overlay(DEATH_SCENE, DEATH_SOURCE, DEATH_DISPLAY_DURATION)
         except Exception as e:
             print(f"[league] Death handler error: {e}")
-        try:
-            obs.hide_source(UDYR_ANIMATION_SCENE, UDYR_ANIMATION_SOURCE)
-        except Exception as e:
-            print(f"[league] Death handler error (Udyr animation): {e}")
     return handle_death
 
 
@@ -45,10 +43,6 @@ def make_respawn_handler():
             show_overlay(RESPAWN_SCENE, RESPAWN_SOURCE, RESPAWN_DISPLAY_DURATION)
         except Exception as e:
             print(f"[league] Respawn handler error (show respawn border): {e}")
-        try:
-            obs.show_source(UDYR_ANIMATION_SCENE, UDYR_ANIMATION_SOURCE)
-        except Exception as e:
-            print(f"[league] Respawn handler error (Udyr animation): {e}")
     return handle_respawn
 
 
@@ -63,7 +57,7 @@ def make_recall_complete_handler():
     def handle_recall_complete():
         print("[league] Recall complete — showing respawn border.")
         try:
-            show_overlay(RESPAWN_SCENE, RESPAWN_SOURCE, RESPAWN_DISPLAY_DURATION)
+            show_overlay(RESPAWN_SCENE, RESPAWN_SOURCE, RESPAWN_DISPLAY_DURATION, production_owned=False)
         except Exception as e:
             print(f"[league] Recall complete handler error: {e}")
     return handle_recall_complete

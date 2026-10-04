@@ -43,7 +43,11 @@ def run_project_action(project: str, action: str) -> dict:
     if iface is None:
         return {"ok": False, "error": f"Project '{project}' is not registered"}
     try:
-        if hasattr(iface, "run_action"):
+        if action in {"pause", "resume"}:
+            from coordinator import coordinator
+            coordinator.manual_action(project, action)
+            result = {"ok": True, "action": action}
+        elif hasattr(iface, "run_action"):
             result = iface.run_action(action)
             if isinstance(result, dict) and not result.get("ok", True):
                 return {"ok": False, "project": project, "action": action, **result}
@@ -84,7 +88,21 @@ def run_workflow(steps: list[dict]) -> dict:
     }
 
 
+def _screen_visibility(visible):
+    from lib.display_capture import set_visible
+    try:
+        return set_visible(visible)
+    except Exception as exc:
+        return {'ok': False, 'error': str(exc)}
+
+
 _ACTIONS: dict[str, HubAction] = {
+    'show_screen': HubAction('show_screen', 'Show screen',
+                            'Shows desktop capture in every nested desktop view.',
+                            lambda: _screen_visibility(True)),
+    'hide_screen': HubAction('hide_screen', 'Hide screen',
+                            'Hides desktop capture in every nested desktop view.',
+                            lambda: _screen_visibility(False)),
     "abort_all_audio": HubAction(
         id="abort_all_audio",
         label="Abort all audio sources",

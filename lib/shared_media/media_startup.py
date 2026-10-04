@@ -9,8 +9,11 @@ import threading
 import time
 
 import obs
+from lib.performance_monitor import note_media_load
 
 _load_lock = threading.Lock()
+_waiter_lock = threading.Lock()
+_foreground_waiters = 0
 
 
 class MediaStartupCancelled(RuntimeError):
@@ -19,13 +22,22 @@ class MediaStartupCancelled(RuntimeError):
 
 @contextmanager
 def media_startup(source: str, *, cancelled=lambda: False, timeout: float = 5):
+    global _foreground_waiters
+    note_media_load(source, 'queued')
     deadline = time.monotonic() + max(1, timeout)
-    while not _load_lock.acquire(timeout=0.05):
-        if cancelled():
-            raise MediaStartupCancelled('Playback replaced while waiting to load')
-        if time.monotonic() >= deadline:
-            raise TimeoutError('Another media source is still loading; no new decoder started')
+    with _waiter_lock:
+        _foreground_waiters += 1
+    try:
+        while not _load_lock.acquire(timeout=0.05):
+            if cancelled():
+                raise MediaStartupCancelled('Playback replaced while waiting to load')
+            if time.monotonic() >= deadline:
+                raise TimeoutError('Another media source is still loading; no new decoder started')
+    finally:
+        with _waiter_lock:
+            _foreground_waiters -= 1
     started = time.monotonic()
+    note_media_load(source, 'loading')
     try:
         if cancelled():
             raise MediaStartupCancelled('Playback replaced before loading')
@@ -54,11 +66,37 @@ def media_startup(source: str, *, cancelled=lambda: False, timeout: float = 5):
         else:
             raise TimeoutError(f"OBS did not report playback progress for '{source}'")
     except Exception:
+        note_media_load(source, 'failed_or_cancelled')
         # Do not release the gate with a failed startup still decoding.
         obs.stop_media(source)
         raise
     finally:
         elapsed = time.monotonic() - started
         _load_lock.release()
+        note_media_load(source, 'released')
         if elapsed >= 0.5:
             print(f"[media-load] '{source}' startup took {elapsed:.2f}s")
+
+
+@contextmanager
+def background_media_slot(stop_event):
+    """Share the startup gate; waiting live requests precede background work.
+
+Callers hold a slot for one small read/probe, then release it before pacing.
+Shutdown yields False instead of starting more background I/O.
+"""
+    acquired = False
+    while not stop_event.is_set():
+        if _load_lock.acquire(timeout=.05):
+            with _waiter_lock:
+                live_waiting = _foreground_waiters > 0
+            if not live_waiting:
+                acquired = True
+                break
+            _load_lock.release()
+        stop_event.wait(.05)
+    try:
+        yield acquired and not stop_event.is_set()
+    finally:
+        if acquired:
+            _load_lock.release()

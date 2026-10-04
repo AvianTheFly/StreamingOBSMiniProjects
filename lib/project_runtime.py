@@ -42,6 +42,7 @@ class ProjectStatus:
     current_activity:   str | None            # human-readable, e.g. "playing: SongName"
     controlled_scenes:  list[str]             # OBS scenes this project may touch
     can_revert:         bool                  # True if revert() is implemented
+    is_paused:          bool = False          # Actual suspension state, distinct from idle.
 
 
 class ProjectInterface:
@@ -67,6 +68,15 @@ class ProjectInterface:
 
     def get_status(self) -> ProjectStatus:
         raise NotImplementedError
+
+    def workflow_state(self) -> dict:
+        """Optional, cheap read-only phase/wait information for the workflow map.
+
+        Features return public state, without connecting/polling or advancing
+        playback. Unknown information stays absent; never include credentials,
+        chat messages or recorded voice text.
+        """
+        return {}
 
     def revert(self) -> None:
         """Stop all activity and restore OBS to a clean state."""
@@ -119,6 +129,10 @@ class ProjectInterface:
 
     def volume_state(self) -> dict:
         """Optional project/profile volume snapshot for hub display."""
+        return {}
+
+    def capabilities(self) -> dict:
+        """Read-only feature capabilities for consumers; never expose live objects."""
         return {}
 
 

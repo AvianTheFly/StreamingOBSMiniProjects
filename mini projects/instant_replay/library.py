@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import threading
 import uuid
+from lib.json_store import write_json, json_transaction
 
 LOCK = threading.RLock()
 STATE_FILE = Path(__file__).with_name("replay_library.json")
@@ -21,7 +22,7 @@ def clip_id(path):
 
 
 def read():
-    with LOCK:
+    with LOCK, json_transaction(STATE_FILE):
         if not STATE_FILE.exists():
             return {"revision": 0, "clips": {}, "groups": []}
         data = json.loads(STATE_FILE.read_text(encoding="utf-8"))
@@ -32,30 +33,51 @@ def read():
 
 def _write(data):
     data["revision"] = data.get("revision", 0) + 1
-    temporary = STATE_FILE.with_suffix(".tmp")
-    temporary.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
-    temporary.replace(STATE_FILE)
+    write_json(STATE_FILE, data)
 
 
-def remember_capture(path, *, tag="untagged", saved_at=None):
+def highlight_candidate(meta):
+    """Older clips stay eligible; only an explicit replay-only choice excludes."""
+    return meta.get('purpose') != 'replay_only'
+
+
+def highlight_paths(paths):
+    labels = read()['clips']
+    result=[]
+    for p in paths:
+        resolved=Path(p).resolve()
+        meta=labels.get(clip_id(resolved), {})
+        if not resolved.is_file():
+            meta=next((m for m in labels.values() if str(resolved) in m.get('archived_from', [])), {})
+            resolved=Path(meta.get('path', resolved))
+        if resolved.is_file() and highlight_candidate(meta):
+            result.append(str(resolved))
+    return result
+
+
+def remember_capture(path, *, tag="untagged", saved_at=None, purpose='highlight', capture_source=None):
     """Persist a newly saved cut's selection metadata without touching UI data."""
     path = Path(path).resolve()
-    with LOCK:
+    with LOCK, json_transaction(STATE_FILE):
         data = read()
         meta = data["clips"].setdefault(clip_id(path), {})
         meta.update(path=str(path), tag=str(tag or "untagged"),
                     saved_at=float(saved_at) if saved_at is not None else None,
-                    kept=True)
+                    kept=True, purpose=purpose)
+        if capture_source:
+            meta['capture_source'] = str(Path(capture_source).resolve())
         _write(data)
 
 
 def archive_capture(source, destination, *, game=""):
     """Move persistent metadata (and any group references) to an archived cut."""
     source, destination = Path(source).resolve(), Path(destination).resolve()
-    with LOCK:
+    with LOCK, json_transaction(STATE_FILE):
         data = read()
         old_key, new_key = clip_id(source), clip_id(destination)
         meta = dict(data["clips"].pop(old_key, {}))
+        if source != destination:
+            meta['archived_from'] = [*meta.get('archived_from', []), str(source)]
         meta.update(path=str(destination), game=str(game or meta.get("game") or ""), kept=True)
         data["clips"].setdefault(new_key, {}).update(meta)
         for group in data["groups"]:
@@ -81,13 +103,31 @@ def tagged_paths(tag, root):
     return [path for _, path in sorted(rows)]
 
 
+def search_paths(query, root):
+    """Find the newest clip by a spoken title or filename fragment."""
+    needle = " ".join(str(query).casefold().split())
+    if len(needle) < 3:
+        return []
+    metadata = read()["clips"]
+    matches = []
+    for row in disk_rows(root):
+        meta = metadata.get(clip_id(row["path"]), {})
+        haystack = " ".join((str(meta.get("title") or ""), row["name"])).casefold()
+        if needle in haystack:
+            matches.append((needle == str(meta.get("title") or "").casefold(),
+                            row["saved_at"], row["path"]))
+    return [path for _, _, path in sorted(matches, reverse=True)[:1]]
+
+
 def game_paths(game_number, root):
     """Return individual cuts belonging to Game N, oldest first."""
     prefix = f"Game {game_number}"
     rows = []
     with LOCK:
         for meta in read()["clips"].values():
-            if not str(meta.get("game", "")).startswith(prefix):
+            if not highlight_candidate(meta):
+                continue
+            if str(meta.get("game", "")).split()[:2] != prefix.split():
                 continue
             try:
                 resolved = resolve(meta.get("path", ""), root)
@@ -102,6 +142,8 @@ def game_numbers():
     numbers = set()
     with LOCK:
         for meta in read()["clips"].values():
+            if not highlight_candidate(meta):
+                continue
             prefix = str(meta.get("game", "")).split(" ")
             if len(prefix) >= 2 and prefix[0] == "Game" and prefix[1].isdigit():
                 numbers.add(int(prefix[1]))
@@ -126,14 +168,17 @@ def decorate(rows):
                    notes=meta.get("notes", ""), favorite=meta.get("favorite", False),
                    kept=meta.get("kept", False), tag=meta.get("tag", row.get("tag", "")),
                    game=meta.get("game", ""))
+        row.update(purpose='highlight' if highlight_candidate(meta) else 'replay_only',
+                   highlight_candidate=highlight_candidate(meta))
     return {"clips": rows, "groups": data["groups"], "revision": data["revision"]}
 
 
 def disk_rows(root):
     """Library management also works before the OBS-dependent module starts."""
+    from .inventory import replay_files
     rows = []
     root = Path(root).resolve()
-    for path in root.rglob("*"):
+    for path in replay_files(root):
         try:
             if not path.is_file() or path.suffix.lower() not in MEDIA_EXTENSIONS:
                 continue
@@ -149,18 +194,30 @@ def disk_rows(root):
 
 
 def mutate(body, root):
-    with LOCK:
+    with LOCK, json_transaction(STATE_FILE):
         data = read()
         if body.get("revision") != data["revision"]:
             raise Conflict("Library changed in another window. Refresh, then retry your edit.")
         action = body.get("action")
-        if action == "clip":
+        if action == 'purpose':
+            purpose = body.get('purpose')
+            paths = body.get('paths')
+            if purpose not in ('highlight', 'replay_only') or not isinstance(paths, list) or not 1 <= len(paths) <= 200:
+                raise ValueError('Choose 1–200 clips and a capture purpose.')
+            validated = [resolve(str(p), root) for p in paths]
+            for path in validated:
+                data['clips'].setdefault(clip_id(path), {}).update(path=str(path), purpose=purpose, kept=True)
+        elif action == "clip":
+            if 'purpose' in body and body['purpose'] not in ('highlight', 'replay_only'):
+                raise ValueError('Choose Highlight candidate or Replay only.')
             path = resolve(str(body.get("path", "")), root)
             key = clip_id(path)
             meta = data["clips"].setdefault(key, {})
             meta.update(path=str(path), title=str(body.get("title", "")).strip()[:160],
                         notes=str(body.get("notes", ""))[:4000],
                         favorite=bool(body.get("favorite")), kept=True)
+            if 'purpose' in body:
+                meta['purpose'] = body['purpose']
         elif action == "group":
             name = str(body.get("name", "")).strip()
             if not name or len(name) > 100:
@@ -183,7 +240,7 @@ def mutate(body, root):
                     path = resolve(str(path), root)
                 validated.append(str(path))
                 data["clips"].setdefault(clip_id(path), {}).update(path=str(path), kept=True)
-            group = {"id": gid, "name": name, "paths": validated}
+            group = {**(existing or {}), "id": gid, "name": name, "paths": validated}
             if existing is not None:
                 data["groups"][data["groups"].index(existing)] = group
             else:
@@ -220,7 +277,7 @@ def group_paths(identifier, root, *, by_name=False):
 
 def retain_after_merge(path):
     """Keep curated source clips; mark them so later cleanup won't merge twice."""
-    with LOCK:
+    with LOCK, json_transaction(STATE_FILE):
         data = read()
         meta = data["clips"].get(clip_id(path), {})
         if not meta.get("kept"):

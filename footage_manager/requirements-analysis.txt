@@ -1,0 +1,4 @@
+# Local CPU analysis; never connects to a game API or requires a transcript.
+rapidocr-onnxruntime==1.4.4
+faster-whisper>=1.2,<2
+numpy>=1.26,<3

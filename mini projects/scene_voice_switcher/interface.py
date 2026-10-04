@@ -18,8 +18,23 @@ class _SceneVoiceSwitcherInterface(ProjectInterface):
     controlled_scenes = ["Lobbies", "Test"]
 
     def get_status(self) -> ProjectStatus:
-        active_source = _live.get("active_source", [None])
-        src           = active_source[0]
+        # Queue routing and OBS buttons can select a location independently of
+        # voice commands. Report the actual scene instead of stale command data.
+        src = None
+        try:
+            from obs.client import get_obs
+            from lib.coordination.lobbies import lobby_catalog
+            client = get_obs()
+            program = client.get_current_program_scene().current_program_scene_name
+            candidates, exclusions = lobby_catalog.snapshot('Lobbies')
+            locations = (*candidates, *(n for n in exclusions if n.lower().endswith('lobby') or n=='Spirit Afterparty'))
+            if program in locations:
+                src = program
+            elif program == 'Lobbies':
+                src = next((i['sourceName'] for i in client.get_scene_item_list('Lobbies').scene_items
+                            if i['sourceName'] in locations and i['sceneItemEnabled']), None)
+        except Exception:
+            pass
         is_active     = src is not None
         return ProjectStatus(
             name             = self.name,

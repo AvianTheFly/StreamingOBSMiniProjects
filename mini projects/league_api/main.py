@@ -16,6 +16,7 @@ from http.server import ThreadingHTTPServer
 from urllib.parse import quote
 from lib.league_live_client import fetch_snapshot
 from .production import ProductionSettings
+from lib.coordination.game_policy import game_scene_policy
 
 from .http_server import make_handler
 from .engine import Engine, defaults
@@ -24,6 +25,7 @@ from .editor import SettingsStore, validate_rule, number, describe, FIELDS, EVEN
 
 ROOT=Path(__file__).resolve().parent
 PORT=7431
+REQUIRES_OBS = False
 LIVE_URL='https://127.0.0.1:2999/liveclientdata/allgamedata'
 
 def load_config():
@@ -37,9 +39,19 @@ class Service:
         self.parent_stop=stop_event; self.stop_event=threading.Event(); self.lock=threading.RLock()
         self.production_store=ProductionSettings(ROOT/'production.json')
         self.engine=Engine(load_config(),production_settings=self.production_store.load()); self.status='Waiting for a League game'
+        from .match_screens import MatchScreens
+        self.match_screens=MatchScreens(ROOT/'media'/'match-screens', self.engine.production.settings)
         self.last_success=None; self.error=None; self.clients=0; self.media_errors=[]
         self.store=SettingsStore(ROOT/'alerts.json'); self.audio_lock=threading.Lock()
         self.last_overlay=-1000
+        from .client_scenes import ClientScenes
+        self.client_scenes=ClientScenes(ROOT/'client_scenes.json',scene_hold=self.match_scene_hold)
+
+    def match_scene_hold(self, **context):
+        # Do not take the service lock here: client routing has its own lock.
+        if self.engine.config.get('paused'):
+            return 0
+        return self.match_screens.scene_hold(**context)
 
     def production_settings(self):
         from .production.catalog import manifest, GROUPS
@@ -54,6 +66,7 @@ class Service:
         with self.lock:
             updated=self.production_store.save(self.engine.production.settings,body)
             self.engine.production.configure(updated)
+            self.match_screens.configure(updated)
             return self.production_settings()
 
     def settings(self):
@@ -131,8 +144,27 @@ class Service:
     def snapshot(self):
         with self.lock:
             alerts=self.engine.active()
+            production=self.engine.production.snapshot()
+            # Clip-overlay visibility is independent of the production border toggle.
+            presentation_active=production['enabled'] and not self.engine.config.get('paused')
+            # A death presentation is sustained by actual player state, never by a timer guess.
+            death=self.engine.death_visual
+            death_options=self.engine.production.settings.get('event_options',{}).get('death',{})
+            if presentation_active and self.engine.production.settings.get('survival',True) and death_options.get('enabled',True) and death:
+                production['death']={**death,'elapsed':max(0,self.engine.clock()-death['started'])}
+            else:
+                production['death']=None
+            if not presentation_active:
+                production['enabled']=False
+            match_screen=self.match_screens.snapshot() if presentation_active else None
+            if match_screen:
+                # The full-canvas art owns these lifecycle shows, without rewriting
+                # the user's saved event options, clip media, volumes or layout.
+                if production.get('effect',{} ) and production['effect'].get('key') in {'game_start','victory','defeat','game_end'}:
+                    production['effect']=None
+                production['death']=None
             reaction=self.engine.death_reactions.alert
-            if reaction and reaction["expires"] > self.engine.clock() and not self.engine.config.get("paused") and self.engine.config.get("overlay_enabled",True):
+            if not production['enabled'] and reaction and reaction["expires"] > self.engine.clock() and not self.engine.config.get("paused") and self.engine.config.get("overlay_enabled",True):
                 reaction=copy.deepcopy(reaction)
                 reaction["volume"]=self.engine.config["events"].get("death",{}).get("volume",.7)
                 alerts=[reaction]+[a for a in alerts if a["key"]!="death"][:2]
@@ -145,7 +177,7 @@ class Service:
                 else: alert['media']=''
                 audio=self.media_path(alert.get('audio',''))
                 alert['audio']='/asset?path='+quote(alert['audio']) if audio else ''
-            return {'production':self.engine.production.snapshot(),'overlay_enabled':self.engine.config.get('overlay_enabled',True),'layout':self.engine.config.get('layout',LAYOUT),'status':self.status,'alerts':alerts,'metrics':self.engine.metrics,
+            return {'production':production,'match_screen':match_screen,'overlay_enabled':self.engine.config.get('overlay_enabled',True),'layout':self.engine.config.get('layout',LAYOUT),'status':self.status,'alerts':alerts,'metrics':self.engine.metrics,
                     'sprite':({**self.engine.sprite,'remaining':max(0,self.engine.sprite['expires']-self.engine.clock())} if self.engine.sprite and self.engine.sprite['expires']>self.engine.clock() and not self.engine.config.get('paused') and self.engine.config.get('overlay_enabled',True) else None),
                     'history':self.engine.history[-20:],'error':self.error,'media_errors':self.media_errors[-10:],
                     'paused':self.engine.config.get('paused',False),'revision':self.engine.config.get('revision',0)}
@@ -168,7 +200,8 @@ class Service:
                 now=time.monotonic()
                 with self.lock:
                     gap=self.last_success is not None and now-self.last_success>3
-                    self.engine.ingest(data,baseline=gap)
+                    candidates=self.engine.ingest(data,baseline=gap)
+                    self.match_screens.ingest(data['gameData']['gameTime'],candidates)
                     self.status='Connected to League'; self.error=None; self.last_success=now
             except Exception as exc:
                 with self.lock:
@@ -194,8 +227,11 @@ def run(input_queue,stop_event,*,startup_event=None):
             from .interface import _live
             _live['service']=service
         except ImportError: pass
+        game_scene_policy.register(service, automatic_lobbies=lambda: service.client_scenes.enabled,
+                                   hold=service.match_scene_hold)
         server.daemon_threads=True
         web=threading.Thread(target=server.serve_forever,daemon=True); web.start()
+        threading.Thread(target=service.client_scenes.run,args=(service.stop_event,stop_event),daemon=True,name='league-client-scenes').start()
         # Recover a browser source that OBS loaded before the HTTP service existed.
         from .production.obs_source import recover_overlay
         threading.Thread(target=recover_overlay,args=(service,),daemon=True,name='league-browser-recovery').start()
@@ -203,7 +239,9 @@ def run(input_queue,stop_event,*,startup_event=None):
         print(f'[league_api] Ready: http://127.0.0.1:{PORT}/production · borders and optional clip alerts',flush=True)
         service.poll()
     finally:
-        service.engine.clear(); server.shutdown(); server.server_close()
+        game_scene_policy.unregister(service)
+        service.stop_event.set()
+        service.engine.clear(); service.match_screens.clear(); server.shutdown(); server.server_close()
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(); parser.add_argument('--write-defaults',action='store_true'); args=parser.parse_args()

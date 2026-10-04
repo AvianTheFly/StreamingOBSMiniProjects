@@ -81,6 +81,9 @@ def make_champion_kill_handler(kill_audio_player=None):
     # ── OBS actions ───────────────────────────────────────────────────────────
 
     def _flash_border():
+        from ..utils import production_borders_active
+        if production_borders_active():
+            return
         try:
             obs.toggle_source(
                 CHAMPION_KILL_BORDER_SCENE,

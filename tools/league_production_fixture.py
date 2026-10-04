@@ -20,6 +20,7 @@ if __name__ == '__main__':
     with tempfile.TemporaryDirectory() as folder, patch.object(main, 'ROOT', Path(folder)), patch('lib.settings_backups.SettingsBackups.snapshot'):
         (main.ROOT/'production.json').write_text(json.dumps({**DEFAULTS,'enabled':True}),encoding='utf-8')
         service = main.Service(threading.Event())
+        service.match_screens.asset_dir = web_root/'media'/'match-screens'
         handler = make_handler(service,root=web_root,port=0,load_config=main.load_config)
         server = ThreadingHTTPServer(('127.0.0.1',0),handler)
         print(json.dumps({'port':server.server_port}),flush=True)

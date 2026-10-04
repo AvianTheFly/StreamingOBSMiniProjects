@@ -2,6 +2,9 @@
 from __future__ import annotations
 
 import json
+import math
+from lib.json_store import write_json
+from lib.project_settings import audio_settings_transaction
 from hub_ui import project_status, updates
 
 class ProfileRoutes:
@@ -59,8 +62,16 @@ class ProfileRoutes:
         except Exception as exc:
             self._err(500, str(exc))
 
+    @audio_settings_transaction
     def _post_editor_profiles(self):
         body = self._body()
+        for key in ("project_volume_db", "profile_volume_db"):
+            if key in body:
+                try:
+                    if not math.isfinite(float(body[key])):
+                        raise ValueError()
+                except (TypeError, ValueError):
+                    return self._err(400, "Volumes must be finite numbers")
         project_key = str(body.get("project") or "").strip()
         profile_name = str(body.get("profile") or "").strip()
         try:
@@ -93,13 +104,10 @@ class ProfileRoutes:
                 profile["interface_hotkeys"] = normalize_interface_hotkeys(body["interface_hotkeys"])
             for key in ("project_volume_db", "profile_volume_db"):
                 if key in body:
-                    try:
-                        profile[key] = float(body.get(key))
-                    except (TypeError, ValueError):
-                        profile[key] = 0.0
+                    profile[key] = float(body[key])
             raw.setdefault("active_profile", profile_name or "default")
             raw.setdefault("live_profile", raw.get("active_profile", profile_name or "default"))
-            state_file.write_text(json.dumps(raw, indent=2, ensure_ascii=False), encoding="utf-8")
+            write_json(state_file, raw)
             if raw.get("live_profile") == (profile_name or "default"):
                 save_hotkeys(proj.hotkeys_file, profile.get("hotkeys", {}))
             updates.broadcast("editor_profiles_updated", {"project": project_key, "profile": profile_name or "default"})

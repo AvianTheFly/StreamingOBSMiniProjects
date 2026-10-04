@@ -20,11 +20,15 @@ class SnapshotClient:
         self.lock = threading.Lock()
         self.snapshot = None
         self.fetched_at = -1000
+        self.unavailable_until = -1000
 
     def fetch(self):
         with self.lock:
-            if self.snapshot is not None and self.clock() - self.fetched_at < .25:
+            now = self.clock()
+            if self.snapshot is not None and now - self.fetched_at < .25:
                 return copy.deepcopy(self.snapshot)
+            if now < self.unavailable_until:
+                raise LiveClientUnavailable('League live client is unavailable')
             try:
                 with self.opener.open('https://127.0.0.1:2999/liveclientdata/allgamedata', timeout=2) as response:
                     data = json.load(response)
@@ -33,11 +37,13 @@ class SnapshotClient:
                     raise ValueError('League snapshot is missing gameTime')
             except (OSError, URLError) as exc:
                 self.snapshot = None
+                self.unavailable_until = self.clock() + .5
                 raise LiveClientUnavailable('League live client is unavailable') from exc
             except (ValueError, TypeError, AttributeError):
                 self.snapshot = None
                 raise
             self.snapshot, self.fetched_at = data, self.clock()
+            self.unavailable_until = -1000
             return copy.deepcopy(data)
 
 

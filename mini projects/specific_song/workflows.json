@@ -1,0 +1,95 @@
+{
+  "module": {
+    "id": "specific_song",
+    "label": "Music",
+    "group": "Media",
+    "icon": "music",
+    "description": "Selects songs and renders their visualizers.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "specific_song.trigger",
+      "label": "Choose a song",
+      "topic": "Music",
+      "trigger": {
+        "label": "Choose a song",
+        "event": "source.request",
+        "kind": "control"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Match song / category",
+          "owner": "specific_song",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "One song source worker",
+          "owner": "media_workers",
+          "kind": "wait",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Apply per-song levels",
+          "owner": "specific_song",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Play with reactive visualizer",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        },
+        {
+          "id": "4",
+          "label": "Cleanup before next song",
+          "owner": "media_workers",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "media_workers": "99a1a00f5854b87301b5e62b0837f5e035bf87e45a4552403c603e0e3de1f064",
+        "specific_song": "e7e1202a6974b27ae26f8bd293bc731a9b8950027cb12ec7468309b3f8f6c66d",
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/specific_song/main.py",
+          "symbol": "run",
+          "hash": "480d7b7a689f76a7bbf0d151445f71437f9fc91ab82160447fbba03a75745f59"
+        },
+        {
+          "path": "mini projects/specific_song/player.py",
+          "symbol": "SongPlayer",
+          "hash": "d7b234f6122d69697d684568d94531ce6dd01d080f63307250f54f30e95c1da0"
+        }
+      ]
+    }
+  ]
+}

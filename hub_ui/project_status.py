@@ -24,12 +24,14 @@ def all_statuses() -> list[dict]:
                 result.append({
                     "name":             s.name,
                     "is_active":        s.is_active,
+                    "is_paused":        s.is_paused,
                     "current_activity": s.current_activity,
                     "controlled_scenes": list(s.controlled_scenes),
                     "can_revert":       s.can_revert,
                     "produces_audio":   getattr(iface, "produces_audio", False),
                     "actions":          iface.action_catalog() if hasattr(iface, "action_catalog") else [],
                     "volume":           iface.volume_state() if hasattr(iface, "volume_state") else {},
+                    "workflow":         iface.workflow_state() if hasattr(iface, 'workflow_state') else {},
                 })
             except Exception as exc:
                 result.append({

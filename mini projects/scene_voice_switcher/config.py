@@ -24,6 +24,18 @@ GAME_SCENE = "Test"
 # name them clearly in PascalCase and the auto-discovery will handle the rest.
 # ---------------------------------------------------------------------------
 SOURCE_ALIASES: dict[str, tuple[str, ...]] = {
+    'TavernWorldLobby': ('lobby of legends','legends','tavern'),
+    'FutureWorldLobby': ('future lounge','future'),
+    'SpiritArcadeLobby': ('arcade','spirit arcade','neon arcade'),
+    'AuroraCampLobby': ('aurora','aurora camp','campfire','camp'),
+    'Spirit Afterparty': ('afterparty','spirit afterparty','clubhouse','party lobby'),
+    'ReefLobby': ('reef', 'turtle reef', 'underwater', 'turtle'),
+    'SpiritRailLobby': ('spirit railway', 'railway', 'train', 'station'),
+    'StormCoastLobby': ('storm coast', 'coast', 'storm retreat', 'beach'),
+    'PhoenixObservatoryLobby': ('phoenix observatory', 'observatory', 'desert', 'phoenix lobby'),
+    'ForgeLobby': ('forge', 'mountain forge', 'spirit forge'),
+    'SanctuaryLobby': ('sanctuary', 'moonlit sanctuary', 'moon lobby'),
+    'SkyHarborLobby': ('sky harbor', 'sky harbour', 'harbor', 'airship'),
     "FutureLobby": (
         "feature lobby",
         "futur lobby",

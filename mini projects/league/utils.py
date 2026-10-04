@@ -9,6 +9,13 @@ import threading
 import obs
 
 
+def production_borders_active() -> bool:
+    """The running border service owns these visuals; retain legacy sources as fallback."""
+    from lib.project_runtime import project_registry
+    interface = project_registry.get('league_api')
+    return bool(interface and interface.capabilities().get('production_borders'))
+
+
 def _normalize_respawn_border(scene: str, source: str) -> None:
     """
     RespawnBorder is an OBS group. OBS persists group transforms, so if it gets
@@ -69,12 +76,14 @@ def _normalize_respawn_border(scene: str, source: str) -> None:
         print(f"[league] Could not reset {source} transform: {exc}")
 
 
-def show_overlay(scene: str, source: str, duration: float | None) -> None:
+def show_overlay(scene: str, source: str, duration: float | None, *, production_owned=True) -> None:
     """Show an OBS source overlay.
 
     duration=None  → source stays visible until hidden by something else.
     duration=N     → source auto-hides after N seconds (non-blocking).
     """
+    if production_owned and production_borders_active():
+        return
     _normalize_respawn_border(scene, source)
     if duration is None:
         obs.show_source(scene, source)

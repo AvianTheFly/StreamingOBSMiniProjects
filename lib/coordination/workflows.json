@@ -1,0 +1,409 @@
+{
+  "module": {
+    "id": "coordination",
+    "label": "Scene & audio ownership",
+    "group": "Shared resources",
+    "icon": "scene",
+    "description": "Decides who may present, play, pause or resume.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "coordination.admission",
+      "label": "A module wants playback",
+      "topic": "Shared audio",
+      "trigger": {
+        "label": "A module wants playback",
+        "event": "coordinator.play_cleared",
+        "kind": "event"
+      },
+      "detail": "Saved rules and optional explicit feature pause targets are both acquired under this actual PlaybackTicket. Existing callers keep saved-rule behavior; newer playback sequence precedence and manual/scoped gates remain intact. Admission callbacks schedule promptly; cleanup finishes its own ticket.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Keep latest module request",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Acquire configured and feature pause claims",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Release older ticket claims",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Grant this ticket when allowed",
+          "owner": "coordination",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "4",
+          "label": "Source worker starts promptly",
+          "owner": "media_workers",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "coordination": "9719a70125356a757d7dd8d4ef1fd4f079a6b403628d6c6088c434b8d230b5a6",
+        "media_workers": "99a1a00f5854b87301b5e62b0837f5e035bf87e45a4552403c603e0e3de1f064"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "lib/coordination/playback.py",
+          "symbol": "PlayCoordinator._dispatch",
+          "hash": "7bc8880c8dc31a0b2260c9a4ac14b534a0132cc54f19ef836531e96f20db05a4"
+        }
+      ],
+      "effects": [
+        {
+          "resource": "audio",
+          "intent": "Grant the latest playback ticket",
+          "role": "write",
+          "protection": "Configured pause claims are acquired before older claims release. A newer playback ticket can preempt an older claim; manual and scoped claims still block.",
+          "watch": "Reciprocal playback rules use ticket sequence to avoid mutual waiting. Manual/scoped claims have no playback sequence and remain blockers."
+        }
+      ]
+    },
+    {
+      "id": "coordination.finish",
+      "label": "A playback finishes",
+      "topic": "Shared audio",
+      "trigger": {
+        "label": "A playback finishes",
+        "event": "coordinator.project_resumed",
+        "kind": "event"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Release this request claim",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Other owners still holding?",
+          "owner": "coordination",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Keep paused until final release",
+          "owner": "coordination",
+          "kind": "wait",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Resume only if permitted",
+          "owner": "coordination",
+          "kind": "end",
+          "detail": "Preexisting and manual pauses survive unrelated completion."
+        }
+      ],
+      "owner_hashes": {
+        "coordination": "9719a70125356a757d7dd8d4ef1fd4f079a6b403628d6c6088c434b8d230b5a6"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "lib/coordination/pauses.py",
+          "symbol": "PauseLedger.release",
+          "hash": "de15c7b86b1e0a7e18dc74a00136304e180770aeadbe654ae5281f6816c1dc31"
+        }
+      ],
+      "effects": [
+        {
+          "resource": "audio",
+          "intent": "Release this request’s pause claims",
+          "role": "release",
+          "protection": "Other owners keep their claims. A preexisting pause, an explicit no-resume rule, or a replaced interface can prevent automatic resume."
+        }
+      ]
+    },
+    {
+      "id": "coordination.scene",
+      "label": "A module wants the screen",
+      "topic": "Scene ownership",
+      "trigger": {
+        "label": "A module wants the screen",
+        "event": "scene.decision",
+        "kind": "event"
+      },
+      "detail": "Revision and lease checks precede scene preparation. Accepted requests without a feature-specific preparation consume any published lobby layer data before the sole program-scene writer changes the destination. Explicit feature preparation, deferred intent, deliberate ownership and temporary lease semantics remain serialized.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Intent still current?",
+          "owner": "coordination",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Temporary owner still active?",
+          "owner": "coordination",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Defer latest automatic destination",
+          "owner": "coordination",
+          "kind": "wait",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Prepare accepted scene",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "4",
+          "label": "Owned scene write to OBS",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
+        "coordination": "9719a70125356a757d7dd8d4ef1fd4f079a6b403628d6c6088c434b8d230b5a6"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "lib/coordination/scenes.py",
+          "symbol": "SceneDirector.request",
+          "hash": "14f92989ee1795971f7edd7018720393745ae3fe633a118a911bedfd321a7923"
+        }
+      ],
+      "effects": [
+        {
+          "resource": "scene",
+          "intent": "Validate and apply a scene intention",
+          "role": "write",
+          "protection": "SceneDirector serializes requests. A temporary reservation blocks automatic writes; a newer manual revision rejects delayed intent.",
+          "watch": "There is no fixed priority between two fresh automatic writers. Without a lease, accepted later writes can replace earlier ones. During a lease, the director retains one latest deferred destination; client automation retries its own target."
+        }
+      ]
+    },
+    {
+      "id": "coordination.outside",
+      "label": "You change scene in OBS",
+      "topic": "Scene ownership",
+      "trigger": {
+        "label": "You change scene in OBS",
+        "event": "scene.decision",
+        "kind": "event"
+      },
+      "detail": "An outside scene choice revokes an older temporary lease and its deferred return. After recording the observed destination, shared mechanics repair the currently chosen published lobby layers. They do not write the program scene, rotate an already selected location or reveal the desktop. A repair failure is recorded as a layout error.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Observe outside scene change",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Revoke temporary ownership",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Discard older automatic return",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Keep your newer view",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
+        "coordination": "9719a70125356a757d7dd8d4ef1fd4f079a6b403628d6c6088c434b8d230b5a6"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "lib/coordination/scenes.py",
+          "symbol": "SceneDirector.observe",
+          "hash": "5aead55843b99b2d7ad8bb096f8848c967d1e9e72a7858fed934db4635c29151"
+        }
+      ],
+      "effects": [
+        {
+          "resource": "scene",
+          "intent": "Keep the newer scene chosen in OBS",
+          "role": "write",
+          "protection": "An outside change advances the manual revision, revokes temporary ownership and discards the older deferred return."
+        }
+      ]
+    },
+    {
+      "id": "coordination.session_return",
+      "label": "A temporary presentation ends",
+      "topic": "Scene ownership",
+      "trigger": {
+        "label": "A temporary presentation ends",
+        "event": "scene.decision",
+        "kind": "event"
+      },
+      "detail": "SceneSession optionally holds its pause claim through the scoped return transition. The minimum duration covers OBS reporting its global cursor; the bounded wait rejects a newer manual revision or a failed connection.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Finish only the current lease",
+          "owner": "coordination",
+          "kind": "gate",
+          "detail": "SceneDirector restores the previous scene only while this lease remains current."
+        },
+        {
+          "id": "1",
+          "label": "Wait for the owned return",
+          "owner": "coordination",
+          "kind": "wait",
+          "detail": "Opt-in wait: scoped minimum plus OBS cursor, bounded to the greater of 12 seconds and the scoped duration; no director lock is held."
+        },
+        {
+          "id": "2",
+          "label": "Reject a newer manual choice",
+          "owner": "coordination",
+          "kind": "gate",
+          "detail": "Manual revision changes and OBS failures prevent automatic resume."
+        },
+        {
+          "id": "3",
+          "label": "Release only this pause claim",
+          "owner": "coordination",
+          "kind": "end",
+          "detail": "Other claims and preexisting manual pauses remain effective."
+        }
+      ],
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "lib/coordination/scene_session.py",
+          "symbol": "SceneSession.finish",
+          "hash": "b861fb122096db03233edcc46bc6e622eca9f947978370141d0a5a4877a8038c"
+        },
+        {
+          "path": "lib/coordination/scene_session.py",
+          "symbol": "SceneSession._wait_for_return_transition",
+          "hash": "c503c4d7b1998cbb9b616b217775d599f878cd914ea314caa7fc1dd5681cad97"
+        }
+      ],
+      "owner_hashes": {
+        "coordination": "9719a70125356a757d7dd8d4ef1fd4f079a6b403628d6c6088c434b8d230b5a6"
+      },
+      "effects": [
+        {
+          "resource": "audio",
+          "intent": "Keep a scoped pause through return",
+          "role": "release",
+          "protection": "The temporary presentation opts in. Resume is allowed only after an owned, current return; the default finish contract remains immediate."
+        }
+      ]
+    }
+  ]
+}

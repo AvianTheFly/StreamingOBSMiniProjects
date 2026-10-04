@@ -8,7 +8,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from lib.paths import ensure_import_paths, load_project_env
 ensure_import_paths(); load_project_env()
 from league.core.game_state_detector import GameStateDetector
-from obs.interaction import ensure_input_on_stream_track
+from obs.audio import ensure_input_on_stream_track
 from specific_song.player import SongPlayer
 import threading
 import tempfile
@@ -16,6 +16,23 @@ import json
 from lib.shared_media.single_source_state import SingleSourceStateStore
 
 class RegressionTests(unittest.TestCase):
+    def test_failed_asset_state_publication_preserves_existing_personal_data(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder)
+            file = path / 'single_source_state.json'
+            original = {'version': 1, 'baseline': {}, 'overrides': {
+                'hooray': {'transform': {'positionX': 75}, 'filters': []}}}
+            file.write_text(json.dumps(original), encoding='utf-8')
+            store = SingleSourceStateStore(project_dir=path, scene='soundboard',
+                source_name='sb__player', tag='test')
+            store._data['overrides']['hooray']['transform']['positionX'] = 100
+            with patch('lib.json_store.os.replace', side_effect=PermissionError('reader holds file')), \
+                 patch('lib.json_store.time.sleep'):
+                with self.assertRaises(PermissionError):
+                    store._save()
+            self.assertEqual(json.loads(file.read_text(encoding='utf-8')), original)
+            self.assertFalse(list(path.glob('*.tmp')))
+
     def test_asset_filters_and_transform_survive_reload(self):
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder)
@@ -76,13 +93,13 @@ class RegressionTests(unittest.TestCase):
         client.get_profile_parameter.side_effect=[SimpleNamespace(parameter_value='Advanced'),SimpleNamespace(parameter_value='3')]
         tracks={'1':False,'2':False,'3':False,'4':True,'5':False,'6':True}
         client.get_input_audio_tracks.return_value=SimpleNamespace(input_audio_tracks=tracks)
-        with patch('obs.interaction.get_obs',return_value=client): self.assertEqual(ensure_input_on_stream_track('music'),3)
+        with patch('obs.audio.get_obs',return_value=client): self.assertEqual(ensure_input_on_stream_track('music'),3)
         client.set_input_audio_tracks.assert_called_once_with('music',{**tracks,'3':True})
 
     def test_simple_output_uses_track_one(self):
         client=Mock(); client.get_profile_parameter.return_value=SimpleNamespace(parameter_value='Simple')
         client.get_input_audio_tracks.return_value=SimpleNamespace(input_audio_tracks={'1':True,'2':False})
-        with patch('obs.interaction.get_obs',return_value=client): self.assertEqual(ensure_input_on_stream_track('music'),1)
+        with patch('obs.audio.get_obs',return_value=client): self.assertEqual(ensure_input_on_stream_track('music'),1)
         client.set_input_audio_tracks.assert_not_called()
 
 if __name__=='__main__': unittest.main()

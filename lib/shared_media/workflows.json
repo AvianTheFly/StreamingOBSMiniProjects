@@ -1,0 +1,102 @@
+{
+  "module": {
+    "id": "media_workers",
+    "label": "Media source workers",
+    "group": "Shared resources",
+    "icon": "play",
+    "description": "Reuses each source only after its prior cleanup.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "media_workers.replace",
+      "label": "A source gets another request",
+      "topic": "Source cleanup",
+      "trigger": {
+        "label": "A source gets another request",
+        "event": "source.request",
+        "kind": "event"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Cancel current request",
+          "owner": "media_workers",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Replace pending request",
+          "owner": "media_workers",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Wait for old final cleanup",
+          "owner": "media_workers",
+          "kind": "wait",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Reuse physical source once",
+          "owner": "media_workers",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "4",
+          "label": "Signal actual completion",
+          "owner": "media_workers",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "media_workers": "99a1a00f5854b87301b5e62b0837f5e035bf87e45a4552403c603e0e3de1f064"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "lib/shared_media/playback_worker.py",
+          "symbol": "PlaybackWorker.submit",
+          "hash": "11871076778cf9988418a0ac95887525af6404ecd3239b22c73dead8dd33c433"
+        },
+        {
+          "path": "lib/shared_media/playback_worker.py",
+          "symbol": "PlaybackWorker._drain",
+          "hash": "41b2a4715a1db73418ad0093ae74435695c78d61dc16d026034247081a0ce977"
+        }
+      ],
+      "effects": [
+        {
+          "resource": "source",
+          "intent": "Replace the pending physical-source request",
+          "role": "write",
+          "protection": "There is one worker and one replaceable pending request. Old cleanup finishes before source reuse.",
+          "watch": "A received request is not completed playback. A replaced pending request is cancelled."
+        }
+      ]
+    }
+  ]
+}

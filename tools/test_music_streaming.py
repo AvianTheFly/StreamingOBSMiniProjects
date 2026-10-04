@@ -47,10 +47,10 @@ class StreamingTests(unittest.TestCase):
 
     def test_start_never_preloads_song(self):
         detector = self.detector(); detector._running = False
-        with patch.object(detector, 'preload') as preload, \
+        with patch('specific_song.bass_detector.subprocess.Popen') as decode, \
              patch('specific_song.bass_detector.threading.Thread') as thread:
             detector.start()
-        preload.assert_not_called()
+        decode.assert_not_called()
         thread.return_value.start.assert_called_once()
 
 

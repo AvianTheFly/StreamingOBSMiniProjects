@@ -1,65 +1,32 @@
-# love_me — CLAUDE.md
+# Mood cues / Love Me
 
-## What this project does
+Read `README.md`, the root `AGENTS.md`, `ARCHITECTURE.md` and `CONTRIBUTING.md`
+before changing this feature.
 
-Sequential media player triggered by `9 → 8 → 7`. Each trigger plays the next
-item in a configured list. Wraps around and resets to item 1 after inactivity
-or when the last item finishes. Designed for sequential "reaction" media moments.
+`987` retains the original four-stage OBS sequence. Authored variations use
+the Hub-owned browser transport, with editable hotkeys and once, fixed-repeat
+or continuous playback. Both paths share `MoodService`'s serial playback worker.
 
-## Scene ownership
+| Owner | Responsibility |
+| --- | --- |
+| `main.py` | Assembly, one keyboard subscription, bounded intent inbox, shutdown |
+| `service.py` | Playback intent, actual coordinator tickets, repeats, replacement cleanup |
+| `player.py` | Original OBS stages and their existing source settings |
+| `settings.py` | Atomic variation persistence, validation and local audio imports |
+| `catalog.py` | Authored directions and timing defaults |
+| `presentation.py` | Browser playback policy, asset faders and recording tracks |
+| `web/` | Original vector art, cue timing, transparent rendering and private preview |
+| `interface.py`, `api.py` | Public workflow and editor contracts |
 
-**Owns:** `LoveMe`
+Keep original sources, groups, transforms, filters, files and levels intact.
+Snapshot settings before edits. OBS fader edits belong to the loaded variation;
+explicit Hub master edits use the public audio interface.
 
-All OBS source interactions (show/hide, restart media) stay within the `LoveMe` scene.
+Use coordinator tickets and their permission gate. Finish the actual ticket
+after source cleanup. Admission only schedules work; never bulk-pause projects
+or hold a source lock while waiting for admission. The browser provider is
+registered during startup and removed during shutdown. Imports start no work.
 
-## Key files
-
-| File | Role |
-|---|---|
-| `main.py` | Hub entry point — keyboard listener, trigger logic, idle reset |
-| `player.py` | `SequentialPlayer` — manages index, plays items, abort/advance |
-| `trigger.py` | `SequenceTrigger` for `987` sequence |
-| `config.py` | `ITEMS` list (the media sequence), trigger sequence, idle reset timing |
-| `interface.py` | `ProjectInterface` — `revert()` aborts playback and hides sources |
-
-## Items configuration
-
-Define the sequence in `config.py → ITEMS`:
-```python
-ITEMS = [
-    {"source": "LoveMeSource1", "scene": "LoveMe"},
-    {"source": "LoveMeSource2", "scene": "LoveMe"},
-]
-```
-Each item must have `source` (OBS source name) and `scene` (must be `"LoveMe"`).
-
-## Trigger logic
-
-```
-Type 9 → 8 → 7  (within TRIGGER_MAX_INTERVAL ms)
-    ├─ If last item is currently playing  →  toggle off (stop + reset)
-    ├─ If IDLE_RESET_SECONDS have passed since last trigger  →  reset to item 1, then play item 1
-    └─ Otherwise  →  play next item in sequence
-```
-
-After the last item finishes naturally, the sequence resets to item 1.
-`IDLE_RESET_SECONDS` (default 15 s) controls the inactivity reset.
-
-## Cross-project coordination
-
-When a trigger fires, this project calls:
-```python
-project_registry.pause_all(except_="love_me")
-```
-This asks all other registered projects to pause (e.g., suspends a song in
-`specific_song`). When the item finishes:
-```python
-project_registry.resume_all(except_="love_me")
-```
-Do NOT use `music_service.pause()` directly — that only reaches specific_song.
-`project_registry.pause_all()` covers any project that implements `pause()`.
-
-## `_live` dict
-
-`main.py` populates:
-- `_live["player"]` — `SequentialPlayer` instance
+HTTP routes use public APIs. Feature-private live state stays in this package.
+Update the responsibility map, workflow map and relevant regression checks when
+changing ownership. See `README.md` for playback controls and verification.

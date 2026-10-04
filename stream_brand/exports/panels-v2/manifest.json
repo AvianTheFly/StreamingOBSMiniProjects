@@ -1,0 +1,61 @@
+{
+  "generatedArtwork": "Built-in imagegen",
+  "assets": [
+    {
+      "id": "social",
+      "file": "social.png",
+      "width": 320,
+      "height": 250,
+      "bytes": 97345
+    },
+    {
+      "id": "club",
+      "file": "club.png",
+      "width": 320,
+      "height": 250,
+      "bytes": 112286
+    },
+    {
+      "id": "support",
+      "file": "support.png",
+      "width": 320,
+      "height": 250,
+      "bytes": 105759
+    },
+    {
+      "id": "receipts",
+      "file": "receipts.png",
+      "width": 320,
+      "height": 250,
+      "bytes": 109462
+    },
+    {
+      "id": "why",
+      "file": "why.png",
+      "width": 320,
+      "height": 250,
+      "bytes": 117360
+    },
+    {
+      "id": "fruit",
+      "file": "fruit.png",
+      "width": 320,
+      "height": 250,
+      "bytes": 113129
+    },
+    {
+      "id": "pum",
+      "file": "pum.png",
+      "width": 320,
+      "height": 250,
+      "bytes": 109118
+    },
+    {
+      "id": "build",
+      "file": "build.png",
+      "width": 320,
+      "height": 250,
+      "bytes": 111330
+    }
+  ]
+}

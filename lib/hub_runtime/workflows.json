@@ -1,0 +1,275 @@
+{
+  "module": {
+    "id": "hub",
+    "label": "Hub & shortcuts",
+    "group": "Inputs",
+    "icon": "desk",
+    "description": "Starts services and dispatches controls and saved workflows.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "hub.startup",
+      "label": "Hub starts",
+      "topic": "Startup",
+      "trigger": {
+        "label": "Hub starts",
+        "event": "hub.started",
+        "kind": "event"
+      },
+      "detail": "OBS-independent features start immediately based on public REQUIRES_OBS=False metadata. Undeclared/invalid dependencies remain deferred; voice and remaining playback workers start once after OBS connects. The CLI keeps its explicit fail-fast option.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Start shared services",
+          "owner": "hub",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "OBS available?",
+          "owner": "hub",
+          "kind": "gate",
+          "detail": "Selected modules publish whether they require OBS."
+        },
+        {
+          "id": "2",
+          "label": "Start independent modules and publish controls",
+          "owner": "hub",
+          "kind": "action",
+          "detail": "Tracking and chat remain available without OBS."
+        },
+        {
+          "id": "3",
+          "label": "Wait for OBS for voice and dependent playback",
+          "owner": "hub",
+          "kind": "wait",
+          "detail": "Cooperative Hub stop signal cancels the wait."
+        },
+        {
+          "id": "4",
+          "label": "Start remaining workers once",
+          "owner": "hub",
+          "kind": "end",
+          "detail": "Independent workers are excluded from the deferred batch."
+        }
+      ],
+      "owner_hashes": {
+        "hub": "2651a208dfe2c15d06a55506164c7fc7795423742dfa750511fa1a7762484d50"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "4",
+          "label": "Online"
+        },
+        {
+          "from": "1",
+          "to": "2",
+          "label": "Offline"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "hub.py",
+          "symbol": "main",
+          "hash": "cebef00bab3483c85cff460b3791a4c9bda6a28a1057424ef52d11c4ac98803b"
+        },
+        {
+          "path": "lib/hub_runtime/projects.py",
+          "symbol": "_start_projects",
+          "hash": "e50b2852da3bec8d618c18b3cd7130ef73fe31552c527dd1394f01ab37e3852d"
+        },
+        {
+          "path": "main.py",
+          "symbol": "_run_hub",
+          "hash": "4c0b26f4cf3c9dd448c1ce17dd84fb8d6fae319ec69a8c385b94c66d82bbfb7a"
+        },
+        {
+          "path": "lib/hub_runtime/projects.py",
+          "symbol": "partition_obs_projects",
+          "hash": "6203dd34200c3c043bd95019af99f407b09bb4aa7b6a12134eeca8433353cec3"
+        }
+      ]
+    },
+    {
+      "id": "hub.controls",
+      "label": "A shortcut or Hub control",
+      "topic": "Shortcuts",
+      "trigger": {
+        "label": "A shortcut or Hub control",
+        "event": "hub_action",
+        "kind": "event"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Resolve the current control",
+          "owner": "hub",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Call the feature interface",
+          "owner": "hub",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Feature accepts or rejects",
+          "owner": "hub",
+          "kind": "gate",
+          "detail": "Accepted is not the same as finished."
+        }
+      ],
+      "owner_hashes": {
+        "hub": "2651a208dfe2c15d06a55506164c7fc7795423742dfa750511fa1a7762484d50"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "hub_actions.py",
+          "symbol": "run_project_action",
+          "hash": "53579d4eafe0db1204305e9eaf4dc4d25d44b66f83dc8b86798173f550ed3a61"
+        }
+      ]
+    },
+    {
+      "id": "hub.workflow",
+      "label": "A saved workflow",
+      "topic": "Saved workflows",
+      "trigger": {
+        "label": "A saved workflow",
+        "event": "hub_action",
+        "kind": "event"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Read your saved steps",
+          "owner": "hub",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Run steps in order",
+          "owner": "hub",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Report each result",
+          "owner": "hub",
+          "kind": "end",
+          "detail": "Later steps still run after a failed step."
+        }
+      ],
+      "owner_hashes": {
+        "hub": "2651a208dfe2c15d06a55506164c7fc7795423742dfa750511fa1a7762484d50"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "hub_actions.py",
+          "symbol": "run_workflow",
+          "hash": "3f10243d48f80021af19bd8198d9512a52c46e54e5e986fa641fb96f3d161a7c"
+        }
+      ]
+    },
+    {
+      "id": "hub.source_review",
+      "label": "Review workflow source evidence",
+      "topic": "Workflow map",
+      "trigger": {
+        "label": "Open workflow map",
+        "kind": "control"
+      },
+      "detail": "Read source without importing feature code. Checkout module junctions are allowed only at the matching supported feature’s exact LOCALAPPDATA home; absolute paths, parent traversal and nested links escaping that home are rejected.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Validate the source location",
+          "owner": "hub",
+          "kind": "gate",
+          "detail": "Checkout Python file or a supported module installed at LOCALAPPDATA/StreamingHub/feature-packages/<module>."
+        },
+        {
+          "id": "1",
+          "label": "Read source and compare AST evidence",
+          "owner": "hub",
+          "kind": "action",
+          "detail": "No feature code executes. Changed functions or owner fingerprints require review."
+        },
+        {
+          "id": "2",
+          "label": "Show verification or review needed",
+          "owner": "hub",
+          "kind": "end",
+          "detail": "Only a reviewed flow is stamped; unrelated changed flows remain flagged."
+        }
+      ],
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "lib/workflow_map/source.py",
+          "symbol": "safe_source",
+          "hash": "26b290674ce3df2f67201a10fe46f50785544260cc20fb8d1f0a80220b51ae02"
+        },
+        {
+          "path": "lib/workflow_map/source.py",
+          "symbol": "proof",
+          "hash": "1a2f183361fa47969b9839bcd8eedf7f05540e629c2787c39d0067f6456e7aec"
+        }
+      ],
+      "owner_hashes": {
+        "hub": "9628c27220bc9e32b00169b5da1e13928e7e25ef443065bdcdfead960668da7f"
+      }
+    }
+  ]
+}

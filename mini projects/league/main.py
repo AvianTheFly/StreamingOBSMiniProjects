@@ -62,4 +62,6 @@ def run(
 
     unsubscribe_global_hotkeys(kb_token)
     watcher_thread.join(timeout=3)
+    watcher.shutdown()
+    atexit.unregister(watcher.shutdown)
     print("[league] Stopped.")

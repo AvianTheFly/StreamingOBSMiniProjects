@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import json
-import subprocess
-from functools import lru_cache
+import math
 from pathlib import Path
 
 import obs
 
 from lib.project_settings import load_project_settings
+from lib.media_metadata import probe_media
 
 from .media_config import MediaProjectConfig
 
@@ -34,33 +34,10 @@ def probe_dimension_key(path: Path) -> str:
     if path.suffix.lower() not in VIDEO_EXTS:
         return ""
     try:
-        stat = path.stat()
-        return _probe_dimension_key(str(path.resolve()), stat.st_mtime_ns, stat.st_size)
+        return probe_media(path).dimension_key
     except Exception:
         # Failed/missing files are retried on the next request, not cached.
         return ""
-
-
-@lru_cache(maxsize=512)
-def _probe_dimension_key(path: str, modified_ns: int, size: int) -> str:
-    """Bounded metadata cache; replacing/editing a file invalidates its entry."""
-    proc = subprocess.run(
-        [
-            "ffprobe", "-v", "error", "-select_streams", "v:0",
-            "-show_entries", "stream=width,height", "-of", "json", path,
-        ],
-        capture_output=True,
-        text=True,
-        timeout=5,
-        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
-    )
-    if proc.returncode != 0:
-        raise ValueError("Media probe failed")
-    raw = json.loads(proc.stdout or "{}")
-    stream = (raw.get("streams") or [{}])[0]
-    width = int(stream.get("width") or 0)
-    height = int(stream.get("height") or 0)
-    return f"{width}x{height}" if width and height else ""
 
 
 def safe_transform(raw: dict) -> dict:
@@ -80,6 +57,8 @@ def safe_transform(raw: dict) -> dict:
             number = float(value)
         except (TypeError, ValueError):
             continue
+        if not math.isfinite(number):
+            continue
         clean[key] = int(number) if key in {"alignment", "boundsAlignment"} else number
     clean.setdefault("alignment", 5)
     clean.setdefault("boundsAlignment", 0)
@@ -91,8 +70,8 @@ def obs_transform_from_rule(rule: dict) -> dict:
     clean = safe_transform(rule)
     crop_left = float(clean.get("cropLeft") or 0)
     crop_top = float(clean.get("cropTop") or 0)
-    scale_x = float(clean.get("scaleX") or 1)
-    scale_y = float(clean.get("scaleY") or 1)
+    scale_x = float(clean.get("scaleX", 1))
+    scale_y = float(clean.get("scaleY", 1))
     # The editor stores position as the un-cropped source box. OBS positions
     # the visible cropped scene item, so offset by the crop amount when applying.
     clean["positionX"] = float(clean.get("positionX") or 0) + crop_left * scale_x

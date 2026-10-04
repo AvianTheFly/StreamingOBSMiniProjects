@@ -1,0 +1,17 @@
+{
+  "enabled": true,
+  "lobby_scene": "Lobbies",
+  "idle_scene": "just screen",
+  "idle_presentation": "lobby",
+  "queue_group": "TavernLobby",
+  "champion_group": "LOL champ select",
+  "other_lobby_groups": [
+    "FutureLobby"
+  ],
+  "hidden_queue_sources": [
+    "DESKTOP 3D SCREEN",
+    "league client"
+  ],
+  "theme": "random",
+  "champion_scene": "League Champion Select World"
+}

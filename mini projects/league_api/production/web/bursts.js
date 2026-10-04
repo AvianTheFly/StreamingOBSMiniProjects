@@ -5,6 +5,7 @@ import { blades, streak, link, fracture, pulse } from './combat.js';
 import { elemental, wings } from './elements.js';
 import { voidArms, eye, grubs, structure, crown } from './objectives.js';
 import { runes, portal, treasure, harvest, vision, march } from './progression.js';
+import { eventArt } from './event-art.js';
 
 const renderers = {
   blades,
@@ -31,6 +32,7 @@ export function burst(c, effect, options) {
   const t = effect.elapsed,
     d = effect.duration;
   if (t < 0 || t >= d) return;
+  if(eventArt(c,effect,options))return;
   const p = clamp(t / d),
     color = colors[effect.theme] || colors.gold;
   const power = Math.max(

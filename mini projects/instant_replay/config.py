@@ -19,10 +19,6 @@ SCENE        = "InstantReplay"
 SOURCE_NAME  = "InstantReplayMedia"
 RETURN_SCENE = "Test"   # scene to return to after replay finishes
 
-# Instant Replay Logo
-INSTANT_REPLAY_LOGO_SCENE = "InstantReplay"
-INSTANT_REPLAY_LOGO_SOURCE = "InstantReplayLogo"
-
 # How long to wait for OBS to confirm the replay buffer was written to disk.
 REPLAY_SAVE_TIMEOUT: float = 15.0
 

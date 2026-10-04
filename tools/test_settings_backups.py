@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 import sys
 import tempfile
@@ -10,6 +11,19 @@ from lib.settings_backups import SettingsBackups
 
 
 class BackupTests(unittest.TestCase):
+    def test_personal_chat_pack_has_version_history_and_recovery(self):
+        with tempfile.TemporaryDirectory() as folder, patch.dict('os.environ', {'APPDATA': ''}):
+            root = Path(folder) / 'repo'
+            root.mkdir()
+            path = root / 'chat_sticker_pack.json'
+            payload = {'emotes': {'RaveTime': {'url': 'https://cdn.test/rave.webp'}}, 'personal': 42}
+            path.write_text(json.dumps(payload))
+            history = SettingsBackups(root, Path(folder) / 'history')
+            history.snapshot()
+            path.unlink()
+            history.recover_missing()
+            self.assertEqual(json.loads(path.read_text()), payload)
+
     def test_versions_recovery_and_valid_user_edits(self):
         with tempfile.TemporaryDirectory() as folder, patch.dict('os.environ', {'APPDATA': ''}):
             root = Path(folder) / 'repo'
@@ -29,6 +43,25 @@ class BackupTests(unittest.TestCase):
             self.assertEqual(json.loads(settings.read_text())['volume'], -8)
             versions = list((history.backup_root / settings.relative_to(root)).glob('*.json'))
             self.assertEqual(len(versions), 3)  # two versions plus latest
+
+    def test_watcher_skips_unchanged_files_and_retries_partial_writes(self):
+        with tempfile.TemporaryDirectory() as folder, patch.dict('os.environ', {'APPDATA': ''}):
+            root = Path(folder) / 'repo'
+            history = SettingsBackups(root, Path(folder) / 'history')
+            settings = root / 'mini projects/soundboard/hotkeys_editor.json'
+            settings.parent.mkdir(parents=True)
+            settings.write_text('{"volume": -12}')
+            history.snapshot()
+            with patch.object(Path, 'read_bytes', side_effect=AssertionError('unchanged file reread')):
+                history.snapshot(changed_only=True)
+
+            settings.write_text('{')
+            history.snapshot(changed_only=True)
+            settings.write_text('{"volume": -8}')
+            os.utime(settings, None)
+            history.snapshot(changed_only=True)
+            latest = history.backup_root / settings.relative_to(root) / 'latest.json'
+            self.assertEqual(json.loads(latest.read_text())['volume'], -8)
 
 
 if __name__ == '__main__':

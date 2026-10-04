@@ -32,6 +32,16 @@ class _SoundboardInterface(PlayerInterface):
             "source_name": SINGLE_SOURCE_NAME,
         }
 
+    def asset_catalog(self) -> list[dict]:
+        getter = _live.get('asset_catalog')
+        return getter() if getter else []
+
+    def play_asset(self, source: str) -> dict:
+        runner = _live.get('play_asset')
+        if not runner:
+            return {'ok': False, 'error': 'Soundboard is not ready.'}
+        return runner(source)
+
 
 interface = _SoundboardInterface(_live)
 project_registry.register(interface)

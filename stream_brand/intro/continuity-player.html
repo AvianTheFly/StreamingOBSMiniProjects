@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rift Stand — Storm and Stone — UdyrIsABotLaner</title>
+<style>
+*{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:#070c12;color:#e5e9e4;font:16px 'Segoe UI',sans-serif}main{max-width:1320px;margin:0 auto;padding:36px 40px}header{display:flex;align-items:end;justify-content:space-between;gap:22px;margin-bottom:22px}.eyebrow{color:#78b8bb;font-size:11px;font-weight:600;letter-spacing:2.6px}h1{font-family:Impact,'Arial Narrow',sans-serif;font-weight:400;letter-spacing:.2px;font-size:clamp(30px,4vw,54px);margin:10px 0 8px}p{color:#99adb7;margin:0;line-height:1.7;font-size:14px}.versions{display:flex;gap:5px;padding:5px;border:1px solid #24404b;border-radius:5px;background:#101922;white-space:nowrap}button{font:600 12px 'Segoe UI',sans-serif;color:#97aab4;border:0;background:transparent;border-radius:3px;padding:11px 14px;cursor:pointer}button[aria-pressed=true]{background:#203d43;color:#daf6ed}button:focus-visible,a:focus-visible{outline:2px solid #91ead9;outline-offset:4px}video{display:block;width:100%;aspect-ratio:16/9;background:#000;border:1px solid #24363f;border-radius:4px}.foot{display:flex;gap:24px;justify-content:space-between;align-items:center;margin:16px 0 30px}a{color:#b0e1d9;text-decoration:none;border-bottom:1px solid #47716c;padding-bottom:3px;font-size:13px}.download{background:#96dcd0;border:0;border-radius:3px;color:#0c2229;font-weight:700;padding:11px 16px}.note{font-size:12px;color:#748c99}.storyboard{border:1px solid #24363f;display:block;width:100%;height:auto}details{margin-top:28px}summary{cursor:pointer;color:#b9ccc9;font-size:13px}details img{margin:16px 0}footer{margin-top:30px;font-size:11px;color:#69818e;letter-spacing:1px}@media(max-width:800px){main{padding:24px 18px}header{align-items:start;flex-direction:column}.foot{flex-wrap:wrap;gap:15px}.versions{width:100%;justify-content:space-around}.note{flex-basis:100%}}
+</style>
+<main>
+<header><div><div class="eyebrow">UDYRISABOTLANER / STREAM INTRO</div><h1>Rift Stand — Storm and Stone</h1><p>40 seconds · 1080p / 60 fps · 26 new keyframes · One continuous fight.</p></div><div class="versions" role="group" aria-label="Soundtrack version"><button data-mode="music" aria-pressed="true">Music + effects</button><button data-mode="effects" aria-pressed="false">Effects only</button><button data-mode="picture" aria-pressed="false">Silent picture</button></div></header>
+<video controls preload="metadata" poster="poster.jpg" src="udyr-sion-continuity-intro-40s.mp4" aria-label="Udyr forty-second stream intro"></video>
+<div class="foot"><span class="note" id="version-note">First 40 seconds of your Fortunate Son (MOONLGHT Remix) file.</span><a href="spirit-effects-40s.wav" download>Effects stem</a><a class="download" id="download" href="udyr-sion-continuity-intro-40s.mp4" download>Download video</a></div>
+<details><summary>View the storyboard</summary><a href="storyboard.jpg" download><img class="storyboard" src="storyboard.jpg" alt="Every shot from the Udyr versus Sion story edit, in chronological order"></a></details>
+<details><summary>Bear and turtle — physical and spirit forms</summary><a href="spirit-designs-poses.jpg" download><img class="storyboard" src="spirit-designs-poses.jpg" alt="Ferocious physical and spectral lightning bear and jade armored turtle"></a></details>
+<details><summary>Bear — connected action poses</summary><a href="bear-poses.jpg" download><img class="storyboard" src="bear-poses.jpg" alt="bear anticipation, strike and recovery poses"></a></details>
+<details><summary>Shield — connected action poses</summary><a href="shield-poses.jpg" download><img class="storyboard" src="shield-poses.jpg" alt="shield anticipation, strike and recovery poses"></a></details>
+<details><summary>Ram — knee, recovery and charge</summary><a href="ram-recovery-poses.jpg" download><img class="storyboard" src="ram-recovery-poses.jpg" alt="Udyr summons the ram from his knee, rises, loads and charges"></a></details>
+<details><summary>Ram — impact, fall and knockdown</summary><a href="ram-knockdown-poses.jpg" download><img class="storyboard" src="ram-knockdown-poses.jpg" alt="Sion is knocked backward and falls onto his back"></a></details>
+<details><summary>Phoenix — connected action poses</summary><a href="phoenix-poses.jpg" download><img class="storyboard" src="phoenix-poses.jpg" alt="phoenix anticipation, strike and recovery poses"></a></details>
+<p style="margin-top:24px"><a href="rift-continuity-artwork.zip" download>Download artwork + edit plans</a></p>
+<footer>26 NEW KEYFRAMES · 39 SHOTS · FOUR SPIRITS</footer>
+<details><summary>Victory — landing, recovery and rise</summary><a href="victory-poses.jpg" download><img class="storyboard" src="victory-poses.jpg" alt="Udyr recovers from his landing while Sion remains down"></a></details>
+</main>
+<script>
+const files={music:'udyr-sion-continuity-intro-40s.mp4',effects:'udyr-sion-continuity-intro-effects-only-40s.mp4',picture:'udyr-sion-continuity-intro-picture-40s.mp4'};
+const notes={music:'First 40 seconds of your Fortunate Son (MOONLGHT Remix) file.',effects:'Same picture, original spirit effects. Ready for a different music mix.',picture:'Silent picture for your editor or an alternate soundtrack.'};
+const video=document.querySelector('video');
+let revision=0;
+document.querySelectorAll('[data-mode]').forEach(button=>button.addEventListener('click',()=>{
+ if(button.getAttribute('aria-pressed')==='true')return;
+ const at=Number.isFinite(video.currentTime)?video.currentTime:0,playing=!video.paused,mode=button.dataset.mode,own=++revision;
+ video.pause();video.src=files[mode];
+ document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
+ document.getElementById('download').href=files[mode];document.getElementById('version-note').textContent=notes[mode];
+ video.addEventListener('loadedmetadata',()=>{if(own!==revision)return;video.currentTime=Math.min(at,video.duration-.01);if(playing)video.play().catch(()=>{});},{once:true});
+ video.load();
+}));
+</script>
+</html>

@@ -1,0 +1,137 @@
+{
+  "id": "golden-mountain-motion-v19",
+  "material": "ram-mountain-material-v16.png",
+  "views": [
+    {
+      "id": "side",
+      "file": "ram-mountain-side-v16.png",
+      "height": 0.92
+    },
+    {
+      "id": "quarter",
+      "file": "ram-mountain-views-v16.png",
+      "crop": [
+        0,
+        0,
+        0.5,
+        0.48828125
+      ],
+      "height": 0.94
+    },
+    {
+      "id": "front",
+      "file": "ram-mountain-views-v16.png",
+      "crop": [
+        0.5,
+        0,
+        0.5,
+        0.5
+      ],
+      "height": 0.94
+    },
+    {
+      "id": "rear",
+      "file": "ram-mountain-rear-v16.png",
+      "height": 1.29
+    },
+    {
+      "id": "fall",
+      "file": "ram-mountain-views-v16.png",
+      "crop": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "height": 0.93
+    },
+    {
+      "id": "backQuarter",
+      "file": "ram-turn-views-v19.png",
+      "crop": [
+        0.0,
+        0.0,
+        0.5,
+        0.5
+      ],
+      "height": 0.94
+    },
+    {
+      "id": "back",
+      "file": "ram-turn-views-v19.png",
+      "crop": [
+        0.5,
+        0.0,
+        0.5,
+        0.5
+      ],
+      "height": 0.94
+    },
+    {
+      "id": "backLeft",
+      "file": "ram-turn-views-v19.png",
+      "crop": [
+        0.0,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "height": 0.94
+    },
+    {
+      "id": "leftQuarter",
+      "file": "ram-turn-views-v19.png",
+      "crop": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "height": 0.94
+    },
+    {
+      "id": "crouch",
+      "file": "ram-jump-views-v19.png",
+      "crop": [
+        0.0,
+        0.0,
+        0.5,
+        0.5
+      ],
+      "height": 0.77
+    },
+    {
+      "id": "push",
+      "file": "ram-jump-views-v19.png",
+      "crop": [
+        0.5,
+        0.0,
+        0.5,
+        0.5
+      ],
+      "height": 0.9
+    },
+    {
+      "id": "tuck",
+      "file": "ram-jump-views-v19.png",
+      "crop": [
+        0.0,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "height": 0.69
+    },
+    {
+      "id": "reach",
+      "file": "ram-jump-views-v19.png",
+      "crop": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "height": 0.92
+    }
+  ]
+}

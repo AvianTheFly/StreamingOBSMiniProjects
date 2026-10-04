@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from lib.hotkeys import load_hotkeys
+from lib.json_store import write_json
 
 from .config_overrides import (
     bool_override,
@@ -300,7 +301,7 @@ def _load_store(store_file: Path) -> dict[str, Any]:
 
 
 def _save_store(store_file: Path, raw: dict[str, Any]) -> None:
-    store_file.write_text(json.dumps(raw, indent=2, ensure_ascii=False), encoding="utf-8")
+    write_json(store_file, raw)
 
 
 def _ensure_profile_files(profile: MediaProfile) -> None:

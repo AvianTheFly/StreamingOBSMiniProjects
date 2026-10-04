@@ -81,6 +81,7 @@ class RewardBridge(RewardStorage, TwitchTransport, RewardManagement):
 
 
     def enqueue(self, key, redemption_id=None, live=False):
+        from events import inspect_event
         if key not in EFFECTS:
             raise ValueError("Unknown sticker.")
         with self.lock:
@@ -95,6 +96,7 @@ class RewardBridge(RewardStorage, TwitchTransport, RewardManagement):
             if self.pending or now - self.last_play < 3:
                 raise RuntimeError("Effects busy")
             self.last_play = now
+            inspect_event('twitch:reward', owner='rewards', phase='queued', action=key)
             self.pending = dict(id=redemption_id or "test-" + secrets.token_hex(8), key=key,
                                 expires=now + 8, live=live, delivered=False,
                                 effect=effect_config(self.config, key))
@@ -115,6 +117,8 @@ class RewardBridge(RewardStorage, TwitchTransport, RewardManagement):
             if not self.pending or self.pending["delivered"]:
                 return None
             self.pending["delivered"] = True
+            from events import inspect_event
+            inspect_event('twitch:reward', owner='rewards', phase='displaying', action=self.pending['key'])
             self.last_effect['status'] = 'displaying'
             return dict(id=self.pending["id"], key=self.pending["key"], **self.pending['effect'])
 
@@ -134,6 +138,8 @@ class RewardBridge(RewardStorage, TwitchTransport, RewardManagement):
                 return
             self.pending = None
             self.last_effect['status'] = 'played' if status == 'played' else 'failed'
+        from events import inspect_event
+        inspect_event('twitch:reward', owner='rewards', phase='played' if status=='played' else 'failed', action=item['key'])
         if status != 'played':
             if item['live']:
                 with self.lock:

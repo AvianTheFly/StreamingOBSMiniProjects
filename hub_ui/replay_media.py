@@ -3,8 +3,9 @@ from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import os
 from pathlib import Path
-import subprocess
 import threading
+from lib.media_jobs import jobs
+from lib.http_files import serve_file as serve_http_file
 
 _pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="replay-preview")
 _lock = threading.Lock()
@@ -16,16 +17,13 @@ def _convert(source, output):
     CACHE.mkdir(parents=True, exist_ok=True)
     temporary = output.with_suffix(".partial.mp4")
     try:
-        result = subprocess.run([
+        result = jobs.run([
             "ffmpeg", "-nostdin", "-v", "error", "-y", "-threads", "1",
             "-filter_threads", "1", "-i", str(source),
             "-map", "0:v:0", "-map", "0:a:0?", "-vf", "scale=-2:480,fps=24",
             "-c:v", "libx264", "-preset", "ultrafast", "-crf", "29", "-threads", "1",
             "-c:a", "aac", "-ac", "2", "-b:a", "96k", "-movflags", "+faststart", str(temporary)
-        ], capture_output=True, timeout=300, creationflags=(
-            getattr(subprocess, "CREATE_NO_WINDOW", 0)
-            | getattr(subprocess, "BELOW_NORMAL_PRIORITY_CLASS", 0)
-        ))
+        ], kind='replay-preview', weight=1, priority=20, timeout=300)
         if result.returncode:
             raise ValueError("This clip could not be decoded for browser preview.")
         temporary.replace(output)
@@ -69,44 +67,4 @@ def preview(source):
 
 
 def serve_file(handler, path):
-    size = path.stat().st_size
-    start, end = 0, size - 1
-    requested = handler.headers.get("Range", "")
-    if requested:
-        import re
-        match = re.fullmatch(r"bytes=(\d*)-(\d*)", requested)
-        try:
-            if not match or not any(match.groups()):
-                raise ValueError()
-            left, right = match.groups()
-            if left:
-                start = int(left)
-                end = min(int(right), end) if right else end
-            else:
-                start = max(0, size - int(right))
-            if start > end or start >= size:
-                raise ValueError()
-        except ValueError:
-            handler.send_response(416)
-            handler.send_header("Content-Range", f"bytes */{size}")
-            handler.end_headers()
-            return
-    handler.send_response(206 if requested else 200)
-    handler.send_header("Content-Type", "video/mp4")
-    handler.send_header("Accept-Ranges", "bytes")
-    handler.send_header("Content-Length", str(end - start + 1))
-    if requested:
-        handler.send_header("Content-Range", f"bytes {start}-{end}/{size}")
-    handler.end_headers()
-    try:
-        with path.open("rb") as stream:
-            stream.seek(start)
-            remaining = end - start + 1
-            while remaining > 0:
-                chunk = stream.read(min(256 * 1024, remaining))
-                if not chunk:
-                    break
-                handler.wfile.write(chunk)
-                remaining -= len(chunk)
-    except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
-        pass
+    serve_http_file(handler, path, content_type='video/mp4')

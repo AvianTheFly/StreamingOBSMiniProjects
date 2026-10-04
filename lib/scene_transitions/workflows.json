@@ -1,0 +1,73 @@
+{
+  "module": {
+    "id": "transitions",
+    "label": "Spirit transitions",
+    "group": "Output",
+    "icon": "spark",
+    "description": "Covers an accepted scene cut with an animal performance.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "transitions.cut",
+      "label": "An owned scene changes",
+      "topic": "Scene ownership",
+      "trigger": {
+        "label": "An owned scene changes",
+        "event": "scene.decision",
+        "kind": "event"
+      },
+      "detail": "SceneDirector accepts the scene transaction. Native OBS chooses a shuffled animal and alternates its two separate clips. The media playback clock waits for that animal's configured cut inside its verified opaque interval, then reveals the destination. Continuous gritty painted character rendering belongs only to finite export and read-only Hub preview; OBS plays the eight encoded clips. The bear's art, quadruped contact paths and painted presentation have separate owners, with the accepted side gallop turning into complete camera-facing painted swipes. Finite open/closed-OBS installers share pure collection patch policy, preserving personal data and valid cut choices; the closed adapter validates clips and never opens OBS.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Accepted scene transaction",
+          "owner": "coordination",
+          "kind": "action",
+          "detail": "SceneDirector is the program-scene write owner; automatic features request its public transaction."
+        },
+        {
+          "id": "1",
+          "label": "Choose transition override / selector",
+          "owner": "transitions",
+          "kind": "gate",
+          "detail": "An accepted transaction uses its scene override or OBS selector. The native spirit transition owns random clip selection, media children and per-animal cut settings. Finite installers select a configured or explicitly observed active collection filename only when its internal name agrees; open installation verifies the loaded media directory to detect OBS caching a different duplicate. Updates preserve the user's selector; finite confirmation polls wait for queued OBS frontend changes during property inspection and restoration. Unrelated personal collection data is preserved. Finite installers accept an explicit production directory so independent revisions do not rewrite shared defaults."
+        },
+        {
+          "id": "2",
+          "label": "Cover, cut, reveal",
+          "owner": "obs",
+          "kind": "output",
+          "detail": "Native playback follows the clip's epoch-guarded media position, cuts inside verified full coverage with safety margins, and prevents old-scene flashes at end or interruption. Bear approach authoring retains calibrated joints, fixed bones and registered yaw views. Frontal attacks use registered complete storm-bear ready/swipe poses with charcoal fur, silver storm mane and metallic claws, measured native ratios, continuous lens-pressure projection and matching projected claw effects; peak strikes retain their audio/camera beats. Its bounded paint buffers belong to the loaded asset generation. The preview publishes only complete generations and releases stale, failed or replaced characters and page-exit resources. Turtle authoring uses one intact anatomical painting and four UV-registered limbs with exact shoulder/hip binding, articulated upper/lower legs and flexing knees, rigid claw pads, a connected shoulder socket, planted diagonal crawl and far/body/near occlusion. Deliberate recovery arcs lift complete feet and flex both leg segments; touchdown audio is checked against actual support changes. A rock-first .92-second block leaves the turtle mostly off screen; the 1.94-second block occurs during approach. The settled creature charges a rough primordial jade-stone hex ward with carved markings and golden fissures. Expansion precedes the final 3.62-second impact and reaches the verified opaque interval. Painted-triangle orientation, all four contacts and encoded full-frame coverage are checked independently. Phoenix turned flight selects complete quarter, profile and true rear paintings with matching wings, feet and tail, using registered torso centers and bounded secondary feather flex. Frontal power-stroke paint retains independently articulated wings and fixed-bone talons. The bird leaves the side boundary, re-enters, dives below the frame and returns upward; direction changes happen wholly outside the viewport. Its egg splits into two lingering jagged halves, then fades. Two central painted wing contacts throw outward brush-like storm fronts; after the verified cut hold, twin openings expand from those spots to reveal the destination. Coverage geometry stays separate from continuously moving ash/frostfire material. Paint buffers and storm surfaces belong to a complete loaded generation and are released on replacement, stale loads or disposal. Ram authoring selects a replaceable thirteen-view mountain-spirit skin by named pose, independently of pack order, trajectory and calibrated anatomy. Separate leap and turn owners supply full-body crouch, push-off, folded airborne knees, landing reach and compression; a planted turn uses true rear and rear-quarter paintings before the leftward bound. Painted facing matches travel in both variants. Body registration preserves early native proportions; a bounded head/neck field smooths jump handoffs without moving hoof pads. Three bounds lead to a triumphant hind-leg rear and descending horn strike; late horn registration and the same projected painted contacts seed the opaque gold/slate fracture before timed plate release. Its finite soundtrack follows landings and impact. Invalid skin generations preserve the current preview. Each bear swipe immediately opens a permanent claw-attached storm tear; later cuts accumulate behind the independently staged foreground bear, which fades only after its final attack. Shared placement, tear policy and foreground composition have explicit feature owners; the verified full-cover interval and native playback-clock cut remain unchanged."
+        }
+      ],
+      "owner_hashes": {
+        "transitions": "484a1b75162cc62c454500628079a0e6f04f2a1b8594c0e1b94b0968ef844e56",
+        "coordination": "9719a70125356a757d7dd8d4ef1fd4f079a6b403628d6c6088c434b8d230b5a6",
+        "obs": "01af456db45e144826db3dff034567f08dc604214b8bb866f0173b47fe4ee7a4"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "lib/scene_transitions/installation.py",
+          "symbol": "patch_collection",
+          "hash": "ae1faf068f248e5ee3b061b940050626e6ed6f9e36df85f4ab98bd19fa4c3dc3"
+        },
+        {
+          "path": "lib/coordination/scenes.py",
+          "symbol": "SceneDirector._write",
+          "hash": "56725e9701ceee67d0b7e7ad0fa2fba6bd12e4d03aac9abad1a42306ea3a5151"
+        }
+      ]
+    }
+  ]
+}

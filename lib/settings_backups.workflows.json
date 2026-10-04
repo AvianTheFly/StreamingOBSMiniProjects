@@ -1,0 +1,67 @@
+{
+  "module": {
+    "id": "settings_history",
+    "label": "Settings history",
+    "group": "Shared resources",
+    "icon": "settings",
+    "description": "Preserves personalized settings outside the checkout.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "settings_history.backup",
+      "label": "Personal settings change",
+      "topic": "Background work",
+      "trigger": {
+        "label": "Personal settings change",
+        "event": "settings_updated",
+        "kind": "event"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Snapshot personal settings",
+          "owner": "settings_history",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Keep external history",
+          "owner": "settings_history",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Apply latest edit atomically",
+          "owner": "hub",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "settings_history": "c0de7909c62939f1fd4a5e9801a1e697f7ce5ce1ec4dd05940d65e2224805cd6",
+        "hub": "2651a208dfe2c15d06a55506164c7fc7795423742dfa750511fa1a7762484d50"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "lib/settings_backups.py",
+          "symbol": "SettingsBackups.snapshot",
+          "hash": "4dc2a7c416f88436c8113e0b9cbaad845e8fa1b081ec9dbd0436a92dd75f6a91"
+        }
+      ]
+    }
+  ]
+}

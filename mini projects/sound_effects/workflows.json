@@ -1,0 +1,102 @@
+{
+  "module": {
+    "id": "sound_effects",
+    "label": "Sound effects",
+    "group": "Media",
+    "icon": "audio",
+    "description": "Plays event-driven sound cues.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "sound_effects.trigger",
+      "label": "A sound effect event",
+      "topic": "Sound & video",
+      "trigger": {
+        "label": "A sound effect event",
+        "event": "sfx.play",
+        "kind": "event"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Match asset / active profile",
+          "owner": "sound_effects",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Exclusive or layered?",
+          "owner": "coordination",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "One worker per source",
+          "owner": "media_workers",
+          "kind": "wait",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Load personal level & placement",
+          "owner": "sound_effects",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "4",
+          "label": "OBS sound / video",
+          "owner": "obs",
+          "kind": "output",
+          "detail": ""
+        },
+        {
+          "id": "5",
+          "label": "Finish the actual ticket",
+          "owner": "coordination",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "coordination": "5057221ec74a11ea01e1c0bcfeab93e331ec71244136a2611a9c0808591898a3",
+        "media_workers": "99a1a00f5854b87301b5e62b0837f5e035bf87e45a4552403c603e0e3de1f064",
+        "sound_effects": "65bc17c0f7ab29429802b35c59fa6efcad6523e844464de8e612baeecf2eac3d",
+        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "lib/shared_media/media_project.py",
+          "symbol": "run_media_project",
+          "hash": "186d06d32a7b8727dd359d8fe448e968f8a34d46afa939ce57f7e48d7678bdb7"
+        }
+      ]
+    }
+  ]
+}

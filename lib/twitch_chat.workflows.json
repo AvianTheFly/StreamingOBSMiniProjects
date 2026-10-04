@@ -1,0 +1,180 @@
+{
+  "module": {
+    "id": "chat_transport",
+    "label": "Twitch chat connection",
+    "group": "Inputs",
+    "icon": "chat",
+    "description": "Read fresh Twitch identities and deliver optional authorized threaded replies.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "chat_transport.message",
+      "label": "Fresh Twitch chat arrives",
+      "topic": "Chat & stats",
+      "trigger": {
+        "label": "Fresh Twitch chat arrives",
+        "event": "twitch.chat.message",
+        "kind": "event"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Read authenticated Twitch tags",
+          "owner": "chat_transport",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Reject stale messages",
+          "owner": "chat_transport",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Publish trusted chat event",
+          "owner": "chat_transport",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Subscribers queue their work",
+          "owner": "league_stats",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "league_stats": "042e2ac8caa8aff6c1076617d040f77e80317baa638c1dd8fac6cb6e0656cf28",
+        "chat_transport": "0935a6133944e3e1e86d0907df4ab370f44fc52849f30badeccb42826fcda23d"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "lib/twitch_chat.py",
+          "symbol": "ChatReader.run",
+          "hash": "1102b120855289379190d87734c91de5d204a90fc170dea29ecb9cb20e6855ee"
+        }
+      ]
+    },
+    {
+      "id": "chat_transport.reply",
+      "label": "An accepted command needs a reply",
+      "topic": "Chat & stats",
+      "trigger": {
+        "label": "An accepted command needs a reply",
+        "kind": "control"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Chat authorization ready?",
+          "owner": "chat_transport",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Queue at most 32 replies",
+          "owner": "chat_transport",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Wait at least two seconds between writes",
+          "owner": "chat_transport",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Still fresh, same channel and allowed?",
+          "owner": "chat_transport",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "4",
+          "label": "Refresh through existing Twitch owner",
+          "owner": "chat_transport",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "5",
+          "label": "Recheck lifetime before Helix write",
+          "owner": "chat_transport",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "6",
+          "label": "Record sent, declined or unavailable result",
+          "owner": "chat_transport",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        },
+        {
+          "from": "5",
+          "to": "6"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "lib/twitch_chat_replies.py",
+          "symbol": "ReplySender",
+          "hash": "ac008f448b6f5f7ac420f47382a5aabfb9fe594bf9b345915e67ed985c2328b2"
+        },
+        {
+          "path": "lib/twitch_chat.py",
+          "symbol": "start",
+          "hash": "a83cf75b6648abf6dadb62ee23ad203c9a528b765f786c142ab8c7913732b176"
+        }
+      ],
+      "owner_hashes": {
+        "chat_transport": "0935a6133944e3e1e86d0907df4ab370f44fc52849f30badeccb42826fcda23d"
+      }
+    }
+  ]
+}

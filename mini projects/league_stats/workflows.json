@@ -1,0 +1,365 @@
+{
+  "module": {
+    "id": "league_stats",
+    "label": "League stats",
+    "group": "Game",
+    "icon": "chart",
+    "description": "Records matches and handles trusted viewer requests.",
+    "separate": false
+  },
+  "flows": [
+    {
+      "id": "league_stats.game",
+      "label": "Live game data changes",
+      "topic": "Your kill",
+      "trigger": {
+        "label": "Live game data changes",
+        "event": "stats.snapshot",
+        "kind": "poll"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Verify signed-in player & game",
+          "owner": "league_stats",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Record match observations",
+          "owner": "league_stats",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Flush on disconnect",
+          "owner": "league_stats",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Enrich with official match data",
+          "owner": "league_stats",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "league_stats": "042e2ac8caa8aff6c1076617d040f77e80317baa638c1dd8fac6cb6e0656cf28"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/league_stats/collector.py",
+          "symbol": "Collector.step",
+          "hash": "9d9a0741ef2e25c133f9cd0caaf3db06a5fc6f1dc54db5072a6dd45fc34d147f"
+        }
+      ]
+    },
+    {
+      "id": "league_stats.chat",
+      "label": "A viewer asks for stats",
+      "topic": "Chat & stats",
+      "trigger": {
+        "label": "A viewer asks for stats",
+        "event": "twitch.chat.message",
+        "kind": "event"
+      },
+      "detail": "Stat and guide requests share viewer cooldowns. Live answers require fresh telemetry. Matchups use confirmed roles and the same known queue. Lifetime answers respect account/exclusion/custom-game filters. Named helpers undo their own last entry; moderators and broadcaster can correct others. Failed, stale and duplicate requests stay quiet.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Queue trusted chat identity",
+          "owner": "league_stats",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Authorized command?",
+          "owner": "league_stats",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Read saved session or persist helper observation",
+          "owner": "league_stats",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Show overlay and enqueue a compact threaded reply",
+          "owner": "league_stats",
+          "kind": "end",
+          "detail": "Only after acceptance, with chat replies enabled. Help lists commands without replacing a card. The delivery worker rejects expired feature intent."
+        }
+      ],
+      "owner_hashes": {
+        "league_stats": "042e2ac8caa8aff6c1076617d040f77e80317baa638c1dd8fac6cb6e0656cf28"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/league_stats/service.py",
+          "symbol": "Tracker.drain_chat",
+          "hash": "7bff25058b49185146062b1de5fe9664e2ce88e96c7a978e006cef71fe293a42"
+        },
+        {
+          "path": "mini projects/league_stats/main.py",
+          "symbol": "run",
+          "hash": "542fdef38ecfa8b6fd3fd2496e4bf70401ca0455d719dc3284d5fe800bb4da88"
+        },
+        {
+          "path": "mini projects/league_stats/chat_replies.py",
+          "symbol": "stat",
+          "hash": "269ea9bff35d6aa498cbdab38d5064f80bd08f0123a254ac122fd8c98b80ef6a"
+        },
+        {
+          "path": "mini projects/league_stats/audience.py",
+          "symbol": "facts",
+          "hash": "72975d4fb7f14163335a9aa26a359ae569c2db1d47c13a7787c52902a86abe95"
+        },
+        {
+          "path": "mini projects/league_stats/observations.py",
+          "symbol": "apply",
+          "hash": "5385f9ce0ebd321679b3cc7c10632b43913919b1c3fdf0735bb6c1343c977821"
+        }
+      ]
+    },
+    {
+      "id": "league_stats.disconnect",
+      "label": "Game ends",
+      "topic": "Game ends",
+      "trigger": {
+        "label": "Game ends",
+        "event": "stats.match",
+        "kind": "poll"
+      },
+      "detail": "",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Live game becomes unavailable",
+          "owner": "league_stats",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Preserve partial match observations",
+          "owner": "league_stats",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Wait for matching post-game data",
+          "owner": "league_stats",
+          "kind": "wait",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Enrich archived match",
+          "owner": "league_stats",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "owner_hashes": {
+        "league_stats": "042e2ac8caa8aff6c1076617d040f77e80317baa638c1dd8fac6cb6e0656cf28"
+      },
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/league_stats/service.py",
+          "symbol": "Tracker.disconnected",
+          "hash": "578c4d1da03fb34852f0ab5d6437e21e011194732289972e0cc9703699504e4f"
+        },
+        {
+          "path": "mini projects/league_stats/collector.py",
+          "symbol": "Collector.step",
+          "hash": "9d9a0741ef2e25c133f9cd0caaf3db06a5fc6f1dc54db5072a6dd45fc34d147f"
+        },
+        {
+          "path": "mini projects/league_stats/service.py",
+          "symbol": "Tracker.enrich",
+          "hash": "60dfe43db2bd53f2e7503b37bb20cbeceb64de3e29cea1ed8e02a783081072c1"
+        }
+      ],
+      "effects": [
+        {
+          "resource": "stats",
+          "intent": "Save and enrich the match record",
+          "role": "write",
+          "protection": "Stats persistence is independent of lobby scene ownership.",
+          "cases": {
+            "normal": {
+              "status": "effect",
+              "text": "Records can finish while a result or replay is showing. This behavior does not request a scene."
+            },
+            "result": {
+              "status": "effect",
+              "text": "Records can finish while a result or replay is showing. This behavior does not request a scene."
+            },
+            "temporary": {
+              "status": "effect",
+              "text": "Records can finish while a result or replay is showing. This behavior does not request a scene."
+            },
+            "manual": {
+              "status": "effect",
+              "text": "Records can finish while a result or replay is showing. This behavior does not request a scene."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "league_stats.viewer_views",
+      "label": "Present stats to streamer and viewers",
+      "topic": "Chat & stats",
+      "trigger": {
+        "label": "Choose a stat view",
+        "kind": "browser"
+      },
+      "detail": "Local overlay presets keep 520 by 190 dimensions, use whitelisted themes, and never write OBS state. Browser preview lifetime owns its polling; hidden previews are removed. Review drafts stay local until explicit Save and pending-save edits retain the updated revision.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Choose dashboard filters",
+          "owner": "league_stats",
+          "kind": "control",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Derive at most 12 completed games with stat gaps",
+          "owner": "league_stats",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Compute goal pace only from fresh reported CS",
+          "owner": "league_stats",
+          "kind": "gate",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Render chart and preview chosen overlay view",
+          "owner": "hub",
+          "kind": "output",
+          "detail": ""
+        },
+        {
+          "id": "4",
+          "label": "Viewer card temporarily takes priority",
+          "owner": "league_stats",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "5",
+          "label": "Return to selected or available rotating view",
+          "owner": "hub",
+          "kind": "end",
+          "detail": ""
+        }
+      ],
+      "edges": [
+        {
+          "to": "1",
+          "from": "0"
+        },
+        {
+          "to": "2",
+          "from": "1"
+        },
+        {
+          "to": "3",
+          "from": "2"
+        },
+        {
+          "to": "4",
+          "from": "3"
+        },
+        {
+          "to": "5",
+          "from": "4"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/league_stats/presentation.py",
+          "symbol": "form",
+          "hash": "451bf401113b3076d1e61952bf51225ed0818cdf4ac1536154951939ce56ad60"
+        },
+        {
+          "path": "mini projects/league_stats/presentation.py",
+          "symbol": "live_progress",
+          "hash": "3a5c6d94f3ac8635fc38496ecae3dce9f548fb0e4cc3d4948f87af091f70a179"
+        },
+        {
+          "path": "mini projects/league_stats/presentation.py",
+          "symbol": "account_labels",
+          "hash": "42acabedac1d51d3412aa6483ab98194fc03de47eed7c026542487dfcb3eb826"
+        },
+        {
+          "path": "mini projects/league_stats/service.py",
+          "symbol": "Tracker.review_match",
+          "hash": "fa9f1b63994af500794231c67ba5018d98eeb958e0008388f266cf48714f1996"
+        }
+      ],
+      "owner_hashes": {
+        "league_stats": "042e2ac8caa8aff6c1076617d040f77e80317baa638c1dd8fac6cb6e0656cf28",
+        "hub": "2651a208dfe2c15d06a55506164c7fc7795423742dfa750511fa1a7762484d50"
+      }
+    }
+  ]
+}

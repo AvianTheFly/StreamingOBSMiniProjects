@@ -3,9 +3,12 @@
 import { api }            from "./api.js";
 import { sse }            from "./sse.js";
 import { state }          from "./state.js";
-import { toast }          from "./toast.js";
 import { initNav, setActiveNavItem } from "./nav.js";
-import { timestamp }      from "./utils.js";
+import { timestamp, esc } from "./utils.js";
+import { initSearch } from './search.js';
+import * as libraryPage from './pages/library.js';
+import * as audioWorkspace from './pages/audio-workspace.js';
+import * as workflowPage from './pages/workflows.js';
 
 // ── Page modules ─────────────────────────────────────────────────────────────
 import * as dashboardPage    from "./pages/dashboard.js";
@@ -19,19 +22,29 @@ import * as soundFxPage      from "./pages/sound-effects.js";
 import * as leaguePage       from "./pages/league.js";
 import * as leagueAlertsPage from "./pages/league-alerts.js";
 import * as instantRepPage   from "./pages/instant-replay.js";
-import * as mixerPage        from "./pages/mixer.js";
-import * as audioPage        from "./pages/audio.js";
+import * as voicePage        from "./pages/voice.js";
 import * as genericPage      from "./pages/project-generic.js";
+import * as startingSoonPage from "./pages/starting-soon.js";
+import * as leagueStatsPage from "./pages/league-stats.js";
+import * as twitchCommandsPage from './pages/twitch-commands.js';
+import * as moodCuesPage from './pages/mood-cues.js';
 
 // ── Page registry ─────────────────────────────────────────────────────────────
 // Map page-id → { mount(container, arg?), unmount() }
 const PAGES = {
+  'projects/love_me': moodCuesPage,
+  "projects/twitch_commands":       twitchCommandsPage,
+  "projects/league_stats":          leagueStatsPage,
+  "projects/starting_soon":         startingSoonPage,
   "dashboard":                     dashboardPage,
+  "library":                       libraryPage,
+  "workflows":                     workflowPage,
   "rules":                         rulesPage,
   "profiles":                      profilesPage,
   "settings":                      settingsPage,
-  "mixer":                         mixerPage,
-  "audio":                         audioPage,
+  "mixer":                         { mount: c => audioWorkspace.mount(c, 'sources'), unmount: audioWorkspace.unmount },
+  "audio":                         { mount: c => audioWorkspace.mount(c, 'media'), unmount: audioWorkspace.unmount },
+  "voice":                         voicePage,
   "projects/specific_song":        specificSongPage,
   "projects/scene_voice_switcher": sceneSwPage,
   "projects/soundboard":           soundboardPage,
@@ -49,11 +62,13 @@ const _pageEl  = document.getElementById("page");
 
 function navigate(page) {
   page = (page || "dashboard").replace(/^#/, "");
+  if (page === _curPage) return;
   if (_curModule?.beforeLeave && !_curModule.beforeLeave()) {
     history.replaceState(null, "", `#${_curPage}`);
     return;
   }
 
+  const changingPage = _curPage !== null;
   // Unmount previous page
   if (_curModule?.unmount) {
     try { _curModule.unmount(); } catch(e) { console.warn("[router] unmount error", e); }
@@ -77,6 +92,8 @@ function navigate(page) {
   _curModule = mod;
 
   _pageEl.innerHTML = "";
+  _pageEl.scrollTop = 0;
+  _pageEl.dataset.route = page;
   setActiveNavItem(page);
 
   try {
@@ -84,11 +101,12 @@ function navigate(page) {
     if (r instanceof Promise) r.catch(e => console.error("[router] async mount error", e));
   } catch(e) {
     console.error("[router] mount error", e);
-    _pageEl.innerHTML = `<div class="empty-state" style="padding-top:60px">Failed to load page:<br><code>${e.message}</code></div>`;
+    _pageEl.innerHTML = `<div class="empty-state" style="padding-top:60px">Failed to load page:<br><code>${esc(e.message)}</code></div>`;
   }
 
   const hash = `#${page}`;
   if (window.location.hash !== hash) history.replaceState(null, "", hash);
+  if (changingPage) _pageEl.focus({ preventScroll: true });
 }
 
 // Expose navigate globally for inline href navigation
@@ -126,26 +144,22 @@ sse.subscribe("*", (type, payload) => {
 });
 
 sse.connect(
-  () => { _setConnected(true);  toast.info("Hub connected");    },
+  () => { _setConnected(true); },
   () => { _setConnected(false); },
 );
 
 // ── Navigation ────────────────────────────────────────────────────────────────
 initNav(navigate);
-
-// Static nav links (Hub / Tools sections defined in HTML)
-document.querySelectorAll(".nav-item[data-page]").forEach(a => {
-  a.addEventListener("click", (e) => {
-    e.preventDefault();
-    navigate(a.dataset.page);
-  });
+initSearch(navigate);
+document.querySelector('.skip-link').addEventListener('click', event => {
+  event.preventDefault();
+  _pageEl.focus();
 });
 
-// ── Fix Hotkey Editor nav link with actual port ───────────────────────────────
-fetch("/api/info").then(r => r.json()).then(({ editor_port }) => {
-  document.querySelectorAll("a.nav-external").forEach(a => {
-    a.href = `http://localhost:${editor_port}`;
-  });
+// Seed status independently of the first SSE message. Page subscriptions mount
+// synchronously so a slow profile request cannot lose the initial status update.
+api.getStatus().then(({ projects }) => {
+  if (Array.isArray(projects) && !state.get('lastUpdated')) state.set({ projects, lastUpdated: Date.now() });
 }).catch(() => {});
 
 // ── Initial page ──────────────────────────────────────────────────────────────

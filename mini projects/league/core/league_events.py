@@ -35,8 +35,15 @@ class LeagueEvents:
         self._handlers[event_name].append(handler)
 
     def emit(self, event_name: str, *args, **kwargs) -> None:
-        for handler in self._handlers.get(event_name, []):
-            try:
-                handler(*args, **kwargs)
-            except Exception as e:
-                print(f"[league] Handler error ({event_name}): {e}")
+        from events import inspected_dispatch
+        handlers = list(self._handlers.get(event_name, []))
+        with inspected_dispatch('league:' + event_name, handlers, owner='league') as report:
+            for handler in handlers:
+                failed = False
+                try:
+                    handler(*args, **kwargs)
+                except Exception as e:
+                    failed = True
+                    print(f"[league] Handler error ({event_name}): {e}")
+                finally:
+                    report(handler, failed=failed)

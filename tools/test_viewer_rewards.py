@@ -133,14 +133,45 @@ class ViewerRewardsTests(unittest.TestCase):
         from unittest.mock import Mock
         from lib.twitch_redemptions.obs_source import attach_obs
         client=Mock()
-        client.send.return_value={'inputs':[{'inputName':'Hub Viewer Stickers','inputKind':'browser_source'}]}
+        client.send.side_effect=[{'inputs':[{'inputName':'Hub Viewer Stickers','inputKind':'browser_source'}]},
+                                 {'inputSettings':{'url':f'http://127.0.0.1:7442/overlay?key={self.b.overlay_key}'}},None]
         with patch('lib.twitch_redemptions.obs_source.obs.get_obs',return_value=client), \
-             patch('lib.twitch_redemptions.obs_source.SettingsBackups'):
+             patch('lib.twitch_redemptions.obs_source.SettingsBackups') as backups:
             self.assertTrue(attach_obs(self.b,existing_only=True))
+        backups.assert_not_called()
         calls=[call.args[0] for call in client.send.call_args_list]
-        self.assertEqual(calls,['GetInputList','SetInputSettings','PressInputPropertiesButton'])
-        settings=client.send.call_args_list[1].args[1]['inputSettings']
-        self.assertFalse(settings['shutdown']);self.assertFalse(settings['restart_when_active'])
+        self.assertEqual(calls,['GetInputList','GetInputSettings','PressInputPropertiesButton'])
+
+    def test_recovery_repairs_rotated_overlay_key_only(self):
+        from unittest.mock import Mock
+        from lib.twitch_redemptions.obs_source import attach_obs
+        client=Mock()
+        client.send.side_effect=[{'inputs':[{'inputName':'Hub Viewer Stickers','inputKind':'browser_source'}]},
+                                 {'inputSettings':{'url':'http://127.0.0.1:7442/overlay?key=old'}},None,None]
+        with patch('lib.twitch_redemptions.obs_source.obs.get_obs',return_value=client), \
+             patch('lib.twitch_redemptions.obs_source.SettingsBackups') as backups:
+            self.assertTrue(attach_obs(self.b,existing_only=True))
+        backups.return_value.snapshot.assert_called_once()
+        requests=[call.args[0] for call in client.send.call_args_list]
+        self.assertEqual(requests,['GetInputList','GetInputSettings','SetInputSettings','PressInputPropertiesButton'])
+        self.assertEqual(client.send.call_args_list[2].args[1]['inputSettings'],
+                         {'url':f'http://127.0.0.1:7442/overlay?key={self.b.overlay_key}'})
+
+    def test_manual_attach_skips_unchanged_obs_settings(self):
+        from unittest.mock import Mock
+        from lib.twitch_redemptions.obs_source import attach_obs
+        client=Mock()
+        expected=dict(url=f'http://127.0.0.1:7442/overlay?key={self.b.overlay_key}',
+                      width=1920,height=1080,fps=30,fps_custom=True,
+                      shutdown=False,restart_when_active=False)
+        client.send.side_effect=[{'inputs':[{'inputName':'Hub Viewer Stickers','inputKind':'browser_source'}]},
+                                 {'inputSettings':expected},None]
+        with patch('lib.twitch_redemptions.obs_source.obs.get_obs',return_value=client), \
+             patch('lib.twitch_redemptions.obs_source.SettingsBackups') as backups:
+            self.assertTrue(attach_obs(self.b))
+        backups.assert_not_called()
+        self.assertEqual([call.args[0] for call in client.send.call_args_list],
+                         ['GetInputList','GetInputSettings','PressInputPropertiesButton'])
 
     def test_unauthorized_api_refreshes_once_and_retries(self):
         from unittest.mock import Mock
