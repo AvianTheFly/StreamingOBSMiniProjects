@@ -4,6 +4,7 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import copy
 import unittest
+from obsws_python.error import OBSSDKRequestError
 
 from tools.install_channel_brand_obs import CARDS, install
 
@@ -24,7 +25,10 @@ class Client:
     def get_video_settings(self): return SimpleNamespace(base_width=2560, base_height=1440)
     def get_scene_list(self): return SimpleNamespace(scenes=[{'sceneName': s} for s in self.scenes])
     def get_input_list(self): return SimpleNamespace(inputs=[{'inputName': n, 'inputKind': k} for n, k in self.inputs.items()])
-    def get_scene_item_list(self, scene): return SimpleNamespace(scene_items=self.scenes[scene])
+    def get_scene_item_list(self, scene):
+        if scene not in self.scenes:
+            raise OBSSDKRequestError('GetSceneItemList',600,'Source does not exist')
+        return SimpleNamespace(scene_items=self.scenes[scene])
     def create_scene(self, name):
         self.calls.append(('scene', name)); self.scenes[name] = []
     def create_scene_item(self, scene, source, enabled):

@@ -30,6 +30,12 @@ class LobbyCatalog:
             return next((deepcopy(plans[location]) for plans in self._layouts.values()
                          if location in plans), None)
 
+    def parent(self, location):
+        """Published presentation destination for a named location."""
+        with self._lock:
+            return next((self._owners[owner][0] for owner, plans in self._layouts.items()
+                         if location in plans), None)
+
     def snapshot(self, scene):
         with self._lock:
             rows = [r for r in self._owners.values() if r[0] == scene]
@@ -105,3 +111,21 @@ def _prepare_presented_lobby(client, scene):
 
 
 lobby_catalog = LobbyCatalog()
+
+
+def resolve_presented_scene(client, scene, *, prepare_default=True):
+    """Keep saved location choices valid after a scene becomes a lobby group.
+
+    Called only after the director accepts the intent. Existing direct scenes
+    keep their destination; a published group selects itself in its parent.
+    """
+    parent = lobby_catalog.parent(scene)
+    if parent and scene not in {row['sceneName'] for row in client.get_scene_list().scenes}:
+        candidates, exclusions = lobby_catalog.snapshot(parent)
+        names = tuple(dict.fromkeys((*candidates, scene)))
+        prepare_lobby(client, parent, names, selected=scene,
+                      exclusions=tuple(name for name in exclusions if name != scene))
+        return parent
+    if prepare_default:
+        prepare_presented_lobby(client, scene)
+    return scene

@@ -1,5 +1,6 @@
 """Apply published OBS layer data; feature owners supply layout and source policy."""
 from lib.settings_backups import SettingsBackups
+from obs.containers import container_items, is_group
 
 def transform_matches(actual, desired):
     for key,value in desired.items():
@@ -18,11 +19,15 @@ def apply_layout(client, scene, plan):
     Resolve dependencies before mutation. Snapshot before the first repair. Unknown
     items retain their relative order; named layers remain below personal overlays.
     """
-    rows = client.get_scene_item_list(scene).scene_items
+    rows = container_items(client, scene).scene_items
     indexed = {row['sourceName']: row for row in rows}
     layers = plan['layers']
     missing = [layer for layer in layers if layer['source'] not in indexed]
     if missing:
+        # WebSocket cannot insert children into a group. Reject before any
+        # partial repair; the finite collection installer owns structural edits.
+        if is_group(client, scene):
+            raise ValueError('Lobby group needs an offline structural repair: ' + scene)
         available = {row['inputName'] for row in client.get_input_list().inputs}
         available.update(row['sceneName'] for row in client.get_scene_list().scenes)
         for layer in missing:
@@ -62,7 +67,7 @@ def apply_layout(client, scene, plan):
         if row and row['sceneItemEnabled']:
             before_write(); client.set_scene_item_enabled(scene, row['sceneItemId'], False)
     # Move only owned layers when their relative stacking is incorrect.
-    ordered = [row['sourceName'] for row in client.get_scene_item_list(scene).scene_items]
+    ordered = [row['sourceName'] for row in container_items(client, scene).scene_items]
     expected = [layer['source'] for layer in layers]
     if [name for name in ordered if name in expected] != expected:
         for index, source in enumerate(expected):

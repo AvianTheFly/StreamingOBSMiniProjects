@@ -22,6 +22,7 @@ class LayerOBS:
         self.inputs={'World art':{'file':'C:/personal-art.png'},'Chat':{'css':'personal','url':'old','width':1}}
     def get_scene_item_list(self,name):return SimpleNamespace(scene_items=copy.deepcopy(self.rows[name]))
     def get_input_list(self):return SimpleNamespace(inputs=[dict(inputName=n) for n in self.inputs])
+    def get_group_list(self):return SimpleNamespace(groups=[])
     def get_scene_list(self):return SimpleNamespace(scenes=[dict(sceneName=n) for n in ['Host',*self.rows]])
     def get_input_settings(self,name):return SimpleNamespace(input_settings=copy.deepcopy(self.inputs[name]))
     def get_current_program_scene(self):return SimpleNamespace(current_program_scene_name=self.scene)

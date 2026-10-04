@@ -7,6 +7,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from lib.paths import ensure_import_paths,load_project_env
 from lib.settings_backups import SettingsBackups
+from obs.containers import container_items, is_group
 ensure_import_paths()
 from scene_voice_switcher import settings
 from scene_voice_switcher.motion import layer,WORLDS
@@ -20,7 +21,9 @@ def digest(value):
 def install(client,name='ReefLobby'):
     spec=layer(name,settings.location(name))
     if not spec:raise ValueError('This world has no reviewed motion layer.')
-    source=spec['source'];rows=client.get_scene_item_list(name).scene_items
+    source=spec['source'];rows=container_items(client,name).scene_items
+    if not any(row['sourceName']==source for row in rows) and is_group(client,name):
+        raise ValueError('Add missing group layers through an offline collection repair: '+name)
     before_inputs={i['inputName']:digest(client.get_input_settings(i['inputName']).input_settings)
                    for i in client.get_input_list().inputs if i['inputName']!=source}
     before_filters={n:digest(client.get_source_filter_list(n).filters) for n in before_inputs}
@@ -43,7 +46,7 @@ def install(client,name='ReefLobby'):
         predecessor=layers[position-1]['source']
         anchor=next(r for r in rows if r['sourceName']==predecessor)
         client.set_scene_item_index(name,identifier,anchor['sceneItemIndex']+1)
-    after={r['sceneItemId']:r for r in client.get_scene_item_list(name).scene_items}
+    after={r['sceneItemId']:r for r in container_items(client,name).scene_items}
     for old in rows:
         # Adding one layer moves indices but cannot alter existing personal items.
         for key in ['sourceName','sceneItemEnabled','sceneItemLocked','sceneItemBlendMode','sceneItemTransform']:

@@ -16,6 +16,20 @@ SOURCE = 'Hub Spirit Afterparty'
 DEFAULT_URL = 'http://127.0.0.1:7420/spirit-lobby/index.html'
 FOREGROUND = 'Hub Spirit Afterparty Foreground'
 CAMERA = 'FaceCamWithProps'
+from obs.containers import container_items
+from obsws_python.error import OBSSDKRequestError
+
+
+def installed_group(client, scenes):
+    if SCENE in scenes:
+        return False
+    try:
+        container_items(client, SCENE)
+    except OBSSDKRequestError as error:
+        if error.code != 600:
+            raise
+        return False
+    return True
 
 
 def layer_url(url, layer):
@@ -35,6 +49,9 @@ def install_camera_stage(client):
     if client.get_stream_status().output_active or client.get_record_status().output_active:
         raise RuntimeError('Update the lobby while streaming and recording are stopped.')
     scenes = {s['sceneName'] for s in client.get_scene_list().scenes}
+    grouped = installed_group(client, scenes)
+    if grouped:
+        scenes.add(SCENE)
     inputs = {i['inputName']: i['inputKind'] for i in client.get_input_list().inputs}
     if CAMERA not in scenes or SCENE not in scenes or inputs.get(SOURCE) != 'browser_source':
         raise ValueError('The installed lobby and existing FaceCamWithProps scene are required.')
@@ -42,7 +59,9 @@ def install_camera_stage(client):
         raise ValueError('The foreground name belongs to a different resource.')
     url = client.get_input_settings(SOURCE).input_settings['url']
     back, front = layer_url(url, 'background'), layer_url(url, 'foreground')
-    rows = {row['sourceName']: row for row in client.get_scene_item_list(SCENE).scene_items}
+    rows = {row['sourceName']: row for row in container_items(client,SCENE).scene_items}
+    if grouped and not {SOURCE,CAMERA,FOREGROUND} <= rows.keys():
+        raise ValueError('Repair missing Afterparty group layers offline before camera-stage installation.')
     if SOURCE not in rows:
         raise ValueError('The lobby browser must be present in its scene.')
     video = client.get_video_settings()
@@ -92,6 +111,9 @@ def install(client, url=DEFAULT_URL):
     if client.get_stream_status().output_active or client.get_record_status().output_active:
         raise RuntimeError('Install the new lobby while streaming and recording are stopped.')
     scenes = {s['sceneName'] for s in client.get_scene_list().scenes}
+    grouped = installed_group(client, scenes)
+    if grouped:
+        scenes.add(SCENE)
     inputs = {i['inputName']: i['inputKind'] for i in client.get_input_list().inputs}
     if SCENE in inputs or SOURCE in scenes or (SOURCE in inputs and inputs[SOURCE] != 'browser_source'):
         raise ValueError('A spirit lobby name already belongs to a different resource.')
@@ -101,9 +123,11 @@ def install(client, url=DEFAULT_URL):
         client.create_scene(SCENE)
         if 'Recording Audio - No Music' in scenes:
             client.create_scene_item(SCENE, 'Recording Audio - No Music', True)
-    rows = client.get_scene_item_list(SCENE).scene_items
+    rows = container_items(client,SCENE).scene_items
     if any(row['sourceName'] == SOURCE for row in rows):
         return {'scene': SCENE, 'source': SOURCE, 'created': False}
+    if grouped:
+        raise ValueError('Repair the missing Afterparty browser in the offline collection.')
     if SOURCE in inputs:
         item_id = client.create_scene_item(SCENE, SOURCE, True).scene_item_id
     else:

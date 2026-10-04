@@ -64,7 +64,10 @@ class BorderCatalogTests(unittest.TestCase):
         settings={**self.settings,'combat':False,'event_options':{'kill':{'enabled':True,'intensity':.4,'duration':.8}}}
         self.assertIsNone(show_for({'key':'kill'},settings))
         show=show_for({'key':'kill'},settings,preview=True)
-        self.assertEqual(show['intensity'],.4);self.assertEqual(show['duration'],.8)
+        self.assertEqual(show['intensity'],.4);self.assertEqual(show['duration'],2)
+        # The existing readable-act contract bounds presentation, while the
+        # saved short override remains personal data for future editing.
+        self.assertEqual(settings['event_options']['kill']['duration'],.8)
         settings['combat']=True;settings['event_options']['kill']['enabled']=False
         self.assertIsNone(show_for({'key':'kill'},settings))
         key='custom_123';self.assertIsNone(show_for({'key':key},settings))

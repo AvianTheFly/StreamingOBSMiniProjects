@@ -10,6 +10,8 @@ from lib.paths import PROJECT_ROOT, load_project_env, ensure_import_paths
 from lib.settings_backups import SettingsBackups
 from lib.display_capture import CAPTURE_SCENE, CAPTURE_SOURCE
 from lib.json_store import update_json
+from obs.containers import container_items
+from obsws_python.error import OBSSDKRequestError
 
 ART = PROJECT_ROOT / 'mini projects' / 'scene_voice_switcher' / 'art'
 PANEL_SCENE = 'Hub Desktop Panel'
@@ -31,11 +33,16 @@ def validate_art(locations):
 
 def ensure_scene(client, name):
     if name not in {s['sceneName'] for s in client.get_scene_list().scenes}:
-        client.create_scene(name)
+        try:
+            container_items(client, name)  # An installed group already owns this name.
+        except OBSSDKRequestError as error:
+            if error.code != 600:
+                raise
+            client.create_scene(name)
 
 
 def item(client, owner, source, *, kind=None, settings=None, enabled=True):
-    rows = client.get_scene_item_list(owner).scene_items
+    rows = container_items(client, owner).scene_items
     found = next((r for r in rows if r['sourceName'] == source), None)
     if found:
         return found['sceneItemId']
@@ -110,9 +117,14 @@ def install_locations(client, locations=LOCATIONS):
     SettingsBackups().snapshot()
     for name, stem, screen, camera, chat in locations:
         if stem is None and name not in scenes:
-            continue  # Browser stages are installed by their dedicated owner.
+            try:
+                container_items(client, name)
+            except OBSSDKRequestError as error:
+                if error.code != 600:
+                    raise
+                continue  # Browser stages are installed by their dedicated owner.
         ensure_scene(client, name)
-        existing = {r['sceneItemId'] for r in client.get_scene_item_list(name).scene_items}
+        existing = {r['sceneItemId'] for r in container_items(client, name).scene_items}
         if name in LAYOUTS:
             blueprint = plan(name)
         else:

@@ -118,9 +118,8 @@ class SceneDirector:
                 return False
             if prepare is not None:
                 prepare(client)
-            else:
-                from .lobbies import prepare_presented_lobby
-                prepare_presented_lobby(client, scene)
+            from .lobbies import resolve_presented_scene
+            scene = resolve_presented_scene(client, scene, prepare_default=prepare is None)
             if current != scene:
                 self._write(client, scene)
             elif not automatic:

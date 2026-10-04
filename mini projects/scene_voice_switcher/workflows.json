@@ -49,9 +49,9 @@
         }
       ],
       "owner_hashes": {
-        "coordination": "9719a70125356a757d7dd8d4ef1fd4f079a6b403628d6c6088c434b8d230b5a6",
-        "obs": "01af456db45e144826db3dff034567f08dc604214b8bb866f0173b47fe4ee7a4",
-        "scene_voice_switcher": "80d37aca1bdfbd392b1aab211a6ef3acd41886638a182ec1b8440f415f4ad2a6"
+        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
+        "scene_voice_switcher": "9c85fd051d688c8c1b8f05ef663abaaeaa83b216ce78f0a979ffda2ebf15c810",
+        "coordination": "1bf723a6b7eb5bb30c91ed682b26757815ed275e05f71b3c9938ba24205a6910"
       },
       "edges": [
         {
@@ -161,9 +161,9 @@
         }
       ],
       "owner_hashes": {
-        "coordination": "9719a70125356a757d7dd8d4ef1fd4f079a6b403628d6c6088c434b8d230b5a6",
-        "obs": "01af456db45e144826db3dff034567f08dc604214b8bb866f0173b47fe4ee7a4",
-        "scene_voice_switcher": "80d37aca1bdfbd392b1aab211a6ef3acd41886638a182ec1b8440f415f4ad2a6"
+        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
+        "scene_voice_switcher": "9c85fd051d688c8c1b8f05ef663abaaeaa83b216ce78f0a979ffda2ebf15c810",
+        "coordination": "1bf723a6b7eb5bb30c91ed682b26757815ed275e05f71b3c9938ba24205a6910"
       },
       "edges": [
         {
@@ -242,7 +242,7 @@
         "event": "hub_action",
         "kind": "control"
       },
-      "detail": "Gallery, Live desk and voice choices prepare the selected world before SceneDirector shows it. Explicit entry with screen visible updates the existing desktop gate inside that accepted request. Normal entry keeps desktop visibility; automatic returns hide it. Disabled-rotation worlds remain manually selectable. Newer choices during inventory reads reject stale selection before repair. The gallery searches labels, edits per-world rectangles and reports actual OBS status. Native direct scene entries repair the published layers through the shared observation owner without another program-scene write.",
+      "detail": "Gallery, Live desk and voice choices prepare the selected world before SceneDirector shows it. Explicit entry with screen visible updates the existing desktop gate inside that accepted request. Normal entry keeps desktop visibility; automatic returns hide it. Disabled-rotation worlds remain manually selectable. Newer choices during inventory reads reject stale selection before repair. The gallery searches labels, edits per-world rectangles and reports actual OBS status. Native direct scene entries repair the published layers through the shared observation owner without another program-scene write. Gallery layout inspection supports group locations; saved direct location choices resolve to the parent through the director.",
       "steps": [
         {
           "id": "0",
@@ -274,9 +274,9 @@
         }
       ],
       "owner_hashes": {
-        "coordination": "9719a70125356a757d7dd8d4ef1fd4f079a6b403628d6c6088c434b8d230b5a6",
-        "obs": "01af456db45e144826db3dff034567f08dc604214b8bb866f0173b47fe4ee7a4",
-        "scene_voice_switcher": "80d37aca1bdfbd392b1aab211a6ef3acd41886638a182ec1b8440f415f4ad2a6"
+        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
+        "scene_voice_switcher": "9c85fd051d688c8c1b8f05ef663abaaeaa83b216ce78f0a979ffda2ebf15c810",
+        "coordination": "1bf723a6b7eb5bb30c91ed682b26757815ed275e05f71b3c9938ba24205a6910"
       },
       "edges": [
         {
@@ -382,8 +382,8 @@
         }
       ],
       "owner_hashes": {
-        "obs": "01af456db45e144826db3dff034567f08dc604214b8bb866f0173b47fe4ee7a4",
-        "scene_voice_switcher": "80d37aca1bdfbd392b1aab211a6ef3acd41886638a182ec1b8440f415f4ad2a6"
+        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
+        "scene_voice_switcher": "9c85fd051d688c8c1b8f05ef663abaaeaa83b216ce78f0a979ffda2ebf15c810"
       }
     },
     {
@@ -395,7 +395,7 @@
         "event": "scene.decision",
         "kind": "event"
       },
-      "detail": "The feature publishes complete per-world source and placement data. Shared mechanics resolve required resources, snapshot before the first repair, and update only named layers when their settings, visibility, placement or relative stacking differ. The publication/presentation lock keeps a saved edit from racing an older layout. Image settings, nested camera filters, personal CSS and unowned overlays survive; only active chat browsers remain loaded. Deferred and stale scene intents do not repair anything until accepted. Ready worlds optionally publish a transparent living-world layer after its original foreground (or camera for a flat painting) and before dedicated chat, with all three saved live apertures passed explicitly. Other worlds retain their authored layers.",
+      "detail": "The feature publishes complete per-world source and placement data. Shared mechanics resolve required resources, snapshot before the first repair, and update only named layers when their settings, visibility, placement or relative stacking differ. The publication/presentation lock keeps a saved edit from racing an older layout. Image settings, nested camera filters, personal CSS and unowned overlays survive; only active chat browsers remain loaded. Deferred and stale scene intents do not repair anything until accepted. Ready worlds optionally publish a transparent living-world layer after its original foreground (or camera for a flat painting) and before dedicated chat, with all three saved live apertures passed explicitly. Other worlds retain their authored layers. Locations may be groups in the single Lobbies scene. Enumeration uses the group transport; missing group children reject before mutation and require offline structural repair.",
       "steps": [
         {
           "id": "0",
@@ -476,7 +476,7 @@
         {
           "path": "lib/coordination/lobby_layout.py",
           "symbol": "apply_layout",
-          "hash": "acd4eec647f49e866353a2c1dd572442acb40acf9b164407f6d42d0a1dd6babb"
+          "hash": "2eace3434dc3a53c884078d27098948a1264f84db349ceb276d18a8b45ffc39b"
         },
         {
           "path": "lib/coordination/lobbies.py",
@@ -485,10 +485,10 @@
         }
       ],
       "owner_hashes": {
-        "coordination": "9719a70125356a757d7dd8d4ef1fd4f079a6b403628d6c6088c434b8d230b5a6",
-        "obs": "01af456db45e144826db3dff034567f08dc604214b8bb866f0173b47fe4ee7a4",
-        "scene_voice_switcher": "80d37aca1bdfbd392b1aab211a6ef3acd41886638a182ec1b8440f415f4ad2a6",
-        "settings_history": "c0de7909c62939f1fd4a5e9801a1e697f7ce5ce1ec4dd05940d65e2224805cd6"
+        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
+        "settings_history": "c0de7909c62939f1fd4a5e9801a1e697f7ce5ce1ec4dd05940d65e2224805cd6",
+        "scene_voice_switcher": "9c85fd051d688c8c1b8f05ef663abaaeaa83b216ce78f0a979ffda2ebf15c810",
+        "coordination": "1bf723a6b7eb5bb30c91ed682b26757815ed275e05f71b3c9938ba24205a6910"
       },
       "effects": [
         {
@@ -507,7 +507,7 @@
         "label": "A ready living lobby is visible",
         "kind": "browser"
       },
-      "detail": "The original painting stays beneath a transparent world layer. Eleven ready worlds (Reef, Forge, Sanctuary, Sky Harbor, Storm Coast, Phoenix Observatory, Spirit Railway, Tavern, Future Lounge, Spirit Arcade and Aurora Camp) each supply their own painted landmark motion, ambience and finite themed guests. New invitations retain existing instances, automatic entrances use novelty and soft pressure, and switching the studio world replaces its single document while rejecting stale selections. Complete saved desktop, camera and chat rectangles are cleared after all accents. Hidden documents pause; native OBS unloads inactive sources; teardown releases clocks, instances and cached canvases. Finite off-air installation preserves original inputs, filters, transforms and the program scene. No audio, new Hub worker, socket or program-scene writer is introduced.",
+      "detail": "The original painting stays beneath a transparent world layer. Eleven ready worlds (Reef, Forge, Sanctuary, Sky Harbor, Storm Coast, Phoenix Observatory, Spirit Railway, Tavern, Future Lounge, Spirit Arcade and Aurora Camp) each supply their own painted landmark motion, ambience and finite themed guests. New invitations retain existing instances, automatic entrances use novelty and soft pressure, and switching the studio world replaces its single document while rejecting stale selections. Complete saved desktop, camera and chat rectangles are cleared after all accents. Hidden documents pause; native OBS unloads inactive sources; teardown releases clocks, instances and cached canvases. Finite off-air installation preserves original inputs, filters, transforms and the program scene. No audio, new Hub worker, socket or program-scene writer is introduced. Maintenance reruns enumerate installed groups and reject missing group children before any installation writes.",
       "steps": [
         {
           "id": "0",
@@ -582,12 +582,12 @@
         {
           "path": "tools/install_lobby_motion.py",
           "symbol": "install",
-          "hash": "daf0b439e0f7910a3f9aac13e55f87e9038b8a6954a0571569614123f9985ff5"
+          "hash": "6f0d8101d5f5c69b8d2b2bf777e53b034e9107383a2c702a721111811fbb7468"
         }
       ],
       "owner_hashes": {
-        "scene_voice_switcher": "80d37aca1bdfbd392b1aab211a6ef3acd41886638a182ec1b8440f415f4ad2a6",
-        "browser_effects": "7cf91e257d9f5bcfdfd036ba677b0885ca53810756575ea879eee05fa4df3eff"
+        "browser_effects": "7cf91e257d9f5bcfdfd036ba677b0885ca53810756575ea879eee05fa4df3eff",
+        "scene_voice_switcher": "9c85fd051d688c8c1b8f05ef663abaaeaa83b216ce78f0a979ffda2ebf15c810"
       }
     }
   ]

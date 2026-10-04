@@ -35,6 +35,8 @@ class _ExpectedErrors(logging.Filter):
         if isinstance(exc, (OSError, WebSocketException)):
             return False
         if isinstance(exc, OBSSDKRequestError):
+            if exc.code == 602 and exc.req_name == 'GetSceneItemList':
+                return False  # The container adapter retries groups explicitly.
             if exc.code == 207:
                 return False
             if exc.code == 604 and exc.req_name in {

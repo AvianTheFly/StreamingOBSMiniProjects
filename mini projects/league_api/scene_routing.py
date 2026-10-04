@@ -24,6 +24,9 @@ def _prepare_scene(client, settings, target):
             raise ValueError(f'OBS champion scene is missing: {scene}')
         return
     scene = destination(settings, target)
+    if (target == 'idle' and not idle_uses_lobby(settings)
+            and lobby_catalog.parent(scene)):
+        return  # The director resolves published location groups inside acceptance.
     if scene not in scenes:
         raise ValueError(f'OBS scene is missing: {scene}')
     if target == 'idle' and not idle_uses_lobby(settings):

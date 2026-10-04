@@ -56,8 +56,8 @@
         }
       ],
       "owner_hashes": {
-        "coordination": "9719a70125356a757d7dd8d4ef1fd4f079a6b403628d6c6088c434b8d230b5a6",
-        "media_workers": "99a1a00f5854b87301b5e62b0837f5e035bf87e45a4552403c603e0e3de1f064"
+        "media_workers": "99a1a00f5854b87301b5e62b0837f5e035bf87e45a4552403c603e0e3de1f064",
+        "coordination": "1bf723a6b7eb5bb30c91ed682b26757815ed275e05f71b3c9938ba24205a6910"
       },
       "edges": [
         {
@@ -135,7 +135,7 @@
         }
       ],
       "owner_hashes": {
-        "coordination": "9719a70125356a757d7dd8d4ef1fd4f079a6b403628d6c6088c434b8d230b5a6"
+        "coordination": "1bf723a6b7eb5bb30c91ed682b26757815ed275e05f71b3c9938ba24205a6910"
       },
       "edges": [
         {
@@ -176,7 +176,7 @@
         "event": "scene.decision",
         "kind": "event"
       },
-      "detail": "Revision and lease checks precede scene preparation. Accepted requests without a feature-specific preparation consume any published lobby layer data before the sole program-scene writer changes the destination. Explicit feature preparation, deferred intent, deliberate ownership and temporary lease semantics remain serialized.",
+      "detail": "Revision and lease checks precede scene preparation. Accepted requests without a feature-specific preparation consume any published lobby layer data before the sole program-scene writer changes the destination. Explicit feature preparation, deferred intent, deliberate ownership and temporary lease semantics remain serialized. A published lobby group resolves a saved location choice to its parent only after acceptance, with explicit selection inside that transaction.",
       "steps": [
         {
           "id": "0",
@@ -215,8 +215,8 @@
         }
       ],
       "owner_hashes": {
-        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
-        "coordination": "9719a70125356a757d7dd8d4ef1fd4f079a6b403628d6c6088c434b8d230b5a6"
+        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
+        "coordination": "1bf723a6b7eb5bb30c91ed682b26757815ed275e05f71b3c9938ba24205a6910"
       },
       "edges": [
         {
@@ -240,7 +240,7 @@
         {
           "path": "lib/coordination/scenes.py",
           "symbol": "SceneDirector.request",
-          "hash": "14f92989ee1795971f7edd7018720393745ae3fe633a118a911bedfd321a7923"
+          "hash": "91efce2ee297b9bf21de59f6b7ecca1137a2572a1dcaba8f0532d00de55c6a40"
         }
       ],
       "effects": [
@@ -294,8 +294,8 @@
         }
       ],
       "owner_hashes": {
-        "obs": "14a609a32922f670be94cc1af9003c422c7441672877972b6012e9485e731497",
-        "coordination": "9719a70125356a757d7dd8d4ef1fd4f079a6b403628d6c6088c434b8d230b5a6"
+        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
+        "coordination": "1bf723a6b7eb5bb30c91ed682b26757815ed275e05f71b3c9938ba24205a6910"
       },
       "edges": [
         {
@@ -394,7 +394,7 @@
         }
       ],
       "owner_hashes": {
-        "coordination": "9719a70125356a757d7dd8d4ef1fd4f079a6b403628d6c6088c434b8d230b5a6"
+        "coordination": "1bf723a6b7eb5bb30c91ed682b26757815ed275e05f71b3c9938ba24205a6910"
       },
       "effects": [
         {

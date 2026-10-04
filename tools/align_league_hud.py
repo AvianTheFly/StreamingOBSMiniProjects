@@ -60,11 +60,12 @@ def main():
     load_project_env()
     SettingsBackups().snapshot()
     import obs
+    from obs.containers import container_items
     client = obs.get_obs()
     before = {}
     for scene in (*CENTERS, 'leagueMAP'):
         before[scene] = {
-            'items': client.send('GetSceneItemList', {'sceneName': scene}, raw=True),
+            'items': {'sceneItems': container_items(client, scene).scene_items},
             'filters': client.send('GetSourceFilterList', {'sourceName': scene}, raw=True)}
     backup = ROOT / 'output' / 'league-hud-20261002'
     backup.mkdir(exist_ok=True)
@@ -85,7 +86,7 @@ def main():
                 if i.get('inputKind') == 'monitor_capture')
     client.set_scene_item_transform('leagueMAP', item['sceneItemId'], {
         'cropLeft': 2173, 'cropTop': 1056, 'cropRight': 2, 'cropBottom': 2})
-    print('Applied portrait/bar masks and map crop; separate scenes and all parent transforms preserved.')
+    print('Applied portrait/bar masks and map crop; separate containers and all parent transforms preserved.')
 
 
 if __name__ == '__main__':

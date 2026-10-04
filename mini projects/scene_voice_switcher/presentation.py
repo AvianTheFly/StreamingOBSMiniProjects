@@ -5,6 +5,7 @@ from .layouts import ART, LAYOUTS, FLAT_LOCATIONS
 from lib.coordination.lobby_layout import apply_layout, transform_matches
 from lib.coordination.lobbies import lobby_catalog
 from .motion import layer as motion_layer
+from obs.containers import container_items
 
 lock = lobby_catalog.presentation_lock
 CAMERA_SOURCE = 'FaceCamWithProps'
@@ -72,7 +73,7 @@ def describe(client,name):
     if name not in LAYOUTS:
         return {'source':name,'label':name,'managed':False,'rotation':True}
     spec=settings.location(name)
-    rows=client.get_scene_item_list(name).scene_items
+    rows=container_items(client,name).scene_items
     indexed={r['sourceName']:r for r in rows}
     blueprint=plan(name)
     expected=[layer['source'] for layer in blueprint['layers']]
