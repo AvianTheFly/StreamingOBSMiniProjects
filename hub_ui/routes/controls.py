@@ -137,6 +137,7 @@ class ControlRoutes:
         self._json(200, {"ok": True})
 
     def _post_hub_action(self, path: str):
+        self._body()  # Consume the request before HTTP/1.0 closes its socket.
         action_id = urllib.parse.unquote(path[len("/api/hub-actions/"):])
         result = commands.run_hub_action(action_id, source="ui")
         if not result.get("ok", False):
@@ -145,6 +146,7 @@ class ControlRoutes:
         self._json(200, result)
 
     def _post_project_action(self, path: str):
+        self._body()
         rest = path[len("/api/project-actions/"):]
         parts = [urllib.parse.unquote(part) for part in rest.split("/") if part]
         if len(parts) != 2:
@@ -157,6 +159,7 @@ class ControlRoutes:
         self._json(200, result)
 
     def _post_workflow(self, path: str):
+        self._body()
         workflow_id = urllib.parse.unquote(path[len("/api/workflows/"):])
         settings = hub_settings.load_settings()
         workflows = settings.get("hub_workflows") if isinstance(settings.get("hub_workflows"), list) else []

@@ -184,6 +184,13 @@ assert not any(t.name.startswith('hub_ui:') for t in threading.enumerate())
                     self.assertEqual(request('/api/projects/missing')[0], 404)
                     self.assertEqual(request('/api/project-actions/soundboard/pause', {})[0], 200)
                     command.assert_called_once_with('soundboard', 'pause')
+                    # Actions must read/validate bodies before dispatch. Leaving
+                    # POST bytes unread can reset HTTP/1.0 sockets on Windows.
+                    for action_path in ('/api/project-actions/soundboard/pause',
+                                        '/api/hub-actions/abort_all_audio',
+                                        '/api/workflows/missing'):
+                        self.assertEqual(request(action_path, [])[0], 400)
+                    command.assert_called_once_with('soundboard', 'pause')
                     self.assertEqual(request('/api/audio', {'project': 'soundboard', 'project_volume_db': 'NaN'})[0], 400)
                     stream = http.client.HTTPConnection('127.0.0.1', port, timeout=3)
                     try:
