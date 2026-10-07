@@ -10,8 +10,8 @@ from lib.coordination.lobbies import lobby_catalog
 
 def publish_inventory(lobbies):
     with presentation.lock:
-        chosen = rotation(lobbies)
         data=settings.read()
+        chosen = rotation(lobbies, data)
         plans={name:presentation.plan(name,data) for name in lobbies if name in LAYOUTS}
         exclusions = ('LOL champ select', *legacy_exclusions(lobbies),
                       *(name for name in lobbies if name not in chosen))

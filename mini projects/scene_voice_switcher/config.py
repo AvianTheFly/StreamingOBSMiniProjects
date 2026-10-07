@@ -7,6 +7,18 @@ RECORD_TIMEOUT_SECONDS: float = 2.0
 LOBBIES_SCENE = "Lobbies"
 GAME_SCENE = "Test"
 
+# Installed presentation destinations offered under the desk's Other scenes menu.
+PRESENTATION_SCENES = {
+    'Spirit Welcome': 'Welcome',
+    'Spirit Intermission': 'Be right back',
+    'Spirit Signoff': 'Signoff',
+    'just screen': 'Desktop',
+    'afk': 'Away',
+    'Bot Lane Court': 'Bot Lane Court',
+    'Court - Genius': 'Court · Genius',
+    'Court - Inting': 'Court · Inting',
+}
+
 # ---------------------------------------------------------------------------
 # Optional voice-alias overrides
 # ---------------------------------------------------------------------------

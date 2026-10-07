@@ -1,0 +1,12 @@
+{
+  "id": "new-18-bridge-footfall",
+  "title": "The bridge takes his weight",
+  "file": "images/new-18-bridge-footfall.png",
+  "prompt": "Use case: illustration-story. Asset: one full-screen landscape 16:9 cinematic frame for a gritty fantasy story slideshow, not a collage or storyboard. Match supplied reference illustration's intensely detailed mature fantasy realism, nocturnal blue moonlight / amber lanterns, weathered basalt and bronze, cinematic light and depth. One Udyr-like muscular weathered shaman with long black hair, beard, dark tattoos, bare chest, ragged brown wolf-fur mantle, wrapped forearms, leather trousers and boots. Spirits are energy envelopes attached to the SAME human body, not independent pets. No other people, villain, text, watermark, UI, panels or cute cartoon. Keep existing identity and persistent damage. Each frame must show the requested intermediate action clearly, not skip to its result.\nInput images: Image 1: adjacent story/world continuity reference. Image 2: original character/environment/style reference.\nSpecific next story moment: FIRST PERSON just beyond breached wall on same old stone bridge, gold ram horns/forearms still at edges. Left glowing hand plants on mossy bridge deck; cracks spiderweb violently out from contact through wet pavers. Directly ahead is a GIANT jagged hole in bridge deck, broken parapets, beyond hole remaining arch slopes to original approach platform. Cloud abyss seen THROUGH hole. Hero overextended still running, surprise beginning. Wall pieces falling behind, same moonlit landscape.",
+  "references": [
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-17-wall-opens.png",
+    "C:/StreamingMedia/ChannelPresentation/2026-10-03/spirit-slideshow-v1/images/23-ram-pov-lowering.png"
+  ],
+  "original": "C:\\Users\\Michael\\.codex\\generated_images\\01a104b1-c082-7921-a920-617bfec4e788\\exec-38a0ae5f-1ce6-4c50-a834-cea53216fc71.png",
+  "generation_mode": "built-in image_gen"
+}

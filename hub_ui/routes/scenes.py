@@ -3,6 +3,13 @@ from pathlib import Path
 from hub_ui import updates
 
 class SceneRoutes:
+    def _svs_catalog(self):
+        try:
+            from scene_voice_switcher.api import catalog
+            self._json(200, catalog())
+        except ValueError as exc:
+            self._err(400, str(exc))
+
     def _svs_artwork(self):
         try:
             from scene_voice_switcher.api import artwork
@@ -22,6 +29,44 @@ class SceneRoutes:
 
 
     def _svs_post(self, action: str, body: dict):
+        if action == 'next_lobby':
+            try:
+                from scene_voice_switcher.api import next_lobby
+                self._json(200, next_lobby())
+            except ValueError as exc:
+                self._err(400, str(exc))
+            except Exception as exc:
+                self._err(500, str(exc))
+            return
+        if action == 'effect':
+            try:
+                from scene_voice_switcher.api import lobby_effect
+                cue = lobby_effect(body.get('source'), body.get('action'))
+                updates.broadcast('living_lobby_action', cue)
+                self._json(200, {'ok': True, **cue})
+            except ValueError as exc:
+                self._err(400, str(exc))
+            except Exception as exc:
+                self._err(500, str(exc))
+            return
+        if action == 'selection':
+            try:
+                from scene_voice_switcher.api import configure_selection
+                self._json(200, configure_selection(body.get('mode'), body.get('source')))
+            except ValueError as exc:
+                self._err(400, str(exc))
+            except Exception as exc:
+                self._err(500, str(exc))
+            return
+        if action == 'select_stage':
+            try:
+                from scene_voice_switcher.api import select_stage
+                self._json(200, select_stage(body.get('stage'), body.get('source')))
+            except ValueError as exc:
+                self._err(400, str(exc))
+            except Exception as exc:
+                self._err(500, str(exc))
+            return
         if action in ('configure_lobby','restore_lobby'):
             try:
                 from scene_voice_switcher.api import configure_lobby, restore_lobby

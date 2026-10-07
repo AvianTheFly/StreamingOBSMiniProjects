@@ -73,6 +73,16 @@ export const api = {
 
   // ── Scene switcher ────────────────────────────────────────────────────
   getLobbies:    () => _req("GET",  "/api/projects/scene_voice_switcher/lobbies"),
+  getLobbyCatalog: () => _req('GET', '/api/projects/scene_voice_switcher/catalog'),
+  setLobbySelection: (mode, source = null) => _req('POST', '/api/projects/scene_voice_switcher/selection', {mode, source}),
+  lobbyEffect: (source, action) => _req('POST', '/api/projects/scene_voice_switcher/effect', {source, action}),
+  nextLobby: () => _req('POST', '/api/projects/scene_voice_switcher/next_lobby', {}),
+  getAfterpartyActions: () => _req('GET', '/api/spirit-lobby/actions'),
+  afterpartyAction: action => _req('POST', '/api/spirit-lobby/action', {action}),
+  getStartingScreen: () => _req('GET', '/api/starting-soon'),
+  saveStartingScreen: body => _req('POST', '/api/starting-soon/settings', body),
+  startingScreenAction: (action, body = {}) => _req('POST', '/api/starting-soon/' + action, body),
+  selectStreamStage: (stage, source = null) => _req('POST', '/api/projects/scene_voice_switcher/select_stage', {stage, source}),
   selectLobby:  (source = null, screenVisible) => _req("POST", "/api/projects/scene_voice_switcher/select_lobby", { source, ...(screenVisible === undefined ? {} : {screen_visible: screenVisible}) }),
   configureLobby: (source, changes) => _req('POST', '/api/projects/scene_voice_switcher/configure_lobby', {source, changes}),
   restoreLobby: (source) => _req('POST', '/api/projects/scene_voice_switcher/restore_lobby', {source}),

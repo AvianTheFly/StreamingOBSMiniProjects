@@ -1,0 +1,11 @@
+{
+  "id": "new-24-phoenix-windup",
+  "title": "A storm coils before release",
+  "file": "images/new-24-phoenix-windup.png",
+  "prompt": "Use case: illustration-story. Asset: one full-screen landscape 16:9 cinematic frame for a gritty fantasy story slideshow, not a collage or storyboard. Match supplied reference illustration's intensely detailed mature fantasy realism, nocturnal blue moonlight / amber lanterns, weathered basalt and bronze, cinematic light and depth. One Udyr-like muscular weathered shaman with long black hair, beard, dark tattoos, bare chest, ragged brown wolf-fur mantle, wrapped forearms, leather trousers and boots. Spirits are energy envelopes attached to the SAME human body, not independent pets. No other people, villain, text, watermark, UI, panels or cute cartoon. Keep existing identity and persistent damage. Each frame must show the requested intermediate action clearly, not skip to its result.\nInput images: Image 1: adjacent story/world continuity reference.\nSpecific next story moment: Same exterior medium view next instant. Shaman midair rotates torso further, one arm crossing chest, the other sweeping backward, legs follow rotational arc. Half-complete blue and orange phoenix wings CURVED around him like a cocoon, gathering glowing circular vortex. Nearby slabs curve into a swirl but have NOT blasted away. Bridge/island damaged behind above right, black hair and fur coil in wind. Anticipation for explosive spin.",
+  "references": [
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-23-phoenix-coil.png"
+  ],
+  "original": "C:\\Users\\Michael\\.codex\\generated_images\\01a104b1-c082-7921-a920-617bfec4e788\\exec-a6016882-507e-4a53-b2a9-9910d5cd19eb.png",
+  "generation_mode": "built-in image_gen"
+}

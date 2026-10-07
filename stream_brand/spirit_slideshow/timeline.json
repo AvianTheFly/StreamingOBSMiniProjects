@@ -1,0 +1,250 @@
+{
+  "title": "Sanctuary / image slideshow MVP 01",
+  "duration_seconds": 40,
+  "fps": 25,
+  "width": 1920,
+  "height": 1080,
+  "presentation": "34 full cinematic stills; hard cuts; no generated in-between animation or moving camera",
+  "music_source": "C:/StreamingMedia/twitch downloads/CCR - Fortunate Son (MOONLGHT Remix).mp3",
+  "music_start_seconds": 0,
+  "shots": [
+    {
+      "id": "01-sanctuary-reveal",
+      "file": "images/01-sanctuary-reveal.png",
+      "title": "Sanctuary revealed",
+      "start_seconds": 0,
+      "end_seconds": 1.55
+    },
+    {
+      "id": "02-descent-gateway",
+      "file": "images/02-descent-gateway.png",
+      "title": "Descent toward gateway",
+      "start_seconds": 1.55,
+      "end_seconds": 2.82
+    },
+    {
+      "id": "03-behind-udyr",
+      "file": "images/03-behind-udyr.png",
+      "title": "Behind Udyr at entrance",
+      "start_seconds": 2.82,
+      "end_seconds": 3.9
+    },
+    {
+      "id": "04-enter-chamber",
+      "file": "images/04-enter-chamber.png",
+      "title": "Entering the chamber",
+      "start_seconds": 3.9,
+      "end_seconds": 4.6
+    },
+    {
+      "id": "05-center-ignition",
+      "file": "images/05-center-ignition.png",
+      "title": "The center ignites",
+      "start_seconds": 4.6,
+      "end_seconds": 5.5
+    },
+    {
+      "id": "06-branching-floor",
+      "file": "images/06-branching-floor.png",
+      "title": "Energy finds its paths",
+      "start_seconds": 5.5,
+      "end_seconds": 6.4
+    },
+    {
+      "id": "07-statues-awaken",
+      "file": "images/07-statues-awaken.png",
+      "title": "Statues and walls awaken",
+      "start_seconds": 6.4,
+      "end_seconds": 7.5
+    },
+    {
+      "id": "08-room-turn",
+      "file": "images/08-room-turn.png",
+      "title": "Udyr surveys the room",
+      "start_seconds": 7.5,
+      "end_seconds": 8.5
+    },
+    {
+      "id": "09-statue-beams",
+      "file": "images/09-statue-beams.png",
+      "title": "Statues send their power",
+      "start_seconds": 8.5,
+      "end_seconds": 9.5
+    },
+    {
+      "id": "10-growing-empowerment",
+      "file": "images/10-growing-empowerment.png",
+      "title": "Power grows around him",
+      "start_seconds": 9.5,
+      "end_seconds": 10.5
+    },
+    {
+      "id": "11-overload-cracks",
+      "file": "images/11-overload-cracks.png",
+      "title": "Power overwhelms the room",
+      "start_seconds": 10.5,
+      "end_seconds": 11.4
+    },
+    {
+      "id": "12-searching-exit",
+      "file": "images/12-searching-exit.png",
+      "title": "He sees the sealed exit",
+      "start_seconds": 11.4,
+      "end_seconds": 12.3
+    },
+    {
+      "id": "13-bear-form-build",
+      "file": "images/13-bear-form-build.png",
+      "title": "Lightning bear takes shape",
+      "start_seconds": 12.3,
+      "end_seconds": 12.9
+    },
+    {
+      "id": "14-bear-sprint",
+      "file": "images/14-bear-sprint.png",
+      "title": "Four-legged sprint",
+      "start_seconds": 12.9,
+      "end_seconds": 13.62
+    },
+    {
+      "id": "15-claw-contact",
+      "file": "images/15-claw-contact.png",
+      "title": "Claws tear the seal",
+      "start_seconds": 13.62,
+      "end_seconds": 14.25
+    },
+    {
+      "id": "16-gate-collapse",
+      "file": "images/16-gate-collapse.png",
+      "title": "The gate breaks above him",
+      "start_seconds": 14.25,
+      "end_seconds": 15.15
+    },
+    {
+      "id": "17-danger-look-up",
+      "file": "images/17-danger-look-up.png",
+      "title": "He notices too late",
+      "start_seconds": 15.15,
+      "end_seconds": 15.95
+    },
+    {
+      "id": "18-turtle-races",
+      "file": "images/18-turtle-races.png",
+      "title": "Turtle protection races in",
+      "start_seconds": 15.95,
+      "end_seconds": 16.67
+    },
+    {
+      "id": "19-shield-impact",
+      "file": "images/19-shield-impact.png",
+      "title": "Shell meets falling stone",
+      "start_seconds": 16.67,
+      "end_seconds": 17.43
+    },
+    {
+      "id": "20-shield-relief",
+      "file": "images/20-shield-relief.png",
+      "title": "Alive inside the shield",
+      "start_seconds": 17.43,
+      "end_seconds": 18.8
+    },
+    {
+      "id": "21-only-wall-left",
+      "file": "images/21-only-wall-left.png",
+      "title": "Only a rubble wall remains",
+      "start_seconds": 18.8,
+      "end_seconds": 19.8
+    },
+    {
+      "id": "22-ram-resolve",
+      "file": "images/22-ram-resolve.png",
+      "title": "The ram answers",
+      "start_seconds": 19.8,
+      "end_seconds": 20.75
+    },
+    {
+      "id": "23-ram-pov-lowering",
+      "file": "images/23-ram-pov-lowering.png",
+      "title": "Dropping into ram stance",
+      "start_seconds": 20.75,
+      "end_seconds": 22
+    },
+    {
+      "id": "24-ram-charge",
+      "file": "images/24-ram-charge.png",
+      "title": "Charge toward the wall",
+      "start_seconds": 22,
+      "end_seconds": 24.27
+    },
+    {
+      "id": "25-ram-contact",
+      "file": "images/25-ram-contact.png",
+      "title": "Ram impact",
+      "start_seconds": 24.27,
+      "end_seconds": 24.85
+    },
+    {
+      "id": "26-breach-to-void",
+      "file": "images/26-breach-to-void.png",
+      "title": "The breach reveals a void",
+      "start_seconds": 24.85,
+      "end_seconds": 26.2
+    },
+    {
+      "id": "27-fall-lookback",
+      "file": "images/27-fall-lookback.png",
+      "title": "Falling below the sanctuary",
+      "start_seconds": 26.2,
+      "end_seconds": 28.3
+    },
+    {
+      "id": "28-phoenix-hint",
+      "file": "images/28-phoenix-hint.png",
+      "title": "A new spirit gathers",
+      "start_seconds": 28.3,
+      "end_seconds": 29.4
+    },
+    {
+      "id": "29-phoenix-storm",
+      "file": "images/29-phoenix-storm.png",
+      "title": "Phoenix storm releases",
+      "start_seconds": 29.4,
+      "end_seconds": 32
+    },
+    {
+      "id": "30-wings-unfurl",
+      "file": "images/30-wings-unfurl.png",
+      "title": "Wings open through the debris",
+      "start_seconds": 32,
+      "end_seconds": 34
+    },
+    {
+      "id": "31-glide-home",
+      "file": "images/31-glide-home.png",
+      "title": "Gliding back home",
+      "start_seconds": 34,
+      "end_seconds": 35.5
+    },
+    {
+      "id": "32-touchdown",
+      "file": "images/32-touchdown.png",
+      "title": "Touchdown on the terrace",
+      "start_seconds": 35.5,
+      "end_seconds": 37
+    },
+    {
+      "id": "33-walk-to-edge",
+      "file": "images/33-walk-to-edge.png",
+      "title": "Walking to the overlook",
+      "start_seconds": 37,
+      "end_seconds": 38
+    },
+    {
+      "id": "34-seated-vista",
+      "file": "images/34-seated-vista.png",
+      "title": "The earned quiet",
+      "start_seconds": 38,
+      "end_seconds": 40
+    }
+  ]
+}

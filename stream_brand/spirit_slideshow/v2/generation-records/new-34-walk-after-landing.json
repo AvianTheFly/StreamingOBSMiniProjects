@@ -1,0 +1,12 @@
+{
+  "id": "new-34-walk-after-landing",
+  "title": "Walking toward the overlook",
+  "file": "images/new-34-walk-after-landing.png",
+  "prompt": "Use case: illustration-story. Asset: one full-screen landscape 16:9 cinematic frame for a gritty fantasy story slideshow, not a collage or storyboard. Match supplied reference illustration's intensely detailed mature fantasy realism, nocturnal blue moonlight / amber lanterns, weathered basalt and bronze, cinematic light and depth. One Udyr-like muscular weathered shaman with long black hair, beard, dark tattoos, bare chest, ragged brown wolf-fur mantle, wrapped forearms, leather trousers and boots. Spirits are energy envelopes attached to the SAME human body, not independent pets. No other people, villain, text, watermark, UI, panels or cute cartoon. Keep existing identity and persistent damage. Each frame must show the requested intermediate action clearly, not skip to its result.\nInput images: Image 1: adjacent story/world continuity reference. Image 2: original character/environment/style reference.\nSpecific next story moment: Image 1 authoritative hero identity, post-landing environment and persistent ruined background. Image 2 only references rear walking posture. Same shaman has stood after landing and walks AWAY from camera toward western stone overlook, mid stride, mantle moving, no wings except a few dying frost/ember feather flecks. Intact wet terrace and amber lantern at LEFT, pine branches, beyond edge majestic cloud canyon/aurora/mountains and waterfalls. Damaged main chamber at RIGHT background stays demolished: broken wall ribs, blue orb fragment, scattered rubble, no healing. Clear continuation of one-hand kneeling recovery into walking, one hero.",
+  "references": [
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-29-landing-recovery.png",
+    "C:/StreamingMedia/ChannelPresentation/2026-10-03/spirit-slideshow-v1/images/33-walk-to-edge.png"
+  ],
+  "original": "C:\\Users\\Michael\\.codex\\generated_images\\01a104b1-c082-7921-a920-617bfec4e788\\exec-38a5e46b-6854-4686-bb4c-c0cfb0fd42cc.png",
+  "generation_mode": "built-in image_gen"
+}

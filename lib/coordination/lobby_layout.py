@@ -1,6 +1,7 @@
 """Apply published OBS layer data; feature owners supply layout and source policy."""
 from lib.settings_backups import SettingsBackups
 from obs.containers import container_items, is_group
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 def transform_matches(actual, desired):
     for key,value in desired.items():
@@ -50,9 +51,18 @@ def apply_layout(client, scene, plan):
         indexed[source] = {'sceneItemId': identifier, 'sceneItemEnabled': True}
     for layer in layers:
         source = layer['source']; row = indexed[source]; identifier = row['sceneItemId']
-        if layer.get('configure') and layer.get('settings'):
+        if layer.get('configure') and (layer.get('settings') or layer.get('url_query')):
             current = client.get_input_settings(source).input_settings
-            changes = {key: value for key, value in layer['settings'].items() if current.get(key) != value}
+            desired = dict(layer.get('settings', {}))
+            if layer.get('url_query'):
+                parts = urlsplit(current.get('url', ''))
+                if not parts.scheme or not parts.netloc:
+                    raise ValueError('Preserve invalid browser URL: ' + source)
+                owned = layer['url_query']
+                query = [(key, value) for key, value in parse_qsl(parts.query, keep_blank_values=True)
+                         if key not in owned]
+                desired['url'] = urlunsplit(parts._replace(query=urlencode(query + list(owned.items()))))
+            changes = {key: value for key, value in desired.items() if current.get(key) != value}
             if changes:
                 before_write(); client.set_input_settings(source, changes, True)
         transform = row.get('sceneItemTransform', {})

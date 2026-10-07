@@ -1,7 +1,7 @@
 import {PaintedWorld,edge} from './painted-world.js';
 import {glow,hash,TAU} from './shared/world-motion.js';
 import {cues,artists} from './storm-coast-guests.js';
-export const scene={id:'storm-coast',source:'StormCoastLobby',holes:[[110,275,590,265],[820,430,440,460],[1502,230,282,487]],patches:[
+export const scene={id:'storm-coast',source:'StormCoastLobby',holes:[[60,180,896,504],[980,430,440,460],[1502,230,282,487]],patches:[
  {rect:[316,116,114,108],move:(u,v,t)=>[Math.sin(t*.9)*5*v*edge(u,v),Math.cos(t*.9)*edge(u,v)]},
  {rect:[42,42,116,154],move:(u,v,t)=>[Math.sin(t*.8+1)*4*v*edge(u,v),Math.cos(t*.8)*edge(u,v)]},
  {rect:[541,578,91,151],move:(u,v,t)=>[Math.sin(t*1.3+v)*7*v*edge(u,v),Math.sin(t*.7)*edge(u,v)]},

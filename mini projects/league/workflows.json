@@ -129,7 +129,7 @@
         "event": "league:champion_kill",
         "kind": "event"
       },
-      "detail": "",
+      "detail": "One replaceable playback worker owns the kill source through cleanup. Layered audio follows the League permission gate; startup, completion, cancellation and errors park the source hidden so scene activation cannot replay the last cue.",
       "steps": [
         {
           "id": "0",
@@ -161,9 +161,9 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "league": "e5c1c40d153f1aa5c9723f700c99c25e772bdaa7ab2a43a29e8c39c7b1b8a83a",
-        "coordination": "1bf723a6b7eb5bb30c91ed682b26757815ed275e05f71b3c9938ba24205a6910"
+        "coordination": "c4fc5a67e5e47be4bc18ef0c9359201377f1dcd8de6671d557968aab81c68b17",
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "league": "b9f1e7c409cfc50ee1852962baf15bfe85b010d5a800e12aadb7d5dced7be3a2"
       },
       "edges": [
         {
@@ -183,7 +183,12 @@
         {
           "path": "mini projects/league/handlers/champion_kill_handler.py",
           "symbol": "make_champion_kill_handler",
-          "hash": "421e12a406f84fc81601e834ff7ecf2fb0f33148a92c646ecb49cc946ed03ea8"
+          "hash": "01d5b045878f5696d97b582c3623aa87d34ce8e3287eb65cd62b44700487aa4e"
+        },
+        {
+          "path": "mini projects/league/kill_audio_player.py",
+          "symbol": "LeagueKillAudioPlayer",
+          "hash": "45f53d5c413d76ee3246388d32fc4dda491a71b8dd493738946da8318af72359"
         }
       ]
     },
@@ -261,7 +266,7 @@
         "event": "league:respawn_3s",
         "kind": "event"
       },
-      "detail": "",
+      "detail": "Start Halo while still dead with 3.5 seconds remaining: its final beep is about three seconds into the asset, and the intentional extra polling interval compensates detection and playback startup. Fire once per death; never start on the actual respawn event.",
       "steps": [
         {
           "id": "0",
@@ -293,10 +298,10 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "league": "e5c1c40d153f1aa5c9723f700c99c25e772bdaa7ab2a43a29e8c39c7b1b8a83a",
-        "coordination": "1bf723a6b7eb5bb30c91ed682b26757815ed275e05f71b3c9938ba24205a6910",
-        "sound_effects": "65bc17c0f7ab29429802b35c59fa6efcad6523e844464de8e612baeecf2eac3d"
+        "coordination": "c4fc5a67e5e47be4bc18ef0c9359201377f1dcd8de6671d557968aab81c68b17",
+        "sound_effects": "65bc17c0f7ab29429802b35c59fa6efcad6523e844464de8e612baeecf2eac3d",
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "league": "91267dbdf4b7a8a30f3e3e1d628858e033c7a73d1082edec1315f33de7c8b05e"
       },
       "edges": [
         {

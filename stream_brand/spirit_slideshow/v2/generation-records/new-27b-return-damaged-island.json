@@ -1,0 +1,12 @@
+{
+  "id": "new-27b-return-damaged-island",
+  "title": "Climbing toward the surviving terrace",
+  "file": "images/new-27b-return-damaged-island.png",
+  "prompt": "Use case: illustration-story. Asset: one full-screen landscape 16:9 cinematic frame for a gritty fantasy story slideshow, not a collage or storyboard. Match supplied reference illustration's intensely detailed mature fantasy realism, nocturnal blue moonlight / amber lanterns, weathered basalt and bronze, cinematic light and depth. One Udyr-like muscular weathered shaman with long black hair, beard, dark tattoos, bare chest, ragged brown wolf-fur mantle, wrapped forearms, leather trousers and boots. Spirits are energy envelopes attached to the SAME human body, not independent pets. No other people, villain, text, watermark, UI, panels or cute cartoon. Keep existing identity and persistent damage. Each frame must show the requested intermediate action clearly, not skip to its result.\nInput images: Image 1: adjacent story/world continuity reference. Image 2: adjacent story/world continuity reference.\nSpecific next story moment: EDIT Image 1 as target; Image 2 is damage reference. Keep EXACT flying hero, upstroke wings, frame composition, spirit-carved mountain scenery, moon, colors, island placement and partial bridge hole. Change only sanctuary masonry on RIGHT to its POST COLLAPSE state matching Image 2: bronze gateway open jagged smashed breach, shattered blue orb, missing sections of circular chamber wall ribs, scattered rubble on rune floor, ruins remain recognizable with four statues. NO healed entrance or reconstructed walls. Keep pine-lined west terrace at LEFT edge of island intact, that is hero's destination. Hero wings unchanged.",
+  "references": [
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-27-upward-flight.png",
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-20b-fall-damaged-sanctuary.png"
+  ],
+  "original": "C:\\Users\\Michael\\.codex\\generated_images\\01a104b1-c082-7921-a920-617bfec4e788\\exec-6fb48889-82c0-4271-a444-9fd1eab666bf.png",
+  "generation_mode": "built-in image_gen"
+}

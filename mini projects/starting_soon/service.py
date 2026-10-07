@@ -5,6 +5,7 @@ from coordinator import coordinator
 from . import settings, clip_library, presentation, artwork, layouts
 from .config import ART, SCENE
 from .player import ClipPlayer
+from .opening import Opening, catalog as opening_catalog
 
 
 class StartingSoon:
@@ -16,6 +17,7 @@ class StartingSoon:
         self._preserved_box = None
         self._placed_override = False
         self.player = ClipPlayer(coordinator.permission('starting_soon'), self.publish, self.place_clip)
+        self.opening = Opening(self)
         self.last_rotation = time.monotonic()
 
     def publish(self, **changes):
@@ -26,10 +28,15 @@ class StartingSoon:
         with self.lock:
             data = dict(self.data)
         return {**settings.read(), **data, 'session_queue':self.player.snapshot(),
+                'opening_catalog': opening_catalog(),
                 'artwork_catalog':artwork.catalog(), 'layout_catalog':layouts.PRESETS,
                 'available_artwork': sorted(p.name for p in ART.glob('*.png'))}
 
     def place_clip(self, path=''):
+        if getattr(self, 'opening', None) and self.opening.active:
+            presentation.place_fullscreen()
+            self.publish(clip_box=[0, 0, 1920, 1080])
+            return
         config = settings.read()
         override = bool(path and path in config['clip_layouts'])
         if layouts.box(config,path) is None and self._placed_override and self._preserved_box:
@@ -45,11 +52,19 @@ class StartingSoon:
         self.publish(clip_box=box)
 
     def execute(self, action, body):
-        if action == 'install':
+        if action == 'intro':
+            self.opening.start()
+        elif action == 'skip-intro':
+            self.opening.finish()
+        elif action == 'install':
             presentation.attach(self.port)
             self.place_clip()
             self.publish(ready=True, error='')
         elif action == 'start':
+            if getattr(self, 'opening', None) and self.opening.active:
+                self.opening.close()
+                if self.session and self.session.owns_scene():
+                    self.session.present(SCENE)
             if self.session and self.session.owns_scene():
                 return
             self.close()
@@ -65,6 +80,8 @@ class StartingSoon:
         elif action == 'finish':
             self.close()
         elif action == 'play':
+            if getattr(self, 'opening', None) and self.opening.active:
+                raise ValueError('Finish the opening before playing a playlist.')
             if not self.session or not self.session.owns_scene():
                 raise ValueError('Open Starting Soon in OBS before playing clips.')
             config = settings.read()
@@ -107,11 +124,15 @@ class StartingSoon:
     def tick(self):
         if self.session and not self.session.owns_scene():
             self.close()
+        if getattr(self, 'opening', None):
+            self.opening.tick()
         config = settings.read()
         if config.get('rotate_artwork',True) and time.monotonic() - self.last_rotation >= config['rotation_seconds']:
             self.execute('next-art', {})
 
     def close(self):
+        if getattr(self, 'opening', None):
+            self.opening.close()
         self.player.close()
         if getattr(self,'_placed_override',False):
             self.place_clip()

@@ -5,7 +5,47 @@
   },
   "arcade-world.js": {
     "source": "mini projects/scene_voice_switcher/web/arcade-world.js",
-    "sha256": "7f75ee5c4a3a4723c5b274c09862af1f453b36bb0224324d1db326ff8972ad6c"
+    "sha256": "9c33e688a560184496de65ad5cb26b72ae8ff1195154f660976a814eb61636c5"
+  },
+  "art/arcade-cast-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/arcade-cast-v1.png",
+    "sha256": "36d8ea37fefa35e0a21da622894810e3b889e363ccf0b482746c406158f2a1d6"
+  },
+  "art/arcade-chaos-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/arcade-chaos-v1.png",
+    "sha256": "424ac926b6980d6bd63f5c602fb5dcf109eb3f7b3df184abdf89fb99b0b4b660"
+  },
+  "art/forge-cast-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/forge-cast-v1.png",
+    "sha256": "b0b2bc1a3a849d102d1a32e2c99b35f68668556d0b4e71c0a68f1883742453e8"
+  },
+  "art/forge-chaos-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/forge-chaos-v1.png",
+    "sha256": "951764e66dede44a97dd2b52827485735a2e768f496984da33a1d06c15d5c7c0"
+  },
+  "art/future-cast-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/future-cast-v1.png",
+    "sha256": "7705326abcc3e1798b20f4f2593f057138c9a0bf31413f3a0568e7173477cf4f"
+  },
+  "art/future-chaos-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/future-chaos-v1.png",
+    "sha256": "d20b5d6bb4cd536b3ff72a1825e2b7176493e4adbc4d0f776dd2e0f5fa939d05"
+  },
+  "art/sky-harbor-cast-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/sky-harbor-cast-v1.png",
+    "sha256": "e4a22dac035fa7015b607211d1c05c3634b35c8e204dfa15f7d02879020efe8d"
+  },
+  "art/sky-harbor-chaos-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/sky-harbor-chaos-v1.png",
+    "sha256": "5670f843074f6e912500126f4b55eb46e480d2b6a4cfeffeb1800e4c5e7d9735"
+  },
+  "art/tavern-cast-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/tavern-cast-v1.png",
+    "sha256": "f5e8966985ce10e15f6fa8e9c274ac003e5dfafba783d1cc1fbd30ed9f36d3f7"
+  },
+  "art/tavern-chaos-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/tavern-chaos-v1.png",
+    "sha256": "c19c3bbe7d838529c270174a2eeb652e18d30b5c9e46d6c104a98340d4599f67"
   },
   "aurora-camp-guests.js": {
     "source": "mini projects/scene_voice_switcher/web/aurora-camp-guests.js",
@@ -13,7 +53,15 @@
   },
   "aurora-camp-world.js": {
     "source": "mini projects/scene_voice_switcher/web/aurora-camp-world.js",
-    "sha256": "74c06dfd348fab076400049648bbfc44f5cfb98963ee69c59e3d74737929a9a4"
+    "sha256": "5becd791cac1ee56d43796a88733e74c34622e874a35ad02e8f5723ef798fa7b"
+  },
+  "chaos-cast.js": {
+    "source": "mini projects/scene_voice_switcher/web/chaos-cast.js",
+    "sha256": "8effe9570bc46756926240379ec4fb5a093d20d1d33ef879cbac55175a8e7029"
+  },
+  "chaos-ink.js": {
+    "source": "mini projects/scene_voice_switcher/web/chaos-ink.js",
+    "sha256": "8eb5a2e02d2976de882b057d36251b314f99d6a3f5a0958a55ec5dd8ab52111a"
   },
   "forge-atmosphere.js": {
     "source": "mini projects/scene_voice_switcher/web/forge-atmosphere.js",
@@ -25,7 +73,7 @@
   },
   "forge-world.js": {
     "source": "mini projects/scene_voice_switcher/web/forge-world.js",
-    "sha256": "653395929d2038c6a039d98340b00ffdf7bc09c7e008f95e1a63db3cb407b7de"
+    "sha256": "44ff05eb75c7dc04da180a0c2d1cd582336f0bb0fbd35c2853952a7f0500def0"
   },
   "future-guests.js": {
     "source": "mini projects/scene_voice_switcher/web/future-guests.js",
@@ -33,15 +81,27 @@
   },
   "future-world.js": {
     "source": "mini projects/scene_voice_switcher/web/future-world.js",
-    "sha256": "c5c44c2269a99afaf67d9e5a0ae5952a2743e711739dbbdc6ea9680e472f4640"
+    "sha256": "940d16a5190faa27fcd08474d5c3c2e56faed73cbeb5e490b684d82d36f340c5"
   },
   "index.html": {
     "source": "mini projects/scene_voice_switcher/web/index.html",
     "sha256": "35b94cd5e7cc843132c035c89cc6431a710163f32387a6f5f99d3fd6dd7b6183"
   },
+  "live-actions.js": {
+    "source": "mini projects/scene_voice_switcher/web/live-actions.js",
+    "sha256": "30988c0592a6fb3457c29e1ee650bb7ce1e054c31d74fcbbf4e78ebb6dc253b9"
+  },
+  "lobby-cameos.js": {
+    "source": "mini projects/scene_voice_switcher/web/lobby-cameos.js",
+    "sha256": "486be93c152b1cc320153627705771c7313b32c48c18b77599b732d2f1c39956"
+  },
+  "lobby-residents.js": {
+    "source": "mini projects/scene_voice_switcher/web/lobby-residents.js",
+    "sha256": "15b47244ad4f7f506f8727b048a0d081c448a8586f4b334f6da24edaeca9c509"
+  },
   "painted-world.js": {
     "source": "mini projects/scene_voice_switcher/web/painted-world.js",
-    "sha256": "30f1e958756148e6bcd2df0bdf32983710e027e7d0613ae818775fc4ce6b9bd7"
+    "sha256": "11c86f011c948059cc04177a4c479cdc49bbe38379c38ad4075387f6f9fb5891"
   },
   "phoenix-observatory-guests.js": {
     "source": "mini projects/scene_voice_switcher/web/phoenix-observatory-guests.js",
@@ -49,7 +109,7 @@
   },
   "phoenix-observatory-world.js": {
     "source": "mini projects/scene_voice_switcher/web/phoenix-observatory-world.js",
-    "sha256": "096b838a290c1de85c47928ba8b92a9e2cca8ac25c7deeb379e8e3fed16cbe6e"
+    "sha256": "fa89a0201476ee2e2b4cae58e78a0086dcd3f820aaf7f68dd906cd8c41431d95"
   },
   "reef-cues.js": {
     "source": "mini projects/scene_voice_switcher/web/reef-cues.js",
@@ -65,7 +125,7 @@
   },
   "reef-scene.js": {
     "source": "mini projects/scene_voice_switcher/web/reef-scene.js",
-    "sha256": "8111a7fd589fda630005865d035678a3967468ade3812ac9f33dfa9495a2c121"
+    "sha256": "99bfdb09ebaa18f463cf7b179d335b4bf8c5021e47dd6511c57203e0a29c78d9"
   },
   "reef-visitors.js": {
     "source": "mini projects/scene_voice_switcher/web/reef-visitors.js",
@@ -85,7 +145,11 @@
   },
   "sanctuary-world.js": {
     "source": "mini projects/scene_voice_switcher/web/sanctuary-world.js",
-    "sha256": "acc87674a486d5de782bbfaa1d3ae59e3da421357619717d92c38f917331baab"
+    "sha256": "6fd409a2f7ae7b0d9655936a52d08ad288e12f217b1daeea258d4807fe1705ee"
+  },
+  "screen-frame.js": {
+    "source": "mini projects/scene_voice_switcher/web/screen-frame.js",
+    "sha256": "80c68ecdb7ccc8d35e915bccf03972f5e3af3654968f9aff864ea9b23c6f8f41"
   },
   "sky-harbor-guests.js": {
     "source": "mini projects/scene_voice_switcher/web/sky-harbor-guests.js",
@@ -93,7 +157,7 @@
   },
   "sky-harbor-world.js": {
     "source": "mini projects/scene_voice_switcher/web/sky-harbor-world.js",
-    "sha256": "fe978a5b5c911a6a285c16f84b3414de58b89fa23f7506546ea479ab9b641726"
+    "sha256": "57cb284c49ad030411b19588148deb8d70a088ed3c43231c4f59f38af44a5d8f"
   },
   "spirit-rail-guests.js": {
     "source": "mini projects/scene_voice_switcher/web/spirit-rail-guests.js",
@@ -101,11 +165,11 @@
   },
   "spirit-rail-world.js": {
     "source": "mini projects/scene_voice_switcher/web/spirit-rail-world.js",
-    "sha256": "b106c2f935e2bc32139fc17089715d29a5d06152ac6d98f674a3101cb7d49358"
+    "sha256": "f5e007f8d112ce1071da0ce41bb4ea463fd072fce662c443447f89222bb598bb"
   },
   "stage.js": {
     "source": "mini projects/scene_voice_switcher/web/stage.js",
-    "sha256": "470d18f773715e1820b1717145b561b262a2aefaf0580891a1fddee01608e28c"
+    "sha256": "d2fd631602b260d1f70797713163c7833b9400cfd8c1cbe49fe85c01392b8c0d"
   },
   "storm-coast-guests.js": {
     "source": "mini projects/scene_voice_switcher/web/storm-coast-guests.js",
@@ -113,7 +177,7 @@
   },
   "storm-coast-world.js": {
     "source": "mini projects/scene_voice_switcher/web/storm-coast-world.js",
-    "sha256": "c3d46f0f1ac79264d7bfd6ad32616d26ca98f516247ae0ff4bbdc4a96ac6a5e7"
+    "sha256": "1af49d3450985812ef3062ae349f4668889d77e464986dc01106bdbfeac9c5ad"
   },
   "studio.css": {
     "source": "mini projects/scene_voice_switcher/web/studio.css",
@@ -125,7 +189,7 @@
   },
   "studio.js": {
     "source": "mini projects/scene_voice_switcher/web/studio.js",
-    "sha256": "76d425b2866d763aba7a60dfd864e808ea2c120e7be1260eb0a0f8c9c903964d"
+    "sha256": "cc2009c3412f1164dec03f4db4865eb0bb4c51a30b3bff1a5145dd985b63cac8"
   },
   "tavern-guests.js": {
     "source": "mini projects/scene_voice_switcher/web/tavern-guests.js",
@@ -133,7 +197,7 @@
   },
   "tavern-world.js": {
     "source": "mini projects/scene_voice_switcher/web/tavern-world.js",
-    "sha256": "18744191dcc3fd07dd39cf741584697f81e91ee7e022cf033c59cc17ade11edf"
+    "sha256": "530a2506622b4c43732a5e2470e8e1c3058cb48c646e2060138915eee6792d3d"
   },
   "travel-ink.js": {
     "source": "mini projects/scene_voice_switcher/web/travel-ink.js",
@@ -145,10 +209,14 @@
   },
   "worlds.js": {
     "source": "mini projects/scene_voice_switcher/web/worlds.js",
-    "sha256": "b07b3f7ef0af248a6fcd59872b5ec35a66ca7462c661366b44a1a0ab07485225"
+    "sha256": "ec6329bbf8dd90c77c3e887ad029a46c0e8710e73a5582cf541e447da296a661"
   },
   "shared/world-motion.js": {
     "source": "lib/browser_effects/web/world-motion.js",
-    "sha256": "183d151c12d4e67f8ee07b8c51ff94417c9ac7e4d417a4595633fdf5d92111da"
+    "sha256": "54d5feb0d08dc5727f4e79ca4cd6c3a69f7b8fc6f7080f3df94b5a0002038dd3"
+  },
+  "shared/display-frame.js": {
+    "source": "lib/browser_effects/web/display-frame.js",
+    "sha256": "d6f4cc06683301a2218e955211161b0b3542b85de9ba3efa7a675ff7304b1e15"
   }
 }

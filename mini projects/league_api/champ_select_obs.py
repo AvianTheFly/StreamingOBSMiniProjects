@@ -9,6 +9,26 @@ SOURCE = 'League Champion Select World Browser'
 URL = 'http://127.0.0.1:7431/champ-select'
 
 
+def recover_browser(client):
+    """Recover the existing draft page after its HTTP owner becomes ready."""
+    inputs = client.send('GetInputList', {}, raw=True)['inputs']
+    source = next((row for row in inputs if row['inputName'] == SOURCE), None)
+    if source is None:
+        return False
+    if source['inputKind'] != 'browser_source':
+        raise ValueError(f'{SOURCE} is already a different OBS input type')
+    current = client.send('GetInputSettings', {'inputName': SOURCE}, raw=True)['inputSettings']
+    changes = {key: value for key, value in {'url': URL, 'restart_when_active': True}.items()
+               if current.get(key) != value}
+    if changes:
+        SettingsBackups().snapshot()
+        client.send('SetInputSettings', {'inputName': SOURCE,
+                    'inputSettings': changes, 'overlay': True}, raw=True)
+    client.send('PressInputPropertiesButton', {'inputName': SOURCE,
+                'propertyName': 'refreshnocache'}, raw=True)
+    return True
+
+
 def install(client):
     """Reuse the facecam scene without altering its original transform or filters."""
     scenes = {item['sceneName'] for item in client.get_scene_list().scenes}
@@ -25,7 +45,7 @@ def install(client):
     if SCENE not in scenes:
         client.send('CreateScene', {'sceneName': SCENE}, raw=True)
     settings = {'url': URL, 'width': 1920, 'height': 1080, 'fps': 30,
-                'fps_custom': True, 'shutdown': False, 'restart_when_active': False}
+                'fps_custom': True, 'shutdown': False, 'restart_when_active': True}
     items = client.send('GetSceneItemList', {'sceneName': SCENE}, raw=True)['sceneItems']
     if not source:
         client.send('CreateInput', {'sceneName': SCENE, 'inputName': SOURCE,

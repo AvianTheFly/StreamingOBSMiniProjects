@@ -33,6 +33,7 @@ export class Props {
     }
   }
   desk(c,t,config,colors) {
+    c.save();c.translate(242,110);
     shadow(c,960,881,380,30);
     // Keep the original brass, jade and moss console in front of the camera.
     c.save();c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';c.drawImage(this.booth,594,650,732,305);c.restore();
@@ -43,6 +44,7 @@ export class Props {
     }
     for(let i=0;i<10;i++){const h=3+(1+Math.sin(t*2.7+i))*9*config.energy;round(c,912+i*10,743-h,5,h,1,colors[i%4]+'aa');}
     glow(c,960,878,300,28,colors[0]+'22');
+    c.restore();
   }
   signs(c,t,config,colors) {
     if(!this.screens?.paint(c,'left'))this.text.draw(c,'left',config.leftTitle,config.leftSubtitle,colors[1]);

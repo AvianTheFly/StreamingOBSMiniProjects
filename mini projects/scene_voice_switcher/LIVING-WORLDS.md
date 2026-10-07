@@ -100,3 +100,81 @@ Review evidence lives outside the checkout at
 `C:/StreamingMedia/LivingLobbies/catalog/review`. Native installation and restart
 proofs accompany the clips and actual-render reports; the studio is for review,
 while the installed OBS sources run their automatic entrances without it.
+
+
+## Five gaming redesigns — 2026-10-04
+
+Arcade, Tavern, Forge, Future and Sky Harbor use versioned paintings under
+`web/art/*-chaos-v1.png`, generated with the built-in image tool from their
+original paintings. Full prompts and reference roles are in
+`web/art/redesign-prompts.json`. Their original image files and native input
+settings are retained. No Afterparty file is part of this redesign.
+
+| World | New identity | Representative punchlines |
+| --- | --- | --- |
+| Arcade | One More Game Arcade | Rage-quit controller queues again; jackpot grows legs; speedrunning toast reverses |
+| Tavern | Respawn Inn | Legendary chest drops a common spoon; cheese dice roll snacks; dragon critical sneeze |
+| Forge | Hotfix Foundry | Balance hammer nerfs a tiny sword; legendary weapon is a duck; emergency pizza patch |
+| Future | Space Queue Lounge | Potato-ping robot rubber-bands; ready check needs snacks; wormhole orders takeaway |
+| Sky Harbor | Lagport | Express pizza airship arrives eventually; luggage blames wind; plunger confidently navigates |
+
+Each now has fourteen finite automatic performances with varied arrivals, novelty and
+soft crowding pressure. New cast lives in feature-local `chaos-cast.js`; comic
+prop drawing lives in `chaos-ink.js`. Cached patches also animate the painted
+characters and silly props between visitors. No music or sound is introduced.
+
+`PaintedWorld` loads `scene.artUrl` when supplied, draws that decoded plate first,
+then its cached deformations and atmosphere. The existing stage clears **all**
+saved screen, camera and chat rectangles after that entire rendering. Other
+worlds omit `artUrl`, retaining their existing transparent overlay behavior.
+The existing OBS Living World sources consume these same published files when
+they next load. Backend code and user settings do not change; Hub restart is
+unnecessary. Refresh an already-open preview to fetch the new files.
+
+For rollback, restore the chosen world's previous metadata/cast imports and
+remove `scene.artUrl` plus its added patches, then run the finite build. The
+original image sources remain available underneath; do not reset camera, chat,
+filters or personal overlays. Do not touch the independent Afterparty tree.
+
+Review reports and clips: `C:/StreamingMedia/LivingLobbies/redesign-2026-10-04/review`.
+
+
+## Painted residents and surprise acts — 2026-10-04
+
+Fifteen transparent painted characters now inhabit the five redesigned rooms.
+Original generated sheets live in `web/art/*-cast-v1.png`; the full built-in
+image-generation prompts and saved paths are in `web/art/cast-prompts.json`.
+They are original illustrated cast members, not extracted footage.
+
+| Room | Painted residents | New surprise routines |
+| --- | --- | --- |
+| Arcade | Skating raccoon, joystick creature, armored coin | Token heist, joystick solo, coin boss, USB pizza portal, silver podium, coin conga |
+| Tavern | Wizard dragon, mimic chest, heroic tankard | Snack raid, furniture chase, tankard choir, breakfast spell, loot inspection, last dungeon |
+| Forge | Goblin smith, knight duck, anvil robot | Balance bonk, duck tank squad, sword audit, honk level-up, anvil moonwalk, patch courier |
+| Future | Toaster robot, pizza UFO, space snail | Breakfast launch, snail speedrun, pizza convoy, reverse abduction, tiny finish line, toaster disco |
+| Sky Harbor | Aviator pigeon, pizza airship, winged luggage | Wrong-cloud delivery, snack airdrop, luggage escape, air traffic jam, ranked mail, nested baggage |
+
+`lobby-residents.js` separates the three connected alpha silhouettes once at
+load time. It preserves source sheets, avoids neighboring tail/wing fragments,
+and retains only three small rendering canvases. Continuous perch routines and
+room accents share the existing 24-fps document clock: marquee chases, bouncing
+tokens, potion bubbles, forge embers, spacecraft traffic and wind ribbons.
+
+`lobby-cameos.js` adds thirty finite performances to the previous forty.
+The existing scheduler selects them automatically with novelty and soft crowding
+pressure. Manual controls remain available. A participating resident fades out
+of its perch during its larger performance, then returns. No extra timer, audio,
+Hub worker or browser document is introduced. The public presentation method
+`PaintedWorld.drawVisitor` keeps bitmap ownership out of cue artists. Hidden or
+paused documents stop all movement together; teardown also handles late decode.
+
+The same final aperture clear protects every saved camera, screen and chat area.
+Afterparty remains independent and unchanged. Build with
+`py -3.11 -B tools/build_lobby_motion.py`; review `tools/test_lobby_residents.cjs`
+for actual alpha, motion, cast handoff, late decode, pause and resource-release
+checks, and `tools/test_lobby_worlds.cjs` for each rendered performance.
+
+Current cast showreel and preservation proof:
+`C:/StreamingMedia/LivingLobbies/cast-2026-10-04/review`.
+The showreel deliberately triggers two examples per room; the separate automatic
+recordings exercise the normal scheduler without manual invitations.

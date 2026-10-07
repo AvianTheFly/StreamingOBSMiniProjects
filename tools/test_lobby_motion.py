@@ -24,7 +24,7 @@ class MotionTests(unittest.TestCase):
         data={'locations':{'ReefLobby':{'camera':[120,300,420,550],'extra_personal':'kept'}}}
         blueprint=plan('ReefLobby',data)
         sources=[e['source'] for e in blueprint['layers']]
-        self.assertEqual(sources[-3:],['ReefLobby Foreground','ReefLobby Living World','ReefLobby Chat'])
+        self.assertEqual(sources[-4:],['ReefLobby Foreground','Hub Display Capture','ReefLobby Living World','ReefLobby Chat'])
         self.assertEqual(blueprint['layers'][0]['kind'],'image_source')
         self.assertIn('reef-base.png',blueprint['layers'][0]['settings']['file'])
         self.assertEqual(data['locations']['ReefLobby']['extra_personal'],'kept')
@@ -38,7 +38,7 @@ class MotionTests(unittest.TestCase):
             blueprint=plan(name,{})
             layers=blueprint['layers'];sources=[item['source'] for item in layers]
             predecessor='FaceCamWithProps' if name in FLAT_LOCATIONS else name+' Foreground'
-            self.assertEqual(sources[-3:],[predecessor,name+' Living World',name+' Chat'])
+            self.assertEqual(sources[-4:],[predecessor,'Hub Display Capture',name+' Living World',name+' Chat'])
             self.assertEqual(layers[0]['kind'],'image_source')
             query=urllib.parse.parse_qs(urllib.parse.urlsplit(layers[-2]['settings']['url']).query)
             self.assertEqual(json.loads(query['holes'][0]),[defaults(name)[key] for key in ('screen','camera','chat')])

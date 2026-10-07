@@ -12,6 +12,49 @@ from lib.coordination.lobbies import LobbyCatalog
 from lib.display_capture import CAPTURE_SCENE
 
 class LobbyManagementTests(unittest.TestCase):
+    def test_enlarged_desktop_is_uncropped_and_clear_of_camera_and_chat_in_every_world(self):
+        for name in layouts.LAYOUTS:
+            spec=layouts.defaults(name);x,y,w,h=spec['screen']
+            self.assertEqual((w,h),(896,504),name)
+            self.assertEqual(w*9,h*16,name)
+            for key in ('camera','chat'):
+                xx,yy,ww,hh=spec[key]
+                self.assertTrue(x+w<=xx or xx+ww<=x or y+h<=yy or yy+hh<=y,name+'/'+key)
+            blueprint=presentation.plan(name,{})
+            layers=blueprint['layers'];screen=next(p for p in layers if p['source']==CAPTURE_SCENE)
+            self.assertEqual(screen['transform']['boundsType'],'OBS_BOUNDS_SCALE_INNER')
+            self.assertEqual(screen['transform']['cropLeft'],0)
+            foreground=next((i for i,p in enumerate(layers) if p['source'].endswith('Foreground')),None)
+            if foreground is not None:self.assertGreater(layers.index(screen),foreground)
+
+    def test_fixed_choice_keeps_rotation_members_and_personal_data(self):
+        original={'future':{'keep':7},'locations':{'ForgeLobby':{'rotation':False,'chat':[10,20,300,400]}}}
+        self.path.write_text(json.dumps(original))
+        names=['ForgeLobby','ReefLobby']
+        fixed=settings.save_selection('fixed','ForgeLobby',names,path=self.path)
+        self.assertEqual(settings.rotation(names,fixed),['ForgeLobby'])
+        self.assertEqual(fixed['locations'],original['locations'])
+        shuffled=settings.save_selection('shuffle',None,names,path=self.path)
+        self.assertEqual(settings.rotation(names,shuffled),['ReefLobby'])
+        self.assertEqual(shuffled['future'],original['future'])
+
+    def test_invalid_selection_and_malformed_data_are_preserved(self):
+        for data in [{'selection':['personal malformed value']},{'selection':{'mode':'fixed','source':'missing'}}]:
+            self.path.write_text(json.dumps(data));before=self.path.read_bytes()
+            with self.assertRaises(ValueError):settings.save_selection('fixed','missing',['ForgeLobby'],path=self.path)
+            self.assertEqual(self.path.read_bytes(),before)
+        self.path.write_text(json.dumps({'selection':['preserve']}));before=self.path.read_bytes()
+        with self.assertRaises(ValueError):settings.save_selection('shuffle',None,['ForgeLobby'],path=self.path)
+        self.assertEqual(self.path.read_bytes(),before)
+
+    def test_offline_world_catalog_does_not_query_obs(self):
+        from scene_voice_switcher.api import catalog
+        with patch('scene_voice_switcher.settings.read',return_value={}), patch('obs.get_obs',side_effect=AssertionError('No OBS during browsing')):
+            data=catalog()
+        self.assertEqual(data['selection']['mode'],'shuffle')
+        self.assertTrue(all(w['art_url'] for w in data['locations']))
+        self.assertIn('ForgeLobby',[w['source'] for w in data['locations']])
+
     def test_specific_voice_names_win_over_common_spirit_alias(self):
         from scene_voice_switcher.commands import _match_lobbies_source
         names={'Spirit Afterparty':['spirit','afterparty','spirit afterparty'],

@@ -1,0 +1,12 @@
+{
+  "id": "new-33-glide-damaged-terrace",
+  "title": "Gliding toward the surviving terrace",
+  "file": "images/new-33-glide-damaged-terrace.png",
+  "prompt": "Use case: illustration-story. Asset: one full-screen landscape 16:9 cinematic frame for a gritty fantasy story slideshow, not a collage or storyboard. Match supplied reference illustration's intensely detailed mature fantasy realism, nocturnal blue moonlight / amber lanterns, weathered basalt and bronze, cinematic light and depth. One Udyr-like muscular weathered shaman with long black hair, beard, dark tattoos, bare chest, ragged brown wolf-fur mantle, wrapped forearms, leather trousers and boots. Spirits are energy envelopes attached to the SAME human body, not independent pets. No other people, villain, text, watermark, UI, panels or cute cartoon. Keep existing identity and persistent damage. Each frame must show the requested intermediate action clearly, not skip to its result.\nInput images: Image 1: adjacent story/world continuity reference. Image 2: original character/environment/style reference.\nSpecific next story moment: Image 1 is authoritative sanctuary damage and scenery reference. Image 2 only references a GLIDING pose. Rear three-quarter wide shot of SAME shaman now closer to intact west pine-lined terrace at LEFT side of SAME damaged island. Wings stretched HORIZONTALLY in calm glide, human legs extended behind, softer wind trails blue/ember. Show broken bridge at right and ram-blasted missing doorway and fractured chamber ribs exactly as Image 1, no intact gateway or healed floor. Existing four statues among rubble. Same giant bear/ram carved mountains, aurora, waterfalls, one moon. Camera advancing toward terrace with hero.",
+  "references": [
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-27b-return-damaged-island.png",
+    "C:/StreamingMedia/ChannelPresentation/2026-10-03/spirit-slideshow-v1/images/31-glide-home.png"
+  ],
+  "original": "C:\\Users\\Michael\\.codex\\generated_images\\01a104b1-c082-7921-a920-617bfec4e788\\exec-5b42d4cc-4b9f-41f2-a1a8-55a31a96c7fd.png",
+  "generation_mode": "built-in image_gen"
+}

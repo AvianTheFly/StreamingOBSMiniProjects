@@ -2,7 +2,7 @@ import {PaintedWorld,edge} from './painted-world.js';
 import {sanctuaryAmbience} from './sanctuary-atmosphere.js';
 import {cues,artists} from './sanctuary-guests.js';
 const lantern=phase=>(u,v,t)=>[Math.sin(t*.85+phase)*5*v*edge(u,v),Math.sin(t*.85+phase)*edge(u,v)];
-export const scene={id:'sanctuary',source:'SanctuaryLobby',holes:[[215,242,577,282],[865,340,475,470],[1510,220,215,431]],patches:[
+export const scene={id:'sanctuary',source:'SanctuaryLobby',holes:[[60,180,896,504],[980,340,475,470],[1510,220,215,431]],patches:[
  {rect:[251,42,72,125],move:lantern(0)},
  {rect:[754,127,66,99],move:lantern(1)},
  {rect:[1610,40,80,135],move:lantern(2)},

@@ -28,10 +28,12 @@ import * as startingSoonPage from "./pages/starting-soon.js";
 import * as leagueStatsPage from "./pages/league-stats.js";
 import * as twitchCommandsPage from './pages/twitch-commands.js';
 import * as moodCuesPage from './pages/mood-cues.js';
+import * as effectsGallery from './pages/effects-gallery.js';
 
 // ── Page registry ─────────────────────────────────────────────────────────────
 // Map page-id → { mount(container, arg?), unmount() }
 const PAGES = {
+  'effects': effectsGallery,
   'projects/love_me': moodCuesPage,
   "projects/twitch_commands":       twitchCommandsPage,
   "projects/league_stats":          leagueStatsPage,
@@ -75,9 +77,10 @@ function navigate(page) {
   }
 
   // Resolve module
-  let mod = PAGES[page];
+  let [route,query='']=page.split('?');
+  let mod = PAGES[route];
   if (!mod && page.startsWith("projects/")) {
-    const name = page.slice("projects/".length);
+    const name = route.slice("projects/".length);
     mod = {
       mount:   (c) => genericPage.mount(c, name),
       unmount: ()  => genericPage.unmount(),
@@ -86,6 +89,7 @@ function navigate(page) {
   if (!mod) {
     mod  = dashboardPage;
     page = "dashboard";
+    route = page;
   }
 
   _curPage   = page;
@@ -93,11 +97,11 @@ function navigate(page) {
 
   _pageEl.innerHTML = "";
   _pageEl.scrollTop = 0;
-  _pageEl.dataset.route = page;
-  setActiveNavItem(page);
+  _pageEl.dataset.route = route;
+  setActiveNavItem(route);
 
   try {
-    const r = mod.mount(_pageEl);
+    const r = ['library','workflows'].includes(route) ? mod.mount(_pageEl,new URLSearchParams(query)) : mod.mount(_pageEl);
     if (r instanceof Promise) r.catch(e => console.error("[router] async mount error", e));
   } catch(e) {
     console.error("[router] mount error", e);

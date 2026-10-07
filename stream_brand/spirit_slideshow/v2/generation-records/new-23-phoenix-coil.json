@@ -1,0 +1,12 @@
+{
+  "id": "new-23-phoenix-coil",
+  "title": "Feathers gather around him",
+  "file": "images/new-23-phoenix-coil.png",
+  "prompt": "Use case: illustration-story. Asset: one full-screen landscape 16:9 cinematic frame for a gritty fantasy story slideshow, not a collage or storyboard. Match supplied reference illustration's intensely detailed mature fantasy realism, nocturnal blue moonlight / amber lanterns, weathered basalt and bronze, cinematic light and depth. One Udyr-like muscular weathered shaman with long black hair, beard, dark tattoos, bare chest, ragged brown wolf-fur mantle, wrapped forearms, leather trousers and boots. Spirits are energy envelopes attached to the SAME human body, not independent pets. No other people, villain, text, watermark, UI, panels or cute cartoon. Keep existing identity and persistent damage. Each frame must show the requested intermediate action clearly, not skip to its result.\nInput images: Image 1: original character/environment/style reference. Image 2: adjacent story/world continuity reference.\nSpecific next story moment: Exterior medium shot of falling shaman in same cloud abyss BELOW damaged bridge/island. Bearded face focused, body curls slightly one knee in as shoulders rotate. Semi-formed translucent frost/ember wing skeletons sprout from shoulders, little feather tongues only halfway filled; blue-orange energy winds helically around torso. Rocks tumbling alongside. This is mid transformation BEFORE full wings; human identity fully clear, no ram.",
+  "references": [
+    "C:/StreamingMedia/ChannelPresentation/2026-10-03/spirit-slideshow-v1/images/10-growing-empowerment.png",
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-20b-fall-damaged-sanctuary.png"
+  ],
+  "original": "C:\\Users\\Michael\\.codex\\generated_images\\01a104b1-c082-7921-a920-617bfec4e788\\exec-b5179ac7-1496-4f79-9fc9-e6ae90774d2f.png",
+  "generation_mode": "built-in image_gen"
+}

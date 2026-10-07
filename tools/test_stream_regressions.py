@@ -88,6 +88,17 @@ class RegressionTests(unittest.TestCase):
         detector._detect_death_respawn({'isDead':False,'respawnTimer':0})
         self.assertEqual([call.args[0] for call in events.emit.call_args_list],['respawn'])
 
+    def test_halo_cue_keeps_pre_respawn_polling_margin(self):
+        events = Mock(); detector = GameStateDetector(events)
+        for timer in (4, 3.6):
+            detector._detect_death_respawn({'isDead': True, 'respawnTimer': timer})
+        events.emit.assert_not_called()
+        detector._detect_death_respawn({'isDead': True, 'respawnTimer': 3.4})
+        self.assertEqual(events.emit.call_args.args[0], 'respawn_3s')
+        for timer in (3, 2, 1):
+            detector._detect_death_respawn({'isDead': True, 'respawnTimer': timer})
+        self.assertEqual(events.emit.call_count, 1)
+
     def test_stream_track_preserves_other_tracks(self):
         client=Mock()
         client.get_profile_parameter.side_effect=[SimpleNamespace(parameter_value='Advanced'),SimpleNamespace(parameter_value='3')]

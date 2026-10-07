@@ -1,0 +1,228 @@
+{
+  "title": "Sanctuary / calmer illustrated sequence 03",
+  "duration_seconds": 40,
+  "fps": 25,
+  "width": 1920,
+  "height": 1080,
+  "presentation": "Longer stationary shots, coherent action viewpoints and gentle dissolves",
+  "music_source": "C:/StreamingMedia/twitch downloads/CCR - Fortunate Son (MOONLGHT Remix).mp3",
+  "music_start_seconds": 0,
+  "shots": [
+    {
+      "id": "new-01-epic-sanctuary",
+      "file": "images/new-01-epic-sanctuary.png",
+      "title": "The sanctuary above the world",
+      "start_seconds": 0,
+      "end_seconds": 2,
+      "role": "new illustration"
+    },
+    {
+      "id": "new-02-descent-bridge",
+      "file": "images/new-02-descent-bridge.png",
+      "title": "Approaching the ancient bridge",
+      "start_seconds": 2,
+      "end_seconds": 3.6,
+      "role": "new illustration"
+    },
+    {
+      "id": "04-enter-chamber",
+      "file": "images/04-enter-chamber.png",
+      "title": "Entering the chamber",
+      "start_seconds": 3.6,
+      "end_seconds": 5.2,
+      "role": "reused v1 illustration"
+    },
+    {
+      "id": "06-branching-floor",
+      "file": "images/06-branching-floor.png",
+      "title": "Energy finds its paths",
+      "start_seconds": 5.2,
+      "end_seconds": 6.6,
+      "role": "reused v1 illustration"
+    },
+    {
+      "id": "new-04-beams-travel",
+      "file": "images/new-04-beams-travel.png",
+      "title": "Power crosses the chamber",
+      "start_seconds": 6.6,
+      "end_seconds": 8,
+      "role": "new illustration"
+    },
+    {
+      "id": "new-05-four-spirit-peak",
+      "file": "images/new-05-four-spirit-peak.png",
+      "title": "All four spirits engulf Udyr",
+      "start_seconds": 8,
+      "end_seconds": 10.2,
+      "role": "new illustration"
+    },
+    {
+      "id": "new-06-bear-condense",
+      "file": "images/new-06-bear-condense.png",
+      "title": "Lightning flows into the claws",
+      "start_seconds": 10.2,
+      "end_seconds": 11.6,
+      "role": "new illustration"
+    },
+    {
+      "id": "new-08-bear-stride",
+      "file": "images/new-08-bear-stride.png",
+      "title": "A bounding bear stride",
+      "start_seconds": 11.6,
+      "end_seconds": 13,
+      "role": "new illustration"
+    },
+    {
+      "id": "15-claw-contact",
+      "file": "images/15-claw-contact.png",
+      "title": "Claws tear the seal",
+      "start_seconds": 13,
+      "end_seconds": 14.2,
+      "role": "reused v1 illustration"
+    },
+    {
+      "id": "18-turtle-races",
+      "file": "images/18-turtle-races.png",
+      "title": "Turtle protection races in",
+      "start_seconds": 14.2,
+      "end_seconds": 15.4,
+      "role": "reused v1 illustration"
+    },
+    {
+      "id": "19-shield-impact",
+      "file": "images/19-shield-impact.png",
+      "title": "Shell meets falling stone",
+      "start_seconds": 15.4,
+      "end_seconds": 16.6,
+      "role": "reused v1 illustration"
+    },
+    {
+      "id": "20-shield-relief",
+      "file": "images/20-shield-relief.png",
+      "title": "Alive inside the shield",
+      "start_seconds": 16.6,
+      "end_seconds": 18.6,
+      "role": "reused v1 illustration"
+    },
+    {
+      "id": "22-ram-resolve",
+      "file": "images/22-ram-resolve.png",
+      "title": "The ram answers",
+      "start_seconds": 18.6,
+      "end_seconds": 20,
+      "role": "reused v1 illustration"
+    },
+    {
+      "id": "new-13-ram-lock",
+      "file": "images/new-13-ram-lock.png",
+      "title": "Horns lock into shape",
+      "start_seconds": 20,
+      "end_seconds": 21.2,
+      "role": "new illustration"
+    },
+    {
+      "id": "24-ram-charge",
+      "file": "images/24-ram-charge.png",
+      "title": "Charge toward the wall",
+      "start_seconds": 21.2,
+      "end_seconds": 22.4,
+      "role": "reused v1 illustration"
+    },
+    {
+      "id": "25-ram-contact",
+      "file": "images/25-ram-contact.png",
+      "title": "Ram impact",
+      "start_seconds": 22.4,
+      "end_seconds": 23.6,
+      "role": "reused v1 illustration"
+    },
+    {
+      "id": "new-17-wall-opens",
+      "file": "images/new-17-wall-opens.png",
+      "title": "Stone bursts outward",
+      "start_seconds": 23.6,
+      "end_seconds": 24.8,
+      "role": "new illustration"
+    },
+    {
+      "id": "new-18-bridge-footfall",
+      "file": "images/new-18-bridge-footfall.png",
+      "title": "The bridge takes his weight",
+      "start_seconds": 24.8,
+      "end_seconds": 26,
+      "role": "new illustration"
+    },
+    {
+      "id": "new-19-bridge-break",
+      "file": "images/new-19-bridge-break.png",
+      "title": "The last support gives way",
+      "start_seconds": 26,
+      "end_seconds": 27.2,
+      "role": "new illustration"
+    },
+    {
+      "id": "new-20b-fall-damaged-sanctuary",
+      "file": "images/new-20b-fall-damaged-sanctuary.png",
+      "title": "Falling below the damaged sanctuary",
+      "start_seconds": 27.2,
+      "end_seconds": 28.4,
+      "role": "new illustration"
+    },
+    {
+      "id": "new-23-phoenix-coil",
+      "file": "images/new-23-phoenix-coil.png",
+      "title": "Feathers gather around him",
+      "start_seconds": 28.4,
+      "end_seconds": 29.6,
+      "role": "new illustration"
+    },
+    {
+      "id": "29-phoenix-storm",
+      "file": "images/29-phoenix-storm.png",
+      "title": "Phoenix storm releases",
+      "start_seconds": 29.6,
+      "end_seconds": 31.2,
+      "role": "reused v1 illustration"
+    },
+    {
+      "id": "new-27b-return-damaged-island",
+      "file": "images/new-27b-return-damaged-island.png",
+      "title": "Climbing toward the surviving terrace",
+      "start_seconds": 31.2,
+      "end_seconds": 32.8,
+      "role": "new illustration"
+    },
+    {
+      "id": "new-33-glide-damaged-terrace",
+      "file": "images/new-33-glide-damaged-terrace.png",
+      "title": "Gliding toward the surviving terrace",
+      "start_seconds": 32.8,
+      "end_seconds": 34.4,
+      "role": "new illustration"
+    },
+    {
+      "id": "new-29-landing-recovery",
+      "file": "images/new-29-landing-recovery.png",
+      "title": "Recovering from the landing",
+      "start_seconds": 34.4,
+      "end_seconds": 36,
+      "role": "new illustration"
+    },
+    {
+      "id": "new-31-epic-vista",
+      "file": "images/new-31-epic-vista.png",
+      "title": "The world opens beyond the sanctuary",
+      "start_seconds": 36,
+      "end_seconds": 40,
+      "role": "new illustration"
+    }
+  ],
+  "version_label": "Calmer Edit 03",
+  "poster": "images/new-31-epic-vista.png",
+  "new_selected_image_count": 33,
+  "calm_edit": {
+    "dissolve_frames": 10,
+    "grade": "subdued highlights; saturation 0.90",
+    "camera_motion": false
+  }
+}

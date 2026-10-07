@@ -96,7 +96,21 @@ def _screen_visibility(visible):
         return {'ok': False, 'error': str(exc)}
 
 
+def _output_control(action):
+    from obs import outputs
+    operations = {'start_stream': outputs.start_stream, 'stop_stream': outputs.stop_stream,
+                  'start_replay_buffer': outputs.start_replay_buffer}
+    try:
+        operations[action]()
+        return {'ok': True, 'action': action}
+    except Exception as exc:
+        return {'ok': False, 'error': str(exc)}
+
+
 _ACTIONS: dict[str, HubAction] = {
+    'start_stream': HubAction('start_stream', 'Go live', 'Starts the OBS broadcast.', lambda: _output_control('start_stream')),
+    'stop_stream': HubAction('stop_stream', 'End stream', 'Stops the OBS broadcast.', lambda: _output_control('stop_stream')),
+    'start_replay_buffer': HubAction('start_replay_buffer', 'Start replay buffer', 'Enables recent-moment capture in OBS.', lambda: _output_control('start_replay_buffer')),
     'show_screen': HubAction('show_screen', 'Show screen',
                             'Shows desktop capture in every nested desktop view.',
                             lambda: _screen_visibility(True)),

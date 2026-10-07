@@ -23,6 +23,21 @@ reference but are disabled and are not discovered by the Hub.
 
 ## Start Here
 
+- Open **Run Hub.bat**, then `http://127.0.0.1:7420/`. **Live desk** follows
+  the current stage: **Starting soon, Lobby, Queue / champ select, Game, Ending**.
+  **Change stage** browses controls; explicit buttons change OBS.
+- Starting has image selection and **Play intro** (Sanctuary, 40 seconds, then
+  lobby). Lobby shows the current world, rotation choices and its effects.
+  Game puts **Replay last 15s** up front. Loading uses Game controls.
+- **Go live / End stream** controls broadcasting. **Auto scenes / Hold view**
+  controls automatic routing. **Other scenes** offers installed presentation
+  screens. See the [control reference](docs/STREAM-CONTROLS.md).
+- **Explore your stream** has six purpose areas. Explore an idea to see what viewers
+  get, what triggers it, and which existing controls to use. **Show me three things
+  to try** tours sounds, lobby worlds and replays without playing them.
+- **Understand what happens** opens that idea in the nested
+  [Stream map](docs/WORKFLOW-MAP.md); **Live desk** contains operating controls.
+
 - Customize your compact desktop chat: **Hub → Chat Overlay**.
   See [chat controls, emotes and desktop setup](docs/CHAT-OVERLAY.md).
 

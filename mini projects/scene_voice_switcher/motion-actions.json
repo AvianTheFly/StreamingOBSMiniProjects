@@ -1,0 +1,493 @@
+{
+  "ReefLobby": {
+    "world": "reef",
+    "actions": [
+      {
+        "id": "teapot",
+        "label": "Teapot submarine"
+      },
+      {
+        "id": "diver",
+        "label": "Diving duck"
+      },
+      {
+        "id": "manta",
+        "label": "Curious manta"
+      },
+      {
+        "id": "jelly",
+        "label": "Jellyfish lanterns"
+      },
+      {
+        "id": "courier",
+        "label": "Seahorse courier"
+      },
+      {
+        "id": "school",
+        "label": "Fish constellation"
+      },
+      {
+        "id": "crab",
+        "label": "Tea-service crab"
+      },
+      {
+        "id": "treasure",
+        "label": "Pearl surprise"
+      },
+      {
+        "id": "chart",
+        "label": "Living treasure map"
+      }
+    ]
+  },
+  "ForgeLobby": {
+    "world": "forge",
+    "actions": [
+      {
+        "id": "hammer",
+        "label": "Balance team bonk"
+      },
+      {
+        "id": "duck",
+        "label": "Apprentice gets promoted"
+      },
+      {
+        "id": "runes",
+        "label": "Hotfix rollercoaster"
+      },
+      {
+        "id": "crystals",
+        "label": "XP piñata"
+      },
+      {
+        "id": "moth",
+        "label": "Debug swarm"
+      },
+      {
+        "id": "forged",
+        "label": "Legendary honk reveal"
+      },
+      {
+        "id": "hotfix",
+        "label": "Emergency snack patch"
+      },
+      {
+        "id": "loot",
+        "label": "Chest quality assurance"
+      },
+      {
+        "id": "goblin-bonk",
+        "label": "The balance department"
+      },
+      {
+        "id": "duck-knights",
+        "label": "Raid party of extremely small tanks"
+      },
+      {
+        "id": "anvil-audit",
+        "label": "The sword failed inspection"
+      },
+      {
+        "id": "duck-levelup",
+        "label": "Apprentice to final boss"
+      },
+      {
+        "id": "anvil-moonwalk",
+        "label": "Heavy metal movement tech"
+      },
+      {
+        "id": "goblin-delivery",
+        "label": "Patch delivery service"
+      }
+    ]
+  },
+  "SanctuaryLobby": {
+    "world": "sanctuary",
+    "actions": [
+      {
+        "id": "boat",
+        "label": "Paper-boat delivery"
+      },
+      {
+        "id": "mushroom",
+        "label": "Mushroom on an errand"
+      },
+      {
+        "id": "moths",
+        "label": "Moon moth visitors"
+      },
+      {
+        "id": "tea",
+        "label": "Tea with wings"
+      },
+      {
+        "id": "frog",
+        "label": "One polite croak"
+      },
+      {
+        "id": "stars",
+        "label": "Lantern constellation"
+      }
+    ]
+  },
+  "SkyHarborLobby": {
+    "world": "sky-harbor",
+    "actions": [
+      {
+        "id": "airship",
+        "label": "Express pizza airship"
+      },
+      {
+        "id": "paper",
+        "label": "Paper dragon detour"
+      },
+      {
+        "id": "pilot",
+        "label": "Pigeon promotion"
+      },
+      {
+        "id": "teaballoon",
+        "label": "Tea with high ping"
+      },
+      {
+        "id": "swallows",
+        "label": "Air traffic union"
+      },
+      {
+        "id": "compass",
+        "label": "Directional plunger"
+      },
+      {
+        "id": "lag",
+        "label": "Rubber-band luggage"
+      },
+      {
+        "id": "boarding",
+        "label": "Loot priority boarding"
+      },
+      {
+        "id": "pigeon-mail",
+        "label": "Your loot has been misdelivered"
+      },
+      {
+        "id": "pizza-drop",
+        "label": "Airborne snack drop"
+      },
+      {
+        "id": "luggage-escape",
+        "label": "Carry on has other plans"
+      },
+      {
+        "id": "air-traffic",
+        "label": "Traffic jam at cloud nine"
+      },
+      {
+        "id": "pigeon-ranked",
+        "label": "Competitive postal service"
+      },
+      {
+        "id": "luggage-loot",
+        "label": "Baggage claim is a boss fight"
+      }
+    ]
+  },
+  "StormCoastLobby": {
+    "world": "storm-coast",
+    "actions": [
+      {
+        "id": "umbrella",
+        "label": "Very prepared duck"
+      },
+      {
+        "id": "message",
+        "label": "Message in a bottle"
+      },
+      {
+        "id": "gulls",
+        "label": "Storm gulls"
+      },
+      {
+        "id": "shells",
+        "label": "Shell castanets"
+      },
+      {
+        "id": "lightning",
+        "label": "Distant sky scribble"
+      },
+      {
+        "id": "lifebuoy",
+        "label": "Tiny rescue service"
+      }
+    ]
+  },
+  "PhoenixObservatoryLobby": {
+    "world": "phoenix-observatory",
+    "actions": [
+      {
+        "id": "comet",
+        "label": "Comet with tea"
+      },
+      {
+        "id": "astronomer",
+        "label": "Duck astronomer"
+      },
+      {
+        "id": "phoenix",
+        "label": "Pocket phoenix"
+      },
+      {
+        "id": "planets",
+        "label": "Planets on parade"
+      },
+      {
+        "id": "wish",
+        "label": "A passing wish"
+      },
+      {
+        "id": "moon",
+        "label": "A curious little moon"
+      }
+    ]
+  },
+  "SpiritRailLobby": {
+    "world": "spirit-rail",
+    "actions": [
+      {
+        "id": "train",
+        "label": "Pocket express"
+      },
+      {
+        "id": "luggage",
+        "label": "Luggage with plans"
+      },
+      {
+        "id": "conductor",
+        "label": "Duck conductor"
+      },
+      {
+        "id": "ticket",
+        "label": "Runaway ticket"
+      },
+      {
+        "id": "bell",
+        "label": "A silent little ding"
+      },
+      {
+        "id": "leaves",
+        "label": "Autumn makes a turtle"
+      }
+    ]
+  },
+  "TavernWorldLobby": {
+    "world": "tavern",
+    "actions": [
+      {
+        "id": "sneeze",
+        "label": "Dragon critical sneeze"
+      },
+      {
+        "id": "mug",
+        "label": "Tankard buff parade"
+      },
+      {
+        "id": "hat",
+        "label": "Wizard hat miscast"
+      },
+      {
+        "id": "quill",
+        "label": "Legendary spoon duel"
+      },
+      {
+        "id": "dice",
+        "label": "RNG cheese dice"
+      },
+      {
+        "id": "coins",
+        "label": "Mimic loot audit"
+      },
+      {
+        "id": "respawn",
+        "label": "Back from the wipe"
+      },
+      {
+        "id": "quest",
+        "label": "Side quest avalanche"
+      },
+      {
+        "id": "dragon-snacks",
+        "label": "The snack hoard has aggro"
+      },
+      {
+        "id": "mimic-chase",
+        "label": "The furniture is hungry"
+      },
+      {
+        "id": "tankard-choir",
+        "label": "The tankards found voice chat"
+      },
+      {
+        "id": "dragon-miscast",
+        "label": "Summon legendary breakfast"
+      },
+      {
+        "id": "mimic-inspection",
+        "label": "Loot quality inspector"
+      },
+      {
+        "id": "last-call",
+        "label": "One more dungeon"
+      }
+    ]
+  },
+  "FutureWorldLobby": {
+    "world": "future",
+    "actions": [
+      {
+        "id": "coffee",
+        "label": "Pizza UFO delivery"
+      },
+      {
+        "id": "bot",
+        "label": "Rubber-band robot"
+      },
+      {
+        "id": "toast",
+        "label": "AFK breakfast"
+      },
+      {
+        "id": "astronaut",
+        "label": "One small honk"
+      },
+      {
+        "id": "marbles",
+        "label": "Queue orbit"
+      },
+      {
+        "id": "comet",
+        "label": "Comet has missed queue"
+      },
+      {
+        "id": "ready",
+        "label": "Ready-check drama"
+      },
+      {
+        "id": "wormhole",
+        "label": "The portal ordered takeaway"
+      },
+      {
+        "id": "toaster-launch",
+        "label": "Breakfast has achieved orbit"
+      },
+      {
+        "id": "snail-speedrun",
+        "label": "Any percent eventually"
+      },
+      {
+        "id": "pizza-convoy",
+        "label": "The squad ordered delivery"
+      },
+      {
+        "id": "takeaway-abduction",
+        "label": "Reverse alien abduction"
+      },
+      {
+        "id": "snail-finish",
+        "label": "Slow and suspicious wins"
+      },
+      {
+        "id": "toaster-disco",
+        "label": "Zero gravity breakfast club"
+      }
+    ]
+  },
+  "SpiritArcadeLobby": {
+    "world": "arcade",
+    "actions": [
+      {
+        "id": "coin",
+        "label": "Jackpot with legs"
+      },
+      {
+        "id": "pixels",
+        "label": "Retro invasion"
+      },
+      {
+        "id": "gamer",
+        "label": "Controller rage quit"
+      },
+      {
+        "id": "joystick",
+        "label": "Accidental final boss"
+      },
+      {
+        "id": "marbles",
+        "label": "Combo snacks"
+      },
+      {
+        "id": "prize",
+        "label": "The claw has opinions"
+      },
+      {
+        "id": "salt",
+        "label": "Salt shaker victory lap"
+      },
+      {
+        "id": "speedrun",
+        "label": "Any% wrong direction"
+      },
+      {
+        "id": "raccoon-heist",
+        "label": "Token heist on wheels"
+      },
+      {
+        "id": "joystick-solo",
+        "label": "Joystick main character moment"
+      },
+      {
+        "id": "coin-boss",
+        "label": "The final microtransaction"
+      },
+      {
+        "id": "cable-portal",
+        "label": "USB summoning ritual"
+      },
+      {
+        "id": "podium-throw",
+        "label": "Emotional support second place"
+      },
+      {
+        "id": "coin-conga",
+        "label": "Exact change conga"
+      }
+    ]
+  },
+  "AuroraCampLobby": {
+    "world": "aurora-camp",
+    "actions": [
+      {
+        "id": "marshmallows",
+        "label": "Marshmallow hikers"
+      },
+      {
+        "id": "kettle",
+        "label": "Starlight from the kettle"
+      },
+      {
+        "id": "moths",
+        "label": "Firelight moths"
+      },
+      {
+        "id": "camper",
+        "label": "Duck under the stars"
+      },
+      {
+        "id": "constellation",
+        "label": "A tiny northern constellation"
+      },
+      {
+        "id": "lantern",
+        "label": "Lantern on a night walk"
+      }
+    ]
+  }
+}

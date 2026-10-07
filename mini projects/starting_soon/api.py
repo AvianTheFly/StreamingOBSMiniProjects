@@ -4,8 +4,11 @@ from . import settings, clip_library
 
 def state():
     if not runtime._service:
+        from . import artwork
+        from .opening import catalog
         return {**settings.read(), 'ready': False, 'active': False, 'playing': False,
-                'error': 'Starting Soon module is offline.', 'available_artwork': []}
+                'error': 'Starting Soon module is offline.', 'available_artwork': [],
+                'artwork_catalog': artwork.catalog(), 'opening_catalog': catalog(), 'opening': False}
     return runtime._service.snapshot()
 
 

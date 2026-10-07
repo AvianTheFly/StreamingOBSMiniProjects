@@ -1,0 +1,11 @@
+{
+  "id": "new-26-wing-powerstroke",
+  "title": "The wings arrest the fall",
+  "file": "images/new-26-wing-powerstroke.png",
+  "prompt": "Use case: illustration-story. Asset: one full-screen landscape 16:9 cinematic frame for a gritty fantasy story slideshow, not a collage or storyboard. Match supplied reference illustration's intensely detailed mature fantasy realism, nocturnal blue moonlight / amber lanterns, weathered basalt and bronze, cinematic light and depth. One Udyr-like muscular weathered shaman with long black hair, beard, dark tattoos, bare chest, ragged brown wolf-fur mantle, wrapped forearms, leather trousers and boots. Spirits are energy envelopes attached to the SAME human body, not independent pets. No other people, villain, text, watermark, UI, panels or cute cartoon. Keep existing identity and persistent damage. Each frame must show the requested intermediate action clearly, not skip to its result.\nInput images: Image 1: adjacent story/world continuity reference.\nSpecific next story moment: NEXT exterior rear three-quarter view of hero, enormous phoenix wings sweep DOWN in their FIRST full powerful stroke. Upper wing elbows raised, feather tips down, chest pitches upward out of falling orientation. Blue frozen feathers edged incandescent ember, energetic downward wind plumes and cleared circular corridor through rubble. Same ruined sanctuary island now above ahead right, dark hair/fur streaming. Distinct wing flap pose stopping fall, not same spread portrait.",
+  "references": [
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-25-storm-release.png"
+  ],
+  "original": "C:\\Users\\Michael\\.codex\\generated_images\\01a104b1-c082-7921-a920-617bfec4e788\\exec-d037d057-9c04-47a0-9d7c-e4175b4f0d64.png",
+  "generation_mode": "built-in image_gen"
+}

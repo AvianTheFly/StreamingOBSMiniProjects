@@ -1,0 +1,12 @@
+{
+  "id": "new-28-landing-approach",
+  "title": "Wings fold for landing",
+  "file": "images/new-28-landing-approach.png",
+  "prompt": "Use case: illustration-story. Asset: one full-screen landscape 16:9 cinematic frame for a gritty fantasy story slideshow, not a collage or storyboard. Match supplied reference illustration's intensely detailed mature fantasy realism, nocturnal blue moonlight / amber lanterns, weathered basalt and bronze, cinematic light and depth. One Udyr-like muscular weathered shaman with long black hair, beard, dark tattoos, bare chest, ragged brown wolf-fur mantle, wrapped forearms, leather trousers and boots. Spirits are energy envelopes attached to the SAME human body, not independent pets. No other people, villain, text, watermark, UI, panels or cute cartoon. Keep existing identity and persistent damage. Each frame must show the requested intermediate action clearly, not skip to its result.\nInput images: Image 1: adjacent story/world continuity reference. Image 2: original character/environment/style reference.\nSpecific next story moment: Exterior low angle from intact west terrace facing approaching same hero. Feet extending forward to land, wings tipping back/up to BRAKE, kneecaps bent, arms out balancing. Feet a few inches above wet stone terrace; amber lantern left, pine silhouettes, broken ruined main chamber behind at right, cooler aurora cloud mountains beyond. Blue ember feathers shed sparks. BEFORE touchdown, not already standing.",
+  "references": [
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-27b-return-damaged-island.png",
+    "C:/StreamingMedia/ChannelPresentation/2026-10-03/spirit-slideshow-v1/images/10-growing-empowerment.png"
+  ],
+  "original": "C:\\Users\\Michael\\.codex\\generated_images\\01a104b1-c082-7921-a920-617bfec4e788\\exec-1f1e3f5c-c78a-47a4-a668-d85482294c7c.png",
+  "generation_mode": "built-in image_gen"
+}

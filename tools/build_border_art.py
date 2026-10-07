@@ -25,6 +25,18 @@ def build():
     for directory, source, output, files in JOBS:
         base = ROOT / directory
         code = (base / source).read_text(encoding='utf-8')
+        if '/* @CULTURE_TIMING@ */' in code:
+            timing = json.loads((base/'culture-timing.json').read_text(encoding='utf-8'))
+            code = code.replace('/* @CULTURE_TIMING@ */', 'const CULTURE_TIMING=' + json.dumps(timing, separators=(',', ':')) + ';')
+        for name in ('ink', 'contacts', 'sets', 'party', 'reactions', 'cameos', 'cues'):
+            marker = '/* @CULTURE_' + name.upper() + '@ */'
+            if marker in code:
+                code = code.replace(marker, (base/('culture-' + name + '.js')).read_text(encoding='utf-8'))
+        if '/* @PLAYFUL_INK@ */' in code:
+            code = code.replace('/* @PLAYFUL_INK@ */', (ROOT/'lib/browser_effects/art/playful-ink.js').read_text(encoding='utf-8'))
+        for marker, filename in [('PLAYFUL_EVENTS', 'playful-events.js'), ('PLAYFUL_SOUNDS', 'playful-sounds.js'), ('PLAYFUL_SETS', 'playful-sets.js'), ('PLAYFUL_SOUND_SETS', 'playful-sound-sets.js'), ('PLAYFUL_SOUND_ACTS', 'playful-sound-acts.js')]:
+            if '/* @' + marker + '@ */' in code:
+                code = code.replace('/* @' + marker + '@ */', (base/filename).read_text(encoding='utf-8'))
         frames = base / source.replace('-scenes.js', '-frames.js')
         if '/* @FRAME_ART@ */' in code:
             code = code.replace('/* @FRAME_ART@ */', frames.read_text(encoding='utf-8'))
@@ -43,8 +55,9 @@ def build():
         if '/* @AUTHORED_CUES@ */' in code:
             code = code.replace('/* @AUTHORED_CUES@ */', (base / 'authored-cues.js').read_text(encoding='utf-8'))
         for name in ('ink', 'lizard', 'gary', 'quack', 'bonk', 'piuw', 'cues'):
-            code = code.replace('/* @SPAM_' + name.upper() + '@ */',
-                                (base / ('spam-' + name + '.js')).read_text(encoding='utf-8'))
+            marker = '/* @SPAM_' + name.upper() + '@ */'
+            if marker in code:
+                code = code.replace(marker, (base / ('spam-' + name + '.js')).read_text(encoding='utf-8'))
         for name in ('frog', 'piuw'):
             marker = '/* @' + name.upper() + '_BORDER@ */'
             if marker in code:

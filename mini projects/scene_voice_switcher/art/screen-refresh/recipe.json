@@ -1,0 +1,215 @@
+{
+  "date": "2026-10-06",
+  "tool": "Built-in image_gen; exact native canvas frame compiler",
+  "assets": [
+    {
+      "id": "tavern",
+      "source": "TavernWorldLobby",
+      "screen": [
+        60,
+        180,
+        896,
+        504
+      ],
+      "plate": "mini projects/scene_voice_switcher/art/screen-refresh/tavern-plate.png",
+      "generated": "C:\\Users\\Michael\\.codex\\generated_images\\01a111f4-a463-78d0-90d6-724854b3fda3\\exec-fea6b42b-c237-4944-915e-af04f79c544e.png",
+      "outputs": [
+        "mini projects/scene_voice_switcher/art/tavern-v2-base.png",
+        "mini projects/scene_voice_switcher/web/art/tavern-chaos-v1.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Edit target: the supplied Respawn Inn fantasy streaming lobby painting. Preserve the same 16:9 canvas, illustration style, gaming jokes, props, lighting, materials, and right-hand chat board EXACTLY. Enlarge ONLY the left desktop screen and move the host chair slightly right to accommodate it. In a 1920x1080 coordinate system, the flat dark empty inner screen MUST occupy x=60,y=180,width=896,height=504, exact 16:9 with straight horizontal and vertical edges and no perspective. Thin ornate gold/wood frame immediately outside these coordinates. Integrate enlarged frame naturally into tavern, move/reduce upper title as necessary without losing Respawn Inn identity. Host camera will occupy x=980,y=350,width=435,height=570: keep that space visually open, chair behind it, counter remains below. Right chat opening remains x=1515,y=180,width=311,height=451. No objects, text, decorations or characters inside screen/chat interiors. Preserve funny foreground props. Output one finished full 1920x1080 landscape scene, no guides or collage.",
+      "plate_prompt": "Use case: precise-object-edit. Edit this tavern lobby painting. REMOVE the large LEFT black desktop display completely: remove its dark interior, all four frame sides, ornamental frame corners, and only the ornament immediately attached to that frame. Reconstruct the scenery or wall naturally behind it, with coherent materials, depth and lighting matching this exact environment. This is a background plate for a precisely sized screen that the application adds separately, so do not draw ANY replacement screen, any new frame or rectangle on the left. Preserve EVERY other part of the image: right tall chat screen, host chair on right, original gaming props and jokes, foreground counter, top signs, animals, texture, colors and composition. Right chat screen must remain. Output one full landscape painting, same aspect ratio."
+    },
+    {
+      "id": "forge",
+      "source": "ForgeLobby",
+      "screen": [
+        60,
+        180,
+        896,
+        504
+      ],
+      "plate": "mini projects/scene_voice_switcher/art/screen-refresh/forge-plate.png",
+      "generated": "C:\\Users\\Michael\\.codex\\generated_images\\01a111f4-a463-78d0-90d6-724854b3fda3\\exec-c9639e89-b9aa-423e-9d91-749c40444034.png",
+      "outputs": [
+        "mini projects/scene_voice_switcher/art/forge-base.png",
+        "mini projects/scene_voice_switcher/web/art/forge-chaos-v1.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Edit supplied forge streaming lobby painting. Keep 16:9 canvas and preserve its distinct existing funny gaming props, titles, colors, original materials, lighting, and right chat board at original position. The left desktop screen must become MUCH larger, true television 16:9 aspect ratio, taller than current ultrawide. On the 1920x1080 canvas its completely plain dark inner opening occupies x60 to956, y180 to684, width896 height504. Surround with a narrow matching carved themed frame. Frame must be square-on, straight edges, no perspective, no objects overlapping screen. Move the host seat to the right to leave open space x980 y450 width460 height460. Keep right chat area at [1463,203,317,470]. Rearrange only props that interfere with enlarged screen, preserving them elsewhere. Retain foreground counter and characters. Output one finished widescreen scene, no guides or collage.",
+      "plate_prompt": "Use case: precise-object-edit. Edit this forge lobby painting. REMOVE the large LEFT black desktop display completely: remove its dark interior, all four frame sides, ornamental frame corners, and only the ornament immediately attached to that frame. Reconstruct the scenery or wall naturally behind it, with coherent materials, depth and lighting matching this exact environment. This is a background plate for a precisely sized screen that the application adds separately, so do not draw ANY replacement screen, any new frame or rectangle on the left. Preserve EVERY other part of the image: right tall chat screen, host chair on right, original gaming props and jokes, foreground counter, top signs, animals, texture, colors and composition. Right chat screen must remain. Output one full landscape painting, same aspect ratio."
+    },
+    {
+      "id": "future",
+      "source": "FutureWorldLobby",
+      "screen": [
+        60,
+        180,
+        896,
+        504
+      ],
+      "plate": "mini projects/scene_voice_switcher/art/screen-refresh/future-plate.png",
+      "generated": "C:\\Users\\Michael\\.codex\\generated_images\\01a111f4-a463-78d0-90d6-724854b3fda3\\exec-3acb30a9-74b5-44e1-b5ab-8ed83ebba122.png",
+      "outputs": [
+        "mini projects/scene_voice_switcher/art/future-v2-base.png",
+        "mini projects/scene_voice_switcher/web/art/future-chaos-v1.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Edit supplied future streaming lobby painting. Keep 16:9 canvas and preserve its distinct existing funny gaming props, titles, colors, original materials, lighting, and right chat board at original position. The left desktop screen must become MUCH larger, true television 16:9 aspect ratio, taller than current ultrawide. On the 1920x1080 canvas its completely plain dark inner opening occupies x60 to956, y180 to684, width896 height504. Surround with a narrow matching cyan metal frame. Frame must be square-on, straight edges, no perspective, no objects overlapping screen. Move the host seat to the right to leave open space x980 y350 width360 height520. Keep right chat area at [1540,270,274,432]. Rearrange only props that interfere with enlarged screen, preserving them elsewhere. Retain foreground counter and characters. Output one finished widescreen scene, no guides or collage.",
+      "plate_prompt": "Use case: precise-object-edit. Edit this future lobby painting. REMOVE the large LEFT black desktop display completely: remove its dark interior, all four frame sides, ornamental frame corners, and only the ornament immediately attached to that frame. Reconstruct the scenery or wall naturally behind it, with coherent materials, depth and lighting matching this exact environment. This is a background plate for a precisely sized screen that the application adds separately, so do not draw ANY replacement screen, any new frame or rectangle on the left. Preserve EVERY other part of the image: right tall chat screen, host chair on right, original gaming props and jokes, foreground counter, top signs, animals, texture, colors and composition. Right chat screen must remain. Output one full landscape painting, same aspect ratio."
+    },
+    {
+      "id": "sky-harbor",
+      "source": "SkyHarborLobby",
+      "screen": [
+        60,
+        180,
+        896,
+        504
+      ],
+      "plate": "mini projects/scene_voice_switcher/art/screen-refresh/sky-harbor-plate.png",
+      "generated": "C:\\Users\\Michael\\.codex\\generated_images\\01a111f4-a463-78d0-90d6-724854b3fda3\\exec-cb790a06-2497-4b42-a736-a483606d7dd0.png",
+      "outputs": [
+        "mini projects/scene_voice_switcher/art/sky-harbor-base.png",
+        "mini projects/scene_voice_switcher/web/art/sky-harbor-chaos-v1.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Edit supplied sky-harbor streaming lobby painting. Keep 16:9 canvas and preserve its distinct existing funny gaming props, titles, colors, original materials, lighting, and right chat board at original position. The left desktop screen must become MUCH larger, true television 16:9 aspect ratio, taller than current ultrawide. On the 1920x1080 canvas its completely plain dark inner opening occupies x60 to956, y180 to684, width896 height504. Surround with a narrow matching carved themed frame. Frame must be square-on, straight edges, no perspective, no objects overlapping screen. Move the host seat to the right to leave open space x980 y425 width450 height475. Keep right chat area at [1465,186,323,466]. Rearrange only props that interfere with enlarged screen, preserving them elsewhere. Retain foreground counter and characters. Output one finished widescreen scene, no guides or collage.",
+      "plate_prompt": "Use case: precise-object-edit. Edit this sky-harbor lobby painting. REMOVE the large LEFT black desktop display completely: remove its dark interior, all four frame sides, ornamental frame corners, and only the ornament immediately attached to that frame. Reconstruct the scenery or wall naturally behind it, with coherent materials, depth and lighting matching this exact environment. This is a background plate for a precisely sized screen that the application adds separately, so do not draw ANY replacement screen, any new frame or rectangle on the left. Preserve EVERY other part of the image: right tall chat screen, host chair on right, original gaming props and jokes, foreground counter, top signs, animals, texture, colors and composition. Right chat screen must remain. Output one full landscape painting, same aspect ratio."
+    },
+    {
+      "id": "arcade",
+      "source": "SpiritArcadeLobby",
+      "screen": [
+        60,
+        180,
+        896,
+        504
+      ],
+      "plate": "mini projects/scene_voice_switcher/art/screen-refresh/arcade-plate.png",
+      "generated": "C:\\Users\\Michael\\.codex\\generated_images\\01a111f4-a463-78d0-90d6-724854b3fda3\\exec-460ac9eb-f0d1-479d-9a1b-c7400998b1a2.png",
+      "outputs": [
+        "mini projects/scene_voice_switcher/art/spirit-arcade-base.png",
+        "mini projects/scene_voice_switcher/web/art/arcade-chaos-v1.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Edit supplied arcade streaming lobby painting. Keep 16:9 canvas and preserve its distinct existing funny gaming props, titles, colors, original materials, lighting, and right chat board at original position. The left desktop screen must become MUCH larger, true television 16:9 aspect ratio, taller than current ultrawide. On the 1920x1080 canvas its completely plain dark inner opening occupies x60 to956, y180 to684, width896 height504. Surround with a narrow matching carved themed frame. Frame must be square-on, straight edges, no perspective, no objects overlapping screen. Move the host seat to the right to leave open space x980 y340 width400 height490. Keep right chat area at [1498,166,303,433]. Rearrange only props that interfere with enlarged screen, preserving them elsewhere. Retain foreground counter and characters. Output one finished widescreen scene, no guides or collage.",
+      "plate_prompt": "Use case: precise-object-edit. Edit this arcade lobby painting. REMOVE the large LEFT black desktop display completely: remove its dark interior, all four frame sides, ornamental frame corners, and only the ornament immediately attached to that frame. Reconstruct the scenery or wall naturally behind it, with coherent materials, depth and lighting matching this exact environment. This is a background plate for a precisely sized screen that the application adds separately, so do not draw ANY replacement screen, any new frame or rectangle on the left. Preserve EVERY other part of the image: right tall chat screen, host chair on right, original gaming props and jokes, foreground counter, top signs, animals, texture, colors and composition. Right chat screen must remain. Output one full landscape painting, same aspect ratio."
+    },
+    {
+      "id": "sanctuary",
+      "source": "SanctuaryLobby",
+      "screen": [
+        60,
+        180,
+        896,
+        504
+      ],
+      "plate": "mini projects/scene_voice_switcher/art/screen-refresh/sanctuary-plate.png",
+      "generated": "C:\\Users\\Michael\\.codex\\generated_images\\01a111f4-a463-78d0-90d6-724854b3fda3\\exec-d97ba5bb-3e2d-4bda-ba0b-0b71cb7919ee.png",
+      "outputs": [
+        "mini projects/scene_voice_switcher/art/sanctuary-base.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Supplied image is edit target: sanctuary streaming lobby environment painting. Keep the original 16:9 canvas, environment, spirit animals, landscape, materials, colors, lighting, furniture, foreground counter, and right chat board. Enlarge ONLY the landscape desktop screen, replacing its old ultrawide proportions with a MUCH bigger true 16:9 television screen. It has a dark perfectly EMPTY interior, thin matching ornate frame, straight horizontal and vertical edges seen square-on, no perspective. In normalized 1920x1080 coordinates place its inside rectangle at x60,y180, width896,height504. Make the screen visibly taller as well as wider. Relocate nearby decorations out of its way and preserve them. Move host chair / open host area slightly right, x980 to1440, keeping its height and foreground counter. Preserve right chat board original location and size, no screen overlap with camera or chat. Screen and chat interiors must contain NO objects, lettering or light glare. Output full finished single landscape painting, no guides or collage.",
+      "plate_prompt": "Use case: precise-object-edit. This sanctuary streaming lobby image is the edit target. REMOVE the LARGE landscape desktop display completely, including its entire dark interior and all frame edges and attached frame ornaments. This is the large landscape board on the left. Reconstruct the scene behind it naturally in this exact environment with coherent architecture, landscape or wall, original materials and lighting. Do not add any replacement rectangle, screen or frame there: the application adds an exact geometric screen separately. Preserve all other imagery, particularly the tall right chat display , host area, foreground counter, original props, animals, landscape, lighting, colors and style. No new characters or text. Output a single finished full painting with the same landscape aspect ratio."
+    },
+    {
+      "id": "storm-coast",
+      "source": "StormCoastLobby",
+      "screen": [
+        60,
+        180,
+        896,
+        504
+      ],
+      "plate": "mini projects/scene_voice_switcher/art/screen-refresh/storm-coast-plate.png",
+      "generated": "C:\\Users\\Michael\\.codex\\generated_images\\01a111f4-a463-78d0-90d6-724854b3fda3\\exec-5b1c203f-b0c4-4140-9492-78cd0b139652.png",
+      "outputs": [
+        "mini projects/scene_voice_switcher/art/storm-coast-base.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Supplied image is edit target: storm-coast streaming lobby environment painting. Keep the original 16:9 canvas, environment, spirit animals, landscape, materials, colors, lighting, furniture, foreground counter, and right chat board. Enlarge ONLY the landscape desktop screen, replacing its old ultrawide proportions with a MUCH bigger true 16:9 television screen. It has a dark perfectly EMPTY interior, thin matching ornate frame, straight horizontal and vertical edges seen square-on, no perspective. In normalized 1920x1080 coordinates place its inside rectangle at x60,y180, width896,height504. Make the screen visibly taller as well as wider. Relocate nearby decorations out of its way and preserve them. Move host chair / open host area slightly right, x980 to1440, keeping its height and foreground counter. Preserve right chat board original location and size, no screen overlap with camera or chat. Screen and chat interiors must contain NO objects, lettering or light glare. Output full finished single landscape painting, no guides or collage.",
+      "plate_prompt": "Use case: precise-object-edit. This storm-coast streaming lobby image is the edit target. REMOVE the LARGE landscape desktop display completely, including its entire dark interior and all frame edges and attached frame ornaments. This is the large landscape board on the left. Reconstruct the scene behind it naturally in this exact environment with coherent architecture, landscape or wall, original materials and lighting. Do not add any replacement rectangle, screen or frame there: the application adds an exact geometric screen separately. Preserve all other imagery, particularly the tall right chat display , host area, foreground counter, original props, animals, landscape, lighting, colors and style. No new characters or text. Output a single finished full painting with the same landscape aspect ratio."
+    },
+    {
+      "id": "phoenix-observatory",
+      "source": "PhoenixObservatoryLobby",
+      "screen": [
+        60,
+        180,
+        896,
+        504
+      ],
+      "plate": "mini projects/scene_voice_switcher/art/screen-refresh/phoenix-observatory-plate.png",
+      "generated": "C:\\Users\\Michael\\.codex\\generated_images\\01a111f4-a463-78d0-90d6-724854b3fda3\\exec-3566f3d9-cc91-4003-b8a0-3c34ac4467ab.png",
+      "outputs": [
+        "mini projects/scene_voice_switcher/art/phoenix-observatory-base.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Supplied image is edit target: phoenix-observatory streaming lobby environment painting. Keep the original 16:9 canvas, environment, spirit animals, landscape, materials, colors, lighting, furniture, foreground counter, and right chat board. Enlarge ONLY the landscape desktop screen, replacing its old ultrawide proportions with a MUCH bigger true 16:9 television screen. It has a dark perfectly EMPTY interior, thin matching ornate frame, straight horizontal and vertical edges seen square-on, no perspective. In normalized 1920x1080 coordinates place its inside rectangle at x60,y180, width896,height504. Make the screen visibly taller as well as wider. Relocate nearby decorations out of its way and preserve them. Move host chair / open host area slightly right, x980 to1440, keeping its height and foreground counter. Preserve right chat board original location and size, no screen overlap with camera or chat. Screen and chat interiors must contain NO objects, lettering or light glare. Output full finished single landscape painting, no guides or collage.",
+      "plate_prompt": "Use case: precise-object-edit. This phoenix-observatory streaming lobby image is the edit target. REMOVE the LARGE landscape desktop display completely, including its entire dark interior and all frame edges and attached frame ornaments. This is the large landscape board on the left. Reconstruct the scene behind it naturally in this exact environment with coherent architecture, landscape or wall, original materials and lighting. Do not add any replacement rectangle, screen or frame there: the application adds an exact geometric screen separately. Preserve all other imagery, particularly the tall right chat display , host area, foreground counter, original props, animals, landscape, lighting, colors and style. No new characters or text. Output a single finished full painting with the same landscape aspect ratio."
+    },
+    {
+      "id": "aurora-camp",
+      "source": "AuroraCampLobby",
+      "screen": [
+        60,
+        180,
+        896,
+        504
+      ],
+      "plate": "mini projects/scene_voice_switcher/art/screen-refresh/aurora-camp-plate.png",
+      "generated": "C:\\Users\\Michael\\.codex\\generated_images\\01a111f4-a463-78d0-90d6-724854b3fda3\\exec-5062046f-fa01-4f49-a133-a0bf2c780c40.png",
+      "outputs": [
+        "mini projects/scene_voice_switcher/art/aurora-camp-base.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Supplied image is edit target: aurora-camp streaming lobby environment painting. Keep the original 16:9 canvas, environment, spirit animals, landscape, materials, colors, lighting, furniture, foreground counter, and right chat board. Enlarge ONLY the landscape desktop screen, replacing its old ultrawide proportions with a MUCH bigger true 16:9 television screen. It has a dark perfectly EMPTY interior, thin matching ornate frame, straight horizontal and vertical edges seen square-on, no perspective. In normalized 1920x1080 coordinates place its inside rectangle at x60,y180, width896,height504. Make the screen visibly taller as well as wider. Relocate nearby decorations out of its way and preserve them. Move host chair / open host area slightly right, x980 to1440, keeping its height and foreground counter. Preserve right chat board original location and size, no screen overlap with camera or chat. Screen and chat interiors must contain NO objects, lettering or light glare. Output full finished single landscape painting, no guides or collage.",
+      "plate_prompt": "Use case: precise-object-edit. This aurora-camp streaming lobby image is the edit target. REMOVE the LARGE landscape desktop display completely, including its entire dark interior and all frame edges and attached frame ornaments. This is the large landscape board on the left. Reconstruct the scene behind it naturally in this exact environment with coherent architecture, landscape or wall, original materials and lighting. Do not add any replacement rectangle, screen or frame there: the application adds an exact geometric screen separately. Preserve all other imagery, particularly the tall right chat display , host area, foreground counter, original props, animals, landscape, lighting, colors and style. No new characters or text. Output a single finished full painting with the same landscape aspect ratio."
+    },
+    {
+      "id": "reef",
+      "source": "ReefLobby",
+      "screen": [
+        640,
+        140,
+        896,
+        504
+      ],
+      "plate": "mini projects/scene_voice_switcher/art/screen-refresh/reef-plate.png",
+      "generated": "C:\\Users\\Michael\\.codex\\generated_images\\01a111f4-a463-78d0-90d6-724854b3fda3\\exec-369425e9-8e67-47ce-b465-f7a681db86e1.png",
+      "outputs": [
+        "mini projects/scene_voice_switcher/art/reef-base.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Supplied image is edit target: reef streaming lobby environment painting. Keep the original 16:9 canvas, environment, spirit animals, landscape, materials, colors, lighting, furniture, foreground counter, and right chat board. Enlarge ONLY the landscape desktop screen, replacing its old ultrawide proportions with a MUCH bigger true 16:9 television screen. It has a dark perfectly EMPTY interior, thin matching ornate frame, straight horizontal and vertical edges seen square-on, no perspective. In normalized 1920x1080 coordinates place its inside rectangle at x640,y140, width896,height504. Make the screen visibly taller as well as wider. Relocate nearby decorations out of its way and preserve them. Keep host area on the left at its original location. Preserve right chat board original location and size, no screen overlap with camera or chat. Screen and chat interiors must contain NO objects, lettering or light glare. Output full finished single landscape painting, no guides or collage.",
+      "plate_prompt": "Use case: precise-object-edit. This reef streaming lobby image is the edit target. REMOVE the LARGE landscape desktop display completely, including its entire dark interior and all frame edges and attached frame ornaments. This is the large horizontal board near the center-right. Reconstruct the scene behind it naturally in this exact environment with coherent architecture, landscape or wall, original materials and lighting. Do not add any replacement rectangle, screen or frame there: the application adds an exact geometric screen separately. Preserve all other imagery, particularly the tall right chat display , host area, foreground counter, original props, animals, landscape, lighting, colors and style. No new characters or text. Output a single finished full painting with the same landscape aspect ratio."
+    },
+    {
+      "id": "spirit-rail",
+      "source": "SpiritRailLobby",
+      "screen": [
+        640,
+        140,
+        896,
+        504
+      ],
+      "plate": "mini projects/scene_voice_switcher/art/screen-refresh/spirit-rail-plate.png",
+      "generated": "C:\\Users\\Michael\\.codex\\generated_images\\01a111f4-a463-78d0-90d6-724854b3fda3\\exec-15aac93b-c146-4249-bfee-bb9fb991d098.png",
+      "outputs": [
+        "mini projects/scene_voice_switcher/art/spirit-rail-base.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Supplied image is edit target: spirit-rail streaming lobby environment painting. Keep the original 16:9 canvas, environment, spirit animals, landscape, materials, colors, lighting, furniture, foreground counter, and right chat board. Enlarge ONLY the landscape desktop screen, replacing its old ultrawide proportions with a MUCH bigger true 16:9 television screen. It has a dark perfectly EMPTY interior, thin matching ornate frame, straight horizontal and vertical edges seen square-on, no perspective. In normalized 1920x1080 coordinates place its inside rectangle at x640,y140, width896,height504. Make the screen visibly taller as well as wider. Relocate nearby decorations out of its way and preserve them. Keep host area on the left at its original location. Preserve right chat board original location and size, no screen overlap with camera or chat. Screen and chat interiors must contain NO objects, lettering or light glare. Output full finished single landscape painting, no guides or collage.",
+      "plate_prompt": "Use case: precise-object-edit. This spirit-rail streaming lobby image is the edit target. REMOVE the LARGE landscape desktop display completely, including its entire dark interior and all frame edges and attached frame ornaments. This is the large horizontal board near the center-right. Reconstruct the scene behind it naturally in this exact environment with coherent architecture, landscape or wall, original materials and lighting. Do not add any replacement rectangle, screen or frame there: the application adds an exact geometric screen separately. Preserve all other imagery, particularly the tall right chat display , host area, foreground counter, original props, animals, landscape, lighting, colors and style. No new characters or text. Output a single finished full painting with the same landscape aspect ratio."
+    },
+    {
+      "id": "afterparty",
+      "source": "Spirit Afterparty",
+      "screen": [
+        60,
+        180,
+        896,
+        504
+      ],
+      "plate": "mini projects/scene_voice_switcher/art/screen-refresh/afterparty-plate.png",
+      "generated": "C:\\Users\\Michael\\.codex\\generated_images\\01a111f4-a463-78d0-90d6-724854b3fda3\\exec-9a942bdf-584e-4fac-bb05-801f7715448d.png",
+      "outputs": [
+        "hub_ui/app/spirit-lobby/art/clubhouse-clean.webp"
+      ],
+      "prompt": "Use case: precise-object-edit. Edit supplied woodland neon spirit clubhouse scene, keeping original 16:9 canvas, detailed warm brass/jade/moss materials, purple/teal lighting, woodland conservatory windows, statues, couches, shelves, crystal accents and dance floor. Replace its small central ultrawide projection screen with a MUCH larger flat true 16:9 blank dark screen on LEFT wall: in 1920x1080 coordinates interior x60,y180,width896,height504. Elegant narrow brass frame with cyan/purple accents, straight edges, square-on, no perspective. Remove old central screen entirely and naturally fill former central screen area with woodland clubhouse architecture so open live host area now occupies x1000,y378,width444,height420. Keep open host stage there, without characters. Preserve right little side display where it was, move left little side display to left wall below main screen around x48,y714 width148,height65. Keep original props/identity elsewhere where they do not obstruct main screen. No additional characters or lettering, screen interiors entirely empty. Output one finished full landscape scene, no guides or collage.",
+      "plate_prompt": "Use case: precise-object-edit. This afterparty streaming lobby image is the edit target. REMOVE the LARGE landscape desktop display completely, including its entire dark interior and all frame edges and attached frame ornaments. This is the large landscape board on the left. Reconstruct the scene behind it naturally in this exact environment with coherent architecture, landscape or wall, original materials and lighting. Do not add any replacement rectangle, screen or frame there: the application adds an exact geometric screen separately. Preserve all other imagery, particularly the tall right chat display and both little side displays, host area, foreground counter, original props, animals, landscape, lighting, colors and style. No new characters or text. Output a single finished full painting with the same landscape aspect ratio."
+    }
+  ]
+}

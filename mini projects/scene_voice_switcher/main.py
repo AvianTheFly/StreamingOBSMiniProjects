@@ -49,6 +49,9 @@ def run(input_queue: queue.Queue, stop_event: threading.Event, *, startup_event=
         input_queue.put('game')
 
     from .interface import _live
+    from .session_controls import SessionControls
+    session_controls = SessionControls()
+    _live['session_controls'] = session_controls
     _live['active_source'] = active_source
     _live['hide_active'] = revert
     ptt = None
@@ -101,6 +104,7 @@ def run(input_queue: queue.Queue, stop_event: threading.Event, *, startup_event=
             except Exception as exc:
                 print(f'[scene_voice_switcher] Routing error: {exc}')
     finally:
+        session_controls.close()
         scene_director.cancel_pending('scene_voice_switcher')
         hub_events.unsubscribe('game.connected', connected)
         hub_events.unsubscribe('game.disconnected', disconnected)

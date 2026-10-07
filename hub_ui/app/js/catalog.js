@@ -42,6 +42,9 @@ export const FEATURES = {
   twitch_celebrations: { label: 'Twitch celebrations', icon: 'spark', group: 'Automatic & community', description: 'Manage shows for subscribers, cheers and raids.', href: 'http://127.0.0.1:7443' },
 };
 export const TOOLS = [
+  { id: 'effects', label: 'Effects gallery', icon: 'spark', group: 'On screen', description: 'Browse every sound and League border. Preview privately with audio.', href: '#effects' },
+  { id: 'lobby_screens', label: 'Clubhouse displays', icon: 'scene', group: 'On screen', description: 'Customize your lobby screen library, displays and clubhouse cues.', href: '/spirit-lobby/studio.html' },
+  { id: 'footage_desk', label: 'Footage Desk', icon: 'library', group: 'Clips & media', description: 'Review recordings in the separate local Footage Desk.', href: 'http://127.0.0.1:8791' },
   { id: 'chat', label: 'Chat overlay', icon: 'chat', group: 'Automatic & community', description: 'Style chat, stickers and the desktop overlay.', href: '/chat/' },
   { id: 'transitions', label: 'Spirit transitions', icon: 'spark', group: 'On screen', description: 'Preview the animal transitions between scenes.', href: '/transitions/' },
   { id: 'rewards', label: 'Channel rewards', icon: 'spark', group: 'Automatic & community', description: 'Manage viewer redemptions and reward playback.', href: 'http://127.0.0.1:7442' },
@@ -54,7 +57,7 @@ export function feature(name) {
 export function destinations(projects) {
   return [
     { id: 'dashboard', label: 'Live desk', icon: 'desk', description: 'Scenes, quick actions and current activity', href: '#dashboard' },
-    { id: 'library', label: 'Library & tools', icon: 'library', description: 'Browse all stream features', href: '#library' },
+    { id: 'library', label: 'Your stream', icon: 'library', description: 'Discover what you can show, how to try it and what happens automatically', href: '#library' },
     { id: 'workflows', label: 'Stream map', icon: 'automation', description: 'See how your stream connects, then open a smaller map', href: '#workflows' },
     { id: 'mixer', label: 'Audio · OBS sources', icon: 'audio', description: 'Live source volume and mute controls', href: '#mixer' },
     { id: 'audio', label: 'Audio · saved media', icon: 'audio', description: 'Project, profile and per-file levels', href: '#audio' },

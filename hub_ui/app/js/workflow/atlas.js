@@ -4,7 +4,7 @@ import { label } from './model.js';
 const group=(id,title,description,icon,children=[],topics=[])=>({id,title,description,icon,children,topics});
 export const AREAS=[
   {...group('you','Your controls','Keys, voice & saved sequences','keyboard',[
-    group('shortcuts','Keyboard & Hub','How a control reaches a feature','keyboard',[],['Shortcuts']),
+    group('shortcuts','Keyboard & Hub','How a control reaches a feature','keyboard',[],['Shortcuts','Workflow map']),
     group('voice','Voice commands','From microphone to a matching command','voice',[],['Voice']),
     group('sequences','Saved sequences','The steps you have configured','automation',[],['Saved workflows','Your saved sequences']),
   ]),color:'#a8c9ef',owners:['keyboard','voice','hub'],x:50,y:65},
@@ -22,7 +22,11 @@ export const AREAS=[
     group('after','After a match','Results, lobby return & saved moments','chart',[],['Game ends']),
   ]),color:'#d8bc89',owners:['league','league_api','league_stats'],x:50,y:275},
   {...group('viewers','Your viewers','Chat, rewards & celebrations','chat',[
-    group('chat','Chat & stats','Messages, stickers and stat requests','chat',[],['Chat & stats']),
+    group('chat','Chat & stats','Messages, replies and viewer-facing records','chat',[
+      group('messages','Chat on screen','Messages, stickers and the shared chat connection','chat',[],['Chat & stats']),
+      group('replies','Commands & replies','Viewer commands and trusted stat requests','chat'),
+      group('viewer-stats','Viewer stat displays','Browser views of tracked records','chart'),
+    ]),
     group('rewards','Channel rewards','A redemption becomes a presentation','spark',[],['Channel rewards']),
     group('celebrations','Celebrations','Raids, subscriptions, cheers & follows','spark',[],['Twitch events']),
   ]),color:'#d4afe0',owners:['chat','chat_transport','twitch_commands','rewards','twitch_celebrations'],x:50,y:485},
@@ -38,28 +42,37 @@ export const AREAS=[
   ]),color:'#efb796',owners:['instant_replay','twitch_clips','footage_desk'],x:470,y:440},
   {...group('screen','Screen & resources','Who plays, who waits & what OBS shows','scene',[
     group('permission','Who gets to play?','Pause claims, handoffs and your rules','audio',[],['Shared audio','Pause & resume rules']),
-    group('scenes','Who owns the screen?','Scene requests, lobbies and transitions','scene',[],['Scene ownership','Scene choice']),
+    group('scenes','Who owns the screen?','Scene requests, lobbies and transitions','scene',[
+      group('scene-decisions','Scene decisions','Requests, leases and newer choices','scene',[],['Scene ownership']),
+      group('scene-choices','Your scene choices','Choose a lobby or gameplay view','scene',[],['Scene choice']),
+      group('passages','Scene passages','Transition presentation and travel','spark'),
+      group('worlds','Inside your lobby','Placement, living worlds and displays','scene',[
+        group('world-layout','Placement & screens','Camera, chat and saved display layouts','scene',[],['Lobby presentation']),
+        group('world-motion','Motion & clubhouse cues','Animated worlds, ambient and party cues','spark',[],['Browser rendering','Presentation']),
+        group('world-library','Your screen library','Import and keep lobby display pictures','library',[],['Asset management']),
+      ]),
+    ]),
     group('services','Behind the scenes','Startup, preparation and safe cleanup','settings',[
       group('startup','Getting ready','Hub startup and OBS observation','desk',[],['Startup']),
       group('background','Background work','Preparation, conversion & settings history','settings',[],['Background work']),
       group('cleanup','Source handoffs','Finish cleanup before the source is reused','play',[],['Source cleanup']),
     ]),
-  ]),color:'#b6becd',owners:['coordination','scene_voice_switcher','transitions','obs','media_workers','conversion','preparation','settings_history'],x:890,y:290},
+  ]),color:'#b6becd',owners:['coordination','scene_voice_switcher','lobby_screens','transitions','obs','media_workers','conversion','preparation','settings_history'],x:890,y:290},
 ];
 const walk=(items)=>items.flatMap(item=>[item,...walk(item.children)]);
 const ALL=walk(AREAS);
 export function entry(id){return ALL.find(item=>item.id===id);}
 export function areaOf(owner){return AREAS.find(area=>area.owners.includes(owner));}
 export function flowsFor(catalog,item){
-  const topics=new Set([item,...walk(item.children)].flatMap(child=>child.topics));
-  return catalog.flows.filter(flow=>topics.has(flow.topic));
+  return catalog.flows.filter(flow=>pathForFlow(catalog,flow).includes(item.id));
 }
 export function pathTo(id){
   function find(items,path){for(const item of items){if(item.id===id)return [...path,item.id];const found=find(item.children,[...path,item.id]);if(found)return found;}return null;}
   return find(AREAS,[])||[];
 }
 export function pathForFlow(catalog,flow){
-  return pathTo(ALL.find(item=>!item.children.length&&item.topics.includes(flow.topic))?.id);
+  const overrides={'transitions.cut':'passages','scene_voice_switcher.passage':'passages','scene_voice_switcher.motion':'world-motion','lobby_screens.display':'world-layout','twitch_commands.reply':'replies','league_stats.chat':'replies','league_stats.viewer_views':'viewer-stats'};
+  return pathTo(overrides[flow.id]||ALL.find(item=>!item.children.length&&item.topics.includes(flow.topic))?.id);
 }
 const FLOW_NAMES={'instant_replay.archive':'Archive your clips','league.end':'Clear game overlays','league_stats.disconnect':'Save match stats','scene_voice_switcher.end':'Return to a lobby','league_api.idle':'Choose the idle view'};
 export function flowTitle(flow){return FLOW_NAMES[flow.id]||flow.label;}

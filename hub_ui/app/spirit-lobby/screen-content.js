@@ -29,7 +29,7 @@ export class ScreenContent {
   }
   open(target,asset){
     const media=asset.kind==='video'?document.createElement('video'):new Image(),texture=document.createElement('canvas');
-    texture.width=target==='main'?960:820;texture.height=target==='main'?360:target==='booth'?182:340;
+    texture.width=target==='main'?960:820;texture.height=target==='main'?540:target==='booth'?182:340;
     const slot={id:asset.id,kind:asset.kind,media,texture,ready:false};this.slots.set(target,slot);
     const ready=()=>{if(this.disposed||this.slots.get(target)!==slot)return;slot.ready=true;this.onChange();};
     if(asset.kind==='video'){media.muted=true;media.loop=true;media.playsInline=true;media.preload='auto';media.addEventListener('loadeddata',ready,{once:true});}

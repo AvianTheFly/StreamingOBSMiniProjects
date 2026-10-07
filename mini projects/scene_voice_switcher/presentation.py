@@ -6,6 +6,7 @@ from lib.coordination.lobby_layout import apply_layout, transform_matches
 from lib.coordination.lobbies import lobby_catalog
 from .motion import layer as motion_layer
 from obs.containers import container_items
+import json
 
 lock = lobby_catalog.presentation_lock
 CAMERA_SOURCE = 'FaceCamWithProps'
@@ -34,23 +35,27 @@ def plan(name, data=None):
     """Publish feature policy as complete data, never callbacks into this package."""
     spec=settings.location(name,data); stem=LAYOUTS[name][0]
     layers=[]
+    holes=json.dumps([spec[key] for key in ('screen','camera','chat')],separators=(',',':'))
     if name == 'Spirit Afterparty':
-        layers.append({'source':'Hub Spirit Afterparty','transform':transform((0,0,1920,1080),stretch=True)})
+        layers.append({'source':'Hub Spirit Afterparty','configure':True,'url_query':{'holes':holes},
+                       'transform':transform((0,0,1920,1080),stretch=True)})
     else:
         layers.append({'source':name+' Base','kind':'image_source',
                        'settings':{'file':str(ART/f'{stem}-base.png')},
                        'transform':transform((0,0,1920,1080),stretch=True)})
-    layers.append({'source':CAPTURE_SCENE,'transform':transform(spec['screen'])})
     camera=transform(spec['camera'],fill=True)
     if name == 'Spirit Afterparty':
         camera.update(cropLeft=370,cropRight=370,cropToBounds=False,boundsType='OBS_BOUNDS_SCALE_INNER')
     layers.append({'source':CAMERA_SOURCE,'transform':camera})
     if name == 'Spirit Afterparty':
-        layers.append({'source':'Hub Spirit Afterparty Foreground','transform':transform((0,0,1920,1080),stretch=True)})
+        layers.append({'source':'Hub Spirit Afterparty Foreground','configure':True,'url_query':{'holes':holes},
+                       'transform':transform((0,0,1920,1080),stretch=True)})
     elif name not in FLAT_LOCATIONS:
         layers.append({'source':name+' Foreground','kind':'image_source',
                        'settings':{'file':str(ART/f'{stem}-foreground-cutout.png')},
                        'transform':transform((0,0,1920,1080),stretch=True)})
+    # Desktop stays above furniture cutouts; the camera remains behind them.
+    layers.append({'source':CAPTURE_SCENE,'transform':transform(spec['screen'])})
     animated=motion_layer(name,spec)
     if animated:
         layers.append({**animated,'transform':transform((0,0,1920,1080),stretch=True)})

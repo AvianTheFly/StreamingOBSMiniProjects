@@ -12,7 +12,7 @@ const musicFeed=new MusicFeed(world,journey);
 journey.stage=6;journey.next=3;journey.visits.fill(0);journey.visits[6]=1;journey.recent=[6];
 let radiance=null,graphicsUnavailable=false;
 const visualizerTiming={frames:0,paintMs:0,sampleAgeMs:null,analysisMs:0,receivedAt:0,rttMs:0};
-function fit(){widget.style.transform=`scale(${Math.min(innerWidth/400,innerHeight/300)})`;}
+function fit(){widget.style.transform=`scale(${Math.min(innerWidth/400,innerHeight/180)})`;}
 fit();window.addEventListener('resize',fit);
 function clear(){if(ctx){ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,canvas.width,canvas.height);}else if(radiance&&!radiance.disposed&&!radiance.lost){radiance.gl.clear(radiance.gl.COLOR_BUFFER_BIT);}}
 function hide(){widget.hidden=true;cancelAnimationFrame(frame);frame=0;clear();lastFrame=0;}

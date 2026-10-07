@@ -17,6 +17,33 @@ class _SceneVoiceSwitcherInterface(ProjectInterface):
     name              = "scene_voice_switcher"
     controlled_scenes = ["Lobbies", "Test"]
 
+    def workflow_state(self):
+        controls = _live.get('session_controls')
+        return {'session': controls.snapshot()} if controls else {}
+
+    def present_lobby(self, *, expected_manual_revision=None):
+        """Public handoff for an opening; stale manual intent cannot change the scene."""
+        from .api import select_lobby
+        controls = _live.get('session_controls')
+        if controls is None:
+            raise ValueError('Scene controls are still starting')
+        return controls.present('lobby', lambda: select_lobby(screen_visible=False,
+            expected_manual_revision=expected_manual_revision))
+
+    def action_catalog(self):
+        return [*super().action_catalog(),
+                {'key': 'hold_scene', 'label': 'Hold this view'},
+                {'key': 'follow_scenes', 'label': 'Follow automatic scenes'}]
+
+    def run_action(self, action, **kwargs):
+        controls = _live.get('session_controls')
+        if action in {'hold_scene', 'follow_scenes'}:
+            if controls is None:
+                return {'ok': False, 'error': 'Scene controls are still starting'}
+            result = controls.hold() if action == 'hold_scene' else controls.follow()
+            return {'ok': True, 'session': result}
+        return super().run_action(action, **kwargs)
+
     def get_status(self) -> ProjectStatus:
         # Queue routing and OBS buttons can select a location independently of
         # voice commands. Report the actual scene instead of stale command data.

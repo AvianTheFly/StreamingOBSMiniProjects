@@ -1,0 +1,11 @@
+{
+  "id": "new-19-bridge-break",
+  "title": "The last support gives way",
+  "file": "images/new-19-bridge-break.png",
+  "prompt": "Use case: illustration-story. Asset: one full-screen landscape 16:9 cinematic frame for a gritty fantasy story slideshow, not a collage or storyboard. Match supplied reference illustration's intensely detailed mature fantasy realism, nocturnal blue moonlight / amber lanterns, weathered basalt and bronze, cinematic light and depth. One Udyr-like muscular weathered shaman with long black hair, beard, dark tattoos, bare chest, ragged brown wolf-fur mantle, wrapped forearms, leather trousers and boots. Spirits are energy envelopes attached to the SAME human body, not independent pets. No other people, villain, text, watermark, UI, panels or cute cartoon. Keep existing identity and persistent damage. Each frame must show the requested intermediate action clearly, not skip to its result.\nInput images: Image 1: adjacent story/world continuity reference.\nSpecific next story moment: FIRST PERSON same bridge next instant, camera tips DOWN. Bridge deck directly under both reaching hands BREAKS and folds downward into giant hole. Gold ram aura thins, fingers open attempting grip on splintered stone. Clearly see jagged circular hole with surviving bridge edges LEFT and RIGHT framing falling paving slabs, void/clouds far BELOW through missing deck, remaining far bridge in upper background. No teleport off island: physical bridge collapse beneath hero causes fall.",
+  "references": [
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-18-bridge-footfall.png"
+  ],
+  "original": "C:\\Users\\Michael\\.codex\\generated_images\\01a104b1-c082-7921-a920-617bfec4e788\\exec-a9f73d70-7106-4bff-95ea-19edbd677023.png",
+  "generation_mode": "built-in image_gen"
+}

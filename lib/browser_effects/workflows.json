@@ -17,7 +17,7 @@
         "event": "browser_effect.play",
         "kind": "control"
       },
-      "detail": "The browser draws from current audio position for the entire sound duration and clears on the owning audio's ended event. Pause and seek reconstruct the same frame; the stock renderer clips artwork to the gameplay perimeter; feature presentations own their own layout. Approved arena/racing/muffin owners remain. The 85 other cues have contextual subjects, individually arranged supporting casts and staggered entrances. Pedro has seven dancing raccoons and a DJ stage; sad violin has an orchestra, glass cameos, notes and a score. No worker, source controller or animation timer is added. Feature-owned presentations may publish explicitly named artwork under token-scoped registration during startup; teardown cannot unregister a newer owner. The shared HTTP owner serves original file bytes, including JSON manifests, while serializing state API objects separately, without importing feature policy. Hooray keeps original audio and current gain while a dedicated bounded native-alpha foil renderer draws corner bursts, sparse confetti across the picture and gold border ribbons; original chroma-filter and transform settings remain preserved.",
+      "detail": "The browser draws from current audio position for the entire sound duration and clears on the owning audio's ended event. Pause and seek reconstruct the same frame; the stock renderer clips artwork to the gameplay perimeter; feature presentations own their own layout. Approved arena/racing/muffin owners remain. The 85 other cues have contextual subjects, individually arranged supporting casts and staggered entrances. Pedro has seven dancing raccoons and a DJ stage; sad violin has an orchestra, glass cameos, notes and a score. No worker, source controller or animation timer is added. Feature-owned presentations may publish explicitly named artwork under token-scoped registration during startup; teardown cannot unregister a newer owner. The shared HTTP owner serves original file bytes, including JSON manifests, while serializing state API objects separately, without importing feature policy. Hooray keeps original audio and current gain while a dedicated bounded native-alpha foil renderer draws corner bursts, sparse confetti across the picture and gold border ribbons; original chroma-filter and transform settings remain preserved. The current culture pass authors distinct native performances for all 30 sounds behind ! 2 # Z T t h H after reviewing their actual local clips. Party/reaction owners supply contextual subjects, causal jokes, finite acts and peripheral sets; supporting cameos preserve approved main shows and recognizable photographic casts. Precomputed original-media envelopes and measured cadence guide illustration only, without live DSP or a new clock. Original audio duration, currentTime, pause, channel identity, personal data and cleanup remain unchanged. The follow-up choreography gives long sounds finite actions and held consequences: prop losses/catches, food grabs, a stolen Pedro record, and a snapped violin string. MuffinShow owns the local clip's final-die cue at approximately 6.24 seconds; all eight muffins collapse together and remain down until the original sound ends. Its 55-ms release retains the punchline without stretching audio. All acts reconstruct solely from currentTime, including backward seeks and fresh replays. The further meme-action pass adds Cena invisibility/autofocus, the hindsight slip, coffee-denial toaster jump, physical spill/failed undo, precise mute click, warded ambush, Starman last-hit deflection, Gary snack, Quack popup escape and the frog microphone topple. Cue-specific contact anchors live in culture-contacts.js and are shared with finite geometry review; no simulations, independent clocks or gameplay commands are introduced.",
       "steps": [
         {
           "id": "0",
@@ -56,7 +56,7 @@
         }
       ],
       "owner_hashes": {
-        "browser_effects": "fc9699db4ebfb112cb8e38b787930aae7b4649bcb2b375d48516421cddbc3ce3"
+        "browser_effects": "da7fab21c1a7910cdd796e8741e36ee6760cf62751538e6c97a374e11dbf7000"
       },
       "edges": [
         {
@@ -107,7 +107,7 @@
         "label": "A feature loads the public mechanics",
         "kind": "browser"
       },
-      "detail": "AmbientClock plans finite weighted phrases with recent-guest weighting and soft pressure, retains at most four plans and starts no timer. PaintedPatch decodes a small crop once, deforms its cached triangle mesh using a feature-provided field, and releases its canvas explicitly. Shared helpers own no theme, cast, live display placement or scene policy. Finite build publication copies original mechanic bytes and records canonical hashes.",
+      "detail": "AmbientClock plans finite weighted phrases with recent-guest weighting and soft pressure, retains at most four plans and starts no timer. PaintedPatch decodes a small crop once, caches fixed triangle connections and source coefficients, and reuses coordinate buffers for each feature-provided deformation. Drawing order and mesh detail stay unchanged; disposal releases the canvas and all mesh buffers. Shared helpers own no theme, cast, live display placement or scene policy. Finite build publication copies original mechanic bytes and records canonical hashes.",
       "steps": [
         {
           "id": "0",
@@ -145,11 +145,11 @@
         {
           "path": "tools/build_lobby_motion.py",
           "symbol": "build",
-          "hash": "125cf6525bda16b02e74aee9d599ac331abc57110d8ec61afe9f6703fa11c753"
+          "hash": "867918e6c43e41ea0019645289648911d242c8c009f9348c10a4d707bcf169b3"
         }
       ],
       "owner_hashes": {
-        "browser_effects": "7cf91e257d9f5bcfdfd036ba677b0885ca53810756575ea879eee05fa4df3eff"
+        "browser_effects": "b8947a7307b6b65abf8bd8dc1ef64fa24b0cdea6477cc2d0c84ad31d092efb4f"
       }
     }
   ]

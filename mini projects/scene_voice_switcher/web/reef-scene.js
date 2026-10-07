@@ -1,6 +1,6 @@
 // Turtle Reef landmarks come from the existing 1672x941 painting in HD space.
 import {PaintedPatch,ellipse,glow,hash,TAU} from './shared/world-motion.js';
-export const scene={id:'reef',source:'ReefLobby',label:'Turtle Reef',holes:[[872,260,586,285],[140,320,390,550],[1596,213,246,487]]};
+export const scene={id:'reef',source:'ReefLobby',label:'Turtle Reef',holes:[[640,140,896,504],[140,320,390,550],[1596,213,246,487]]};
 export function oceanClip(c){
   c.beginPath();
   for(const polygon of [ [[389,0],[816,0],[761,280],[739,631],[304,693]], [[851,0],[1433,0],[1494,220],[1447,252],[1176,111],[1073,219],[812,249]], [[1494,285],[1537,505],[1509,690],[1453,737],[831,735],[791,594],[1477,565]] ]){

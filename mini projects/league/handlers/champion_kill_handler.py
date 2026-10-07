@@ -11,7 +11,7 @@
 #   - Each kill reveals one random triangle that hasn't been shown yet.
 #   - If KILL_STREAK_TIMEOUT seconds pass without another kill, all triangles
 #     are hidden and the streak resets.
-#   - Once all 4 triangles are revealed the timer stops — they stay visible
+#   - Once all 4 triangles are revealed the timer stops â€” they stay visible
 #     until the next kill resets the whole thing (which immediately starts
 #     revealing again from zero).
 
@@ -28,13 +28,13 @@ from ..config import (
 
 
 def make_champion_kill_handler(kill_audio_player=None):
-    # ── Streak state (lives inside the closure, protected by _lock) ───────────
+    # â”€â”€ Streak state (lives inside the closure, protected by _lock) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     _lock              = threading.Lock()
     _revealed: list    = []      # sources currently visible
     _pool: list        = []      # sources not yet revealed this streak
     _expire_timer: list = [None] # one-element list so inner funcs can mutate it
 
-    # ── Timer helpers ─────────────────────────────────────────────────────────
+    # â”€â”€ Timer helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _cancel_timer():
         """Cancel pending expiry timer. Must be called while holding _lock."""
@@ -51,7 +51,7 @@ def make_champion_kill_handler(kill_audio_player=None):
         t.start()
         _expire_timer[0] = t
 
-    # ── Streak expiry ─────────────────────────────────────────────────────────
+    # â”€â”€ Streak expiry â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _on_streak_expired():
         """Called from a timer thread when KILL_STREAK_TIMEOUT elapses."""
@@ -64,7 +64,7 @@ def make_champion_kill_handler(kill_audio_player=None):
         if not to_hide:
             return
 
-        print(f"[league] Kill streak expired — hiding {len(to_hide)} triangle(s).")
+        print(f"[league] Kill streak expired â€” hiding {len(to_hide)} triangle(s).")
         for source in to_hide:
             try:
                 obs.hide_source(KILL_STREAK_SCENE, source)
@@ -78,7 +78,7 @@ def make_champion_kill_handler(kill_audio_player=None):
             except Exception as e:
                 print(f"[league] Error hiding {KILL_STREAK_LOGO}: {e}")
 
-    # ── OBS actions ───────────────────────────────────────────────────────────
+    # â”€â”€ OBS actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _flash_border():
         from ..utils import production_borders_active
@@ -102,7 +102,7 @@ def make_champion_kill_handler(kill_audio_player=None):
             all_revealed = not _pool and len(_revealed) == len(KILL_STREAK_SOURCES)
 
             if all_revealed:
-                # Previous streak completed — hide everything, start fresh
+                # Previous streak completed â€” hide everything, start fresh
                 to_hide = list(_revealed)
                 _revealed.clear()
                 _pool.extend(KILL_STREAK_SOURCES)
@@ -149,7 +149,7 @@ def make_champion_kill_handler(kill_audio_player=None):
             except Exception as e:
                 print(f"[league] Error showing {KILL_STREAK_LOGO}: {e}")
 
-    # ── Public handlers ───────────────────────────────────────────────────────
+    # â”€â”€ Public handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def handle_champion_kill(event: dict):
         if not CHAMPION_KILL_ENABLED:
@@ -159,7 +159,7 @@ def make_champion_kill_handler(kill_audio_player=None):
         threading.Thread(target=_flash_border,         daemon=True).start()
         threading.Thread(target=_reveal_next_triangle, daemon=True).start()
         if kill_audio_player is not None:
-            threading.Thread(target=kill_audio_player.play_random, daemon=True).start()
+            kill_audio_player.play_random()
 
     def handle_assist(event: dict):
         if not ASSIST_KILL_ENABLED:
@@ -169,7 +169,7 @@ def make_champion_kill_handler(kill_audio_player=None):
         threading.Thread(target=_flash_border,         daemon=True).start()
         threading.Thread(target=_reveal_next_triangle, daemon=True).start()
         if kill_audio_player is not None:
-            threading.Thread(target=kill_audio_player.play_random, daemon=True).start()
+            kill_audio_player.play_random()
 
     def force_streak_reset():
         """

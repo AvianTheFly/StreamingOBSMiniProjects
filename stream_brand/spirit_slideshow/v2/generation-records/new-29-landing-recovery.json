@@ -1,0 +1,12 @@
+{
+  "id": "new-29-landing-recovery",
+  "title": "Recovering from the landing",
+  "file": "images/new-29-landing-recovery.png",
+  "prompt": "Use case: illustration-story. Asset: one full-screen landscape 16:9 cinematic frame for a gritty fantasy story slideshow, not a collage or storyboard. Match supplied reference illustration's intensely detailed mature fantasy realism, nocturnal blue moonlight / amber lanterns, weathered basalt and bronze, cinematic light and depth. One Udyr-like muscular weathered shaman with long black hair, beard, dark tattoos, bare chest, ragged brown wolf-fur mantle, wrapped forearms, leather trousers and boots. Spirits are energy envelopes attached to the SAME human body, not independent pets. No other people, villain, text, watermark, UI, panels or cute cartoon. Keep existing identity and persistent damage. Each frame must show the requested intermediate action clearly, not skip to its result.\nInput images: Image 1: adjacent story/world continuity reference. Image 2: original character/environment/style reference.\nSpecific next story moment: Same terrace close three-quarter view immediately AFTER touchdown. Same shaman rises from one hand/one knee landing crouch, front foot firmly planted, back knee lifting, face exhales. Phoenix wings breaking into wisps and disappearing, lingering blue orange feather sparks around shoulder. Amber lantern left and wet stones intact, ruined chamber behind right, persistent bridge absent deck in background. No standing reset. Scenic aurora and chasm distant.",
+  "references": [
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-28-landing-approach.png",
+    "C:/StreamingMedia/ChannelPresentation/2026-10-03/spirit-slideshow-v1/images/10-growing-empowerment.png"
+  ],
+  "original": "C:\\Users\\Michael\\.codex\\generated_images\\01a104b1-c082-7921-a920-617bfec4e788\\exec-36f20de2-061d-4316-b023-4508c5dec244.png",
+  "generation_mode": "built-in image_gen"
+}

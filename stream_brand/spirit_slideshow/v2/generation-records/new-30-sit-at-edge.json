@@ -1,0 +1,12 @@
+{
+  "id": "new-30-sit-at-edge",
+  "title": "Lowering onto the overlook",
+  "file": "images/new-30-sit-at-edge.png",
+  "prompt": "Use case: illustration-story. Asset: one full-screen landscape 16:9 cinematic frame for a gritty fantasy story slideshow, not a collage or storyboard. Match supplied reference illustration's intensely detailed mature fantasy realism, nocturnal blue moonlight / amber lanterns, weathered basalt and bronze, cinematic light and depth. One Udyr-like muscular weathered shaman with long black hair, beard, dark tattoos, bare chest, ragged brown wolf-fur mantle, wrapped forearms, leather trousers and boots. Spirits are energy envelopes attached to the SAME human body, not independent pets. No other people, villain, text, watermark, UI, panels or cute cartoon. Keep existing identity and persistent damage. Each frame must show the requested intermediate action clearly, not skip to its result.\nInput images: Image 1: original character/environment/style reference. Image 2: adjacent story/world continuity reference.\nSpecific next story moment: Rear three-quarter view of same shaman at intact west terrace overlook, amber lantern left, pine branches frame. He has reached edge and is LOWERING to sit: knees bent, one hand braced on wet stone edge, hips halfway down, right foot still taking weight. Tiny four-color spirit flecks in mantle. Landscape from new establishing scene: monumental spirit-shaped eroded mountains, deep luminous waterfall canyon, cloud rivers, teal aurora, ONE moon. Quiet earned recovery, no wings.",
+  "references": [
+    "C:/StreamingMedia/ChannelPresentation/2026-10-03/spirit-slideshow-v1/images/34-seated-vista.png",
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-01-epic-sanctuary.png"
+  ],
+  "original": "C:\\Users\\Michael\\.codex\\generated_images\\01a104b1-c082-7921-a920-617bfec4e788\\exec-bf3d56a2-6d16-4508-a6bf-a6377debecbb.png",
+  "generation_mode": "built-in image_gen"
+}

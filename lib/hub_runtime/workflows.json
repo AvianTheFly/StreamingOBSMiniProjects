@@ -114,7 +114,7 @@
         "event": "hub_action",
         "kind": "event"
       },
-      "detail": "",
+      "detail": "Live desk follows observed scene ownership into Starting soon, opening, Lobby, Queue/champion select, Game and Ending. Browsing Change stage or an image gallery is read-only. Explicit feature actions show destinations; the current lobby stays separate from a selected draft. Play intro uses the approved Sanctuary edit and guarded lobby handoff. Lobby exposes current-world effects and rotation preferences. Loading is a League phase within Game, where replay remains prominent. Other scenes lists only installed presentation destinations. Audio and secondary controls stay collapsed. Go live and confirmed End stream are separate explicit output actions; live commands require observed OBS availability.",
       "steps": [
         {
           "id": "0",
@@ -139,7 +139,7 @@
         }
       ],
       "owner_hashes": {
-        "hub": "2651a208dfe2c15d06a55506164c7fc7795423742dfa750511fa1a7762484d50"
+        "hub": "37d8a0769f17a64890d5da38416b4377ad0ef16d04bf235dae60c6b0ebf0acae"
       },
       "edges": [
         {
@@ -156,6 +156,11 @@
           "path": "hub_actions.py",
           "symbol": "run_project_action",
           "hash": "53579d4eafe0db1204305e9eaf4dc4d25d44b66f83dc8b86798173f550ed3a61"
+        },
+        {
+          "path": "hub_actions.py",
+          "symbol": "_output_control",
+          "hash": "cd2c707bd7bf04de3b764480050dad91a34985dabc49723e399f57a177f436cc"
         }
       ]
     },

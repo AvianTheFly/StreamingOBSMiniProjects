@@ -42,6 +42,8 @@ class ProjectRoutes(SongRoutes, SceneRoutes, SoundEffectRoutes, ReplayRoutes):
                 self._err(404, "Unknown action")
         elif name == "scene_voice_switcher" and action == "lobbies":
             self._svs_lobbies()
+        elif name == 'scene_voice_switcher' and action == 'catalog':
+            self._svs_catalog()
         elif name == "scene_voice_switcher" and action == "artwork":
             self._svs_artwork()
         elif name == "sound_effects" and action == "library":

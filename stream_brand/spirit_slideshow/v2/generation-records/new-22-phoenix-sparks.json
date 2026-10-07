@@ -1,0 +1,11 @@
+{
+  "id": "new-22-phoenix-sparks",
+  "title": "Frost and embers answer",
+  "file": "images/new-22-phoenix-sparks.png",
+  "prompt": "Use case: illustration-story. Asset: one full-screen landscape 16:9 cinematic frame for a gritty fantasy story slideshow, not a collage or storyboard. Match supplied reference illustration's intensely detailed mature fantasy realism, nocturnal blue moonlight / amber lanterns, weathered basalt and bronze, cinematic light and depth. One Udyr-like muscular weathered shaman with long black hair, beard, dark tattoos, bare chest, ragged brown wolf-fur mantle, wrapped forearms, leather trousers and boots. Spirits are energy envelopes attached to the SAME human body, not independent pets. No other people, villain, text, watermark, UI, panels or cute cartoon. Keep existing identity and persistent damage. Each frame must show the requested intermediate action clearly, not skip to its result.\nInput images: Image 1: adjacent story/world continuity reference.\nSpecific next story moment: FIRST PERSON falling same upward bridge/island framing. Gold gone, open hands at lower corners spread fingers; frost BLUE and ember ORANGE glowing feather veins begin forming along wrists, sparks crawl inward to chest not visible. Falling slabs still near. Early phoenix transformation: ONLY partial feathers and wisps, not complete wings or storm yet. Hands startled reacting, huge bridge hole still overhead.",
+  "references": [
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-21-fall-lookback.png"
+  ],
+  "original": "C:\\Users\\Michael\\.codex\\generated_images\\01a104b1-c082-7921-a920-617bfec4e788\\exec-e7259596-7635-4d79-a3c0-505d744119ba.png",
+  "generation_mode": "built-in image_gen"
+}

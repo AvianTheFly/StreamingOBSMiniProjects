@@ -85,3 +85,19 @@ def place_box(desired):
     obs.set_source_transform(STAGE, MEDIA, dict(positionX=x*sx,positionY=y*sy,
         boundsType='OBS_BOUNDS_SCALE_INNER',boundsWidth=width*sx,boundsHeight=height*sy,
         alignment=5,boundsAlignment=0))
+
+
+def clip_transform():
+    client = obs.get_obs()
+    item = client.get_scene_item_id(STAGE, MEDIA).scene_item_id
+    return dict(client.get_scene_item_transform(STAGE, item).scene_item_transform)
+
+
+def restore_clip_transform(transform):
+    obs.set_source_transform(STAGE, MEDIA, transform)
+
+
+def place_fullscreen():
+    place_box((0, 0, 1920, 1080))
+    obs.set_source_transform(STAGE, MEDIA, dict(rotation=0, cropLeft=0, cropRight=0,
+        cropTop=0, cropBottom=0, scaleX=1, scaleY=1))

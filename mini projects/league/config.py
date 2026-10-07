@@ -23,7 +23,11 @@ REQUEST_TIMEOUT        = 2
 
 # ── Respawn SFX (Halo sound at 3 seconds) ─────────────────────────────────────
 RESPAWN_SFX_SOURCE = "Halo Respawn sound effect"
-RESPAWN_SFX_LEAD_SECONDS = 3.0
+# Intentional pre-respawn lead: the final Halo beep is ~3 seconds into the
+# asset. Allow another polling interval for detection/playback startup so that
+# beep aligns with revival. Do not remove this margin or move the cue to the
+# actual respawn event: that makes the countdown finish after the player revives.
+RESPAWN_SFX_LEAD_SECONDS = 3.0 + POLL_INTERVAL
 
 # ── Death / Respawn ───────────────────────────────────────────────────────────
 # Brief splash; corner reactions live in league_api.death_reactions.

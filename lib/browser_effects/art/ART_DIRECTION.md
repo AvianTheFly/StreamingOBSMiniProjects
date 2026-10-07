@@ -1,5 +1,68 @@
 # Original border artwork / 2026-10-02
 
+## Cultural-context sound pass / 2026-10-04
+
+The current 30 sounds behind `! 2 # Z T t h H` use `culture-cues.js` and its
+party, reaction, setting and cameo owners. This supersedes the earlier generic
+playful sound performances described below. Every concept is checked against
+the actual local video/audio, not inferred only from its filename. Toothless,
+the trombone/oven jam, Nyan Cat, the telephone panic, Frolic/end credits,
+Starman/Superman and X-Files/dog references now have distinct visual stories.
+Approved Cena, car, muffin, Pedro, violin and photographic short casts retain
+their recognizable main shows, with relevant new supporting actions.
+
+All new artwork is native canvas illustration, without new bitmap processing.
+`culture-ink.js` provides geometry and reconstruction from the existing audio
+position. `culture-timing.json` stores measured original-media envelopes and
+cadence; it adds no live DSP, timer, decoder, worker or sound. Dancing figures
+use measured cadence where the local seven-second excerpt gives strong evidence.
+Progress gates unfold once; the original sound still owns duration and cleanup.
+The follow-up choreography replaces repeated primary dance poses with finite
+actions: misplaced accessories, food grabs, recoveries and held ending poses.
+Pedro's record theft and violin's snapped string live with their existing cast
+owners. `web/muffins.js` owns its final-lyric cue at approximately 6.24 seconds:
+all eight die together, with dropped accessories and no resurrection before
+audio-end cleanup. Secondary beat motion may continue around the developing act.
+Further actions use the cultural premise as the punchline: Cena literally becomes
+invisible; a hindsight detective slips on his own evidence; closing Quack creates
+more ducks; the Starman save stops the last hit. `culture-contacts.js` defines
+their physical blocking where props must meet. Contact review checks actual
+crossing/landing points, alongside full-composition alpha and enlarged prop views.
+References, cue-by-cue rationale and evidence are in
+`docs/SOUND-CULTURE-20261004.md`; `output/sound-culture/` contains original-video
+contact sheets, nine-moment review data and real-audio browser verification.
+
+Prop alignment is explicit: Bonk's mallet meets the helmet at one contact point;
+the rescue ally's feet settle onto the hero's supporting hand; the pallbearers,
+casket and hands share one parent transform. Rat scenery crossfades between its
+three stages. The standard gameplay opening remains fully transparent.
+
+## Playful redesign / 2026-10-04
+
+The current League collection replaces 57 event/death performances with native
+miniature illustration and keeps the approved Hextech show unchanged. Each key
+has an explicit story in `playful-events.js`, with its own cast, props, placement
+and motion. `playful-sets.js` provides context-specific peripheral scenery.
+`playful-ink.js` supplies only drawing primitives and surface materials, with
+warm enamel highlights, dark outlines and genuine alpha. It owns no story,
+clock, layout policy, media or state.
+
+In the preceding pass, the 30 sounds reachable from `! 2 # Z T t h H` received new primary performances
+or new supporting casts. Approved Cena, Muffin, racing, Pedro and violin
+performances, the five photographic short-cue casts and Frog concert stay
+recognizable. The other selected cues have distinct playful stage designs.
+Long sound performances develop through arrival, second act and encore;
+normalized progress gates never wrap or change the audio duration. Sounds
+continue using actual audio position; League continues using event/death state.
+
+`tools/review_playful_borders.cjs` checks the exact hotkey expansion against the
+real catalog and original audio metadata, all 58 League entries, motion at three
+moments, central alpha, distinct composed frames and original Hextech pixels.
+It captures eight contact sheets and a per-entry report in
+`output/playful-borders/`. The fixture is read-only and cannot open OBS, subscribe
+to live events or install keyboard hooks. Original media, settings, audio levels,
+filters and bindings are preserved.
+
 Created with the built-in image-generation tool, six independent generations.
 The original PNG bytes are preserved: no background removal, recoloring,
 resizing, or destructive image processing was applied. The renderer selects

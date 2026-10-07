@@ -15,7 +15,7 @@ async function until(predicate) {
   }
 }
 const projects = [
-  { name: 'instant_replay', actions: ['save', 'play_replay', 'play_random', 'pause', 'resume', 'skip', 'revert'].map(action) },
+  { name: 'instant_replay', actions: ['quick_replay', 'save', 'play_replay', 'play_random', 'pause', 'resume', 'skip', 'revert'].map(action) },
   { name: 'soundboard', actions: ['random', 'start_listen', 'stop_listen', 'abort_listen', 'pause', 'resume', 'next', 'stop', 'reload', 'test_muffins'].map(action), volume: { profile: 'default', project_volume_db: -4 } },
   { name: 'specific_song', actions: ['pause', 'resume', 'revert'].map(action) },
   { name: 'scene_voice_switcher', actions: [] },
@@ -33,7 +33,8 @@ async function main() {
     if (process.argv.includes('--live')) {
       const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
       const errors = [];
-      page.on('pageerror', e => errors.push(e.message));
+      const chooseStage=async id=>{if(!await page.locator('#deskStageMenu').evaluate(el=>el.open))await page.locator('#deskStageMenu > summary').click();await page.locator('#deskTab-'+id).click();};
+    page.on('pageerror', e => errors.push(e.message));
       // Chromium's stream interception can delay EventSource headers; its native
       // GET transport stays direct while every other request is read-only.
       await page.route(url => new URL(url).pathname !== '/api/events', route => route.request().method() === 'GET' ? route.continue() : route.abort());
@@ -44,13 +45,15 @@ async function main() {
         throw error;
       });
       await page.locator('#currentScene').filter({ hasNotText: '—' }).waitFor();
-      await page.waitForFunction(() => !document.querySelector('[data-action="save"]').disabled);
-      await page.locator('.desk-audio-channel').first().waitFor();
+      await page.waitForFunction(() => !document.querySelector('[data-action="quick_replay"]').disabled);
+      await page.locator('.desk-audio-drawer > summary').click();
+    await page.locator('.desk-audio-channel').first().waitFor();
       await page.screenshot({ path: path.join(output, 'live-desk.png'), animations: 'disabled' });
-      await page.getByRole('button',{name:'In game',exact:true}).click();
+      if (!await page.locator('.desk-extras').evaluate(el=>el.open)) await page.locator('.desk-extras > summary').click();
+      await chooseStage('game');
       await page.waitForFunction(()=>!document.querySelector('#voiceState').textContent.includes('Checking'));
       await page.screenshot({path:path.join(output,'live-in-game.png'),animations:'disabled'});
-      await page.getByRole('button',{name:'Out of game',exact:true}).click();
+      await chooseStage('game');
       for (const panel of ['scenes','clips','music','sounds','waiting']) {
         await page.locator(`[data-desk-panel="${panel}"]`).click();
         await page.waitForFunction(()=>!document.querySelector('#deskResultCount').textContent.includes('Loading'));
@@ -59,7 +62,7 @@ async function main() {
         await page.locator('#deskPanelClose').click();
       }
       await page.locator('a[data-page="library"]').click();
-      await page.locator('.library-tile').first().waitFor();
+      await page.locator('.guide-area').first().waitFor();
       await page.screenshot({ path: path.join(output, 'live-library.png'), animations: 'disabled' });
       await page.locator('a[data-page="projects/soundboard"]').click();
       await page.getByText('Ready to play', { exact: true }).waitFor();
@@ -93,6 +96,7 @@ async function main() {
       { name: 'Desktop audio', kind: 'wasapi_output_capture', volume_db: -12, muted: false },
       { name: 'Media music', kind: 'ffmpeg_source', volume_db: -9, muted: false },
     ];
+    const chooseStage=async id=>{if(!await page.locator('#deskStageMenu').evaluate(el=>el.open))await page.locator('#deskStageMenu > summary').click();await page.locator('#deskTab-'+id).click();};
     page.on('pageerror', e => errors.push(e.message));
     await page.addInitScript(() => {
       window.fixtureSources = [];
@@ -124,7 +128,7 @@ async function main() {
       if (url.pathname === '/api/coordination') {
         coordinationCalls++;
         if (staleCoordination) await new Promise(resolve => setTimeout(resolve, 600));
-        return route.fulfill({ json: { scenes: { scene: 'Lobbies', observing: true }, display: {visible:false}, stream:{active:streamActive}, pauses:pauseClaims } });
+        return route.fulfill({ json: { scenes: { scene: 'Lobbies', observing: true }, display: {visible:false}, stream:{active:streamActive}, replay_buffer:{active:true}, pauses:pauseClaims } });
       }
       if (url.pathname.endsWith('/lobbies')) return route.fulfill({ json: { game_scene: 'Test', program_scene:'Lobbies', current_lobby:'TavernLobby', screen:{visible:false}, lobbies: ['TavernLobby','ForgeLobby'], locations:['TavernLobby','ForgeLobby'].map(source=>({source,label:source==='TavernLobby'?'Tavern Lobby':'Spirit forge',description:source==='TavernLobby'?'Conversation in the tavern':'Amber smithy',managed:true,rotation:true,ready:true,layout:{screen:[100,200,600,300],camera:[800,300,400,500],chat:[1500,200,300,500]}})) } });
       if (url.pathname === '/api/projects/soundboard/assets') {
@@ -134,6 +138,7 @@ async function main() {
       if (url.pathname === '/api/projects/sound_effects/library') return route.fulfill({json:['Sad violin','Hooray cue']});
       if (url.pathname === '/api/projects/specific_song/library') return route.fulfill({json:[{source:'Loreen',name:'Tattoo',aliases:['Loreen']}]});
       if (url.pathname === '/api/projects/instant_replay/clips') return route.fulfill({json:{clips:[{title:'A good escape',path:'C:/fixture/escape.mp4'}]}});
+      if (url.pathname === '/api/projects/instant_replay/stage') return route.fulfill({json:{active:false,pending:false,capture:{status:'idle'}}});
       if (url.pathname === '/api/voice') return route.fulfill({json:{ready:true,recording:false}});
       if (url.pathname === '/api/hub-actions') return route.fulfill({json:{workflows:[{id:'break',name:'Take a break',steps:[{project:'starting_soon',action:'start'}]}]}});
       if (url.pathname === '/api/starting-soon') return route.fulfill({json:{playlists:[{id:'best',name:'Best moments',paths:['C:/fixture/escape.mp4']}]}});
@@ -159,19 +164,23 @@ async function main() {
       return route.fulfill({ body: fs.readFileSync(file), contentType });
     });
     await page.goto('http://hub.test/#dashboard');
-    await page.getByRole('button', { name: 'Save clip', exact: true }).waitFor();
-    await page.waitForFunction(() => !document.querySelector('[data-action="save"]').disabled);
+    await chooseStage('game');
+    await page.getByRole('button', { name: 'Replay last 15s', exact: true }).waitFor();
+    await page.waitForFunction(() => !document.querySelector('[data-action="quick_replay"]').disabled);
     assert.equal(await page.locator('#loadedCount').innerText(), '13 features loaded');
     assert.equal(profileCalls, 0, 'Home must not wait on profile discovery');
     assert.equal(checks, 0, 'Collapsed diagnostics do not poll Twitch');
-    assert.equal(await page.locator('#currentScene').innerText(), 'Lobbies');
+    assert.equal(await page.locator('#currentScene').innerText(), 'TavernLobby');
     await page.setViewportSize({width:1280,height:720});
     await page.screenshot({path:path.join(output,'fixture-compact.png'),animations:'disabled'});
-    assert(await page.locator('.desk-launch').last().evaluate(el=>el.getBoundingClientRect().bottom<=innerHeight), 'Main destinations fit a 720px desktop');
+    assert(await page.locator('.desk-replay-choices').evaluate(el=>el.getBoundingClientRect().bottom<=innerHeight), 'Stream steps and replay choices fit a 720px desktop');
+    assert.equal(await page.locator('.desk-extras').getAttribute('open'),null,'Extra tools start collapsed');
     await page.setViewportSize({width:1440,height:1000});
     await page.screenshot({ path: path.join(output, 'fixture-desk.png'), animations: 'disabled' });
+    await page.locator('.desk-extras > summary').click();
 
     // The operating surface controls the actual named sources and active owners.
+    await page.locator('.desk-audio-drawer > summary').click();
     await page.locator('.desk-audio-channel').first().waitFor();
     assert.equal(await page.locator('.desk-audio-channel').count(),2);
     assert.equal(await page.locator('#streamState').innerText(),'Not streaming');
@@ -218,12 +227,12 @@ async function main() {
     assert.equal(await page.locator('#streamState').innerText(),'Live · OBS');
     assert.equal(await homeMusic.locator('.desk-playback-state').innerText(),'Paused');
     pauseClaims={specific_song:{owners:[{kind:'playback',owner:'instant_replay',sequence:4}]}};
-    await page.getByRole('button',{name:'Gameplay',exact:true}).click();
+    await page.getByRole('button',{name:'Show game',exact:true}).click();
     await page.waitForFunction(()=>document.querySelector('[data-playback-project="specific_song"] .desk-playback-state').textContent.includes('Waiting for'));
     assert(await homeMusic.getByRole('button',{name:'Resume Music',exact:true}).isDisabled(),'Resume cannot bypass another playback owner');
     await page.screenshot({path:path.join(output,'fixture-production-active.png'),animations:'disabled'});
     pauseClaims={};
-    await page.getByRole('button',{name:'Gameplay',exact:true}).click();
+    await page.getByRole('button',{name:'Show game',exact:true}).click();
     await page.waitForFunction(()=>!document.querySelector('[data-playback-project="specific_song"] [data-action="resume"]').disabled);
     await homeMusic.getByRole('button',{name:'Resume Music',exact:true}).focus();
     await page.evaluate(p=>window.emitStatus(p),serverProjects);
@@ -251,15 +260,15 @@ async function main() {
 
     // Focus modes affect presentation only. Browsing a focused catalog is read-only.
     const beforeModes=requests.length;
-    await page.getByRole('button',{name:'In game',exact:true}).click();
+    await chooseStage('game');
     assert.equal(await page.locator('#gameTools').isVisible(),true);
     await page.waitForFunction(()=>document.querySelector('#voiceState').textContent==='Microphone ready');
     assert.equal(await page.locator('[data-action="stop_listen"]').isVisible(),false,'Idle voice hides finish controls');
-    assert.equal(await page.locator('[data-desk-panel="scenes"]').isVisible(),false);
+    assert.equal(await page.locator('#deskStageMenu > summary').isVisible(),true);
     assert.equal(requests.length,beforeModes);
     await page.screenshot({path:path.join(output,'fixture-in-game.png'),animations:'disabled'});
-    await page.getByRole('button',{name:'Out of game',exact:true}).click();
-    const sounds=page.locator('.desk-launch[data-desk-panel="sounds"]');
+    await chooseStage('game');
+    const sounds=page.locator('#deskSection-game [data-desk-panel="sounds"]');
     await sounds.click();
     await page.locator('.desk-choice strong').filter({hasText:'Hooray'}).waitFor();
     assert.equal(await page.evaluate(()=>document.activeElement.id),'deskPanelSearch','Picker starts with search focused');
@@ -296,10 +305,10 @@ async function main() {
     await page.waitForFunction(()=>!document.querySelector('.desk-choice button').disabled);
     assert.deepEqual(requests.at(-1),{path:'/api/projects/sound_effects/play',body:{source:'Sad violin'}});
     await page.locator('#deskPanelSearch').press('Escape');
-    await page.waitForFunction(()=>document.activeElement?.matches('.desk-launch[data-desk-panel="sounds"]'));
+    await page.waitForFunction(()=>document.activeElement?.matches('#deskSection-game [data-desk-panel="sounds"]'));
     assert.equal(await sounds.evaluate(el=>el===document.activeElement),true,'Closing restores focus');
 
-    await page.locator('.desk-launch[data-desk-panel="clips"]').click();
+    await page.locator('.desk-extras [data-desk-panel="clips"]').click();
     await page.locator('.desk-choice strong').filter({hasText:'A good escape'}).waitFor();
     await page.locator('#deskReplayMode').selectOption('replay');
     await page.locator('.desk-choice button').click();
@@ -307,26 +316,28 @@ async function main() {
     assert.deepEqual(requests.at(-1),{path:'/api/projects/instant_replay/play',body:{path:'C:/fixture/escape.mp4',mode:'replay'}});
     await page.locator('#deskPanelClose').click();
 
-    await page.locator('.desk-launch[data-desk-panel="music"]').click();
+    await page.locator('#deskSection-game [data-desk-panel="music"]').click();
     await page.locator('.desk-choice strong').filter({hasText:'Tattoo'}).waitFor();
     await page.locator('.desk-choice button').click();
     await page.waitForFunction(()=>!document.querySelector('.desk-choice button').disabled);
     assert.deepEqual(requests.at(-1),{path:'/api/projects/specific_song/play',body:{source:'Loreen'}});
     await page.locator('#deskPanelClose').click();
 
-    await page.locator('.desk-launch[data-desk-panel="waiting"]').click();
+    await page.locator('.desk-extras [data-desk-panel="waiting"]').click();
     await page.locator('.desk-choice strong').filter({hasText:'Best moments'}).waitFor();
     await page.getByRole('button',{name:'Show playlist',exact:true}).click();
     await page.waitForFunction(()=>!document.querySelector('.desk-choice button').disabled);
     assert.deepEqual(requests.slice(-2),[{path:'/api/starting-soon/start',body:{}},{path:'/api/starting-soon/play',body:{paths:['C:/fixture/escape.mp4']}}]);
     await page.locator('#deskPanelClose').click();
 
-    await page.getByRole('button',{name:'Run a workflow',exact:true}).click();
+    await page.getByRole('button',{name:'Workflows',exact:true}).click();
     await page.getByRole('button',{name:'Run',exact:true}).click();
     await page.waitForFunction(()=>!document.querySelector('[data-workflow]').disabled);
     assert.equal(requests.at(-1).path,'/api/workflows/break');
     await page.locator('#deskPanelClose').click();
+    await chooseStage('lobby');
     await page.getByRole('button',{name:'Show desktop',exact:true}).click();
+    await chooseStage('game');
     await page.waitForFunction(()=>!document.querySelector('[data-hub-action="show_screen"]').disabled);
     assert.equal(requests.at(-1).path,'/api/hub-actions/show_screen');
 
@@ -334,6 +345,7 @@ async function main() {
     staleCoordination=true;
     await sounds.click();
     await page.locator('#deskPanelClose').click();
+    await page.locator('#deskStageMenu > summary').click();
     await page.locator('[data-desk-panel="scenes"]').click();
     await page.getByRole('button',{name:'Show',exact:true}).first().waitFor();
     await page.waitForTimeout(650);
@@ -342,17 +354,18 @@ async function main() {
     await page.locator('#deskPanelClose').click();staleCoordination=false;
 
     // Preserve focused controls on SSE updates and block repeated pending actions.
-    await page.getByRole('button', { name: 'Save clip', exact: true }).focus();
+    await page.getByRole('button', { name: 'Replay last 15s', exact: true }).focus();
     await page.evaluate(p => window.emitStatus(p), projects);
-    assert.equal(await page.evaluate(() => document.activeElement?.textContent.trim()), 'Save clip');
-    await page.getByRole('button', { name: 'Save clip', exact: true }).click();
-    assert.equal(await page.locator('[data-action="save"]').getAttribute('aria-busy'), 'true');
-    assert(await page.locator('[data-action="save"]').isDisabled());
-    await page.waitForFunction(() => !document.querySelector('[data-action="save"]').disabled);
-    assert.equal(requests.filter(r => r.path.endsWith('/instant_replay/save')).length, 1);
-    await page.getByRole('button', { name: 'Gameplay', exact: true }).click();
+    assert.equal(await page.evaluate(() => document.activeElement?.textContent.trim()), 'Replay last 15s');
+    await page.getByRole('button', { name: 'Replay last 15s', exact: true }).click();
+    assert.equal(await page.locator('[data-action="quick_replay"]').getAttribute('aria-busy'), 'true');
+    assert(await page.locator('[data-action="quick_replay"]').isDisabled());
+    await page.waitForFunction(() => !document.querySelector('[data-action="quick_replay"]').disabled);
+    assert.equal(requests.filter(r => r.path.endsWith('/instant_replay/quick_replay')).length, 1);
+    await chooseStage('game');
+    await page.getByRole('button', { name: 'Show game', exact: true }).click();
     await page.waitForFunction(() => !document.querySelector('#gameAction').disabled);
-    assert.deepEqual(requests.at(-1), { path: '/api/projects/scene_voice_switcher/switch_scene', body: { scene: 'Test' } });
+    assert.deepEqual(requests.at(-1), { path: '/api/projects/scene_voice_switcher/select_stage', body: { stage: 'game', source: null } });
     failAction = true;
     await page.getByRole('button', { name: 'Replay latest', exact: true }).click();
     await page.getByText('Fixture rejected action', { exact: true }).waitFor();
@@ -368,14 +381,17 @@ async function main() {
     await page.getByRole('searchbox', { name: 'Search controls' }).press('Enter');
     assert.equal(new URL(page.url()).hash, '#projects/instant_replay');
     await page.locator('a[data-page="library"]').click();
-    assert.equal(await page.locator('.library-tile').count(), 17);
-    await page.getByRole('searchbox', { name: 'Search library' }).fill('music');
-    assert.equal(await page.locator('.library-tile').count(), 1);
-    await page.getByRole('searchbox', { name: 'Search library' }).fill('<img src=x onerror=alert(1)>');
+    assert.equal(await page.locator('.guide-area').count(), 6);
+    assert.equal(await page.locator('.library-tile').count(), 0,'The default discovery view must not be a long tool list');
+    await page.getByRole('searchbox', { name: 'Search your stream' }).fill('music');
+    assert(await page.locator('.library-tile').count()>0);
+    await page.getByRole('searchbox', { name: 'Search your stream' }).fill('<img src=x onerror=alert(1)>');
     assert.equal(await page.locator('.library-tile').count(), 0);
-    await page.getByRole('searchbox', { name: 'Search library' }).fill('');
-    await page.getByRole('button', { name: 'On screen', exact: true }).click();
-    assert.equal(await page.locator('.library-group h2').innerText(), 'On screen');
+    await page.getByRole('searchbox', { name: 'Search your stream' }).fill('');
+    await page.locator('.guide-area[href*="area=spaces"]').click();
+    await page.locator('.guide-idea').first().waitFor();
+    assert.equal(await page.locator('.guide-idea').count(),6);
+    assert.match(await page.locator('.guide-header h1').innerText(),/atmosphere/);
     await page.screenshot({ path: path.join(output, 'fixture-library.png'), animations: 'disabled' });
 
     // No hidden profile editor fetch until requested. A late response cannot
@@ -468,11 +484,12 @@ async function main() {
     // Dashboard subscriptions and polling end on navigation; stale scene results
     // cannot write into a different page. Offline controls become unavailable.
     await page.locator('a[data-page="dashboard"]').click();
-    await page.getByRole('button', { name: 'Save clip', exact: true }).waitFor();
+    await chooseStage('game');
+    await page.getByRole('button', { name: 'Replay last 15s', exact: true }).waitFor();
     await page.evaluate(() => window.fixtureSources.at(-1).onerror());
-    assert(await page.getByRole('button', { name: 'Save clip', exact: true }).isDisabled());
+    assert(await page.getByRole('button', { name: 'Replay last 15s', exact: true }).isDisabled());
     await page.evaluate(() => window.fixtureSources.at(-1).onopen());
-    await page.waitForFunction(() => !document.querySelector('[data-action="save"]').disabled);
+    await page.waitForFunction(() => !document.querySelector('[data-action="quick_replay"]').disabled);
     staleCoordination = true;
     await page.locator('a[data-page="library"]').click();
     await page.locator('.skip-link').focus();
@@ -490,10 +507,12 @@ async function main() {
       await page.getByRole('heading', { name: 'Live desk', exact: true }).waitFor();
       const overflow = await page.locator('#page').evaluate(el => el.scrollWidth > el.clientWidth + 1);
       assert.equal(overflow, false, `Desk must fit ${width}px`);
+      if (!await page.locator('.desk-extras').evaluate(el=>el.open)) await page.locator('.desk-extras > summary').click();
+      await chooseStage('game');
       if (width === 390) {
         largeCatalog=true;
         await page.setViewportSize({width:390,height:640});
-        await page.locator('.desk-launch[data-desk-panel="sounds"]').click();
+        await page.locator('#deskSection-game [data-desk-panel="sounds"]').click();
         await page.locator('.desk-choice strong').filter({hasText:'Hooray'}).waitFor();
         assert.equal(await page.locator('.desk-dialog').evaluate(el=>el.scrollWidth>el.clientWidth+1),false);
         const searchTop=await page.locator('#deskPanelSearch').evaluate(el=>el.getBoundingClientRect().top);

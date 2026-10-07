@@ -10,9 +10,11 @@ import { recordList, recordKey, traceDetails, time } from '../workflow/timeline.
 
 let active=null, generation=0;
 export function unmount(){generation++;if(active){active.abort.abort();clearTimeout(active.timer);clearTimeout(active.searchTimer);active.graph?.dispose();active.map?.dispose();active.resize?.disconnect();active=null;}}
-export async function mount(container){
+export async function mount(container,params=new URLSearchParams()){
   unmount();const run=generation;
   const view={container,abort:new AbortController(),mode:'explore',path:[],selection:null,catalog:null,live:null,records:[],next:null,frozen:false,filter:'',historyQuery:'',period:3600,historyRequest:0,resource:'all',example:'now',areaConnections:false,scopes:new Map()};active=view;
+  if(entry(params.get('area')))view.path=pathTo(params.get('area'));
+  if(['live','history'].includes(params.get('mode')))view.mode=params.get('mode');
   container.innerHTML=`<section class="wf-page">
     <header class="wf-heading"><div><p class="wf-eyebrow">Understand your stream</p><h1>Stream map</h1></div><span class="wf-sync" role="status">Loading map…</span><div class="wf-review" hidden></div></header>
     <div class="wf-modebar"><div class="wf-modes" role="tablist" aria-label="Workflow view"><button role="tab" aria-selected="true" data-mode="explore">${icon('library')}Map</button><button role="tab" aria-selected="false" data-mode="live">${icon('play')}Live</button><button role="tab" aria-selected="false" data-mode="history">${icon('replay')}History</button></div><div class="wf-map-search"><label class="wf-search">${icon('search')}<input type="search" placeholder="Find something in your stream…" aria-label="Search stream map"></label><div class="wf-search-results" hidden></div></div><button class="btn btn-quiet wf-freeze" data-freeze hidden>Freeze view</button><span class="wf-recording"></span></div>
@@ -61,7 +63,7 @@ export async function mount(container){
   $('.wf-period').addEventListener('change',e=>{view.period=Number(e.target.value);loadHistory(view);},options);
   $('.wf-history-search').addEventListener('input',e=>{view.historyQuery=e.target.value;clearTimeout(view.searchTimer);view.searchTimer=setTimeout(()=>loadHistory(view),300);},options);
   container.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('.wf-inspector').hidden){e.preventDefault();closeDetails(view);}$('.wf-search-results').hidden=true;}},options);
-  try {const [catalog,live]=await Promise.all([api.getWorkflowMap(),api.getWorkflowLive()]);if(run!==generation)return;view.catalog=enrich(catalog);view.live=live;view.revision=catalog.revision;renderMode(view);renderStatus(view);}
+  try {const [catalog,live]=await Promise.all([api.getWorkflowMap(),api.getWorkflowLive()]);if(run!==generation)return;view.catalog=enrich(catalog);view.live=live;view.revision=catalog.revision;const flow=view.catalog.flows.find(f=>f.id===params.get('flow'));if(flow){view.path=pathForFlow(view.catalog,flow);view.selection={flow:flow.id};}renderMode(view);renderStatus(view);if(view.mode==='history')await loadHistory(view);}
   catch(error){if(active===view){$('.wf-sync').textContent='Map unavailable';$('.wf-map-canvas').innerHTML=`<div class="wf-empty">${esc(error.message)}. Refresh the page to retry.</div>`;}}
   if(active===view)view.timer=setTimeout(()=>poll(view),2000);
 }

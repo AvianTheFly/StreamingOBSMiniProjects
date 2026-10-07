@@ -45,7 +45,15 @@ def repair_overlay(service, existing_only=False):
 def recover_overlay(service):
     retry_seconds = 30
     last_attempt = -float('inf')
+    draft_recovered = False
     while not service.parent_stop.is_set() and not service.stop_event.is_set():
+        if not draft_recovered:
+            try:
+                from ..champ_select_obs import recover_browser
+                recover_browser(obs.get_obs())
+                draft_recovered = True
+            except Exception:
+                pass  # Retry on this existing bounded worker while OBS is unavailable.
         now = time.monotonic()
         if now-service.last_overlay <= 12:
             retry_seconds = 30

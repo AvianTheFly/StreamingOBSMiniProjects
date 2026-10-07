@@ -9,6 +9,9 @@ import { mountDeskControls } from './desk-controls.js';
 import { deskView } from './desk-view.js';
 import { mountDeskPlayback } from './desk-playback.js';
 import { mountDeskAudio } from './desk-audio.js';
+import { updateDeskStatus } from './desk-status.js';
+import { mountDeskSession } from './desk-session.js';
+import { mountDeskSections } from './desk-sections.js';
 
 let _dispose = null;
 let _events = [];
@@ -21,16 +24,22 @@ export function mount(container) {
   let stopChecks = null;
   let sceneKnown = false;
   let gameScene = null;
+  let lobbies = [];
+  let lobbyData = null;
+  let lobbyReadAt = 0;
+  let replayStage = null;
+  let captureRequest = false;
   let voice = null;
   const disposers = [];
   container.innerHTML = deskView();
-  const lobbyBtn = container.querySelector('#lobbyAction');
+  const sections = mountDeskSections(container, refreshAfterAction, stage=>{setMode(stage==='game'?'game':'produce');refreshVoice();});
   const gameBtn = container.querySelector('#gameAction');
   const diagnostics = container.querySelector('.desk-diagnostics');
   let coordination = null;
   const controls = mountDeskControls(container, refreshAfterAction, () => coordination?.pauses || {});
   const playback = mountDeskPlayback(container.querySelector('#activeFeatures'), refreshAfterAction);
   const audio = mountDeskAudio(container.querySelector('#deskAudioChannels'), container.querySelector('#deskAudioFeedback'));
+  const session = mountDeskSession(container, refreshAfterAction);
   function setMode(mode) {
     workspaceMode = mode;
     container.dataset.deskMode = mode;
@@ -56,6 +65,18 @@ export function mount(container) {
       const p = projects.find(p => p.name === btn.dataset.project);
       const action = btn.dataset.action;
       let available = connected && !!p?.actions?.some(a => a.key === action);
+      if (btn.dataset.project === 'starting_soon') available &&= sceneKnown;
+      if (btn.dataset.project === 'instant_replay') {
+        available &&= sceneKnown;
+        if (['save', 'quick_replay', 'play_replay'].includes(action)) {
+          available &&= !captureRequest && !!replayStage && !p?.is_active && !replayStage.active && !replayStage.pending && !['saving', 'queued', 'trimming'].includes(replayStage.capture?.status);
+          if (action !== 'play_replay') available &&= coordination?.replay_buffer?.active === true;
+        }
+        if (action === 'revert') {
+          btn.hidden = !(connected && (p?.is_active || replayStage?.active));
+          available &&= !btn.hidden;
+        }
+      }
       const ownsVoice = voice?.owner === btn.dataset.project;
       if (['stop_listen', 'abort_listen'].includes(action)) {
         btn.hidden = !ownsVoice || !(voice?.recording || voice?.transcribing);
@@ -66,21 +87,22 @@ export function mount(container) {
       if (!btn.hasAttribute('aria-busy')) btn.disabled = !available;
       btn.title = available ? (p.actions.find(a => a.key === btn.dataset.action)?.description || '') : 'This feature is not available right now';
     });
-    const sceneFeature = !!projects.find(p => p.name === 'scene_voice_switcher');
-    lobbyBtn.disabled = !connected || !sceneKnown || !sceneFeature || lobbyBtn.hasAttribute('aria-busy');
-    gameBtn.disabled = !connected || !sceneKnown || !gameScene || !sceneFeature || gameBtn.hasAttribute('aria-busy');
-    lobbyBtn.dataset.available = String(connected && sceneKnown && sceneFeature);
-    gameBtn.dataset.available = String(connected && sceneKnown && !!gameScene && sceneFeature);
     const stopBtn = container.querySelector('#stopAudioAction');
     stopBtn.dataset.available = String(connected && projects.some(p => p.is_active && p.produces_audio));
     stopBtn.hidden = !projects.some(p => p.is_active && p.produces_audio);
     if (!stopBtn.hasAttribute('aria-busy')) stopBtn.disabled = stopBtn.dataset.available === 'false';
 
     const active = projects.filter(p => p.is_active);
+    container.querySelector('.desk-now').hidden = active.length === 0;
     container.querySelector('#activeCount').textContent = connected ? active.length : '—';
     container.querySelector('#loadedCount').textContent = connected ? `${projects.length} features loaded` : 'Hub disconnected · controls will return when connected';
     playback.update(projects, connected, coordination?.pauses);
     controls.update();
+    const replay = projects.find(p => p.name === 'instant_replay');
+    const sceneFeature = projects.find(p => p.name === 'scene_voice_switcher');
+    updateDeskStatus(container, { connected, scenes: sceneKnown ? coordination?.scenes : null, gameScene, lobbies, replay, replayStage, captureRequest, session: sceneFeature?.workflow?.session, currentLobby: lobbies.includes(coordination?.scenes?.scene) ? coordination.scenes.scene : lobbyData?.program_scene === coordination?.scenes?.scene ? lobbyData?.current_lobby : null });
+    session.update({ connected, sceneKnown, coordination, projects, lobbyData });
+    sections.update({ connected, sceneKnown, coordination, projects, lobbyData });
     if (!connected) {
       sceneKnown = false;
       container.querySelector('#obsIndicator').textContent = 'Hub disconnected';
@@ -94,15 +116,19 @@ export function mount(container) {
   // Subscribe before any async work, and never replace focused control DOM on status updates.
   disposers.push(state.watch('projects', update), state.watch('connected', update));
   container.querySelectorAll('[data-project][data-action]').forEach(btn => btn.addEventListener('click', async () => {
+    if (btn.disabled) return;
     const action = btn.dataset.action;
-    const messages = { save: 'Saving your replay clip', play_replay: 'Playing the latest replay', random: 'Playing a sound', revert: 'Hub music stopped', start: 'Starting soon opened', finish: 'Waiting room finished' };
-    await runWithFeedback(btn, () => api.runProjectAction(btn.dataset.project, action), messages[action] || 'Control applied');
+    const messages = { quick_replay: 'Replay requested', play_replay: 'Latest replay requested', random: 'Playing a sound', revert: 'Returning to live', start: 'Starting soon selected', finish: 'Waiting room finished' };
+    const capturing = btn.dataset.project === 'instant_replay' && ['save', 'quick_replay'].includes(action);
+    const request = runWithFeedback(btn, () => api.runProjectAction(btn.dataset.project, action), messages[action] || 'Control applied');
+    if (capturing) { captureRequest = true; update(); }
+    await request;
+    if (capturing) captureRequest = false;
+    if (disposed) return;
     update(); refreshAfterAction();
     if(action.includes('listen'))refreshVoice();
   }));
   container.querySelectorAll('[data-hub-action]').forEach(btn=>btn.addEventListener('click',async()=>{await runWithFeedback(btn,()=>api.runHubAction(btn.dataset.hubAction),'Desktop visibility requested');refreshAfterAction();}));
-  lobbyBtn.addEventListener('click', async () => { await runWithFeedback(lobbyBtn, () => api.selectLobby(), r => `Showing ${r.lobby || 'a lobby'}`); refreshScene(); });
-  gameBtn.addEventListener('click', async () => { await runWithFeedback(gameBtn, () => api.switchScene(gameScene), 'Gameplay scene selected'); refreshScene(); });
   container.querySelector('#stopAudioAction').addEventListener('click', async e => {await runWithFeedback(e.currentTarget, () => api.runHubAction('abort_all_audio'), 'Stop Hub audio requested');refreshAfterAction();});
   diagnostics.addEventListener('toggle', () => {
     if (diagnostics.open && !stopChecks) { stopChecks = watchTwitchSettings(container.querySelector('#twitchStartupCheck')); renderEvents(container); }
@@ -113,6 +139,7 @@ export function mount(container) {
   let statusInFlight = false;
   async function refreshAfterAction() {
     if(disposed)return;
+    lobbyReadAt = 0;
     refreshScene();
     if(statusInFlight)return;
     statusInFlight=true;
@@ -125,21 +152,34 @@ export function mount(container) {
     if (document.hidden) { timer = setTimeout(refreshScene, 4000); return; }
     inFlight = true;
     try {
-      const data = await api.getCoordination();
+      const [sceneResult, stageResult] = await Promise.allSettled([api.getCoordination(), api.getReplayStage()]);
       if (disposed) return;
+      if (sceneResult.status === 'rejected') throw sceneResult.reason;
+      const data = sceneResult.value;
       coordination = data;
+      // Use the feature's public capture snapshot on the existing desk poll.
+      replayStage = stageResult.status === 'fulfilled' && typeof stageResult.value?.active === 'boolean' ? stageResult.value : null;
       const streamActive = data.stream?.active;
       container.querySelector('#streamState').textContent = streamActive === true ? 'Live · OBS' : streamActive === false ? 'Not streaming' : 'Stream status unavailable';
       container.querySelector('#streamState').classList.toggle('is-live', streamActive === true);
       sceneKnown = data.scenes?.observing === true;
+      const activeLobby = state.get('projects').find(p=>p.name==='scene_voice_switcher')?.current_activity?.replace(/^showing:\s*/, '');
+      if (sceneKnown && (!lobbyData || lobbyData.program_scene !== data.scenes.scene || (activeLobby && activeLobby !== lobbyData.current_lobby) || Date.now() - lobbyReadAt > 30000)) {
+        lobbyReadAt = Date.now();
+        try {
+          const inventory = await api.getLobbies();
+          if (disposed) return;
+          lobbyData = inventory; gameScene = inventory.game_scene || null; lobbies = inventory.lobbies || [];
+        } catch { /* Retry on the existing desk poll after OBS connects. */ }
+      }
       container.querySelector('#currentScene').textContent = data.scenes?.scene || 'No scene reported';
       container.querySelector('#obsIndicator').textContent = sceneKnown ? 'OBS connected' : 'OBS unavailable';
       container.querySelector('#obsIndicator').classList.toggle('is-connected', sceneKnown);
-      container.querySelector('#sceneCaption').textContent = sceneKnown ? (data.scenes.temporary_owner ? 'Temporary presentation in OBS' : '') : 'Last observed scene · check the OBS connection';
+      container.querySelector('#sceneCaption').textContent = sceneKnown ? `OBS scene: ${data.scenes.scene || 'unreported'}` : 'Last observed scene · check the OBS connection';
       container.querySelector('#desktopState').textContent = data.display?.visible === true ? 'Desktop visible' : data.display?.visible === false ? 'Desktop hidden' : 'Desktop status unavailable';
       container.querySelectorAll('[data-hub-action]').forEach(btn=>btn.setAttribute('aria-pressed',String(sceneKnown && data.display?.visible === (btn.dataset.hubAction === 'show_screen'))));
       gameBtn.setAttribute('aria-pressed',String(sceneKnown && data.scenes?.scene === gameScene));
-      if(data.scenes?.temporary_owner)container.querySelector('#sceneCaption').textContent=`${feature(data.scenes.temporary_owner).label} owns this presentation`;
+      if(data.scenes?.temporary_owner)container.querySelector('#sceneCaption').textContent=`${feature(data.scenes.temporary_owner).label} · OBS scene: ${data.scenes.scene || 'unreported'}`;
     } catch {
       if (!disposed) { sceneKnown = false; container.querySelector('#obsIndicator').textContent = 'OBS status unavailable'; container.querySelector('#obsIndicator').classList.remove('is-connected');container.querySelector('#streamState').textContent='Stream status unavailable';container.querySelector('#streamState').classList.remove('is-live');container.querySelector('#desktopState').textContent='Desktop status unavailable'; }
     } finally {
@@ -161,10 +201,9 @@ export function mount(container) {
     if(!disposed)voiceTimer=setTimeout(refreshVoice,4000);
   }
   refreshVoice();
-  api.getLobbies().then(data => { if (!disposed) { gameScene = data.game_scene || null; update(); } }).catch(() => {});
   update();
   refreshScene();
-  _dispose = () => { disposed = true; clearTimeout(timer);clearTimeout(voiceTimer); controls.dispose();playback.dispose();audio.dispose(); disposers.forEach(fn => fn()); stopChecks?.(); };
+  _dispose = () => { disposed = true; clearTimeout(timer);clearTimeout(voiceTimer); controls.dispose();playback.dispose();audio.dispose();session.dispose();sections.dispose(); disposers.forEach(fn => fn()); stopChecks?.(); };
 }
 export function unmount() { _dispose?.(); _dispose = null; }
 

@@ -1,0 +1,11 @@
+{
+  "id": "new-32-ram-alternate",
+  "title": "The alternate ram stride",
+  "file": "images/new-32-ram-alternate.png",
+  "prompt": "Use case: illustration-story. Asset: one full-screen landscape 16:9 cinematic frame for a gritty fantasy story slideshow, not a collage or storyboard. Match supplied reference illustration's intensely detailed mature fantasy realism, nocturnal blue moonlight / amber lanterns, weathered basalt and bronze, cinematic light and depth. One Udyr-like muscular weathered shaman with long black hair, beard, dark tattoos, bare chest, ragged brown wolf-fur mantle, wrapped forearms, leather trousers and boots. Spirits are energy envelopes attached to the SAME human body, not independent pets. No other people, villain, text, watermark, UI, panels or cute cartoon. Keep existing identity and persistent damage. Each frame must show the requested intermediate action clearly, not skip to its result.\nInput images: Image 1: adjacent story/world continuity reference.\nSpecific next story moment: EDIT TARGET Image 1: keep the same FIRST PERSON camera and character identity, same gold ram horns and ruined rune chamber, but advance one distinct running stride. CHANGE BOTH FOREARM POSES: LEFT arm now bent sharply downward with palm firmly PLANTED on floor at bottom LEFT; RIGHT arm reaching forward toward wall with lifted palm at mid RIGHT. Completely reverse which hand is lifted versus planted compared to reference. Do not keep both original arm positions. Move viewpoint one body length closer to wall, blue orb now bigger. Clear alternating all-fours gait, gold spectral hooves around palms. Keep wall UNBROKEN ahead, no impact cracks yet, no third person view or head/hair visible.",
+  "references": [
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-14-ram-push.png"
+  ],
+  "original": "C:\\Users\\Michael\\.codex\\generated_images\\01a104b1-c082-7921-a920-617bfec4e788\\exec-eef8e6c6-252b-4142-a589-82b6ba952f2b.png",
+  "generation_mode": "built-in image_gen"
+}

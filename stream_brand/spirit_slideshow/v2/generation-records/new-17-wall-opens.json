@@ -1,0 +1,11 @@
+{
+  "id": "new-17-wall-opens",
+  "title": "Stone bursts outward",
+  "file": "images/new-17-wall-opens.png",
+  "prompt": "Use case: illustration-story. Asset: one full-screen landscape 16:9 cinematic frame for a gritty fantasy story slideshow, not a collage or storyboard. Match supplied reference illustration's intensely detailed mature fantasy realism, nocturnal blue moonlight / amber lanterns, weathered basalt and bronze, cinematic light and depth. One Udyr-like muscular weathered shaman with long black hair, beard, dark tattoos, bare chest, ragged brown wolf-fur mantle, wrapped forearms, leather trousers and boots. Spirits are energy envelopes attached to the SAME human body, not independent pets. No other people, villain, text, watermark, UI, panels or cute cartoon. Keep existing identity and persistent damage. Each frame must show the requested intermediate action clearly, not skip to its result.\nInput images: Image 1: original character/environment/style reference.\nSpecific next story moment: Next instant AFTER impact. SAME FIRST PERSON camera and gold forearms/horns, broken bear-left ram-right arch fragments at edges, blue orb fractures above. Wall explodes OUTWARD away from hero revealing moonlit STONE BRIDGE surface continuing in front, NOT open void at doorway. Aged narrow bridge arches outward over chasm, damaged parapets, a large missing section several meters ahead. Rocks from wall bounce onto bridge. Preserve gold ram aura still active.",
+  "references": [
+    "C:/StreamingMedia/ChannelPresentation/2026-10-03/spirit-slideshow-v1/images/25-ram-contact.png"
+  ],
+  "original": "C:\\Users\\Michael\\.codex\\generated_images\\01a104b1-c082-7921-a920-617bfec4e788\\exec-89d10f9c-8b64-416a-ab9d-60f70c9f1b94.png",
+  "generation_mode": "built-in image_gen"
+}

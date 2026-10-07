@@ -1,0 +1,39 @@
+RESEARCH BEHIND THE CALMER EDIT
+
+Adobe - What is continuity editing in film?
+https://www.adobe.com/creativecloud/video/hub/ideas/what-is-continuity-editing-in-film.html
+Continuity establishes time and space. Screen direction, match on action and eye
+trace help viewers follow events across cuts. Applied here: reduce independent
+pose substitutions; preserve the ram POV until the fall; allow more time to read
+each location and action. The 1.2-second minimum is an authored choice, not an
+industry rule or a scientifically established comfort threshold.
+
+Adobe - Sequence shots
+https://www.adobe.com/creativecloud/video/production/cinematography/camera-shots-and-angles/sequence-shot.html
+Maintaining consistent spatial relationships avoids confusing layout jumps.
+Applied here: remove charge overhead and reverse fall POV inserts; keep the
+bridge footfall and failure before the exterior fall.
+
+Adobe - Over-the-shoulder shot
+https://www.adobe.com/creativecloud/video/production/cinematography/camera-shots-and-angles/over-the-shoulder-shot.html
+Eyelines and consistent lighting help adjacent shots read as one scene.
+Applied here: avoid rapid repeated switches among rear, frontal, side and POV
+views; use a restrained consistent video grade rather than alternating glare.
+
+W3C - Understanding SC 2.3.3: Animation from Interactions
+https://www.w3.org/WAI/WCAG21/Understanding/animation-from-interactions
+Unnecessary motion and parallax can produce discomfort for some viewers.
+Applied here: no added moving crops, shakes, spins or zoom pulses; preview does
+not autoplay. This criterion concerns web interactions. It is design guidance
+here, not a formal compliance claim for this movie.
+
+W3C - Multimedia and Animations designer curriculum
+https://www.w3.org/WAI/curricula/designer-modules/multimedia-and-animations/
+Avoid unnecessary flashing. Applied here: remove abrupt micro-shot switching,
+use short opacity transitions and reduce video highlights. Pixel-change numbers
+are descriptive comparisons, not a formal photosensitive-flash assessment.
+
+The transition method is an artistic choice. Short dissolves ease abrupt changes
+between independently generated paintings but cannot create physically exact
+continuous character animation. Actual transition strips must be inspected for
+ghosted outlines and confusing overlaps before delivery.

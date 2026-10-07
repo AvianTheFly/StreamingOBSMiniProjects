@@ -25,6 +25,7 @@ from .routes.league_stats import LeagueStatsRoutes
 from .routes.workflow_map import WorkflowMapRoutes
 from .routes.mood_cues import MoodCueRoutes
 from .routes.spirit_lobby import SpiritLobbyRoutes
+from .routes.effects_gallery import EffectsGalleryRoutes
 
 _APP_DIR = Path(__file__).resolve().parent / "app"
 
@@ -33,7 +34,7 @@ class InvalidRequestBody(ValueError):
     pass
 
 
-class _Handler(AudioRoutes, ProfileRoutes, ProjectRoutes, ControlRoutes, TransitionRoutes, ChatRoutes, TwitchCommandRoutes, StartingSoonRoutes, LeagueStatsRoutes, WorkflowMapRoutes, MoodCueRoutes, SpiritLobbyRoutes, http.server.BaseHTTPRequestHandler):
+class _Handler(AudioRoutes, ProfileRoutes, ProjectRoutes, ControlRoutes, TransitionRoutes, ChatRoutes, TwitchCommandRoutes, StartingSoonRoutes, LeagueStatsRoutes, WorkflowMapRoutes, MoodCueRoutes, SpiritLobbyRoutes, EffectsGalleryRoutes, http.server.BaseHTTPRequestHandler):
 
     def log_message(self, fmt, *args):  # suppress default request logs
         pass
@@ -76,6 +77,8 @@ class _Handler(AudioRoutes, ProfileRoutes, ProjectRoutes, ControlRoutes, Transit
 
     def do_GET(self):
         path = urllib.parse.urlparse(self.path).path.rstrip("/") or "/"
+        if path == '/api/effects-gallery' or path.startswith('/effects/art/') or path.startswith('/effects/audio/'):
+            return self._get_effects_gallery(path)
         if path == '/api/spirit-lobby' or path.startswith('/api/spirit-lobby/'):
             return self._get_spirit_lobby(path)
         if path == '/api/mood-cues' or path.startswith('/api/mood-cues/audio/'):

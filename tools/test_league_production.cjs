@@ -232,7 +232,9 @@ async function endpoint() {
     });
     assert.equal(deathCheck.entrance.filled,0,'Death enters smoothly from clear');
     assert(deathCheck.visible.filled>500&&deathCheck.sustained.filled>500,'Stasis persists through a real death');
-    assert(deathCheck.visible.max<=205);assert(deathCheck.visible.max>170);assert.equal(deathCheck.center,false);assert.equal(deathCheck.ended.filled,0);
+    // Translucent wisps replace solid foreground props; retain readable status
+    // and the saved opacity ceiling without requiring an opaque character.
+    assert(deathCheck.visible.max<=205);assert(deathCheck.visible.max>100);assert.equal(deathCheck.center,false);assert.equal(deathCheck.ended.filled,0);
 
     const timing = await page.evaluate(() => {
       const start = performance.now();

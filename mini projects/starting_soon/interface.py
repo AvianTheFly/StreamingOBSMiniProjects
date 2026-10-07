@@ -22,8 +22,17 @@ class StartingSoonInterface(ProjectInterface):
     def revert(self):
         self.run_action('finish')
 
+    def workflow_state(self):
+        data = _service.snapshot() if _service else {}
+        images = data.get('artwork', [])
+        index = data.get('artwork_index', 0)
+        return {'opening': bool(data.get('opening')), 'active': bool(data.get('active')),
+                'artwork_file': images[index % len(images)] if images else None,
+                'error': data.get('error', '')}
+
     def action_catalog(self):
-        return [dict(key=k, label=v) for k, v in [('start', 'Open Starting Soon'),
+        return [dict(key=k, label=v) for k, v in [('intro', 'Play opening'), ('skip-intro', 'Skip to lobby'),
+            ('start', 'Open Starting Soon'),
             ('finish', 'Finish Starting Soon'), ('play', 'Play Selected Clips'), ('stop', 'Stop Clips'),
             ('skip', 'Next Clip'), ('pause','Pause Clips'), ('resume','Resume Clips'),
             ('next-art', 'Next Background'), ('install', 'Install OBS Scene'),

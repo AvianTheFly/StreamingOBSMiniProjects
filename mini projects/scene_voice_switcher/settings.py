@@ -24,10 +24,37 @@ def location(name, data=None):
 
 def rotation(names, data=None):
     data = read() if data is None else data
+    choice = selection(data)
+    if choice['mode'] == 'fixed':
+        if choice['source'] not in names:
+            raise ValueError('Selected lobby is not installed: ' + choice['source'])
+        return [choice['source']]
     chosen = [n for n in names if data.get('locations',{}).get(n,{}).get('rotation',DEFAULT_ROTATION.get(n,True))]
     if not chosen:
         raise ValueError('Keep at least one location in lobby rotation')
     return chosen
+
+
+def selection(data=None):
+    data = read() if data is None else data
+    value = data.get('selection', {'mode': 'shuffle', 'source': None})
+    if (not isinstance(value, dict) or value.get('mode') not in {'shuffle', 'fixed'}
+            or (value.get('mode') == 'fixed' and not isinstance(value.get('source'), str))):
+        raise ValueError('Preserve malformed lobby selection preferences')
+    return dict(value)
+
+
+def save_selection(mode, source, names, *, path=None):
+    if mode not in {'shuffle', 'fixed'} or (mode == 'fixed' and source not in names):
+        raise ValueError('Choose a rotation or an installed lobby')
+    def update(data):
+        if not isinstance(data, dict) or not isinstance(data.get('locations', {}), dict):
+            raise ValueError('Preserve malformed lobby preferences')
+        prior = selection(data)
+        result = {**data, 'selection': {**prior, 'mode': mode, 'source': source if mode == 'fixed' else None}}
+        rotation(names, result)
+        return result
+    return update_json(path or PATH, update, default={})
 
 def validate_rect(rect):
     if not isinstance(rect,(list,tuple)) or len(rect)!=4 or any(

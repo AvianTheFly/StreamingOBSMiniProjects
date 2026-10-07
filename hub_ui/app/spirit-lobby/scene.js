@@ -10,6 +10,13 @@ import {Penguin} from './penguin.js';
 import {ScreenContent} from './screen-content.js';
 import {ActionLink} from './action-link.js';
 import {PartyDirector} from './party-director.js';
+import {drawDisplayFrame} from '../lobby-motion/shared/display-frame.js';
+
+let holes=[[60,180,896,504],[1000,378,444,420],[1460,480,360,225]];
+try{
+ const saved=JSON.parse(new URLSearchParams(location.search).get('holes'));
+ if(Array.isArray(saved)&&saved.length===3&&saved.every(r=>Array.isArray(r)&&r.length===4&&r.every(Number.isFinite)&&r[0]>=0&&r[1]>=0&&r[2]>=32&&r[3]>=32&&r[0]+r[2]<=W&&r[1]+r[3]<=H))holes=saved;
+}catch{/* Retain the authored layout when the URL has no complete placement. */}
 
 const canvas=document.querySelector('#stage'),c=canvas.getContext('2d',{alpha:true});
 let config=readConfig(),frame=0,last=0,time=config.at,ready=false,disposed=false;
@@ -41,12 +48,18 @@ function draw(){
   }
   if(config.layer!=='background'){
     if(config.cameraGuide&&config.layer==='full'){
-      c.save();c.strokeStyle='#b7fff1aa';c.lineWidth=2;c.setLineDash([8,8]);c.strokeRect(738,378,444,325);c.setLineDash([]);
-      c.fillStyle='#b7fff1';c.font='18px Segoe UI';c.textAlign='center';c.fillText('YOUR LIVE FACE CAM',960,520);c.restore();
+      const [x,y,w,h]=holes[1];c.save();c.strokeStyle='#b7fff1aa';c.lineWidth=2;c.setLineDash([8,8]);c.strokeRect(x,y,w,h);c.setLineDash([]);
+      c.fillStyle='#b7fff1';c.font='18px Segoe UI';c.textAlign='center';c.fillText('YOUR LIVE FACE CAM',x+w/2,y+h/2);c.restore();
     }
     props.desk(c,time,display,colors);lights.front(c,time,config.energy,colors);
     // Accents surround the live camera without passing over the user's face.
-    c.save();c.beginPath();c.rect(0,0,W,H);c.rect(738,378,444,272);c.clip('evenodd');confetti.draw(c,time,colors);c.restore();
+    c.save();c.beginPath();c.rect(0,0,W,H);c.rect(...holes[1]);c.clip('evenodd');confetti.draw(c,time,colors);c.restore();
+  }
+  // Native layers leave every live desktop/chat pixel clear; full studio keeps
+  // the selected media programs visible inside the authored main display.
+  if(config.layer!=='full'){
+   if(config.layer==='foreground')drawDisplayFrame(c,holes[0],{accent:'#86e5de'});
+   for(const rect of config.layer==='foreground'?holes:[holes[1],holes[2]])c.clearRect(...rect);
   }
   canvas.dataset.ready='true';canvas.dataset.time=time.toFixed(3);canvas.dataset.paused=String(config.paused);
   canvas.dataset.paintMs=((Number(canvas.dataset.paintMs)||0)*.9+(performance.now()-began)*.1).toFixed(2);

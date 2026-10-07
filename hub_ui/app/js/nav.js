@@ -74,9 +74,9 @@ export function setActiveNavItem(page) {
   const crumb = document.getElementById('breadcrumbs');
   if (crumb) {
     const isFeature = page.startsWith('projects/');
-    const labels = { dashboard: 'Live desk', library: 'Library & tools', mixer: 'Audio', audio: 'Audio', rules: 'Automation rules', profiles: 'Hotkeys & profiles', voice: 'Voice & microphone', settings: 'Hub settings' };
-    const label = isFeature ? feature(page.slice(9)).label : page === 'workflows' ? 'Stream map' : labels[page] || 'Live desk';
-    crumb.innerHTML = `<a href="#${isFeature ? 'library' : 'dashboard'}">${isFeature ? 'Library & tools' : 'Workspace'}</a><span aria-hidden="true">/</span><span>${esc(label)}</span>`;
+    const labels = { dashboard: 'Live desk', library: 'Your stream', mixer: 'Audio', audio: 'Audio', rules: 'Automation rules', profiles: 'Hotkeys & profiles', voice: 'Voice & microphone', settings: 'Hub settings' };
+    const label = isFeature ? feature(page.slice(9)).label : page === 'effects' ? 'Effects gallery' : page === 'workflows' ? 'Stream map' : labels[page] || 'Live desk';
+    crumb.innerHTML = `<a href="#library">${isFeature ? 'Your stream' : 'Workspace'}</a><span aria-hidden="true">/</span><span>${esc(label)}</span>`;
     document.title = `${label} · Stream Hub`;
   }
 }

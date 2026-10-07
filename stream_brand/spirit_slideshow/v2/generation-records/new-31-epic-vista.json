@@ -1,0 +1,13 @@
+{
+  "id": "new-31-epic-vista",
+  "title": "The world opens beyond the sanctuary",
+  "file": "images/new-31-epic-vista.png",
+  "prompt": "Use case: illustration-story. Asset: one full-screen landscape 16:9 cinematic frame for a gritty fantasy story slideshow, not a collage or storyboard. Match supplied reference illustration's intensely detailed mature fantasy realism, nocturnal blue moonlight / amber lanterns, weathered basalt and bronze, cinematic light and depth. One Udyr-like muscular weathered shaman with long black hair, beard, dark tattoos, bare chest, ragged brown wolf-fur mantle, wrapped forearms, leather trousers and boots. Spirits are energy envelopes attached to the SAME human body, not independent pets. No other people, villain, text, watermark, UI, panels or cute cartoon. Keep existing identity and persistent damage. Each frame must show the requested intermediate action clearly, not skip to its result.\nInput images: Image 1: original character/environment/style reference. Image 2: adjacent story/world continuity reference. Image 3: adjacent story/world continuity reference.\nSpecific next story moment: Final majestic wide frame. SAME shaman now fully seated relaxed on same west terrace stone edge in left foreground with same amber lantern and pines, legs hanging safely. Huge breathtaking fantasy vista occupying most frame: cloud sea curling around floating ancient stone sanctuaries, thousand-foot waterfalls, towering moonlit jagged mountain ridge with subtle colossal bear/ram carved geological silhouettes, teal aurora arcs, warm distant lantern civilizations, one moon reflected in rivers far below. Rich layered detail beautiful epic gritty painterly realism, not generic scattered islands. Four spirit colors barely glimmer around hero's resting hands/mantle. No text.",
+  "references": [
+    "C:/StreamingMedia/ChannelPresentation/2026-10-03/spirit-slideshow-v1/images/34-seated-vista.png",
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-01-epic-sanctuary.png",
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-30-sit-at-edge.png"
+  ],
+  "original": "C:\\Users\\Michael\\.codex\\generated_images\\01a104b1-c082-7921-a920-617bfec4e788\\exec-b8cdb53e-9270-4be8-aba2-b0448424b95a.png",
+  "generation_mode": "built-in image_gen"
+}

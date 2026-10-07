@@ -865,19 +865,19 @@
       "kind": "text"
     },
     {
-      "command": "!pc",
+      "command": "!specs",
       "aliases": [
-        "!specs",
+        "!pc",
         "!setup",
         "!gear"
       ],
-      "response": "",
-      "category": "Needs your details or integration",
+      "response": "CPU: i9-9900K (8 cores / 16 threads) | GPU: RTX 2080 Ti (11GB) | RAM: 64GB DDR4 @ 2133 MT/s | Board: ASUS Maximus XI Hero | Socket: LGA1151 | Storage: 4 SSDs, ~4.5TB total | Monitor: 1440p / 240Hz | OS: Windows 10",
+      "category": "Hardware",
       "status": "disabled",
       "note": "Your current PC specifications.",
       "permission": "everyone",
       "cooldown": 30,
-      "enabled": false,
+      "enabled": true,
       "kind": "text"
     },
     {

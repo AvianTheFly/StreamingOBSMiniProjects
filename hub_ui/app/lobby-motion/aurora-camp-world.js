@@ -3,7 +3,7 @@ import {glow} from './shared/world-motion.js';
 import {sparks} from './forge-atmosphere.js';
 import {steam} from './sanctuary-atmosphere.js';
 import {cues,artists} from './aurora-camp-guests.js';
-export const scene={id:'aurora-camp',source:'AuroraCampLobby',holes:[[180,290,710,350],[970,330,400,355],[1570,265,237,383]],patches:[
+export const scene={id:'aurora-camp',source:'AuroraCampLobby',holes:[[60,180,896,504],[980,330,400,355],[1570,265,237,383]],patches:[
  {rect:[949,0,477,289],move:(u,v,t)=>[Math.sin(t*.3+v*4)*5*edge(u,v),Math.sin(t*.4+u*5)*3*edge(u,v)]},
  {rect:[120,3,586,181],move:(u,v,t)=>[Math.sin(t*.65+u*4)*3*edge(u,v),Math.sin(t*.75+u*3)*4*edge(u,v)]},
  {rect:[1195,690,184,158],move:(u,v,t)=>[Math.sin(t*3.6+v*5)*4*edge(u,v),Math.sin(t*4.5+u*5)*6*edge(u,v)]},

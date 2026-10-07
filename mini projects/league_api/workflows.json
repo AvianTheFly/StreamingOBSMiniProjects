@@ -17,7 +17,7 @@
         "event": "league_client.phase",
         "kind": "poll"
       },
-      "detail": "",
+      "detail": "Confirmed queue/bans phases choose the private lobby through SceneDirector. Manual Queue validates the current client phase and captured manual revision. A manual draft privacy choice persists through that draft, then clears on phase change. Streamer holds defer automatic preparation. Obsolete client intent is withdrawn on target/configuration changes and shutdown.",
       "steps": [
         {
           "id": "0",
@@ -67,9 +67,9 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "league_api": "9a19d16096177a36c6fe0ec0a1f6099c457248ebbe15b17ecf10b92416ce3240",
-        "coordination": "1bf723a6b7eb5bb30c91ed682b26757815ed275e05f71b3c9938ba24205a6910"
+        "coordination": "c4fc5a67e5e47be4bc18ef0c9359201377f1dcd8de6671d557968aab81c68b17",
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "league_api": "d4e0c9554fb2513e45b831ade69538159c3844b930d0ad61a91c130e2d8e2565"
       },
       "edges": [
         {
@@ -103,6 +103,16 @@
           "path": "mini projects/league_api/client_scenes.py",
           "symbol": "route",
           "hash": "56184da343f20faec3f1a88d210e0289a2ed6e71c7cb63bc8e97eb4cf2569785"
+        },
+        {
+          "path": "mini projects/league_api/client_scenes.py",
+          "symbol": "ClientScenes.tick",
+          "hash": "5aa2b9132a6069e72cf7f5be4b006fd140ba5cdcf92b3e079e5b7febd9c82ebd"
+        },
+        {
+          "path": "mini projects/league_api/client_scenes.py",
+          "symbol": "ClientScenes.hide_now",
+          "hash": "d929880e6085649a9b76f91a0f21b82eaf378c4238fad912f91643ab33c54bc7"
         }
       ],
       "effects": [
@@ -142,7 +152,7 @@
         "event": "league_client.phase",
         "kind": "poll"
       },
-      "detail": "",
+      "detail": "Automatic champion presentation begins after completed bans or picks/finalization. Manual Champ select requires confirmed draft data and current manual intent, then persists through the draft. Manual Queue can hide it again. The overlay uses applied draft state even with automatic routing disabled. New phases clear manual overrides and withdraw obsolete deferred requests. The existing browser-recovery worker refreshes the installed draft browser once after HTTP startup, retrying while OBS is unavailable. Draft scene activation reloads its page so an early OBS launch cannot retain a failed page. Personal filters, dimensions and camera placement are preserved.",
       "steps": [
         {
           "id": "0",
@@ -192,9 +202,9 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "league_api": "9a19d16096177a36c6fe0ec0a1f6099c457248ebbe15b17ecf10b92416ce3240",
-        "coordination": "1bf723a6b7eb5bb30c91ed682b26757815ed275e05f71b3c9938ba24205a6910"
+        "league_api": "c81b58ea97b127823d99f2f5314d32bac84bb06d3b49a49ca0e206e3de485ede",
+        "coordination": "c4fc5a67e5e47be4bc18ef0c9359201377f1dcd8de6671d557968aab81c68b17",
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c"
       },
       "edges": [
         {
@@ -228,6 +238,16 @@
           "path": "mini projects/league_api/client_scenes.py",
           "symbol": "route",
           "hash": "56184da343f20faec3f1a88d210e0289a2ed6e71c7cb63bc8e97eb4cf2569785"
+        },
+        {
+          "path": "mini projects/league_api/client_scenes.py",
+          "symbol": "ClientScenes.tick",
+          "hash": "5aa2b9132a6069e72cf7f5be4b006fd140ba5cdcf92b3e079e5b7febd9c82ebd"
+        },
+        {
+          "path": "mini projects/league_api/client_scenes.py",
+          "symbol": "ClientScenes.present_champions",
+          "hash": "8453fcc47d1671314c4e90c03abfa9a7d6a8b6a568ef9547fa1618a28c7eb643"
         }
       ],
       "effects": [
@@ -267,7 +287,7 @@
         "event": "league_client.phase",
         "kind": "poll"
       },
-      "detail": "",
+      "detail": "Confirmed idle/results phases request the configured idle view after result/replay gates release. New manual intent and streamer holds take precedence. Connection and phase are published from existing worker state; the desk adds no client poll. A client outage does not invent an idle transition.",
       "steps": [
         {
           "id": "0",
@@ -317,9 +337,9 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "league_api": "9a19d16096177a36c6fe0ec0a1f6099c457248ebbe15b17ecf10b92416ce3240",
-        "coordination": "1bf723a6b7eb5bb30c91ed682b26757815ed275e05f71b3c9938ba24205a6910"
+        "coordination": "c4fc5a67e5e47be4bc18ef0c9359201377f1dcd8de6671d557968aab81c68b17",
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "league_api": "d4e0c9554fb2513e45b831ade69538159c3844b930d0ad61a91c130e2d8e2565"
       },
       "edges": [
         {
@@ -353,6 +373,11 @@
           "path": "mini projects/league_api/client_scenes.py",
           "symbol": "route",
           "hash": "56184da343f20faec3f1a88d210e0289a2ed6e71c7cb63bc8e97eb4cf2569785"
+        },
+        {
+          "path": "mini projects/league_api/client_scenes.py",
+          "symbol": "ClientScenes.tick",
+          "hash": "5aa2b9132a6069e72cf7f5be4b006fd140ba5cdcf92b3e079e5b7febd9c82ebd"
         }
       ],
       "effects": [
@@ -443,8 +468,8 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "league_api": "9a19d16096177a36c6fe0ec0a1f6099c457248ebbe15b17ecf10b92416ce3240"
+        "league_api": "c2394527381a040799af27d860ed3a2e3a47bd1c05fd37294be0e0fb609bbc4c",
+        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f"
       },
       "edges": [
         {
@@ -542,8 +567,8 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "league_api": "9a19d16096177a36c6fe0ec0a1f6099c457248ebbe15b17ecf10b92416ce3240"
+        "league_api": "c2394527381a040799af27d860ed3a2e3a47bd1c05fd37294be0e0fb609bbc4c",
+        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f"
       },
       "edges": [
         {
@@ -641,8 +666,8 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "league_api": "9a19d16096177a36c6fe0ec0a1f6099c457248ebbe15b17ecf10b92416ce3240"
+        "league_api": "c2394527381a040799af27d860ed3a2e3a47bd1c05fd37294be0e0fb609bbc4c",
+        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f"
       },
       "edges": [
         {
@@ -690,7 +715,7 @@
         "event": "league_api:*",
         "kind": "poll"
       },
-      "detail": "The director owns objective admission and elapsed time. Event acts last two to five seconds; legacy short saved overrides are retained and bounded only in presentation. Native elemental creatures, Void casts and structural acts develop from this existing elapsed clock. Hextech capture layers one approved crystal-wing discharge over the existing ambient border without restarting or duplicating it. Open light tails leave before their next entrance; all art stays within the gameplay edge mask, with no new timer or source owner.",
+      "detail": "The director owns objective admission and elapsed time. Event acts last two to five seconds; legacy saved overrides are retained and bounded only in presentation. Every non-Hextech border now uses thin luminous trails, small particles, ripples and tiny outline jokes within narrow edge margins. Dragon ambience uses quieter continuous motion and death uses moonlit wisps; neither starts another timer. The approved Hextech capture and atmosphere remain unchanged and are never duplicated. Saved opacity applies once to the composed show. Event detection, admission, audio and personal settings retain their existing owners.",
       "steps": [
         {
           "id": "0",
@@ -740,8 +765,8 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "league_api": "9a19d16096177a36c6fe0ec0a1f6099c457248ebbe15b17ecf10b92416ce3240"
+        "league_api": "c2394527381a040799af27d860ed3a2e3a47bd1c05fd37294be0e0fb609bbc4c",
+        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f"
       },
       "edges": [
         {
@@ -839,8 +864,8 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "league_api": "9a19d16096177a36c6fe0ec0a1f6099c457248ebbe15b17ecf10b92416ce3240"
+        "league_api": "c2394527381a040799af27d860ed3a2e3a47bd1c05fd37294be0e0fb609bbc4c",
+        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f"
       },
       "edges": [
         {
@@ -938,8 +963,8 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "league_api": "9a19d16096177a36c6fe0ec0a1f6099c457248ebbe15b17ecf10b92416ce3240"
+        "league_api": "c2394527381a040799af27d860ed3a2e3a47bd1c05fd37294be0e0fb609bbc4c",
+        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f"
       },
       "edges": [
         {

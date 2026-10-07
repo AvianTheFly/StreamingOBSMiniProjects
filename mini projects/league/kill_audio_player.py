@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import Any
 
 import obs
+from lib.coordination.playback import coordinator
+from lib.shared_media.playback_worker import PlaybackWorker
 from lib.shared_media.config_overrides import load_config_overrides, audio_tracks_override
 
 
@@ -40,7 +42,8 @@ class LeagueKillAudioPlayer:
         self.source_name = f"{self.source_prefix}player"
         self._lock = threading.Lock()
         self._current_stem: str | None = None
-        self._play_generation = 0
+        self._worker = PlaybackWorker("league:kill-audio")
+        self._permission = coordinator.permission("league")
         self._ready = False
 
     @property
@@ -60,7 +63,7 @@ class LeagueKillAudioPlayer:
         )
         self.source_name = str(single or self.source_name)
         try:
-            obs.show_source(self.scene, self.source_name)
+            obs.park_media_source(self.scene, self.source_name)
         except Exception:
             pass
         self._ready = True
@@ -86,43 +89,48 @@ class LeagueKillAudioPlayer:
 
     def play_file(self, path: Path) -> None:
         path = Path(path)
+        self._worker.submit(lambda cancelled: self._play_owned(path, cancelled))
+
+    def _play_owned(self, path: Path, cancelled: threading.Event) -> None:
+        while not self._permission.wait(.05):
+            if cancelled.is_set():
+                return
+        if cancelled.is_set():
+            return
         source_name = self.ensure_ready()
         stem = path.stem
         with self._lock:
-            self._play_generation += 1
-            generation = self._play_generation
             self._current_stem = stem
-
         try:
-            obs.set_media_source_file(source_name, path)
+            obs.configure_media_source_properties(
+                source_name, restart_on_activate=False, close_when_inactive=False)
+            if cancelled.is_set():
+                return
+            changed = obs.set_media_source_file(source_name, path)
             obs.set_input_audio_monitor_type(source_name, self.monitor)
             if self.audio_tracks is not None:
                 obs.set_input_audio_tracks(source_name, self.audio_tracks)
             obs.set_input_volume_db(source_name, self._effective_volume_db(stem))
+            if cancelled.is_set():
+                return
             obs.show_source(self.scene, source_name)
-            obs.restart_media(source_name)
+            if not changed:
+                obs.restart_media(source_name)
             print(f"{self.tag} Kill audio: '{path.name}'")
+            obs.wait_for_media_end(
+                source_name, start_timeout=3.0, total_timeout=30.0,
+                cancelled=cancelled.is_set, allowed=self._permission.is_set)
         except Exception as exc:
             print(f"{self.tag} Could not play kill audio '{path.name}': {exc}")
-            with self._lock:
-                if self._play_generation == generation:
+        finally:
+            try:
+                obs.park_media_source(self.scene, source_name)
+            finally:
+                with self._lock:
                     self._current_stem = None
-            return
-
-        threading.Thread(
-            target=self._wait_for_end,
-            args=(source_name, generation),
-            daemon=True,
-            name="league-kill-audio-wait",
-        ).start()
 
     def stop(self) -> None:
-        try:
-            obs.stop_media(self.ensure_ready())
-        except Exception:
-            pass
-        with self._lock:
-            self._current_stem = None
+        self._worker.cancel()
 
     def volume_state(self) -> dict[str, Any]:
         current = self.current_stem
@@ -131,16 +139,6 @@ class LeagueKillAudioPlayer:
             "current_stem": current,
             "source_name": self.source_name if current else None,
         }
-
-    def _wait_for_end(self, source_name: str, generation: int) -> None:
-        try:
-            obs.wait_for_media_end(source_name, start_timeout=3.0, total_timeout=30.0)
-        except Exception:
-            pass
-        finally:
-            with self._lock:
-                if self._play_generation == generation:
-                    self._current_stem = None
 
     def _effective_volume_db(self, stem: str) -> float:
         state = self._read_state()

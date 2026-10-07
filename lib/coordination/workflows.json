@@ -176,7 +176,7 @@
         "event": "scene.decision",
         "kind": "event"
       },
-      "detail": "Revision and lease checks precede scene preparation. Accepted requests without a feature-specific preparation consume any published lobby layer data before the sole program-scene writer changes the destination. Explicit feature preparation, deferred intent, deliberate ownership and temporary lease semantics remain serialized. A published lobby group resolves a saved location choice to its parent only after acceptance, with explicit selection inside that transaction.",
+      "detail": "Revision, automatic-hold and lease checks precede scene preparation. Identity-scoped streamer holds block automatic preparation/writes and keep the latest deferred intent. Manual choices revoke temporary leases and clear older pending destinations. Releasing the final hold can resume only current intent; shutdown release discards it. Accepted requests consume published lobby data before the sole program-scene writer changes the destination. Published group choices resolve to their parent only after acceptance.",
       "steps": [
         {
           "id": "0",
@@ -187,7 +187,7 @@
         },
         {
           "id": "1",
-          "label": "Temporary owner still active?",
+          "label": "Temporary owner or streamer hold?",
           "owner": "coordination",
           "kind": "gate",
           "detail": ""
@@ -215,8 +215,8 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "coordination": "1bf723a6b7eb5bb30c91ed682b26757815ed275e05f71b3c9938ba24205a6910"
+        "coordination": "c4fc5a67e5e47be4bc18ef0c9359201377f1dcd8de6671d557968aab81c68b17",
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c"
       },
       "edges": [
         {
@@ -240,7 +240,12 @@
         {
           "path": "lib/coordination/scenes.py",
           "symbol": "SceneDirector.request",
-          "hash": "91efce2ee297b9bf21de59f6b7ecca1137a2572a1dcaba8f0532d00de55c6a40"
+          "hash": "be14d087dc132d0977d7111d575be3176c09beacc7fbdc098c0e05cb4e97938c"
+        },
+        {
+          "path": "lib/coordination/scenes.py",
+          "symbol": "SceneDirector.release_automatic",
+          "hash": "0c18d70868c0f478303928a543a3e3814ef05d5897f04b50d5fba53fd2363c3e"
         }
       ],
       "effects": [
@@ -248,7 +253,7 @@
           "resource": "scene",
           "intent": "Validate and apply a scene intention",
           "role": "write",
-          "protection": "SceneDirector serializes requests. A temporary reservation blocks automatic writes; a newer manual revision rejects delayed intent.",
+          "protection": "SceneDirector serializes automatic holds and temporary leases. Newer manual revisions reject delayed intent before preparation.",
           "watch": "There is no fixed priority between two fresh automatic writers. Without a lease, accepted later writes can replace earlier ones. During a lease, the director retains one latest deferred destination; client automation retries its own target."
         }
       ]

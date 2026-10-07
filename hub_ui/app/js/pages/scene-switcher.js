@@ -48,7 +48,7 @@ export async function mount(container) {
       <p style="font-size:13px;color:var(--muted)">
         Press <kbd style="background:var(--panel-3);border:1px solid var(--line);border-radius:4px;padding:2px 7px;font-family:var(--mono)">\`</kbd>
         (backtick) to open the mic, then say a lobby name or "game" / "test" to switch scenes.
-        Press <kbd style="background:var(--panel-3);border:1px solid var(--line);border-radius:4px;padding:2px 7px;font-family:var(--mono)">C</kbd> to send early.
+        Press <kbd style="background:var(--panel-3);border:1px solid var(--line);border-radius:4px;padding:2px 7px;font-family:var(--mono)">\`</kbd> again to send early.
         Say "next lobby" for another location.
       </p>
       <p style="font-size:13px;color:var(--muted)">Type <kbd>*-</kbd> to show your screen or <kbd>-*</kbd> to hide it. Test keeps its gameplay capture.</p>

@@ -49,7 +49,12 @@ class ControlRoutes:
             stream = {'active': get_stream_status()['active']}
         except Exception:
             stream = {'active': None}
-        self._json(200, {'scenes': scenes, 'display': display, 'stream': stream,
+        try:
+            from obs.outputs import get_replay_buffer_status
+            replay_buffer = get_replay_buffer_status()
+        except Exception:
+            replay_buffer = {'active': None}
+        self._json(200, {'scenes': scenes, 'display': display, 'stream': stream, 'replay_buffer': replay_buffer,
                          **coordinator.snapshot()})
 
     def _post_voice(self):

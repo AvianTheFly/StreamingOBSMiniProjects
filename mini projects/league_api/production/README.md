@@ -14,6 +14,24 @@ Hooray, soundboard trigger rules and per-asset settings are untouched.
 
 ## Auxiliary art direction
 
+The 2026-10-04 playful redesign supersedes the metallic compositions described
+below. Current delivery uses `art/playful-events.js` for 57 individually authored
+stories and the continuous ghost rest stop, `art/playful-sets.js` for contextual
+edge scenery, and stateless `lib/browser_effects/art/playful-ink.js` for native
+miniature illustration. Original artwork sources remain as history and are not
+compiled into the current event bundle. Hextech's approved crystal-wing/circuit
+performance is unchanged, including its ambient/capture composition. The build
+continues to publish through the existing native route without new resources.
+
+The new casts include a crown-stealing Baron serpent, trampoline grubs,
+elemental dragon characters, smiling heart gardens, toy demolition crews,
+minion bean parades and comforting defeat clouds. Match/death state, captions,
+saved strength, admission and precedence are unchanged. Review coverage and
+contact sheets are recorded in `output/playful-borders/verification.json` and
+`docs/PLAYFUL-BORDERS-20261004.md`. OBS remains closed during this work.
+
+### Previous collection history
+
 All 58 built-in event keys have compositions; the current collection refresh is
 tracked in `docs/BORDER-REFRESH-20261002.md`. `web/event-art.js` owns dispatch,
 captions and entrances; `art/event-scenes.js` assembles artwork owners. Native
@@ -259,8 +277,9 @@ healthy overlay heartbeats. The temporary expansion plan was removed after these
 checks. Isolated Chrome's slowest effect averaged 1.97 ms per frame on this machine;
 this is a renderer measurement, not an OBS/game FPS guarantee.
 
-The current artwork sources are `art/event-scenes.js` and `art/event-frames.js`.
-Each event family owns its silhouette, surface treatment and transition. They
+The current artwork sources are `art/event-scenes.js`, `art/playful-events.js`
+and `art/playful-sets.js`. Each event owns a light-cue recipe: motion family,
+palette, tiny outline accent, trail count and tempo. They
 compile with `tools/build_border_art.py` into the existing `web/event-relics.js`
 static route. Shared material shading and edge transparency remain in the public
 browser-effects mechanics; no event policy or source lifecycle moved.
@@ -292,3 +311,20 @@ the control input uses the same lower bound. Historical saved overrides below
 two seconds remain intact as user data and are clamped only when presented.
 Sustained dragon ambience and the actual death-to-respawn lifetime retain their
 existing owners. Soundboard borders instead follow the complete audio duration.
+
+
+## Current edge-effects direction (2026-10-04)
+
+This pass supersedes the earlier material attributes and miniature cartoon
+scenery. All 57 non-Hextech built-ins use airy light choreography: comet tails,
+braids, soda bubbles, ripples, springy glints and occasional tiny outline props.
+The 58th event, Hextech, keeps its approved rendering. Non-Hextech event titles
+are left to controls rather than drawn across the picture. Existing death status
+remains small. Dragon ambience reduces speed and density of light; the existing
+opacity control still applies once. Personal settings, event mappings, durations,
+custom rules and audio are preserved. Custom rules receive the same edge-light
+language. No soundboard artwork is included in this change.
+
+`node tools/review_league_edges.cjs` checks catalog coverage, animated alpha,
+center clearance, finite cleanup, sustained motion, light-area budgets and
+Hextech equivalence against a pre-edit fixture when supplied.

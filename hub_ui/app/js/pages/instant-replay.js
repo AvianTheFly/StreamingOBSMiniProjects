@@ -39,7 +39,7 @@ export function mount(container) {
         <div><h3>Capture</h3><p><code>mark</code> sets the start. <code>save</code> uses it or the game moment; <code>save 30</code> saves 30 seconds; <code>save full</code> keeps the whole buffer. Add a tag with <code>save win</code>. Quick replay is faster and may include a little extra lead-in.</p><div class="ir-actions">${button("irSaveBuffer", "Save highlight")}${button("irMark", "Mark start")}</div></div>
       <div><h3>Play</h3><p><code>quick replay</code> captures the last 15 seconds for replay only. <code>quick replay 30</code> changes the duration. <code>save and replay</code> saves a highlight candidate and requests a Twitch clip. <code>replay</code> plays the latest capture. <code>showcase</code> and <code>random</code> use highlight candidates.</p></div>
         <div><h3>Control</h3><p>Choose the side view above. <b>Live gameplay view</b> follows your gameplay capture. <b>Gated desktop</b> follows the shared screen visibility control. Use <b>Next clip</b> or <b>Return to live</b> during playback.</p></div>
-      </div><p>Voice sends after two seconds, or press <kbd>C</kbd> sooner. During a sequence, <kbd>|</kbd> skips; during a single clip it stops. Browser preview stays off stream.</p>
+      </div><p>Voice sends after two seconds, or press <kbd>|</kbd> again to send sooner. During a sequence, <kbd>|</kbd> skips; during a single clip or shuffle it stops. Browser preview stays off stream.</p>
     </details>
     <div class="ir-workspace mt-16">
       <section class="card ir-library" aria-label="Replay library">

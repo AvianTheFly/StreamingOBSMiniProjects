@@ -1,5 +1,30 @@
 # Stream map
 
+The Hub starts with **Live desk** (`http://127.0.0.1:7420/#dashboard`):
+It follows the current stage, with Starting soon, Lobby, Queue / champ select,
+Game and Ending controls. Loading is a phase within Game. Browsing a stage or
+image is read-only; explicit buttons change the stream. Play intro uses the
+approved Sanctuary edit and hands off to a lobby after source cleanup, unless
+a newer manual choice has taken over. Lobby effects target the actual world.
+Go live / End stream controls broadcasting separately. Ending holds automatic
+routing; Auto scenes releases that hold. Explanations stay in Stream map.
+
+**Explore your stream** (`http://127.0.0.1:7420/#library`) is the visual
+guide organized by the outcome you want. Its six areas open short sets of ideas;
+each idea explains the viewer experience, trigger and next step. The optional
+three-idea tour introduces a sound, lobby world and replay. Browsing is read-only;
+explicit playback and scene controls use the existing feature APIs. Illustrations
+are examples, while private previews and saved keys come from existing workspaces.
+Newly loaded features without a curated idea remain available in additional
+controls and search.
+
+**Understand what happens** links an idea directly into its behavior map. For
+example, `#workflows?flow=instant_replay.play` opens replay playback, while
+`#workflows?area=after` opens the overview of independent end-of-match reactions.
+`#library?area=spaces` opens the atmosphere guide, and `#library?idea=sound`
+opens a specific idea. Query routing belongs to the browser shell; neither guide
+nor map changes runtime policy.
+
 Open **Stream map** in the Hub navigation (`http://127.0.0.1:7420/#workflows`).
 The **Map** starts with six connected areas: your controls, your game, your
 viewers, sound and video, clips and replays, and screen resources. Open an area

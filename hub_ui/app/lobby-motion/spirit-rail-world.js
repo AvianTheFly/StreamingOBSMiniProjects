@@ -3,7 +3,7 @@ import {glow,hash} from './shared/world-motion.js';
 import {steam} from './sanctuary-atmosphere.js';
 import {leaf} from './world-ink.js';
 import {cues,artists} from './spirit-rail-guests.js';
-export const scene={id:'spirit-rail',source:'SpiritRailLobby',holes:[[828,196,630,252],[150,320,355,510],[1544,183,309,463]],patches:[
+export const scene={id:'spirit-rail',source:'SpiritRailLobby',holes:[[640,140,896,504],[150,320,355,510],[1544,183,309,463]],patches:[
  {rect:[354,0,100,392],move:(u,v,t)=>[Math.sin(t*.85+v)*7*v*edge(u,v),Math.sin(t*.7)*edge(u,v)]},
  {rect:[575,211,93,204],move:(u,v,t)=>[Math.sin(t*1.2+v*4)*6*edge(u,v),Math.sin(t*1.6+u*3)*2*edge(u,v)]},
  {rect:[964,599,271,67],move:(u,v,t)=>[Math.sin(t*.65)*2*edge(u,v),Math.sin(t*3+u*4)*2*edge(u,v)]},

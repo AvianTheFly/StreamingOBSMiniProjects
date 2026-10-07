@@ -1,0 +1,13 @@
+{
+  "id": "new-20-drop-through-bridge",
+  "title": "Falling through the broken span",
+  "file": "images/new-20-drop-through-bridge.png",
+  "prompt": "Use case: illustration-story. Asset: one full-screen landscape 16:9 cinematic frame for a gritty fantasy story slideshow, not a collage or storyboard. Match supplied reference illustration's intensely detailed mature fantasy realism, nocturnal blue moonlight / amber lanterns, weathered basalt and bronze, cinematic light and depth. One Udyr-like muscular weathered shaman with long black hair, beard, dark tattoos, bare chest, ragged brown wolf-fur mantle, wrapped forearms, leather trousers and boots. Spirits are energy envelopes attached to the SAME human body, not independent pets. No other people, villain, text, watermark, UI, panels or cute cartoon. Keep existing identity and persistent damage. Each frame must show the requested intermediate action clearly, not skip to its result.\nInput images: Image 1: adjacent story/world continuity reference. Image 2: adjacent story/world continuity reference. Image 3: original character/environment/style reference.\nSpecific next story moment: Exterior side wide shot: SAME bearded fur-clad human shaman drops feet-first THROUGH giant hole in ancient bridge. Arms reach upward, gold horn envelope peeling away, collapsing bridge paving stones accompany him. Ruined sanctuary island to RIGHT/top connected to near bridge abutment, approach platform left, long bridge partly shattered across view. Hero clearly below bridge level within hole silhouette, huge cloud chasm under him. One hero, no animal-body replacement. Show scale and unmistakable geography.",
+  "references": [
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-19-bridge-break.png",
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-01-epic-sanctuary.png",
+    "C:/StreamingMedia/ChannelPresentation/2026-10-03/spirit-slideshow-v1/images/10-growing-empowerment.png"
+  ],
+  "original": "C:\\Users\\Michael\\.codex\\generated_images\\01a104b1-c082-7921-a920-617bfec4e788\\exec-cfb20b57-4f6f-48f8-a172-c003c97b269b.png",
+  "generation_mode": "built-in image_gen"
+}

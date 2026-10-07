@@ -1,0 +1,11 @@
+{
+  "id": "new-25-storm-release",
+  "title": "Phoenix storm breaks open",
+  "file": "images/new-25-storm-release.png",
+  "prompt": "Use case: illustration-story. Asset: one full-screen landscape 16:9 cinematic frame for a gritty fantasy story slideshow, not a collage or storyboard. Match supplied reference illustration's intensely detailed mature fantasy realism, nocturnal blue moonlight / amber lanterns, weathered basalt and bronze, cinematic light and depth. One Udyr-like muscular weathered shaman with long black hair, beard, dark tattoos, bare chest, ragged brown wolf-fur mantle, wrapped forearms, leather trousers and boots. Spirits are energy envelopes attached to the SAME human body, not independent pets. No other people, villain, text, watermark, UI, panels or cute cartoon. Keep existing identity and persistent damage. Each frame must show the requested intermediate action clearly, not skip to its result.\nInput images: Image 1: adjacent story/world continuity reference.\nSpecific next story moment: Exterior wider shot next instant: shaman extends arms while spinning out of coiled wings, bright circular shockwave frost-blue outside ember-orange inside BLASTS rubble radially OUTWARD. Wings spring wide partially, spiral wake shows clear rotation, flying rocks recede away from center. Broken bridge/island above right persistent. Furious epic energy with visible human at center, powerful clarity rather than entirely obscuring hero in glow.",
+  "references": [
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-24-phoenix-windup.png"
+  ],
+  "original": "C:\\Users\\Michael\\.codex\\generated_images\\01a104b1-c082-7921-a920-617bfec4e788\\exec-f5962789-acb0-45d2-8740-905049e6fd41.png",
+  "generation_mode": "built-in image_gen"
+}

@@ -2,7 +2,7 @@ import {PaintedWorld,edge} from './painted-world.js';
 import {glow,TAU} from './shared/world-motion.js';
 import {sparks} from './forge-atmosphere.js';
 import {cues,artists} from './phoenix-observatory-guests.js';
-export const scene={id:'phoenix-observatory',source:'PhoenixObservatoryLobby',holes:[[94,323,541,245],[825,445,430,460],[1465,203,313,480]],patches:[
+export const scene={id:'phoenix-observatory',source:'PhoenixObservatoryLobby',holes:[[60,180,896,504],[980,445,430,460],[1465,203,313,480]],patches:[
  {rect:[425,20,108,216],move:(u,v,t)=>[Math.sin(t*.75+v)*6*v*edge(u,v),Math.cos(t*.8)*edge(u,v)]},
  {rect:[389,53,47,110],move:(u,v,t)=>[Math.sin(t*.8)*4*v*edge(u,v),Math.cos(t*.8)*edge(u,v)]},
  {rect:[858,290,198,213],move:(u,v,t)=>[Math.sin(t*2.9+v*4)*4*edge(u,v),Math.sin(t*3.5+u*4)*5*edge(u,v)]},

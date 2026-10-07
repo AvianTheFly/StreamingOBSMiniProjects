@@ -1,0 +1,12 @@
+{
+  "id": "new-27-upward-flight",
+  "title": "Climbing toward the terrace",
+  "file": "images/new-27-upward-flight.png",
+  "prompt": "Use case: illustration-story. Asset: one full-screen landscape 16:9 cinematic frame for a gritty fantasy story slideshow, not a collage or storyboard. Match supplied reference illustration's intensely detailed mature fantasy realism, nocturnal blue moonlight / amber lanterns, weathered basalt and bronze, cinematic light and depth. One Udyr-like muscular weathered shaman with long black hair, beard, dark tattoos, bare chest, ragged brown wolf-fur mantle, wrapped forearms, leather trousers and boots. Spirits are energy envelopes attached to the SAME human body, not independent pets. No other people, villain, text, watermark, UI, panels or cute cartoon. Keep existing identity and persistent damage. Each frame must show the requested intermediate action clearly, not skip to its result.\nInput images: Image 1: adjacent story/world continuity reference. Image 2: adjacent story/world continuity reference.\nSpecific next story moment: Rear wide view next flight stage. Same shaman propelled UP and forward toward intact WEST terrace of same sanctuary island, wings raised high in recovery upstroke, open human legs behind. Broken bridge hole and damaged main chamber at far right background remain. Sweeping majestic canyon/aurora/waterfalls from establishing picture, sparse ancient spirit carved mountains in distance. Still same one island destination, no reset to undamaged room.",
+  "references": [
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-26-wing-powerstroke.png",
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-01-epic-sanctuary.png"
+  ],
+  "original": "C:\\Users\\Michael\\.codex\\generated_images\\01a104b1-c082-7921-a920-617bfec4e788\\exec-f42282a2-1796-48f4-a5c7-b6fd5a22a345.png",
+  "generation_mode": "built-in image_gen"
+}

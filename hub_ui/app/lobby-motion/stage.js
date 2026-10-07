@@ -1,11 +1,14 @@
 // One visible-document loop owns a chosen world's painted motion and finite guests.
 import {AmbientClock,smooth,hash} from './shared/world-motion.js';
 import {loadWorld} from './worlds.js';
+import {LiveActions} from './live-actions.js';
+import {screenFrame} from './screen-frame.js';
 const params=new URLSearchParams(location.search),preview=params.get('preview')==='1';
 const world=await loadWorld(params.get('world')||'reef'),{scene,cues,artists}=world;
 const canvas=document.querySelector('#stage'),c=canvas.getContext('2d'),surface=document.createElement('canvas');surface.width=1920;surface.height=1080;const m=surface.getContext('2d');
 document.title=world.label+' · Living lobby';canvas.setAttribute('aria-label','Animated '+world.label+' painting');
 const art=world.createMotion(),clock=new AmbientClock(cues,world.seed||71),manual=[],ambient=new Map(),decisions=new Map();
+const live=preview?null:new LiveActions(world.id,cue=>trigger(cue.action,cue.id));
 let ready=false,disposed=false,frame=0,last=0,paused=params.get('paused')==='1',automatic=params.get('auto')!=='0',at=params.has('at')?Number(params.get('at')):null,time=Number.isFinite(at)&&at!==null?at:Date.now()/1000;
 let holes=scene.holes;
 try{const custom=JSON.parse(params.get('holes'));if(Array.isArray(custom)&&custom.length===3&&custom.every(r=>Array.isArray(r)&&r.length===4&&r.every(Number.isFinite)&&r[2]>=32&&r[3]>=32&&r[0]>=0&&r[1]>=0&&r[0]+r[2]<=1920&&r[1]+r[3]<=1080))holes=custom;}catch{ /* Use authored apertures when no complete valid placement is provided. */ }
@@ -23,7 +26,8 @@ function draw(){
   if(!ready||disposed)return;const began=performance.now(),active=events();
   m.clearRect(0,0,1920,1080);art.draw(m,time,active);
   for(const event of active){const age=time-event.started,spec=cues.find(x=>x.id===event.kind);if(!spec)continue;const artist=artists[event.kind];if(!artist)continue;
-    m.save();m.globalAlpha=smooth(age/.6)*smooth((spec.life-age)/.75);world.clip?.(m,spec);artist(m,age,event);m.restore();}
+    m.save();m.globalAlpha=smooth(age/.6)*smooth((spec.life-age)/.75);world.clip?.(m,spec);artist(m,age,event,art);m.restore();}
+  screenFrame(m,holes[0],world.id);
   // Saved live-camera, desktop and chat placement wins over every accent.
   for(const rect of holes)m.clearRect(...rect);
   c.clearRect(0,0,1920,1080);if(preview)c.drawImage(art.base,0,0);c.drawImage(surface,0,0);
@@ -41,7 +45,7 @@ function message(e){if(e.origin!==location.origin||e.source!==parent||e.data?.ty
   if(typeof data.automatic==='boolean'){automatic=data.automatic;draw();}
 }
 function key(e){if(e.repeat||e.ctrlKey||e.metaKey||e.altKey)return;const index=Number(e.key)-1;if(Number.isInteger(index)&&index>=0&&index<cues.length){e.preventDefault();trigger(cues[index].id);}}
-document.addEventListener('visibilitychange',()=>document.hidden?stop():start());window.addEventListener('message',message);window.addEventListener('keydown',key);
-window.addEventListener('pagehide',()=>{disposed=true;stop();art.dispose();clock.dispose();manual.length=0;ambient.clear();decisions.clear();surface.width=surface.height=1;window.removeEventListener('message',message);window.removeEventListener('keydown',key);},{once:true});
-try{await art.load();if(disposed)art.dispose();else{ready=true;if(params.has('cue'))trigger(params.get('cue'),undefined,Math.max(0,Math.min(11,Number(params.get('age'))||0)));document.querySelector('#loading').hidden=true;draw();start();}}
+document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();live?.stop();}else{start();if(ready)live?.start();}});window.addEventListener('message',message);window.addEventListener('keydown',key);
+window.addEventListener('pagehide',()=>{disposed=true;stop();live?.dispose();art.dispose();clock.dispose();manual.length=0;ambient.clear();decisions.clear();surface.width=surface.height=1;window.removeEventListener('message',message);window.removeEventListener('keydown',key);},{once:true});
+try{await art.load();if(disposed)art.dispose();else{ready=true;if(params.has('cue'))trigger(params.get('cue'),undefined,Math.max(0,Math.min(11,Number(params.get('age'))||0)));document.querySelector('#loading').hidden=true;draw();start();live?.start();}}
 catch(error){if(!disposed){document.querySelector('#loading').textContent='The lobby artwork could not load. Keep the Streaming Hub running.';console.error(error);}}

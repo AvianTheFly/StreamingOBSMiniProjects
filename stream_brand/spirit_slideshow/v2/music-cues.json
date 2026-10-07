@@ -1,0 +1,122 @@
+{
+  "music_source": "C:/StreamingMedia/twitch downloads/CCR - Fortunate Son (MOONLGHT Remix).mp3",
+  "music_start_seconds": 0,
+  "analysis_method": "Spectral-attack fit to supplied first 40 seconds; approximate grid",
+  "approximate_bpm": 128.0,
+  "source_developments": "Measured energy rises around 7-8 seconds; 20-22-second dip accommodates ram stance; 36-39-second easing accommodates landing and vista.",
+  "selected_cues": [
+    {
+      "id": "new-05-four-spirit-peak",
+      "title": "All four spirits engulf Udyr",
+      "source_attack_seconds": 8.0,
+      "delivery_seconds": 8.0,
+      "delivery_frame": 200,
+      "error_milliseconds": 0.0
+    },
+    {
+      "id": "15-claw-contact",
+      "title": "Claws tear the seal",
+      "source_attack_seconds": 13.16,
+      "delivery_seconds": 13.16,
+      "delivery_frame": 329,
+      "error_milliseconds": 0.0
+    },
+    {
+      "id": "16-gate-collapse",
+      "title": "The gate breaks above him",
+      "source_attack_seconds": 13.62,
+      "delivery_seconds": 13.64,
+      "delivery_frame": 341,
+      "error_milliseconds": 20.0
+    },
+    {
+      "id": "19-shield-impact",
+      "title": "Shell meets falling stone",
+      "source_attack_seconds": 15.969999999999999,
+      "delivery_seconds": 15.96,
+      "delivery_frame": 399,
+      "error_milliseconds": -10.0
+    },
+    {
+      "id": "25-ram-contact",
+      "title": "Ram impact",
+      "source_attack_seconds": 23.0,
+      "delivery_seconds": 23.0,
+      "delivery_frame": 575,
+      "error_milliseconds": 0.0
+    },
+    {
+      "id": "new-19-bridge-break",
+      "title": "The last support gives way",
+      "source_attack_seconds": 24.88,
+      "delivery_seconds": 24.88,
+      "delivery_frame": 622,
+      "error_milliseconds": 0.0
+    },
+    {
+      "id": "new-20b-fall-damaged-sanctuary",
+      "title": "Falling below the damaged sanctuary",
+      "source_attack_seconds": 25.34,
+      "delivery_seconds": 25.36,
+      "delivery_frame": 634,
+      "error_milliseconds": 20.0
+    },
+    {
+      "id": "new-25-storm-release",
+      "title": "Phoenix storm breaks open",
+      "source_attack_seconds": 28.87,
+      "delivery_seconds": 28.88,
+      "delivery_frame": 722,
+      "error_milliseconds": 10.0
+    },
+    {
+      "id": "29-phoenix-storm",
+      "title": "Phoenix storm releases",
+      "source_attack_seconds": 29.57,
+      "delivery_seconds": 29.56,
+      "delivery_frame": 739,
+      "error_milliseconds": -10.0
+    },
+    {
+      "id": "30-wings-unfurl",
+      "title": "Wings open through the debris",
+      "source_attack_seconds": 30.75,
+      "delivery_seconds": 30.76,
+      "delivery_frame": 769,
+      "error_milliseconds": 10.0
+    },
+    {
+      "id": "new-26-wing-powerstroke",
+      "title": "The wings arrest the fall",
+      "source_attack_seconds": 31.44,
+      "delivery_seconds": 31.44,
+      "delivery_frame": 786,
+      "error_milliseconds": 0.0
+    },
+    {
+      "id": "new-28-landing-approach",
+      "title": "Wings fold for landing",
+      "source_attack_seconds": 34.02,
+      "delivery_seconds": 34.04,
+      "delivery_frame": 851,
+      "error_milliseconds": 20.0
+    },
+    {
+      "id": "new-29-landing-recovery",
+      "title": "Recovering from the landing",
+      "source_attack_seconds": 34.96,
+      "delivery_seconds": 34.96,
+      "delivery_frame": 874,
+      "error_milliseconds": 0.0
+    },
+    {
+      "id": "new-31-epic-vista",
+      "title": "The world opens beyond the sanctuary",
+      "source_attack_seconds": 38.0,
+      "delivery_seconds": 38.0,
+      "delivery_frame": 950,
+      "error_milliseconds": 0.0
+    }
+  ],
+  "other_cuts": "Intermediate action cuts use varied holds; these are not required to land on a beat."
+}

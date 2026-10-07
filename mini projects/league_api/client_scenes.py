@@ -73,18 +73,41 @@ class ClientScenes:
         self.error = None
         self.retry_at = 0
         self.privacy_armed = False
+        self.manual_choice = None
+        self.connected = False
         self.status = 'Waiting for League client'
 
     def snapshot(self):
         with self.lock:
             return {'settings': copy.deepcopy(self.settings), 'phase': self.phase,
                     'target': self.target, 'status': self.status, 'error': self.error,
-                    'privacy_armed': self.privacy_armed}
+                    'privacy_armed': self.privacy_armed, 'connected': self.connected}
 
     def overlay_snapshot(self):
         with self.lock:
-            return self.champ_select.snapshot(self.enabled and self.phase == 'ChampSelect'
+            return self.champ_select.snapshot(self.phase == 'ChampSelect'
                                              and self.target == 'champions' and self.applied == 'champions')
+
+    def present_champions(self):
+        """Show the configured draft presentation from confirmed client data."""
+        revision = self.director.snapshot()['manual_revision']
+        phase, session = self.reader.snapshot()
+        if phase != 'ChampSelect' or not isinstance(session, dict):
+            raise ValueError('Champion select is available while you are in a League draft')
+        with self.lock:
+            self.champ_select.update(phase, session, self.settings['theme'])
+            if not apply_scene(self.obs_factory(), self.settings, 'champions',
+                               director=self.director, automatic=False,
+                               expected_manual_revision=revision):
+                raise ValueError('Champion select choice was superseded')
+            self.phase, self.target, self.applied = phase, 'champions', 'champions'
+            self.connected = True
+            self.intent_revision = self.director.snapshot()['manual_revision']
+            self.error = None
+            self.status = 'Champion select chosen manually'
+            # A manual draft view lasts through bans/picks in this draft.
+            self.manual_choice = (phase, 'champions')
+            return self.snapshot()
 
     @property
     def enabled(self):
@@ -110,9 +133,11 @@ class ClientScenes:
                 return {**copy.deepcopy(DEFAULTS), **saved, **body}
             updated = update_json(self.path, merge, default={})
             self.settings = updated
+            self.director.cancel_pending('league_client')
             if updated['theme'] in THEMES:
                 self.champ_select.theme = updated['theme']
             self.applied = None
+            self.manual_choice = None
             self.intent_revision = self.director.snapshot()['manual_revision']
             self.retry_at = 0
             self.error = None
@@ -125,6 +150,7 @@ class ClientScenes:
 
     def hide_now(self):
         """Enter a private location before the streamer clicks Find Match."""
+        revision = self.director.snapshot()['manual_revision']
         phase, _ = self.reader.snapshot()
         if phase not in IDLE_PHASES | {'Matchmaking', 'ReadyCheck', 'ChampSelect'}:
             raise ValueError('Hide screen now is available outside gameplay.')
@@ -132,9 +158,12 @@ class ClientScenes:
             client = self.obs_factory()
             if replay_is_active(client):
                 raise ValueError('Wait for Instant Replay to finish before hiding the screen.')
-            if not apply_scene(client, self.settings, 'queue', director=self.director, automatic=False):
+            if not apply_scene(client, self.settings, 'queue', director=self.director, automatic=False,
+                               expected_manual_revision=revision):
                 raise ValueError('A temporary scene owns the screen; try after it finishes.')
             self.privacy_armed = phase in IDLE_PHASES
+            self.manual_choice = (phase, 'queue') if phase == 'ChampSelect' else None
+            self.connected = True
             self.phase = phase
             self.target = 'queue'
             self.applied = 'queue'
@@ -161,6 +190,7 @@ class ClientScenes:
             elif not apply_scene(client, self.settings, 'idle', director=self.director, automatic=False):
                 raise ValueError('A temporary scene owns the screen; try after it finishes.')
             self.privacy_armed = False
+            self.manual_choice = None
             self.phase = phase
             self.target = 'idle'
             self.applied = 'idle'
@@ -181,6 +211,11 @@ class ClientScenes:
                 if self.enabled and target is not None:
                     self.scene_hold(previous_phase=self.phase, phase=phase)
                 self.phase = phase
+                self.connected = True
+                if self.manual_choice and self.manual_choice[0] != phase:
+                    self.manual_choice = None
+                if self.manual_choice:
+                    target = self.manual_choice[1]
                 if phase not in IDLE_PHASES:
                     self.privacy_armed = False
                 if self.privacy_armed and phase in IDLE_PHASES:
@@ -191,9 +226,11 @@ class ClientScenes:
                 # Fail closed: losing the client API is not evidence that queue
                 # ended. Keep the private scene until an idle phase is confirmed.
                 self.status = 'League client unavailable; keeping current scene private'
+                self.connected = False
                 return
         with self.lock:
             if target != self.target:
+                self.director.cancel_pending('league_client')
                 from events import inspect_event
                 inspect_event('league_client.phase', owner='league_api', phase=str(phase), action=target or 'gameplay')
                 self.intent_revision = revision
@@ -284,10 +321,15 @@ class ClientScenes:
             except Exception:
                 with self.lock:
                     self.status = 'League client unavailable; keeping current scene private'
+                    self.connected = False
                 # A confirmed route can still finish its hold if the client closes.
                 if self.target != self.applied:
                     self.apply_pending()
                 stop_event.wait(2)
             finally:
-                if connection is not None:
-                    connection.close()
+                try:
+                    if connection is not None:
+                        connection.close()
+                finally:
+                    if stop_event.is_set() or parent_stop.is_set():
+                        self.director.cancel_pending('league_client')

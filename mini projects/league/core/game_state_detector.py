@@ -96,6 +96,8 @@ class GameStateDetector:
         elif self.last_is_dead and not is_dead:
             self.events.emit("respawn", me)
             self._respawn_sfx_fired = False
+        # Preserve the intentional pre-respawn margin in RESPAWN_SFX_LEAD_SECONDS:
+        # the final beep, rather than the start of the sound, belongs at revival.
         # Fire once while still dead, including a skipped exact threshold or
         # reconnect during the final seconds. Never play a late cue after revival.
         timer = me.get("respawnTimer")

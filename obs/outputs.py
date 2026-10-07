@@ -19,6 +19,15 @@ def get_stream_status() -> dict:
     r = get_obs().get_stream_status()
     return {"active": r.output_active, "bytes": getattr(r, "output_bytes", None)}
 
+
+def get_replay_buffer_status() -> dict:
+    return {'active': get_obs().get_replay_buffer_status().output_active}
+
+
+def start_replay_buffer() -> None:
+    if not get_replay_buffer_status()['active']:
+        get_obs().start_replay_buffer()
+
 def save_replay_buffer_and_wait(timeout: float = 15.0, *, on_save_requested=None) -> str | None:
     """
     Trigger OBS to save the replay buffer, block until OBS fires the

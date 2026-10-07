@@ -203,6 +203,50 @@ class ClientSceneTests(unittest.TestCase):
         return ClientScenes(path, reader=reader, obs_factory=lambda: obs, clock=lambda: now[0],
                             director=SceneDirector(lambda: obs))
 
+    def test_manual_draft_and_queue_survive_same_phase_then_release(self):
+        with tempfile.TemporaryDirectory() as folder:
+            reader = Mock(); obs = FakeOBS()
+            watcher = self.make_watcher(folder, reader, obs, [0])
+            reader.snapshot.return_value = ('ChampSelect', session(bans=[False]))
+            watcher.present_champions(); watcher.tick()
+            self.assertEqual(watcher.target, 'champions')
+            self.assertTrue(obs.items[1]['sceneItemEnabled'])
+            watcher.hide_now()
+            reader.snapshot.return_value = ('ChampSelect', session('PICK'))
+            watcher.tick()
+            self.assertEqual(watcher.target, 'queue')
+            self.assertFalse(obs.items[1]['sceneItemEnabled'])
+            reader.snapshot.return_value = ('Lobby', None); watcher.tick()
+            self.assertEqual(obs.scene, 'just screen')
+            self.assertIsNone(watcher.manual_choice)
+
+    def test_manual_draft_requires_live_draft_and_rejects_newer_intent(self):
+        with tempfile.TemporaryDirectory() as folder:
+            reader = Mock(); obs = FakeOBS()
+            watcher = self.make_watcher(folder, reader, obs, [0])
+            reader.snapshot.return_value = ('Lobby', None)
+            with self.assertRaises(ValueError): watcher.present_champions()
+            self.assertEqual(obs.writes, [])
+            def read():
+                watcher.director.request('Newer choice', owner='user', automatic=False)
+                return ('ChampSelect', session('PICK'))
+            reader.snapshot.side_effect = read
+            with self.assertRaisesRegex(ValueError, 'superseded'): watcher.present_champions()
+            self.assertEqual(obs.scene, 'Newer choice')
+
+    def test_hold_drops_obsolete_draft_when_game_starts(self):
+        with tempfile.TemporaryDirectory() as folder:
+            reader = Mock(); obs = FakeOBS()
+            watcher = self.make_watcher(folder, reader, obs, [0])
+            token = watcher.director.hold_automatic('streamer')
+            reader.snapshot.return_value = ('ChampSelect', session('PICK')); watcher.tick()
+            self.assertEqual(obs.writes, [])
+            self.assertIsNotNone(watcher.director.snapshot()['pending_scene'])
+            reader.snapshot.return_value = ('InProgress', None); watcher.tick()
+            self.assertIsNone(watcher.director.snapshot()['pending_scene'])
+            watcher.director.release_automatic(token, resume=True)
+            self.assertEqual(obs.writes, [])
+
     def test_queue_bans_picks_dodge_without_reasserting_over_manual_scene(self):
         with tempfile.TemporaryDirectory() as folder:
             reader = Mock(); obs = FakeOBS(); now = [0]

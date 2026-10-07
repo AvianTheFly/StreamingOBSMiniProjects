@@ -38,6 +38,18 @@ class LayerOBS:
 
 
 class LobbyLayoutTests(unittest.TestCase):
+    def test_browser_geometry_query_preserves_personal_program_and_settings(self):
+        from urllib.parse import parse_qs, urlsplit
+        self.plan['layers'][-1].update(settings={'width':300},url_query={'holes':'[[60,180,896,504]]'})
+        self.client.inputs['Chat']['url']='http://localhost:7420/custom.html?party=wild&title=My+Title&extra=&holes=old#keep'
+        apply_layout(self.client,'WorldLobby',self.plan)
+        value=self.client.inputs['Chat'];parts=urlsplit(value['url']);query=parse_qs(parts.query,keep_blank_values=True)
+        self.assertEqual(parts.path,'/custom.html');self.assertEqual(parts.fragment,'keep')
+        self.assertEqual(query,{'party':['wild'],'title':['My Title'],'extra':[''],'holes':['[[60,180,896,504]]']})
+        self.assertEqual(value['css'],'personal')
+        writes=list(self.client.writes);self.assertFalse(apply_layout(self.client,'WorldLobby',self.plan))
+        self.assertEqual(self.client.writes,writes)
+
     def setUp(self):
         self.client=LayerOBS()
         self.plan={'layers':[

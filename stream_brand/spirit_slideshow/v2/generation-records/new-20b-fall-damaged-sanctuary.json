@@ -1,0 +1,11 @@
+{
+  "id": "new-20b-fall-damaged-sanctuary",
+  "title": "Falling below the damaged sanctuary",
+  "file": "images/new-20b-fall-damaged-sanctuary.png",
+  "prompt": "Use case: illustration-story. Asset: one full-screen landscape 16:9 cinematic frame for a gritty fantasy story slideshow, not a collage or storyboard. Match supplied reference illustration's intensely detailed mature fantasy realism, nocturnal blue moonlight / amber lanterns, weathered basalt and bronze, cinematic light and depth. One Udyr-like muscular weathered shaman with long black hair, beard, dark tattoos, bare chest, ragged brown wolf-fur mantle, wrapped forearms, leather trousers and boots. Spirits are energy envelopes attached to the SAME human body, not independent pets. No other people, villain, text, watermark, UI, panels or cute cartoon. Keep existing identity and persistent damage. Each frame must show the requested intermediate action clearly, not skip to its result.\nInput images: Image 1: adjacent story/world continuity reference.\nSpecific next story moment: EDIT TARGET Image 1. Preserve exact hero falling pose, anatomy, giant missing bridge span, camera composition, clouds, foreground, colors, spirit monuments, moon and lanterns. Change ONLY the sanctuary entrance and nearby stonework at upper right: its doorway has just been ram-breached, so remove the intact steps/closed doorway appearance, replace with a big jagged OPEN blasted hole with broken bear/ram carved pillars, fractured blue orb hanging above, scattered rubble along the bridge abutment; several roof ribs above must be fractured and dropping stones, statue area rubble scattered. Keep intact WEST pine terrace where he will land later, four original statues, island location and bridge geometry identical. No new subjects. Original bridge gap and falling hero must stay unchanged.",
+  "references": [
+    "F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/spirit_slideshow/v2/images/new-20-drop-through-bridge.png"
+  ],
+  "original": "C:\\Users\\Michael\\.codex\\generated_images\\01a104b1-c082-7921-a920-617bfec4e788\\exec-7a4fd13d-88a8-40b4-9039-e0ba1e6a675f.png",
+  "generation_mode": "built-in image_gen"
+}

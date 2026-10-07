@@ -43,6 +43,31 @@ class SceneDirector:
         self._observing = False
         self._own_events = deque()
         self._pending = None
+        self._automatic_holds = {}
+
+    def hold_automatic(self, owner):
+        """Suspend automatic scene writes under an identity-scoped UI intent."""
+        if not isinstance(owner, str) or not owner.strip():
+            raise ValueError('A scene hold needs an owner')
+        token = object()
+        with self._lock:
+            self._automatic_holds[token] = owner
+        return token
+
+    def release_automatic(self, token, *, resume=False):
+        """Release only this hold; optionally apply the newest valid deferred view."""
+        with self._lock:
+            if token not in self._automatic_holds:
+                return False
+            self._automatic_holds.pop(token)
+            if self._automatic_holds:
+                return True
+            pending, self._pending = self._pending, None
+            if resume and pending:
+                scene, owner, reason, prepare, manual_revision = pending
+                self.request(scene, owner=owner, reason=reason, prepare=prepare,
+                             expected_manual_revision=manual_revision, defer=True)
+            return True
 
     def _record(self, owner, scene, result, reason):
         decision = dict(time=time.time(), revision=self._revision,
@@ -110,6 +135,10 @@ class SceneDirector:
                 return False
             if expected_revision is not None and self._revision != expected_revision:
                 self._record(owner, scene, 'stale', reason)
+                return False
+            if automatic and self._automatic_holds:
+                self._pending = (scene, owner, reason, prepare, self._manual_revision)
+                self._record(owner, scene, 'held', 'Streamer is holding the current view')
                 return False
             if automatic and self._lease is not None:
                 if defer:
@@ -259,6 +288,7 @@ class SceneDirector:
                     'temporary_owner': lease.owner if lease else None,
                     'reserved_scene': lease.scene if lease else None,
                     'pending_scene': self._pending[0] if self._pending else None,
+                    'automatic_holds': sorted(set(self._automatic_holds.values())),
                     'observing': self._observing, 'history': list(self._history)}
 
 

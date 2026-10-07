@@ -3,11 +3,11 @@ import {ellipse,glow,hash,TAU} from './paint.js';
 import {FractalGalaxy} from './fractal-galaxy.js';
 import {paintPanel} from './surfaces.js';
 export class Projection {
-  constructor(screens){this.screens=screens;this.galaxy=new FractalGalaxy();this.canvas=document.createElement('canvas');this.canvas.width=960;this.canvas.height=360;this.c=this.canvas.getContext('2d');}
+  constructor(screens){this.screens=screens;this.galaxy=new FractalGalaxy();this.canvas=document.createElement('canvas');this.canvas.width=960;this.canvas.height=540;this.c=this.canvas.getContext('2d');}
   render(c,t,config,colors) {
     if(this.screens?.paint(c,'main'))return;
     const choice=this.screens?.choice('main',config)||config.background;
-    const p=this.c;p.fillStyle='#050716';p.fillRect(0,0,960,360);p.save();p.translate(480,180);p.scale(1.5,1.5);
+    const p=this.c;p.fillStyle='#050716';p.fillRect(0,0,960,540);p.save();p.translate(480,270);p.scale(1.5,1.5);
     if(choice==='liquid') this.liquid(p,t,colors);
     else if(choice==='spirit') this.spirit(p,t,colors);
     else this.galaxy.draw(p,t,colors);
