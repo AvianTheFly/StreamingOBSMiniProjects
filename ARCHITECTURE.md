@@ -10,6 +10,10 @@ polling, visibility and stale-response rejection. Existing Hub and League HTTP
 owners serve that exact shared module; it owns no media or feature state.
 Starting Soon and champion select stop requests while hidden and refresh upon
 visibility. Feature renderers retain their own artwork and playback policy.
+Shared sound-effect playback suspends invisible canvas work while retaining its
+audio clock, channel heartbeat and completion acknowledgement. Visible return
+draws the current audio position; a bounded startup yield cannot hang on a
+suspended animation clock. Hiding the source never substitutes for audio pause.
 
 ## Dependency direction
 

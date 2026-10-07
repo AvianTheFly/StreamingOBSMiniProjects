@@ -31,7 +31,7 @@
           "label": "Wait for ready OBS browser",
           "owner": "browser_effects",
           "kind": "wait",
-          "detail": "The browser waits for metadata and atlas readiness, draws and clears a zero-time warm-up frame, then yields one presentation frame before starting the owning audio. A replaced or stopped audio identity cannot continue delayed startup."
+          "detail": "The browser waits for metadata and atlas readiness. Visible sources draw and clear a zero-time warm-up frame, then yield one presentation frame with a 100-ms fallback for a suspended browser clock. Hidden sources skip painting. A replaced or stopped audio identity cannot continue delayed startup."
         },
         {
           "id": "2",
@@ -45,7 +45,7 @@
           "label": "Wait for current playback ID",
           "owner": "browser_effects",
           "kind": "wait",
-          "detail": "Current audio time drives every live border frame. Under-1.5-second BorderShow cues opt into 12-ms attack/18-ms release; other presentations retain their existing fades. Pause freezes audio and drawing together. Finite review exports use original audio, one A/V timeline, exact-duration frame sampling and external controls; looping belongs only to the review page."
+          "detail": "Current audio time drives every live border frame. Under-1.5-second BorderShow cues opt into 12-ms attack/18-ms release; other presentations retain their existing fades. Pause freezes audio and drawing together. Invisible sources cancel canvas frames while audio, heartbeats and completion continue; visible return draws current audio time. Finite review exports use original audio, one A/V timeline, exact-duration frame sampling and external controls; looping belongs only to the review page."
         },
         {
           "id": "4",
@@ -56,7 +56,7 @@
         }
       ],
       "owner_hashes": {
-        "browser_effects": "9bb34470bf1940ca4f1f5c597241fd7b1db47750c6a971d14116904ed6854b9a"
+        "browser_effects": "6d30d11331920aff65826cd344e96bee0da95a5000961e47177b410c06d8d6b8"
       },
       "edges": [
         {

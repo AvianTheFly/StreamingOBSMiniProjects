@@ -35,11 +35,33 @@ function silence(){const n=44100*12,b=Buffer.alloc(44+n*2);b.write('RIFF');b.wri
   await page.waitForFunction(()=>audio.at(-1)&&!audio.at(-1).paused,null,{timeout:900});const wakeMs=Date.now()-start;
   await Promise.race([playing,new Promise((_,reject)=>setTimeout(()=>reject(Error('Missing playing acknowledgement')),1000))]);
   assert(acks.some(a=>a.id==='first'&&a.status==='playing'));
+  await page.waitForFunction(()=>paints>1);
+  await page.evaluate(()=>dispatchEvent(new CustomEvent('obsSourceVisibleChanged',{detail:{visible:false}})));
+  const hidden=await page.evaluate(()=>({paints,time:audio.at(-1).currentTime}));
+  await page.waitForTimeout(350);
+  assert.equal(await page.evaluate(()=>paints),hidden.paints,'invisible audio must not paint');
+  assert(await page.evaluate(t=>audio.at(-1).currentTime>t+.15,hidden.time),'hidden audio keeps its actual clock');
+  await page.evaluate(()=>dispatchEvent(new CustomEvent('obsSourceVisibleChanged',{detail:{visible:true}})));
+  await page.waitForFunction(n=>paints>n,hidden.paints);
   publish({...active,paused:true});await page.waitForFunction(()=>audio.at(-1).paused);
   publish({...active,paused:false});await page.waitForFunction(()=>!audio.at(-1).paused);
   publish(null);await page.waitForFunction(()=>audio.at(-1).getAttribute('src')===null);
+  await page.evaluate(()=>dispatchEvent(new CustomEvent('obsSourceVisibleChanged',{detail:{visible:false}})));
+  const hiddenStart=await page.evaluate(()=>paints);
+  publish({id:'hidden',effect:{},stem:'cue',elapsed:0,paused:false});
+  await page.waitForFunction(()=>audio.at(-1).currentTime>.1);
+  assert.equal(await page.evaluate(()=>paints),hiddenStart,'hidden startup neither warms nor draws a canvas');
+  assert(acks.some(a=>a.id==='hidden'&&a.status==='playing'));
+  publish(null);await page.waitForFunction(()=>audio.at(-1).getAttribute('src')===null);
+  // Chromium can suspend rAF between the visibility check and warm-up yield.
+  await page.evaluate(()=>{window.originalFrame=requestAnimationFrame;window.requestAnimationFrame=()=>0;dispatchEvent(new CustomEvent('obsSourceVisibleChanged',{detail:{visible:true}}));});
+  publish({id:'no-frames',effect:{},stem:'cue',elapsed:0,paused:false});
+  await page.waitForFunction(()=>audio.at(-1).currentTime>.1);
+  assert(acks.some(a=>a.id==='no-frames'&&a.status==='playing'),'a stopped animation clock cannot stall audio readiness');
+  await page.evaluate(()=>{window.requestAnimationFrame=window.originalFrame;});
+  publish(null);await page.waitForFunction(()=>audio.at(-1).getAttribute('src')===null);
   await page.evaluate(()=>dispatchEvent(new Event('pagehide')));await page.waitForTimeout(150);
   began=requests;await page.waitForTimeout(1200);assert.equal(requests,began);assert.equal(pending.size,0);
-  assert.deepEqual(errors,[]);console.log(JSON.stringify({passed:true,requestsIn3_1s:{legacy,notified},wakeMs,pauseResume:true,teardown:true}));
+  assert.deepEqual(errors,[]);console.log(JSON.stringify({passed:true,requestsIn3_1s:{legacy,notified},wakeMs,pauseResume:true,hiddenPaints:0,hiddenAudio:true,teardown:true}));
  }finally{if(browser)await browser.close();for(const finish of [...pending])finish();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
 })().catch(e=>{console.error(e);process.exitCode=1});
