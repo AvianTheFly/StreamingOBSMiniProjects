@@ -844,3 +844,67 @@ No tests were discarded to hide a regression. New checks target observable
 behavior, lifetime and resource bounds; real-browser and media benchmarks provide
 separate evidence beyond the inherited tests. Step 7 is browser-only and has the
 pixel/compositing checks above plus the existing lobby publication regressions.
+
+### Deployment and practical limits
+
+The original Hub (11872) and its keyboard/Spotify children exited through normal
+Ctrl+C cleanup. The optimized `hub.py --no-browser` started hidden as PID 21260;
+its single keyboard child is 11668. All 14 modules and small.en CUDA voice are
+ready. Runtime BLAS/OpenMP environment budgets are all two. Preparation completed
+with zero failures and 176 persisted metadata records (54,449 bytes).
+
+Before restart, settings were snapshotted and checksummed. All personal JSON
+checksums matched afterward; Soundboard still has only `default` and `@ -> hooray`.
+All 37 live browser-input settings matched across restart. Idle Soundboard,
+Love Me and Starting Soon browsers plus the current Sky Harbor layer were
+refreshed to load their updated scripts. Current scene remains `Lobbies`.
+Recording and replay paths still point to `C:\StreamingMedia\Replays` in OBS
+and `.env`; 1920×1080/60 output and existing NVENC encoders are unchanged.
+
+The read-only live UI checks passed across desktop/mobile, feature pages, audio
+and catalogs. Three stale assumptions in this inherited smoke test were corrected:
+a stopped replay buffer correctly disables Quick Replay, Other scenes is inside
+Change stage, and lobby cards now expose `data-location-card`. No live action was
+sent to make a test pass. Three socket-abort messages occurred during startup/
+browser reconnection; the count remained stable through final verification.
+
+The final 30-second off-air sample, after preparation and browser tests finished,
+measured 11.84% overall CPU, 0.469% for Python processes, 1.036% for OBS main and
+7.082% for OBS browser subprocesses. OBS maintained 60 FPS, about 0.606 ms average
+render time and zero new skipped render frames. GPU utilization averaged 38.33%
+in the existing diagnostic samples within that window; encoding/decoding were
+idle. Background applications and lobby events varied between measurements,
+so the overall CPU difference is **not** a causal optimization percentage.
+No game or live stream was running; elimination of the gaming-time 100% spikes
+has not been demonstrated. The new subprocess attribution supports that next
+real-workload diagnosis without installing another monitor.
+
+Architecture validation: 411 runtime modules, zero violations. The complete
+Python suite passed 1,060 tests; the final browser-only change also passed 11
+lobby/publication Python checks and all thirteen pixel comparisons. Relevant
+workflow explanations were reviewed/restamped. The workflow checker still
+reports inherited stale evidence/owner scopes elsewhere; it is not a clean pass.
+External evidence is under `%LOCALAPPDATA%/StreamingHub/diagnostics/resource-20261006`.
+
+### Rollback checkpoints
+
+| Commit | Step |
+| --- | --- |
+| `5a0a8ab` | Complete pre-optimization checkout checkpoint |
+| `80ee9a2` | Native CPU pools and launcher |
+| `4659dfa` | Browser-effect notifications and cancellation |
+| `3774af1` | Consume HTTP control bodies before dispatch |
+| `644b85e` | Persistent bounded media metadata |
+| `909e5b6` | Authored lobby frame limits and finite measurement tools |
+| `f5ab6a8` | Unchanged overlay layout and off-scene motion |
+| `323aa94` | Background CPU admission and OBS child diagnostics |
+| `902cc1d` | Direct lobby canvas rendering |
+| `3d973d6` | Correct live UI smoke checks and reviewed workflow evidence |
+
+Snapshot the latest settings before any rollback. Prefer reverting the selected
+code commits, newest dependent step first, rather than resetting personal files
+to the initial checkpoint. The live OBS frame flags have their separate before/
+after input backup at `diagnostics/frame-caps-20261006-221908`; Git alone does not
+restore those OBS settings. Preserve newer volumes and placement edits when
+using any backup. Derived metadata can be discarded or disabled with
+`HUB_METADATA_CACHE=0` without altering original media or profiles.
