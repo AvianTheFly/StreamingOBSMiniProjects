@@ -38,6 +38,11 @@ the existing SSE subscription. Lobby documents request only their action cues;
 unrequested statuses are neither encoded nor queued. Unfiltered Hub clients keep
 the full feed, and workflow history sampling remains independent of subscribers.
 
+Spotify's media observer retains track properties between metadata events, with
+a five-second fallback read for missed notifications. Playback events still wake
+immediately; a half-second status heartbeat preserves freshness. Revision checks
+retain metadata changes arriving during an awaited read. No extra worker is added.
+
 `lib/browser_effects/presentations.py` publishes explicitly named feature artwork
 during that feature's Hub lifetime. Identity tokens guard unregister; the shared
 HTTP server serves original file bytes (including JSON manifests) and serializes

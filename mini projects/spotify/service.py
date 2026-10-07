@@ -113,6 +113,7 @@ async def watch_media(state, stop):
     )
     manager = None
     notifications = MediaNotifications(asyncio.get_running_loop())
+    metadata_revision, metadata_at, metadata = -1, -1000., None
     try:
         while not stop.is_set():
             notifications.begin()
@@ -123,16 +124,24 @@ async def watch_media(state, stop):
                 session = select_spotify(manager.get_sessions(), Status.PLAYING)
                 notifications.bind_session(session)
                 if session is None:
+                    metadata = None
                     state.set_media(playing=False, title='', artist='', error='Open Spotify on this computer')
                 else:
-                    props = await asyncio.wait_for(session.try_get_media_properties_async(), 1)
+                    # Track properties are expensive WinRT reads. Events invalidate
+                    # them immediately; a five-second fallback repairs missed events.
+                    revision = notifications.metadata_revision
+                    if metadata is None or revision != metadata_revision or time.monotonic()-metadata_at >= 5:
+                        props = await asyncio.wait_for(session.try_get_media_properties_async(), 1)
+                        metadata = (props.title, props.artist)
+                        metadata_revision, metadata_at = revision, time.monotonic()
                     # Read status AFTER metadata so a pause during the read cannot reveal stale content.
                     playing = session.get_playback_info().playback_status == Status.PLAYING
-                    state.set_media(playing=playing and bool(props.title), title=props.title,
-                                    artist=props.artist, error='')
+                    state.set_media(playing=playing and bool(metadata[0]), title=metadata[0],
+                                    artist=metadata[1], error='')
             except Exception as exc:
                 state.set_media(playing=False, title='', artist='', error=f'Windows media: {exc}')
                 manager = None
+                metadata = None
                 notifications.reset()
             await notifications.wait()
     finally:

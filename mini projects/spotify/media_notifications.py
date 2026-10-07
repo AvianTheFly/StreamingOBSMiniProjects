@@ -11,12 +11,23 @@ class MediaNotifications:
         self.session_key = None
         self.rebind = True
         self.closed = False
+        self.metadata_revision = 0
 
     def _wake(self, sessions=False):
         if self.closed:
             return
         self.rebind |= sessions
         self.changed.set()
+
+    def _metadata_changed(self, *args):
+        def wake():
+            if not self.closed:
+                self.metadata_revision += 1
+                self._wake()
+        try:
+            self.loop.call_soon_threadsafe(wake)
+        except RuntimeError:
+            pass
 
     def _notify(self, *args):
         try:
@@ -51,9 +62,11 @@ class MediaNotifications:
             return
         self._release(self.session_bindings)
         self.session_key, self.rebind = key, False
+        self.metadata_revision += 1
         if session:
             for name in ('playback_info_changed', 'media_properties_changed'):
-                token = getattr(session, 'add_'+name)(self._notify)
+                callback = self._metadata_changed if name == 'media_properties_changed' else self._notify
+                token = getattr(session, 'add_'+name)(callback)
                 self.session_bindings.append((session, 'remove_'+name, token))
 
     def begin(self):
@@ -61,7 +74,7 @@ class MediaNotifications:
 
     async def wait(self):
         try:
-            await asyncio.wait_for(self.changed.wait(), .25)
+            await asyncio.wait_for(self.changed.wait(), .5)
         except asyncio.TimeoutError:
             pass  # Existing freshness heartbeat and bounded stop observation.
 
