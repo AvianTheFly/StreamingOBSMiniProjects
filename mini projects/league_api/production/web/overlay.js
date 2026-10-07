@@ -11,6 +11,7 @@ let state = null,
   frame = 0,
   painted = false,
   lastFrame = 0,
+  sourceVisible = true,
   visible = !document.hidden;
 function clear() {
   cancelAnimationFrame(frame);
@@ -59,9 +60,14 @@ window.leagueProduction = {
     if (!frame && visible) frame = requestAnimationFrame(tick);
   },
 };
-document.addEventListener('visibilitychange', () => {
-  visible = !document.hidden;
+function updateVisibility() {
+  visible = sourceVisible && !document.hidden;
   if (!visible) clear();
   else if (!frame && state && (state.ambient || state.effect || state.death)) frame = requestAnimationFrame(tick);
+}
+document.addEventListener('visibilitychange', updateVisibility);
+window.addEventListener('obsSourceVisibleChanged', event => {
+  sourceVisible = event.detail?.visible !== false;
+  updateVisibility();
 });
 window.addEventListener('pagehide', clear);

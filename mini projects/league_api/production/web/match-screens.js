@@ -20,20 +20,27 @@ border.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer
 const scene = new ProductionScene(border);
 let artReady = false;
 scene.ready.then(() => { artReady = true; paint(); }).catch(() => {});
-let state = null, received = 0;
+let state = null, received = 0, timer = 0, sourceVisible = true, painted = false;
 let production = null;
 function clear() {
   state = null;
-  scene.clear();
-  layer.style.display = 'none';
-  layer.style.opacity = '0';
+  clearTimeout(timer); timer = 0;
+  if (painted) {
+    scene.clear();
+    layer.style.display = 'none';
+    layer.style.opacity = '0';
+    painted = false;
+  }
 }
 function paint() {
+  clearTimeout(timer); timer = 0;
   if (!state) return;
   const since = (performance.now() - received) / 1000;
   const elapsed = state.elapsed + since;
   const remaining = state.remaining - since;
   if (remaining <= 0) { clear(); return; }
+  if (!sourceVisible || document.hidden) { layer.style.display = 'none'; return; }
+  timer = setTimeout(paint, 50);
   const image = images.get(state.key);
   if (elapsed < 0 || !image?.complete || !image.naturalWidth) {
     layer.style.display = 'none';
@@ -50,6 +57,7 @@ function paint() {
   }
   layer.style.display = 'block';
   layer.style.opacity = String(Math.max(0, Math.min(1, elapsed / .3, remaining / .3)));
+  painted = true;
 }
 window.leagueMatchScreens = {
   update(next, settings) {
@@ -64,5 +72,9 @@ window.leagueMatchScreens = {
   disconnected() { paint(); },
   ownsPresentation() { return !!state && state.remaining-(performance.now()-received)/1000>0; },
 };
-setInterval(paint, 50);
+document.addEventListener('visibilitychange', paint);
+window.addEventListener('obsSourceVisibleChanged', event => {
+  sourceVisible = event.detail?.visible !== false;
+  paint();
+});
 window.addEventListener('pagehide', clear);
