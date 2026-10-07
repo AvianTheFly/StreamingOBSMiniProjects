@@ -16,6 +16,43 @@ from hub_ui import audio, commands, hotkeys, project_status, server, settings, u
 
 
 class HubArchitectureTests(unittest.TestCase):
+    def test_animation_subscriptions_receive_only_selected_events(self):
+        with updates.subscription({'living_lobby_action'}) as lobby, updates.subscription() as hub:
+            updates.broadcast('status_update', {'projects': ['status']})
+            self.assertTrue(lobby.empty())
+            self.assertEqual(hub.qsize(), 1)
+            updates.broadcast('living_lobby_action', {'id': 'cue'})
+            self.assertEqual(lobby.qsize(), 1)
+            self.assertEqual(hub.qsize(), 2)
+        self.assertNotIn(lobby, updates._sse_clients)
+
+    def test_filtered_status_skips_encoding_and_keeps_history_sampling(self):
+        with updates.subscription({'living_lobby_action'}), patch.object(updates.json, 'dumps') as encode:
+            updates.broadcast('status_update', {'projects': []})
+            encode.assert_not_called()
+        for recording in (False, True):
+            stop = Mock()
+            stop.is_set.side_effect = [False, True]
+            with updates.subscription({'living_lobby_action'}), \
+                 patch.object(updates.audio_service, 'sync_audio_memory_from_obs', return_value=set()), \
+                 patch.object(updates.project_status, 'all_statuses', return_value=[]) as statuses, \
+                 patch('hub_ui.workflow_map.journal', Mock(recording=recording)), \
+                 patch('hub_ui.workflow_map.sample') as sample:
+                updates.poll_loop(stop)
+                self.assertEqual(statuses.call_count, int(recording))
+                self.assertEqual(sample.call_count, int(recording))
+
+    def test_filtered_stream_does_not_build_initial_status(self):
+        import io
+        stop = threading.Event()
+        stop.set()
+        handler = Mock(path='/api/events?events=living_lobby_action',
+                       server=Mock(stop_event=stop), wfile=io.BytesIO())
+        with patch.object(updates.project_status, 'all_statuses') as statuses:
+            updates.stream(handler)
+        statuses.assert_not_called()
+        self.assertEqual(handler.wfile.getvalue(), b': connected\n\n')
+
     def test_unwatched_events_skip_serialization(self):
         with patch.object(updates, '_sse_clients', []), patch.object(updates.json, 'dumps') as encode:
             updates.broadcast('hub_event', {'event': 'game.connected'})
@@ -113,7 +150,7 @@ assert not any(t.name.startswith('hub_ui:') for t in threading.enumerate())
             self.assertTrue(inbox.empty())
 
     def test_failed_sse_connection_releases_browser_queue(self):
-        handler = Mock()
+        handler = Mock(path='/api/events')
         handler.wfile.write.side_effect = BrokenPipeError()
         before = list(updates._sse_clients)
         with patch.object(project_status, 'all_statuses', return_value=[]):

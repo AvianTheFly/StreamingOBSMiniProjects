@@ -246,7 +246,7 @@
         "label": "Open workflow map",
         "kind": "control"
       },
-      "detail": "Read source without importing feature code. Checkout module junctions are allowed only at the matching supported feature’s exact LOCALAPPDATA home; absolute paths, parent traversal and nested links escaping that home are rejected.",
+      "detail": "Read source without importing feature code. Checkout module junctions are allowed only at the matching supported featureâ€™s exact LOCALAPPDATA home; absolute paths, parent traversal and nested links escaping that home are rejected.",
       "steps": [
         {
           "id": "0",
@@ -294,6 +294,71 @@
       ],
       "owner_hashes": {
         "hub": "9628c27220bc9e32b00169b5da1e13928e7e25ef443065bdcdfead960668da7f"
+      }
+    },
+    {
+      "id": "hub.presentation_events",
+      "label": "Deliver browser updates",
+      "topic": "Background resources",
+      "trigger": {
+        "kind": "event",
+        "label": "Presentation subscribes"
+      },
+      "detail": "The existing bounded SSE transport filters optional event types before serialization and queueing. Lobby artwork subscribes only to its cues. Unfiltered Hub clients retain initial and periodic status; workflow history still samples with no status subscriber. Disconnect releases the queue.",
+      "steps": [
+        {
+          "id": "subscribe",
+          "label": "Register bounded event subscription",
+          "owner": "hub",
+          "kind": "action"
+        },
+        {
+          "id": "filter",
+          "label": "Send only requested events",
+          "owner": "hub",
+          "kind": "gate"
+        },
+        {
+          "id": "release",
+          "label": "Release on disconnect",
+          "owner": "hub",
+          "kind": "end"
+        }
+      ],
+      "edges": [
+        {
+          "from": "subscribe",
+          "to": "filter"
+        },
+        {
+          "from": "filter",
+          "to": "release"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "hub_ui/updates.py",
+          "symbol": "subscription",
+          "hash": "22f572a65aa1cc84c5f428212fd0e7f82d28519f2fc2d41a6876f40c4efac0b6"
+        },
+        {
+          "path": "hub_ui/updates.py",
+          "symbol": "broadcast",
+          "hash": "846f43f023b9178e3a2559fa80328474e930eb8ade3db235019863d51b3228c8"
+        },
+        {
+          "path": "hub_ui/updates.py",
+          "symbol": "poll_loop",
+          "hash": "9b3acd8e09de3721ee655f8cd98519893f0c8973d74590fd00c8fb9b27171012"
+        },
+        {
+          "path": "hub_ui/updates.py",
+          "symbol": "stream",
+          "hash": "82d2e04787b28d894b1c63db9419547fb2f52d6a55c60fa7caee26b2313f9262"
+        }
+      ],
+      "owner_hashes": {
+        "hub": "b9b788f67f36e3e61acf7e7b14cf3d96728f674c610c9e1dde9d60046175fa6c"
       }
     }
   ]

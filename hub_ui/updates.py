@@ -10,11 +10,22 @@ import queue
 import threading
 import time
 from contextlib import contextmanager
+from urllib.parse import parse_qs, urlsplit
 from . import audio as audio_service
 from . import project_status
 
 _sse_clients: list[queue.Queue] = []
 _sse_lock = threading.Lock()
+
+
+class EventInbox(queue.Queue):
+    """A bounded presentation subscription; None preserves the full Hub feed."""
+    def __init__(self, event_types=None):
+        super().__init__(maxsize=200)
+        self.event_types = None if event_types is None else frozenset(event_types)
+
+    def accepts(self, event_type):
+        return self.event_types is None or event_type in self.event_types
 
 DOMAIN_EVENTS = (
     "coordinator.project_paused", "coordinator.play_cleared",
@@ -40,9 +51,9 @@ def forward_domain_events():
 
 
 @contextmanager
-def subscription():
+def subscription(event_types=None):
     """One bounded queue per browser; slow clients never block producers."""
-    inbox = queue.Queue(maxsize=200)
+    inbox = EventInbox(event_types)
     with _sse_lock:
         _sse_clients.append(inbox)
     try:
@@ -56,15 +67,16 @@ def broadcast(event_type: str, payload: dict) -> None:
         import events
         events.inspect_event(event_type, owner='hub', phase='accepted' if payload.get('result',{}).get('ok',True) else 'failed', **payload)
     with _sse_lock:
-        if not _sse_clients:
-            return
-        msg = f"data: {json.dumps({'type': event_type, 'payload': payload})}\n\n"
-        encoded = msg.encode("utf-8")
-        for q in list(_sse_clients):
-            try:
-                q.put_nowait(encoded)
-            except queue.Full:
-                pass
+        clients = [q for q in _sse_clients if q.accepts(event_type)]
+    if not clients:
+        return
+    msg = f"data: {json.dumps({'type': event_type, 'payload': payload})}\n\n"
+    encoded = msg.encode("utf-8")
+    for q in clients:
+        try:
+            q.put_nowait(encoded)
+        except queue.Full:
+            pass
 
 
 def poll_loop(stop: threading.Event) -> None:
@@ -76,7 +88,7 @@ def poll_loop(stop: threading.Event) -> None:
             for project in changed:
                 broadcast("audio_updated", {"project": project})
             with _sse_lock:
-                has_clients = bool(_sse_clients)
+                has_clients = any(q.accepts('status_update') for q in _sse_clients)
             from .workflow_map import journal, sample
             if has_clients or journal.recording:
                 statuses = project_status.all_statuses()
@@ -96,13 +108,20 @@ def stream(handler):
     handler.end_headers()
 
     stop = getattr(handler.server, "stop_event", None)
-    with subscription() as inbox:
-        init = json.dumps({
-            "type": "status_update",
-            "payload": {"projects": project_status.all_statuses()},
-        })
+    query = parse_qs(urlsplit(getattr(handler, 'path', '')).query, keep_blank_values=True)
+    event_types = None if 'events' not in query else {
+        name.strip() for value in query['events'] for name in value.split(',') if name.strip()
+    }
+    with subscription(event_types) as inbox:
         try:
-            handler.wfile.write(f"data: {init}\n\n".encode("utf-8"))
+            if inbox.accepts('status_update'):
+                init = json.dumps({
+                    "type": "status_update",
+                    "payload": {"projects": project_status.all_statuses()},
+                })
+                handler.wfile.write(f"data: {init}\n\n".encode("utf-8"))
+            else:
+                handler.wfile.write(b": connected\n\n")
             handler.wfile.flush()
             last_ping = time.monotonic()
             while stop is None or not stop.is_set():

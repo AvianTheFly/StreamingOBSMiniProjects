@@ -115,7 +115,7 @@
         "event": "game.disconnected",
         "kind": "event"
       },
-      "detail": "Game disconnect records the shared hold and queues a manual-revision-scoped intent. A registered enabled client provider owns automatic lobbies; otherwise the switcher waits for the hold, chooses a rotation location inside SceneDirector preparation and hides the shared desktop. Deferred requests retain the revision guard. Shutdown withdraws only this owner’s pending intent. The accepted lobby is repaired from the complete published layer snapshot before it appears. Each chat browser has its own board dimensions; the existing camera and desktop resources are reused. Break and Wrap up retain their automatic hold through newer game events; Auto scenes can resume the latest valid request. The feature releases only its own hold without switching scenes during shutdown.",
+      "detail": "Game disconnect records the shared hold and queues a manual-revision-scoped intent. A registered enabled client provider owns automatic lobbies; otherwise the switcher waits for the hold, chooses a rotation location inside SceneDirector preparation and hides the shared desktop. Deferred requests retain the revision guard. Shutdown withdraws only this ownerâ€™s pending intent. The accepted lobby is repaired from the complete published layer snapshot before it appears. Each chat browser has its own board dimensions; the existing camera and desktop resources are reused. Break and Wrap up retain their automatic hold through newer game events; Auto scenes can resume the latest valid request. The feature releases only its own hold without switching scenes during shutdown.",
       "steps": [
         {
           "id": "0",
@@ -370,7 +370,7 @@
         "event": "scene.decision",
         "kind": "event"
       },
-      "detail": "The finite off-air installer adds only the feature’s OBS script entry. OBS owns one frontend subscription, native show/hide transitions and style/duration controls, with no timer, socket or Hub worker. Show/hide pairs use the same mask and duration. Existing personal item transitions take priority. Unload releases its callback and removes only its own named item transitions. No camera, chat, filters, transforms, global transition or output path is changed.",
+      "detail": "The finite off-air installer adds only the featureâ€™s OBS script entry. OBS owns one frontend subscription, native show/hide transitions and style/duration controls, with no timer, socket or Hub worker. Show/hide pairs use the same mask and duration. Existing personal item transitions take priority. Unload releases its callback and removes only its own named item transitions. No camera, chat, filters, transforms, global transition or output path is changed.",
       "steps": [
         {
           "id": "0",
@@ -634,7 +634,7 @@
         "event": "hub_action",
         "kind": "control"
       },
-      "detail": "The feature validates the action against metadata exported from actual authored worlds, checks the current OBS lobby and its installed living layer, then returns a world-scoped cue to the HTTP adapter. The adapter broadcasts through the existing Hub updates owner. Native documents reject stale, wrong-world and repeated cues before handing off to the same artist. Hidden documents and page exit release subscriptions; Afterparty retains its separate public action API. No playback worker or program-scene write is added.",
+      "detail": "The feature validates the action against metadata exported from actual authored worlds, checks the current OBS lobby and its installed living layer, then returns a world-scoped cue to the HTTP adapter. The adapter broadcasts through the existing Hub updates owner. Native documents reject stale, wrong-world and repeated cues before handing off to the same artist. Hidden documents and page exit release subscriptions; Afterparty retains its separate public action API. No playback worker or program-scene write is added. The SSE subscription requests only living_lobby_action; Hub status payloads are not sent to animation documents.",
       "steps": [
         {
           "id": "0",
@@ -692,8 +692,8 @@
         }
       ],
       "owner_hashes": {
-        "scene_voice_switcher": "d22677dc856ffd2f18ebc165dbb5a6d6dd8be248e85508bb1ef5ba04b6f9ad86",
-        "hub": "37d8a0769f17a64890d5da38416b4377ad0ef16d04bf235dae60c6b0ebf0acae"
+        "hub": "b9b788f67f36e3e61acf7e7b14cf3d96728f674c610c9e1dde9d60046175fa6c",
+        "scene_voice_switcher": "dd247b23af4a5f2fd5db9354c8c493b3518ecf73520babe87886eb93641ed049"
       }
     }
   ]

@@ -139,7 +139,7 @@
           "owner": "lobby_screens",
           "label": "Relay the cue through existing Hub browser transport",
           "kind": "action",
-          "detail": "No OBS writes, new bus or global worker. Visible documents own one SSE stream; hide and teardown close it."
+          "detail": "No OBS writes, new bus or global worker. Visible documents own one SSE stream; hide and teardown close it. The SSE subscription requests only spirit_lobby_action and avoids unrelated Hub status payloads."
         },
         {
           "id": "admit",
@@ -184,11 +184,11 @@
         {
           "path": "hub_ui/updates.py",
           "symbol": "broadcast",
-          "hash": "d8bfab1d893f2bea1256f95c738fad062abb05c4c244073bcf4c9e9c86f8fe73"
+          "hash": "846f43f023b9178e3a2559fa80328474e930eb8ade3db235019863d51b3228c8"
         }
       ],
       "owner_hashes": {
-        "lobby_screens": "a36a0a9fab1c0312b4e1d6640e25a6d3cc5f4b6b5288b139145556ee3629a95c"
+        "lobby_screens": "9975c5f53cc86c7d630649c438b0c60e985a30e1e3d8fe8263de6b561021f21d"
       }
     },
     {

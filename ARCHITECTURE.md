@@ -33,6 +33,11 @@ through project interfaces, events, or shared provider contracts. HTTP feature
 adapters are explicitly declared composition boundaries in the architecture
 checker; they may import only the feature they expose.
 
+Hub event transport (`hub_ui/updates.py`) accepts optional event-type filters on
+the existing SSE subscription. Lobby documents request only their action cues;
+unrequested statuses are neither encoded nor queued. Unfiltered Hub clients keep
+the full feed, and workflow history sampling remains independent of subscribers.
+
 `lib/browser_effects/presentations.py` publishes explicitly named feature artwork
 during that feature's Hub lifetime. Identity tokens guard unregister; the shared
 HTTP server serves original file bytes (including JSON manifests) and serializes

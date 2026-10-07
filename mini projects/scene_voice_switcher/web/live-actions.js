@@ -3,7 +3,7 @@ export class LiveActions {
   constructor(world,receive){this.world=world;this.receive=receive;this.source=null;this.seen=new Map();this.disposed=false;}
   start(){
     if(this.disposed||this.source||document.hidden)return;
-    this.source=new EventSource('/api/events');
+    this.source=new EventSource('/api/events?events=living_lobby_action');
     this.source.onmessage=e=>{
       try{
         const message=JSON.parse(e.data),cue=message.payload,now=Date.now()/1000;
