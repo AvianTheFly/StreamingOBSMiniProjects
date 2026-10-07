@@ -14,21 +14,16 @@ class StartingSoonInterface(ProjectInterface):
     produces_audio = True
 
     def get_status(self):
-        data = _service.snapshot() if _service else {}
+        data = _service.status() if _service else {}
         return ProjectStatus(self.name, bool(data.get('active')), data.get('clip_title') or
                              ('Waiting for stream' if data.get('active') else None), self.controlled_scenes, True,
-                             is_paused=data.get('session_queue',{}).get('paused',False))
+                             is_paused=data.get('paused',False))
 
     def revert(self):
         self.run_action('finish')
 
     def workflow_state(self):
-        data = _service.snapshot() if _service else {}
-        images = data.get('artwork', [])
-        index = data.get('artwork_index', 0)
-        return {'opening': bool(data.get('opening')), 'active': bool(data.get('active')),
-                'artwork_file': images[index % len(images)] if images else None,
-                'error': data.get('error', '')}
+        return _service.workflow_state() if _service else {}
 
     def action_catalog(self):
         return [dict(key=k, label=v) for k, v in [('intro', 'Play opening'), ('skip-intro', 'Skip to lobby'),

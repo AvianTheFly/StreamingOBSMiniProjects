@@ -179,7 +179,7 @@
         "event": "hub_action",
         "kind": "control"
       },
-      "detail": "Artwork, editable copy, optional highlight frame, reveal style and drift are visual preferences. Named looks exclude playlists, clip placement overrides and volumes. Previews remain private; applying a look cannot start clips. Invalid personal data remains untouched, and unknown saved-look fields are preserved.",
+      "detail": "Artwork, editable copy, optional highlight frame, reveal style and drift are visual preferences. Named looks exclude playlists, clip placement overrides and volumes. Previews remain private; applying a look cannot start clips. Invalid personal data remains untouched, and unknown saved-look fields are preserved. Automatic rotation advances only during an owned waiting-room session; inactive ticks perform no file reads. Explicit artwork choices remain immediate, and re-entry starts a fresh rotation interval. Background status uses compact runtime/player state instead of rebuilding editor catalogs or copying the playlist.",
       "steps": [
         {
           "id": "0",
@@ -228,10 +228,20 @@
           "path": "mini projects/starting_soon/looks.py",
           "symbol": "validate",
           "hash": "e0bf756321c2e2de80eb16d22c3b0afd66b6b9e95cc900462c787ac28b9a4738"
+        },
+        {
+          "path": "mini projects/starting_soon/service.py",
+          "symbol": "StartingSoon.tick",
+          "hash": "ce66be8e747d760bf85241645cfe8fd8594e8980a937a61ba74e0541f0df6d75"
+        },
+        {
+          "path": "mini projects/starting_soon/service.py",
+          "symbol": "StartingSoon.status",
+          "hash": "71f12008da5f79d61c18d61b74203e5ef399f564928bd7676afcd1c8be99f3ff"
         }
       ],
       "owner_hashes": {
-        "starting_soon": "5ee563e95c9990438f778ae9cdba15e8042bdba73a22cbcb0ef1680fc2e94d07"
+        "starting_soon": "034269c9d36ddc168fbdd32b28df62984b9ca56729322dd5c8134be40c65c922"
       }
     },
     {

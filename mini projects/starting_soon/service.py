@@ -3,7 +3,7 @@ import threading
 import time
 from coordinator import coordinator
 from . import settings, clip_library, presentation, artwork, layouts
-from .config import ART, SCENE
+from .config import SCENE
 from .player import ClipPlayer
 from .opening import Opening, catalog as opening_catalog
 
@@ -27,10 +27,28 @@ class StartingSoon:
     def snapshot(self):
         with self.lock:
             data = dict(self.data)
+        catalog = artwork.catalog()
         return {**settings.read(), **data, 'session_queue':self.player.snapshot(),
                 'opening_catalog': opening_catalog(),
-                'artwork_catalog':artwork.catalog(), 'layout_catalog':layouts.PRESETS,
-                'available_artwork': sorted(p.name for p in ART.glob('*.png'))}
+                'artwork_catalog':catalog, 'layout_catalog':layouts.PRESETS,
+                'available_artwork': [row['file'] for row in catalog]}
+
+    def status(self):
+        """Cheap live status; background observers never build editor catalogs."""
+        with self.lock:
+            data = {key:self.data.get(key) for key in (
+                'active', 'clip_title', 'opening', 'artwork_index', 'error')}
+        return {**data, **self.player.status()}
+
+    def workflow_state(self):
+        data, config = self.status(), settings.read()
+        images = config['artwork']
+        return {'opening': bool(data['opening']), 'active': bool(data['active']),
+                'artwork_file': images[(data['artwork_index'] or 0) % len(images)] if images else None,
+                'error': data['error'] or ''}
+
+    def tick_interval(self):
+        return .25 if self.session is not None else 1.0
 
     def place_clip(self, path=''):
         if getattr(self, 'opening', None) and self.opening.active:
@@ -76,6 +94,7 @@ class StartingSoon:
             if not self.session.activate():
                 self.close()
                 raise ValueError('Scene selection changed; try opening Starting Soon again.')
+            self.last_rotation = time.monotonic()
             self.publish(ready=True, active=True, error='')
         elif action == 'finish':
             self.close()
@@ -114,7 +133,8 @@ class StartingSoon:
             self.publish(artwork_index=config['artwork'].index(body['file']))
             self.last_rotation = time.monotonic()
         elif action == 'next-art':
-            self.publish(artwork_index=self.snapshot()['artwork_index'] + 1)
+            with self.lock:
+                self.publish(artwork_index=self.data['artwork_index'] + 1)
             self.last_rotation = time.monotonic()
         elif action in ('show-message','hide-message'):
             settings.save({'show_message':action=='show-message'})
@@ -124,6 +144,8 @@ class StartingSoon:
     def tick(self):
         if self.session and not self.session.owns_scene():
             self.close()
+        if self.session is None:
+            return  # No waiting-room policy or disk reads during gameplay.
         if getattr(self, 'opening', None):
             self.opening.tick()
         config = settings.read()

@@ -13,7 +13,7 @@ def run(input_queue, stop_event, *, startup_event=None):
             startup_event.set()
         while not stop_event.is_set():
             try:
-                action, body = input_queue.get(timeout=.25)
+                action, body = input_queue.get(timeout=service.tick_interval())
             except queue.Empty:
                 action, body = None, {}
             try:

@@ -258,7 +258,12 @@ This is a standalone maintenance owner, never imported by the Hub. See
 `docs/OBS-ORGANIZATION.md` for the installed structure and paired rollback.
 
 Starting Soon owns waiting-room policy in `mini projects/starting_soon/service.py`,
-personal configuration and named playlists in `settings.py`, atomic per-clip
+including rotation only while its scene session is active. Idle ticks do no
+settings/catalog work; queued controls still wake immediately. Its public status
+and workflow snapshots bypass editor catalogs and queue/history copies; player
+status reports the same worker and permission gate. Editor artwork availability
+and labels come from one catalog scan.
+Personal configuration and named playlists live in `settings.py`, atomic per-clip
 levels in `levels.py`, dedicated OBS sources in `presentation.py`, and one source
 worker in `player.py`. `opening.py` owns the approved Sanctuary opening on that
 same worker: wait for cleanup, temporarily use full-canvas placement, restore the

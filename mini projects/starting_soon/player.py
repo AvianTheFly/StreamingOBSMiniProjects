@@ -26,7 +26,11 @@ class ClipPlayer:
 
     def snapshot(self):
         data = self.plan.snapshot() if self.plan else dict(current=None, upcoming=[], history=[], played=0)
-        return {**data, 'busy':self.worker.busy, 'paused':self.worker.busy and not self.gate.is_set()}
+        return {**data, **self.status()}
+
+    def status(self):
+        busy = self.worker.busy
+        return {'busy':busy, 'paused':busy and not self.gate.is_set()}
 
     def edit_queue(self, action, body, rows=None):
         if not self.worker.busy or self.plan is None:

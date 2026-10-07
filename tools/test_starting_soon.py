@@ -211,6 +211,44 @@ class PlayerTests(unittest.TestCase):
 
 
 class SessionTests(unittest.TestCase):
+    def test_idle_ticks_do_no_settings_catalog_or_opening_work(self):
+        service = StartingSoon.__new__(StartingSoon)
+        service.session = None;service.opening = Mock()
+        with patch('starting_soon.service.settings.read',side_effect=AssertionError('idle disk read')), \
+             patch('starting_soon.service.artwork.catalog',side_effect=AssertionError('idle catalog')):
+            for _ in range(240): service.tick()
+        service.opening.tick.assert_not_called()
+        self.assertEqual(service.tick_interval(), 1)
+
+    def test_active_rotation_and_explicit_idle_choices_keep_the_selected_art(self):
+        service = StartingSoon.__new__(StartingSoon)
+        service.session = Mock();service.session.owns_scene.return_value=True
+        service.opening = Mock();service.lock = threading.RLock()
+        service.data = {'artwork_index':4};service.last_rotation=0
+        with patch('starting_soon.service.time.monotonic',return_value=40), \
+             patch('starting_soon.service.settings.read',return_value={'rotation_seconds':35}), \
+             patch.object(service,'snapshot',side_effect=AssertionError('rotation must not build editor')):
+            service.tick()
+            self.assertEqual(service.data['artwork_index'],5)
+            self.assertEqual(service.tick_interval(),.25)
+            service.session=None;service.execute('next-art',{})
+            self.assertEqual(service.data['artwork_index'],6)
+        service.opening.tick.assert_called_once()
+
+    def test_status_observers_do_not_read_files_or_copy_queue_history(self):
+        from starting_soon import interface as runtime
+        service = StartingSoon.__new__(StartingSoon)
+        service.lock=threading.RLock();service.data=dict(active=True,clip_title='Personal clip',artwork_index=0)
+        player = ClipPlayer.__new__(ClipPlayer);player.worker=Mock(busy=True);player.gate=threading.Event()
+        player.plan=Mock();service.player=player
+        with patch.object(runtime,'_service',service), \
+             patch('starting_soon.service.settings.read',side_effect=AssertionError('status disk read')), \
+             patch('starting_soon.service.artwork.catalog',side_effect=AssertionError('status catalog')):
+            for _ in range(30): status=runtime.interface.get_status()
+        self.assertTrue(status.is_active);self.assertTrue(status.is_paused)
+        self.assertEqual(status.current_activity,'Personal clip')
+        player.plan.snapshot.assert_not_called()
+
     def test_disabled_highlights_reject_play_before_resolving_or_loading(self):
         service=StartingSoon.__new__(StartingSoon);service.session=Mock();service.player=Mock()
         with patch('starting_soon.service.settings.read',return_value={'highlights_enabled':False}), \

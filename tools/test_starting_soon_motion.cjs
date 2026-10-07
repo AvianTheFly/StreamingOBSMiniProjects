@@ -16,7 +16,7 @@ const out=process.env.STARTING_SOON_OUTPUT_DIR||'C:/Users/Michael/.codex/artifac
    if(u.pathname==='/deck-test.html')return route.fulfill({contentType:'text/html',body:'<div id="a"></div><div id="b"></div>'});
    if(u.searchParams.has('hold'))return;
    if(u.pathname.endsWith('/mountain.png')&&blocked)await blocked;
-   const file=u.pathname.startsWith('/starting-soon/art/')?path.join(root,'mini projects/starting_soon/art',path.basename(u.pathname)):path.join(app,u.pathname);
+   const file=u.pathname==='/shared/visible-poll.js'?path.join(root,'lib/browser_effects/web/visible-poll.js'):u.pathname.startsWith('/starting-soon/art/')?path.join(root,'mini projects/starting_soon/art',path.basename(u.pathname)):path.join(app,u.pathname);
    return route.fulfill({body:fs.readFileSync(file),contentType:file.endsWith('.css')?'text/css':file.endsWith('.js')?'text/javascript':file.endsWith('.png')?'image/png':'text/html'});
   });
   await page.goto('http://motion.test/starting-soon/overlay.html?demo=1');
