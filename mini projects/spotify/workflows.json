@@ -38,7 +38,7 @@
           "label": "Analyze newest Spotify audio packet",
           "owner": "spotify",
           "kind": "action",
-          "detail": "One owned process captures only Spotify on an MTA thread and serves fresh spectra directly on the existing browser port. Hub status is sampled from a nonblocking latest-frame mailbox; a separate control mailbox carries media and visibility. Process identity checks replace global scans. Causal frequency windows and bounded cleanup preserve one capture. Fixed waveform gain and unsaturated full-window presence preserve loud/quiet contrast. Salient partial interactions supply a bounded roughness proxy; spectral flatness supplies noise content. Both reuse the existing transform and are published in complete audio frames. Absolute register energy uses Hann-compensated Parseval power from the same causal transforms. Display compression never supplies structural gain."
+          "detail": "One owned process captures only Spotify on an MTA thread and serves fresh spectra directly on the existing browser port. Hub status is sampled from a nonblocking latest-frame mailbox; a separate control mailbox carries media and visibility. Process identity checks replace global scans. Causal frequency windows and bounded cleanup preserve one capture. Fixed waveform gain and unsaturated full-window presence preserve loud/quiet contrast. Salient partial interactions supply a bounded roughness proxy; spectral flatness supplies noise content. Both reuse the existing transform and are published in complete audio frames. Absolute register energy uses Hann-compensated Parseval power from the same causal transforms. Display compression never supplies structural gain. Frequency selections and waveform coordinates are cached in bounded immutable plans; stereo register power is reduced in batches without changing per-packet cadence or measured values."
         },
         {
           "id": "3",
@@ -49,8 +49,8 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "spotify": "64aafcfac7c473dd4a4b19ded7e17935607fd67fdac879ddd4df9438b971dfea"
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "spotify": "068f8f01d9e702a91db987c1b31b929fb1fcd3acac35fc36a4c6db37ae095fb0"
       },
       "edges": [
         {
@@ -100,7 +100,7 @@
         {
           "path": "mini projects/spotify/audio_analysis.py",
           "symbol": "AudioAnalysis",
-          "hash": "eba429781c110c4941fc08273da4feb07964fa4371574151fccdff16c3cc5bd5"
+          "hash": "bd565e5e44ee95d40aa36d5397d1026ebcd6e31dfee44f4d220b845935d351a8"
         },
         {
           "path": "mini projects/spotify/audio_texture.py",

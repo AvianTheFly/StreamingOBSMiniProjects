@@ -46,6 +46,33 @@ def spectrum(samples, rate):
     return _bands(magnitude, mono, bounds)
 
 
+@lru_cache(maxsize=8)
+def _display_plan(size, rate):
+    """Immutable frequency selections and waveform coordinates, shared by packets."""
+    edges = np.geomspace(40, min(16000, rate / 2), 49)[:-1]
+    mid = np.flatnonzero((edges >= 350) & (edges < 2500))
+    high = np.flatnonzero(edges >= 2500)
+    positions = np.linspace(0, size - 1, 128)
+    samples = np.arange(size)
+    for values in (mid, high, positions, samples):
+        values.flags.writeable = False
+    return mid, high, positions, samples
+
+
+def _voice_power(transform, size, rate, first, last):
+    """Reduce contiguous registers together instead of issuing per-voice kernels."""
+    left = transform[:, 0]
+    right = transform[:, min(1, transform.shape[1] - 1)]
+    energy = np.column_stack((np.abs(left)**2, np.abs(right)**2,
+                              np.abs((left-right)*.5)**2))
+    bounds = _spectral_plan(size, rate)[4][first*6:last*6+1:6]
+    # A final edge may be just past the transform on odd-sized input windows.
+    energy = np.vstack((energy, np.zeros((1, 3))))
+    totals = np.add.reduceat(energy, bounds, axis=0)[:-1]
+    totals[bounds[1:] == bounds[:-1]] = 0
+    return totals
+
+
 class AudioAnalysis:
     def __init__(self):
         self.bass_average = .02
@@ -77,15 +104,14 @@ class AudioAnalysis:
         if realtime and len(samples) >= 2048:
             # Frequency-dependent apertures: 46 ms bass, 23 ms mids, 12 ms
             # highs. Equal normalization keeps the absolute dB range intact.
-            for size, low, high in ((1024, 350, 2500), (512, 2500, float('inf'))):
+            mid, high, _, _ = _display_plan(512, rate)
+            for size, indices in ((1024, mid), (512, high)):
                 short_window, _, _, _, short_bounds = _spectral_plan(size, rate)
                 short = np.fft.rfft(samples[-size:] * short_window[:, None], axis=0)
                 transforms[size] = short
                 levels = _bands(np.sqrt(np.mean(np.abs(short)**2, axis=1)), samples[-size:, 0], short_bounds)
-                edges = np.geomspace(40, min(16000, rate/2), 49)
-                for i, frequency in enumerate(edges[:-1]):
-                    if low <= frequency < high:
-                        bands[i] = levels[i]
+                for i in indices:
+                    bands[i] = levels[i]
         energy = float(1-np.exp(-rms*14))
         bass = float(np.mean(bands[:15]))
         treble = float(np.mean(bands[32:]))
@@ -93,7 +119,8 @@ class AudioAnalysis:
         self.beat = max(self.beat*.74, min(1., onset*5))
         self.bass_average += (bass-self.bass_average)*.055
         wave_source = mono[-512:] if realtime else mono
-        wave = np.interp(np.linspace(0, len(wave_source)-1, 128), np.arange(len(wave_source)), wave_source)
+        _, _, positions, sample_indices = _display_plan(len(wave_source), rate)
+        wave = np.interp(positions, sample_indices, wave_source)
         # Fixed display gain preserves a quiet passage's smaller waveform.
         # Per-packet RMS normalization exaggerated low-level material and
         # concealed the difference between a held sound and a release.
@@ -112,21 +139,17 @@ class AudioAnalysis:
         width = float(np.clip(np.sqrt(np.mean(side*side)) / max(rms, .001), 0, 1))
         left, right = np.sqrt(np.mean(stereo[:, :2]**2, axis=0))
         balance = float((right-left)/(right+left+1e-9))
-        voice_widths, voice_balances, voice_levels = [], [], []
-        for voice in range(8):
-            size = (2048 if voice < 3 else 1024 if voice < 6 else 512) if realtime and len(samples) >= 2048 else len(samples)
-            spatial_fft = transforms[size]
-            left_fft, right_fft = spatial_fft[:, 0], spatial_fft[:, min(1, spatial_fft.shape[1]-1)]
-            voice_slices = _spectral_plan(size, rate)[2]
-            section = slice(voice_slices[voice*6].start, voice_slices[voice*6+5].stop)
-            l, r = left_fft[section], right_fft[section]
-            lp, rp = float(np.sum(np.abs(l)**2)), float(np.sum(np.abs(r)**2))
-            side_power = float(np.sum(np.abs((l-r)*.5)**2))
-            # Parseval energy with Hann power compensation. Unlike logarithmic
-            # display bars, this fixed-gain register level preserves dynamics.
-            voice_levels.append(float(np.clip(np.sqrt((lp+rp)*.5)*np.sqrt(16/3)/size*2, 0, 1)))
-            voice_widths.append(float(np.clip(np.sqrt(side_power/max((lp+rp)*.5, 1e-12)), 0, 1)))
-            voice_balances.append(float((np.sqrt(rp)-np.sqrt(lp))/(np.sqrt(rp)+np.sqrt(lp)+1e-9)))
+        groups = ((2048, 0, 3), (1024, 3, 6), (512, 6, 8)) if realtime and len(samples) >= 2048 else ((len(samples), 0, 8),)
+        powers = np.concatenate([_voice_power(transforms[size], size, rate, first, last)
+                                 for size, first, last in groups])
+        sizes = np.concatenate([np.full(last-first, size) for size, first, last in groups])
+        lp, rp, side_power = powers.T
+        average = (lp+rp)*.5
+        # The same Hann-compensated Parseval power and fixed gain for all voices.
+        voice_levels = np.clip(np.sqrt(average)*np.sqrt(16/3)/sizes*2, 0, 1).tolist()
+        voice_widths = np.clip(np.sqrt(side_power/np.maximum(average, 1e-12)), 0, 1).tolist()
+        left_power, right_power = np.sqrt(lp), np.sqrt(rp)
+        voice_balances = ((right_power-left_power)/(right_power+left_power+1e-9)).tolist()
         flux = float(np.clip(np.maximum(0, np.array(bands)-self.previous_spectrum).mean()*5, 0, 1))
         self.previous_spectrum = np.array(bands)
         return bands, dict(waveform=wave.tolist(), bass=bass, treble=treble, energy=energy, beat=self.beat,
