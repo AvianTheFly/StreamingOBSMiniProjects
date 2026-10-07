@@ -1,3 +1,69 @@
+# Additional passive gaming optimization pass — 2026-10-07
+
+Initial rollback checkpoint: `05194e9`. Tracked code was clean, so the checkpoint
+is an explicit empty commit. Existing output artifacts were left out of commits.
+Personal settings were snapshotted under LOCALAPPDATA before maintenance.
+
+| Change | Verified behavior | Commit |
+| --- | --- | --- |
+| Filter presentation event feeds | Living lobbies and Spirit Afterparty request only their cue types. Unwanted status payloads are not serialized or queued. The ordinary Hub feed and independent workflow history retain status sampling. | `d2f03cb` |
+| Reuse Spotify track metadata | The half-second playback heartbeat and immediate WinRT events retain responsiveness. Track properties refresh on metadata/session changes or a five-second fallback. A deterministic ten-second run made two metadata reads; events arriving during an awaited read remain pending. | `7ea6d62` |
+| Cull covered lobby triangles | Across all eleven authored worlds, two aperture layouts and three times, all 66 full-resolution frames were pixel-identical. Image draw calls fell from 36,984 to 27,157 (26.6%). Current deformed bounds plus a seam/antialias margin protect aperture edges and visible re-entry. Mesh density and personal placement are unchanged. | `c8a80ff` |
+| Postpone League archive work during gameplay | InProgress/Reconnect keep live observations and chat active while historical downloads, enrichment, rank and catalogue refresh wait. Pending work and manual import intent survive; the same worker resumes after gameplay. Temporary live-feed failure does not start backfill during a match. | `a3d46a9` |
+| Bound Spotify browser lifetimes and recovery | Invisible sources release animation callbacks while audio generations continue musical history. Page exit cancels fetch/deadline/retry work and rejects stale responses on restoration. Outage retries back off to two seconds. Chromium observed zero invisible paints, zero page-exit requests and three requests during a 2.2-second outage. | `68b2a23` |
+
+These measurements describe specific operations, not an equivalent percentage
+reduction in total CPU/GPU use. No active game was available for an FPS comparison.
+The idle baseline on SkyHarborLobby/Lobbies measured 14.41% whole-machine CPU,
+0.330% Python, 1.124% OBS main and 6.564% OBS browser children, with zero new render
+skips in fifteen seconds. Animated browser composition remains a material cost.
+
+The audit also revisited voice capture, keyboard delivery, shared media workers,
+metadata preparation, conversion budgets, live League snapshot sharing, status
+and fader reconciliation, asset discovery, native thread limits and the browser
+presentation loops. The existing source ownership and bounded worker architecture
+was retained. A larger rewrite was not necessary for these savings. No resolution,
+frame-rate, bitrate, encoder, voice-model, asset-volume, filter or layout setting
+was lowered. Gameplay prioritization belongs to the League statistics collector;
+event filtering belongs to Hub transport; drawing policy remains in each feature.
+
+## Verification and deployment
+
+- Full offline suite: **1,088 tests passed**, 174.962 seconds. Architecture:
+  **416 modules, zero violations**. No tests were disabled or removed.
+- Chromium: 66 identical real-art frames across eleven lobbies; 24 additional
+  shared-mesh reference frames; Spotify visibility, live timing, recovery,
+  page teardown/restoration; and GET-only desktop/mobile Hub views passed.
+- The workflow checker remains non-clean: inherited stale proofs and conservative
+  whole-owner review flags remain elsewhere. Changed explanations were reviewed
+  and their specific proofs stamped. No checker was weakened.
+- Hub 2792 and its descendants shut down gracefully. The supported hidden Hub is
+  now **24548**, with exactly one keyboard child **13112**, all **14 modules
+  startup-ready**, and voice ready. The active Sky Harbor living-world browser
+  was refreshed; Spotify's existing startup owner refreshed its browser.
+- All **64 personal/config JSON files** and **37 browser settings** matched before
+  and after. Soundboard retains only `default` and `@ -> hooray`. OBS recording
+  profile paths and root REPLAY_DIR still agree on `C:\StreamingMedia\Replays`.
+  Scene, output status and video settings matched. Stream, recording and replay
+  buffer remained stopped as found. Four startup socket-abort traces were logged;
+  no other exception type or module readiness failure was observed.
+- Final fifteen-second off-air sample on the same lobby: **11.99% system CPU**,
+  **0.432% Python**, **1.129% OBS main**, **5.768% OBS browser children**, 0.626 ms
+  render time and **zero new skipped render frames**. Browser CPU was lower than
+  the 6.564% baseline, but animation and unrelated load vary; this is not a
+  controlled causal saving or a gaming FPS measurement. GPU improvement remains
+  unmeasured.
+Evidence is saved under `%LOCALAPPDATA%/StreamingHub/diagnostics/passive-20261007/`.
+Reproduce the focused browser checks with `node tools/test_lobby_occlusion.cjs`
+(read-only artwork requests to the running Hub) and
+`node tools/test_spotify_transport.cjs` (isolated local fixture). The former needs
+Playwright; the existing workspace Node dependency bundle supplies it.
+
+For rollback, first snapshot the latest settings with
+`lib.settings_backups.SettingsBackups().snapshot()`, then revert selected commits,
+newest first when dependent. Do not reset the checkout to an old settings snapshot
+or restore an earlier master volume. Each implementation step has its own commit.
+
 # Passive gaming follow-up — 2026-10-06
 
 This pass searched the supported Hub's passive loops, OBS/browser presentation,
