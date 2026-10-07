@@ -1,7 +1,10 @@
 import {WorldDeck} from './world-deck.js';
 const $=id=>document.getElementById(id), query=new URLSearchParams(location.search);
-let loadedAt=0,fetching=false,draft={},lastState=null,renderVersion=0;
+let loadedAt=0,fetching=false,draft={},lastState=null,viewSignature='',disposed=false,request=null,sourceVisible=true;
 const deck=new WorldDeck([$('bg1'),$('bg2')]);
+function visibility(){deck.setVisible(sourceVisible&&!document.hidden);}
+addEventListener('obsSourceVisibleChanged',e=>{sourceVisible=e.detail?.visible!==false;visibility();});
+document.addEventListener('visibilitychange',visibility);visibility();
 const demoPage=query.has('demo');
 const layerMode=['artwork','message','frame'].includes(query.get('layer'))?query.get('layer'):'full';
 document.documentElement.dataset.layer=layerMode;
@@ -24,8 +27,8 @@ function place(box){
  document.querySelector('footer').style.display=y+h>990?'none':'flex';
  fitHeading(corner?262:y-55);
 }
-async function render(s){
- const version=++renderVersion;
+function render(s){
+ if(disposed)return;
  const available=s.available_artwork||[],art=s.artwork?.filter(name=>available.includes(name))||[];
  const index=(s.artwork_index||0)%Math.max(1,art.length);
  const name=draft.art||query.get('art')||art[index];
@@ -33,31 +36,38 @@ async function render(s){
   // Do not block status polling or text changes on a two-second reveal.
   deck.show(name,{style:draft.transition_style??s.transition_style,motion:draft.motion??s.motion});
  }
- if(version!==renderVersion)return;
  const info=s.artwork_catalog?.find(a=>a.file===name);
  const legacy={'fjord.png':'FJORD SANCTUARY','forest.png':'THE SPIRIT GROVE','mountain.png':'FORGE ABOVE THE CLOUDS'};
- $('location').textContent=info?.title.toUpperCase()||legacy[name]||name?.replace(/\.png$/,'').toUpperCase()||'';
- $('title').textContent=draft.title??s.title??'STREAM STARTING SOON';$('subtitle').textContent=draft.subtitle??s.subtitle??'';
- $('title').parentElement.hidden=layerMode==='artwork'||!(draft.show_message??s.show_message??true);
  const enabled=draft.highlights_enabled??s.highlights_enabled??true;
  const demo=enabled&&demoPage&&(draft.demo??true);
- $('clip-title').textContent=s.clip_title||(demo?'Selected highlight · placement preview':'');
- document.body.classList.toggle('playing',enabled&&!demoPage&&!!s.playing&&!!s.active);
- document.body.classList.toggle('demo',demo);
+ const view={location:info?.title.toUpperCase()||legacy[name]||name?.replace(/\.png$/,'').toUpperCase()||'',
+  title:draft.title??s.title??'STREAM STARTING SOON',subtitle:draft.subtitle??s.subtitle??'',
+  message:layerMode!=='artwork'&&(draft.show_message??s.show_message??true),
+  clip:s.clip_title||(demo?'Selected highlight · placement preview':''),demo,
+  playing:enabled&&!demoPage&&!!s.playing&&!!s.active,art,index,
+  box:draft.clip_box||s.clip_box||[690,320,1144,643.5],footer:draft.show_footer??s.show_footer??true};
+ const signature=JSON.stringify(view);
+ if(signature===viewSignature)return;
+ viewSignature=signature;
+ $('location').textContent=view.location;$('title').textContent=view.title;$('subtitle').textContent=view.subtitle;
+ $('title').parentElement.hidden=!view.message;$('clip-title').textContent=view.clip;
+ document.body.classList.toggle('playing',view.playing);document.body.classList.toggle('demo',demo);
  $('dots').replaceChildren(...art.map((_,i)=>{const d=document.createElement('i');d.className=i===index?'active':'';return d;}));
- place(draft.clip_box||s.clip_box||[690,320,1144,643.5]);
- if(!(draft.show_footer??s.show_footer??true))document.querySelector('footer').style.display='none';
+ place(view.box);
+ if(!view.footer)document.querySelector('footer').style.display='none';
 }
 addEventListener('message',e=>{
  if(!demoPage||e.source!==parent||e.origin!==location.origin||!e.data?.startingSoonPreview)return;
  const v=e.data.startingSoonPreview;draft=v.reset?{}:{...draft,...v};if(lastState)render(lastState);
 });
 async function refresh(){
- if(fetching)return;fetching=true;
- try{const r=await fetch('/api/starting-soon',{cache:'no-store'});if(!r.ok)throw Error();lastState=await r.json();loadedAt=Date.now();await render(lastState);}
- catch{if(Date.now()-loadedAt>3000)document.body.classList.remove('playing');}
- finally{fetching=false;}
+ if(fetching||disposed)return;fetching=true;
+ const controller=new AbortController();request=controller;
+ const timeout=setTimeout(()=>controller.abort(),3000);
+ try{const r=await fetch('/api/starting-soon',{cache:'no-store',signal:controller.signal});if(!r.ok)throw Error();const state=await r.json();if(disposed)return;lastState=state;loadedAt=Date.now();render(lastState);}
+ catch{if(!disposed&&Date.now()-loadedAt>3000){document.body.classList.remove('playing');viewSignature='';}}
+ finally{clearTimeout(timeout);if(request===controller)request=null;fetching=false;}
 }
 refresh();const poll=setInterval(refresh,750);
-addEventListener('pagehide',()=>{clearInterval(poll);deck.dispose();},{once:true});
+addEventListener('pagehide',()=>{disposed=true;clearInterval(poll);request?.abort();deck.dispose();},{once:true});
 

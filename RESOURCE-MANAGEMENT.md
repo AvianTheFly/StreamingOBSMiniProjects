@@ -800,3 +800,17 @@ Rollback inputs are stored in `diagnostics/frame-caps-20261006-221908` under
 LOCALAPPDATA/StreamingHub; settings history was also snapshotted first.
 The matching lobby/layout tests passed 26 cases. Step 3's full offline run
 passed 1,054 tests in 171.345 seconds, including the HTTP body fix.
+
+The two 30-second off-air frame-cap samples do **not** establish CPU savings:
+OBS browser processes averaged 5.796% of the machine before and 7.476% after;
+system CPU was 21.23% and 22.97%. Random lobby activity and other applications
+were not controlled. OBS stayed at 60 FPS with zero new rendering skips in both
+windows. Treat the cap as enforcement of the authored rate, not a measured win.
+
+Step 5 stops Starting Soon's unchanged 750-ms responses from rebuilding its DOM
+and forcing heading/layout calculations. A real Chromium run received four
+responses in 3.1 seconds with **zero DOM mutations and zero layouts**. Changes
+to text and clip placement still rendered, stale connection state recovered,
+and teardown aborted the pending request. Artwork drift/reveals pause off-scene;
+status remains current. Existing four-style animation, geometry, transparent
+layer, stale decode and reduced-motion checks also passed.

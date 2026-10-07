@@ -261,7 +261,9 @@ failure returns to Starting Soon and exposes the error. It starts no extra worke
 from saved playlists; `layouts.py` owns validated placement and per-asset precedence;
   `artwork.py` owns the artwork catalog. `looks.py` validates reusable visual presets;
   browser `world-deck.js` owns two bounded image layers, reveal cancellation and drift,
-  while the overlay owns separate artwork, message and frame presentation. The
+  pausing motion while the source is invisible. The overlay owns separate artwork,
+  message and frame presentation, memoizes the displayed fields to avoid unchanged
+  DOM/layout work, and cancels its bounded request and polling on exit. The
   production desk saves visual looks without changing playlists, asset placements
   or levels, and disabling highlights cancels the existing clip worker.
   Its persistent temporary `SceneSession` prevents automatic game

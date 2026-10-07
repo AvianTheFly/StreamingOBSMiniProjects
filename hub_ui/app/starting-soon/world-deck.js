@@ -2,11 +2,18 @@
 export const WORLD_TRANSITIONS={dissolve:'Cinematic dissolve',portal:'Celestial aperture',gates:'Stormglass gates',embers:'Ember sweep'};
 const duration=1800;
 export class WorldDeck{
- constructor(elements){this.elements=elements;this.shown='';this.current=0;this.intent=0;this.animations=[];this.disposed=false;}
+ constructor(elements){this.elements=elements;this.shown='';this.current=0;this.intent=0;this.animations=[];this.disposed=false;this.visible=true;}
+ setVisible(visible){
+  if(this.disposed||this.visible===visible)return;
+  this.visible=visible;
+  for(const el of this.elements)el.style.animationPlayState=visible?'running':'paused';
+  for(const animation of this.animations)visible?animation.play():animation.pause();
+ }
  cancel(){for(const animation of this.animations)animation.cancel();this.animations=[];}
  async show(name,{style='dissolve',motion='still'}={}){
   if(this.disposed)return;
-  for(const el of this.elements)el.dataset.motion=motion==='drift'?'drift':'still';
+  const mode=motion==='drift'?'drift':'still';
+  for(const el of this.elements)if(el.dataset.motion!==mode)el.dataset.motion=mode;
   if(this.pending===name)return;
   if(this.shown===name){
    if(this.pending){this.intent++;this.pending='';this.cancel();this.elements[1-this.current].classList.remove('visible');}
@@ -21,7 +28,7 @@ export class WorldDeck{
   const first=!this.shown;next.style.backgroundImage=`url("${url}")`;next.style.zIndex='1';previous.style.zIndex='0';
   next.classList.add('visible');this.shown=name;this.current=1-this.current;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(first||reduced){previous.classList.remove('visible');return;}
+  if(first||reduced||!this.visible){previous.classList.remove('visible');return;}
   const frames={
    dissolve:[{opacity:0},{opacity:1}],
    portal:[{clipPath:'circle(0% at 50% 50%)',filter:'brightness(1.35)'},{clipPath:'circle(80% at 50% 50%)',filter:'brightness(1)'}],
@@ -33,5 +40,5 @@ export class WorldDeck{
   if(this.disposed||intent!==this.intent)return;
   previous.classList.remove('visible');this.cancel();
  }
- dispose(){this.disposed=true;this.intent++;this.cancel();}
+ dispose(){this.setVisible(false);this.disposed=true;this.intent++;this.cancel();}
 }
