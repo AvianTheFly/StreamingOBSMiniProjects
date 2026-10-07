@@ -29,11 +29,14 @@ def benchmark():
         rows = {}
         for overlay in (False, True):
             times=[]
-            for _ in range(20):
+            for _ in range(6):
                 started=time.process_time()
-                value=tracker.snapshot(overlay=overlay,period='all')
-                payload=json.dumps(value)
-                times.append((time.process_time()-started)*1000)
+                # Batch samples so Windows' CPU-time tick is small relative to
+                # each measured interval, rather than rounding individual reads.
+                for _ in range(10):
+                    value=tracker.snapshot(overlay=overlay,period='all')
+                    payload=json.dumps(value)
+                times.append((time.process_time()-started)*100)
             rows['overlay' if overlay else 'full']=dict(cpu_ms=statistics.median(times),json_bytes=len(payload.encode()))
         return dict(matches=len(tracker.records),**rows,
                     reduction_percent=100*(1-rows['overlay']['cpu_ms']/rows['full']['cpu_ms']))

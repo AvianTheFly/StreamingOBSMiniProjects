@@ -1,4 +1,96 @@
-# Media resource work
+# Latest codebase optimization pass — 2026-10-06
+
+Five additional optimizations are implemented, committed separately and loaded
+in the supported Hub. The starting rollback checkpoint is `b13b9fb`. Personal
+settings were snapshotted outside the repository before maintenance.
+
+## Measured changes
+
+| Change | Evidence | Commit |
+| --- | --- | --- |
+| Spotify packet analysis reuses immutable frequency/waveform plans and batches stereo register reductions | Median CPU time fell from 1.016 to 0.781 ms per packet (23.1%). All fields matched across 240 synthetic packets, including silence, changing levels, opposed stereo, odd windows and three sample rates; maximum difference 3.33e-16. Packet cadence, gain and visualizer behavior are preserved. | `9e2688d` |
+| Replay inventory reuses directory metadata for filtering, ordering and UI sizes, and reads one label generation | A fresh 1,200-file disposable scan fell from 307.6 to 29.2 ms (90.5%). Explicit Path.stat calls fell from 4,819 to 1; directory entries still supply metadata. This fixture has no linked-label overhead. Newly added, resized and deleted files remain visible on the next request; there is no retained inventory cache. | `db2fdcd` |
+| OBS League stats requests only viewer fields; hidden overlays cancel polling | In a 1,200-match archive, full report plus serialization used 73.44 ms CPU versus 28.91 ms for the viewer response (60.6%). JSON fell from 34,921 to 4,485 bytes. Viewer fields match the full desk across periods and spotlight topics. Export also bypasses report generation. | `aaf71dc` |
+| Idle Twitch celebrations wait for service notifications | Chromium made 2 requests instead of 9 over 2.4 seconds; a queued alert appeared 29 ms after notification in the isolated test. One-second condition waits release the state lock; active cadence, legacy responses, cancellation and shutdown remain covered. | `73f789f` |
+| League presentations stop invisible and idle drawing | The match-screen 20 Hz idle timer is gone, repeated empty updates perform zero canvas clears, and hidden production borders/match screens perform zero draw calls. Returning uses current elapsed time and rejects expired results. | `528ebde` |
+
+These are measurements of particular operations, not percentages to add together
+or a demonstrated whole-machine CPU/GPU reduction. CPU benchmarks use bounded
+native pools; the stats benchmark batches reads to reduce Windows CPU-timer
+quantization. Commands are reproducible with:
+
+```powershell
+py -3.11 tools/benchmark_spotify_analysis.py --reference b13b9fb --output output/spotify-analysis.json
+py -3.11 tools/benchmark_replay_inventory.py --reference b13b9fb --output output/replay-inventory.json
+py -3.11 tools/benchmark_stats_snapshot.py --output output/stats-snapshot.json
+```
+
+## Architecture and broader audit
+
+Twitch assembly now lives in `main.py`, synchronized queue/settings/notification
+state in `service.py`, and OBS attachment in `obs_source.py`. HTTP adapters and
+project controls call public service methods. Shutdown wakes pending requests;
+no additional polling worker, audio controller or OBS connection was introduced.
+Settings edits now use the shared atomic JSON transaction and preserve unknown
+fields from external edits and malformed files. Existing imports of Service from
+main remain compatible. All media and personalized files stayed in place.
+
+The audit also reviewed shared playback admission, decoder lifetime, conversion
+budgets, native CPU pools, voice, metadata preparation, browser transport, scene
+ownership and diagnostic polling. Their existing bounds remain in effect:
+two-thread native defaults, one worker per physical source, a shared finite-job
+budget, bounded persistent metadata and CPU-sensitive background preparation.
+OBS output remains 1920x1080 at 60 FPS. No quality, bitrate, encoder, voice-model,
+profile, asset gain, transform or scene-layout setting was changed in this pass.
+
+The active authored lobby remains the largest observed application component:
+OBS browser children used about 6.64% of the whole CPU during the final off-air
+sample. Further reductions there need per-scene measurements of artwork/media
+costs; blanket source shutdown could interrupt audio, alerts or readiness.
+Saved diagnostics confirm historical 100% system CPU incidents, but the incident
+samples do not establish one consistent cause. Gaming-time spike elimination
+and changes to game frame times or GPU utilization remain unverified.
+
+## Verification and deployment
+
+- Full offline suite: **1,069 tests passed**, 170.756 seconds. Tests were not
+  discarded. Added regressions exercise real files, HTTP waits, concurrent state
+  changes, fresh snapshots, malformed settings preservation and shutdown.
+- Architecture: **415 modules, zero violations**. Relevant workflow explanations
+  were updated and reviewed. The workflow checker still reports inherited stale
+  proofs and broad owner-scope review flags elsewhere, including Hub scope after
+  the UI changes; it is not a clean pass.
+- Chromium: complete League stats desktop/mobile/viewer checks; notification and
+  legacy Twitch transport plus all four raid worlds; all three match pictures,
+  borders and deadlines; seven League ambient themes and 58 border events;
+  zero hidden draws, idle clears and expired-result resumption. Live Hub UI
+  verification used GET-only requests and passed.
+- Original Hub 21260 and keyboard/Spotify children exited through normal Ctrl+C
+  cleanup. Hub **21824** started hidden from this checkout, with one keyboard
+  child **9212**, all 14 modules ready, and small.en CUDA voice ready. Preparation
+  completed with zero failures. Existing desktop chat stayed running.
+- All **64 checked personal/config JSON files** and all **37 OBS browser-input
+  settings** matched across restart. Soundboard has only `default`, with
+  `@ -> hooray`. Root REPLAY_DIR, OBS recording directory and all three profile
+  output paths still point to `C:\StreamingMedia\Replays`. Program scene stayed
+  `Lobbies`; streaming, recording and replay buffer remained stopped as found.
+- Final 30-second off-air sample: **12.51% system CPU**, 0.365% Python, 0.959%
+  OBS main and 6.636% OBS browser children; 60 FPS, 0.599 ms render time and
+  **zero new skipped render frames**. GPU averaged 38.67%, with encoding and
+  decoding idle. The baseline system average was 18.16%, but unrelated workload
+  and animated lobby activity varied, so this difference is not a causal saving.
+- Three Windows socket-abort traces occurred during startup/browser reconnects;
+  the count stayed stable through final verification. No module readiness failure
+  or repeating resource-loop failure was observed.
+
+Evidence is in `output/resource-optimization-20261006/` and external
+`%LOCALAPPDATA%/StreamingHub/diagnostics/resource-20261006-followup/`.
+Settings history remains under `%LOCALAPPDATA%/StreamingHub/settings-history/`.
+For rollback, snapshot the latest settings and revert the selected code commit;
+avoid restoring older personal files or resetting the checkout wholesale. This
+pass made no persistent OBS-setting changes requiring a separate OBS rollback.
+
+# Earlier media resource investigations
 
 Updated 2026-09-30. This goal remains active: reduce asset-loading spikes and
 verify improvements under the actual streaming workload. A passing offline
