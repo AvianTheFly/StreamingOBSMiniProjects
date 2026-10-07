@@ -27,11 +27,20 @@ def aggregate(records):
     complete = [r for r in records if r.get('state')=='complete']
     decided = [r for r in complete if isinstance(r.get('win'),bool)]
     wins = sum(r['win'] for r in decided)
-    keys = set().union(*(r.get('metrics',{}).keys() for r in records)) if records else set()
+    # Group covered observations in one pass. Re-scanning the whole archive
+    # twice for every metric makes a continuously displayed card grow costly.
+    columns = {}
+    for record in records:
+        finished = record.get('state') == 'complete'
+        for key, value in record['metrics'].items():
+            column = columns.get(key)
+            if column is None:
+                column = columns[key] = ([], [])
+            column[0].append(value)
+            if finished:
+                column[1].append(value)
     metrics = {}
-    for key in sorted(keys):
-        observed = [r['metrics'][key] for r in records if key in r.get('metrics',{})]
-        finished = [r['metrics'][key] for r in complete if key in r.get('metrics',{})]
+    for key, (observed, finished) in sorted(columns.items()):
         metrics[key] = dict(total=None if is_rate(key) else sum(observed), average=sum(finished)/len(finished) if finished else None,
                             games=len(observed), completed_games=len(finished),
                             maximum=max(observed) if observed else None, is_peak=key in PEAKS,is_rate=is_rate(key))

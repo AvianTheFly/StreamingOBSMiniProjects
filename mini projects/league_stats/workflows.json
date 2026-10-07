@@ -267,7 +267,7 @@
         "label": "Choose a stat view",
         "kind": "browser"
       },
-      "detail": "Local overlay presets keep 520 by 190 dimensions, use whitelisted themes, and never write OBS state. Browser preview lifetime owns its polling; hidden previews are removed. Review drafts stay local until explicit Save and pending-save edits retain the updated revision.",
+      "detail": "Local overlay presets keep 520 by 190 dimensions, use whitelisted themes, and never write OBS state. Browser preview lifetime owns its polling; hidden previews are removed. Review drafts stay local until explicit Save and pending-save edits retain the updated revision. Aggregate coverage groups reported metrics in one archive pass instead of scanning every match twice per metric. Observed and completed values remain separate; missing statistics remain unknown, derived rates retain their original meaning, and source records are not mutated.",
       "steps": [
         {
           "id": "0",
@@ -354,11 +354,16 @@
           "path": "mini projects/league_stats/service.py",
           "symbol": "Tracker.review_match",
           "hash": "fa9f1b63994af500794231c67ba5018d98eeb958e0008388f266cf48714f1996"
+        },
+        {
+          "path": "mini projects/league_stats/analytics.py",
+          "symbol": "aggregate",
+          "hash": "7f054ef941d024c02fae462d0f47ceedd7b3bf62f4031e9fa14e9d15927870d1"
         }
       ],
       "owner_hashes": {
-        "hub": "0238f85c641b60e97604fe174a9ef498843e73278b920821f2c61efae5eacc36",
-        "league_stats": "da52d5432d9f96ae8e6b1502ef17912b1becf420ff8b16f35ecdf00b8635d109"
+        "league_stats": "d313ddf48be41de6d02622e93ba8c4699126d35ad38b7e79f564e06edeb0b963",
+        "hub": "40bd807609f763027d6a9c5ba598e6d523b408028fbb059df52f91098d54ba4a"
       }
     }
   ]
