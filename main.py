@@ -52,8 +52,9 @@ def _configure_runtime(debug: bool) -> None:
     os.environ["PYTHONUNBUFFERED"] = "1"
     ensure_import_paths()
     load_project_env()
-    from lib.hub_runtime.resources import configure_native_threads
+    from lib.hub_runtime.resources import configure_native_threads, restore_media_metadata
     configure_native_threads()
+    restore_media_metadata()
     if debug:
         os.environ["LOG_LEVEL"] = "DEBUG"
     log.start()

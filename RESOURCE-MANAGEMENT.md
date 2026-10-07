@@ -770,3 +770,23 @@ Actual audio rendering, pause/resume, replacement readiness, transparency, idle
 clearing, server loss and page teardown regressions passed. This reduces
 transport work; it does not establish a system-wide CPU percentage improvement.
 Step 1 full offline validation passed 1,041 tests in 167.808 seconds.
+
+Step 3 persists bounded derived media metadata across Hub starts. On 20 actual
+local media files, the first pass launched 20 ffprobe processes and took 3.92149
+seconds. A simulated restart loaded identical metadata with zero probes in
+0.00583 seconds. Source sizes and mtimes were unchanged. This measures only
+metadata lookup, not full startup or playback. The disposable benchmark cache
+was separate from the live cache and removed after the run.
+
+The cache is capped at 512 entries / 2 MiB outside Git. Exact file path, size and
+nanosecond mtime still invalidate edits; malformed/unavailable cache data causes
+ordinary probing. Writes coalesce, unchanged snapshots do not write, and cached
+reads remain independent of slow probes or disk publication. Existing asset
+preparation owns trailing flushes; no cache worker was added. Personal settings
+and original assets are never rewritten. `HUB_METADATA_CACHE=0` disables disk
+reuse; offline suites set it automatically to protect the live derived cache.
+
+The second full suite exposed an existing Windows HTTP reset caused by unread
+POST bodies in control routes. Those routes now consume and validate the body
+before dispatch. The original failing HTTP test plus malformed-body/no-dispatch
+checks pass; 37 related regressions passed after the fix.

@@ -11,6 +11,8 @@ import time
 
 
 def configure_test_process():
+    # Tests must not populate the live derived cache with disposable probe data.
+    os.environ['HUB_METADATA_CACHE'] = '0'
     # Must run before test discovery imports numerical/inference libraries.
     # Respect deliberately supplied environment values.
     for name in ('OPENBLAS_NUM_THREADS', 'OMP_NUM_THREADS', 'MKL_NUM_THREADS'):

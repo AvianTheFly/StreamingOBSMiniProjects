@@ -12,7 +12,7 @@ import os
 from pathlib import Path
 import threading
 
-from lib.media_metadata import probe_media
+from lib.media_metadata import probe_media, flush_metadata_cache
 from lib.shared_media.media_startup import background_media_slot
 
 VIDEO_EXTS = {'.mp4', '.mkv', '.mov', '.m4v', '.ts', '.webm', '.avi', '.flv', '.ogv'}
@@ -109,6 +109,7 @@ class AssetPreparation:
                 if path is None:
                     self._wake.clear()
             if path is None:
+                flush_metadata_cache()
                 self._wake.wait(.25)
                 continue
             try:
@@ -120,6 +121,7 @@ class AssetPreparation:
                 with self._lock:
                     self._queued.discard(path)
             stop_event.wait(.15)
+        flush_metadata_cache(force=True)
 
 
 preparation = AssetPreparation()

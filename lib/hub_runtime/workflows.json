@@ -17,7 +17,7 @@
         "event": "hub.started",
         "kind": "event"
       },
-      "detail": "OBS-independent features start immediately based on public REQUIRES_OBS=False metadata. Undeclared/invalid dependencies remain deferred; voice and remaining playback workers start once after OBS connects. The CLI keeps its explicit fail-fast option. Native BLAS/OpenMP pools default to two threads after loading the environment and before feature imports; explicit thread settings are preserved and inherited by children. The launcher checks availability without initializing the native dependencies.",
+      "detail": "OBS-independent features start immediately based on public REQUIRES_OBS=False metadata. Undeclared/invalid dependencies remain deferred; voice and remaining playback workers start once after OBS connects. The CLI keeps its explicit fail-fast option. Native BLAS/OpenMP pools default to two threads after loading the environment and before feature imports; explicit thread settings are preserved and inherited by children. The launcher checks availability without initializing the native dependencies. Before starting features, hydrate the bounded derived metadata cache from LOCALAPPDATA; unchanged files avoid repeat ffprobe launches. Missing/invalid cache data falls back to ordinary probing. The existing preparation worker flushes trailing cache changes and never writes source assets.",
       "steps": [
         {
           "id": "0",
@@ -56,7 +56,7 @@
         }
       ],
       "owner_hashes": {
-        "hub": "ea792566db12b05a3104c630cd07731330eadcc22866dfb59b9e9e0e91bf32ee"
+        "hub": "f1457985d793411be23867bb750b5ed5cc2fe606bb5fc0a2197e76095472810c"
       },
       "edges": [
         {
@@ -106,12 +106,17 @@
         {
           "path": "main.py",
           "symbol": "_configure_runtime",
-          "hash": "2fb413edc6145a4f47c8b4a42df509504e66cc95e83fdd19d380d2a9187b4487"
+          "hash": "33f4bdec63d4e9b14eef2dd725eee4193ed22fd4d4df798be8ee492b0cab249b"
         },
         {
           "path": "lib/hub_runtime/resources.py",
           "symbol": "configure_native_threads",
           "hash": "b6c2f07cfd5b2fa581ae328a3e8e66c7f59a452d63a2e6b23757ca519264d0a7"
+        },
+        {
+          "path": "lib/hub_runtime/resources.py",
+          "symbol": "restore_media_metadata",
+          "hash": "e5d573f7407236862fb71d65c480baaab685fbe985c884f2e64ec885bd6f8a05"
         }
       ]
     },
