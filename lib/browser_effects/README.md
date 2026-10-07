@@ -19,13 +19,13 @@ Hub test button use the same player path. No keyboard input is simulated.
 | File | Responsibility |
 | --- | --- |
 | `catalog.py` | Read module effect mappings and select supported renderers |
-| `session.py` | Current playback ownership, pause clock, start/end acknowledgements |
+| `session.py` | Current playback ownership, pause clock, acknowledgements, revision and bounded change waits |
 | `audio.py` | Preserve original audio in an external ffmpeg WAV cache |
 | `player.py` | Module adapter, preparation, OBS fader, completion/cancellation |
 | `obs_source.py` | Create/reuse full-canvas browser inputs without resetting user edits |
 | `runtime.py` | Hub-owned HTTP lifecycle and per-project channel lookup |
 | `http_server.py` | Host checks, scoped media, byte ranges and acknowledgements |
-| `web/playback.js` | Browser audio lifecycle, polling, offline cleanup |
+| `web/playback.js` | Browser audio lifecycle, serialized change requests, timeout and teardown cleanup |
 | `web/muffins.js` | Compatibility adapter for the retained muffin cue |
 | `web/renderers.js` | Explicit renderer selection for the active effect |
 | `web/borders.js` | Perimeter canvas and boundary finish |
@@ -74,6 +74,12 @@ by the owning module is served; paths supplied by clients are never opened. Byte
 ranges support seeking/reloading. JSON acknowledgements reject cross-origin callers
 and refer to a specific playback ID. Audio `playing`, `ended` and `error` events
 provide actual browser playback evidence; a server poll alone does not prove audio.
+Revision-aware browsers wait up to one second on the existing channel condition;
+play, pause, resume, acknowledgement and stop wake them immediately. Waiting releases
+the channel lock, refreshes browser presence, and introduces no background worker.
+Older clients retain immediate reads; older servers retain the polling fallback.
+Each browser owns one cancellable HTTP request; page teardown releases it and the
+next timer. A two-second request deadline also detects a hung local transport.
 Loss of server contact clears visuals/audio within 2.5 seconds. Startup failure or
 autoplay rejection ends the request and releases coordinator ownership.
 

@@ -756,3 +756,17 @@ pools and verifies feature equivalence. Local evidence is in
 The workflow checker already reports many stale owner fingerprints inherited
 from the checkpoint. Only explanations reviewed for this work are restamped;
 those pre-existing failures are not hidden by weakening the checker.
+
+Step 2 replaces browser-effect state polling with revision notifications. The
+existing channel condition releases its lock while requests wait; each request
+expires within one second and all playback mutations wake waiting readers.
+The browser retains original audio clocks/levels and supports old servers.
+Page teardown cancels both the request and its next timer. A stalled request
+has a two-second timeout. No worker or alternate player was added.
+
+The real Chromium disposable-server test measured 8 idle requests versus 3
+in a 3.1-second window, with 29 ms observed notification-to-play response.
+Actual audio rendering, pause/resume, replacement readiness, transparency, idle
+clearing, server loss and page teardown regressions passed. This reduces
+transport work; it does not establish a system-wide CPU percentage improvement.
+Step 1 full offline validation passed 1,041 tests in 167.808 seconds.

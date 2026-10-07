@@ -5,7 +5,7 @@ from pathlib import Path
 from lib.http_files import serve_file
 from .presentations import resolve as presentation_file
 from http.server import BaseHTTPRequestHandler
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 WEB = Path(__file__).parent/'web'
 STATIC = {'overlay.html', 'playback.js', 'muffins.js', 'borders.js', 'renderers.js', 'production.js', 'rave.js', 'subtle.js', 'overlay.css', 'mash-dance.png'}
@@ -36,6 +36,16 @@ def handler(find_channel, port):
             path = urlparse(self.path).path
             if path.startswith('/api/state/'):
                 channel = find_channel(path.removeprefix('/api/state/'))
+                revision = parse_qs(urlparse(self.path).query).get('after', [None])[0]
+                if revision is not None:
+                    try:
+                        revision = int(revision)
+                        if revision < 0:
+                            raise ValueError()
+                    except ValueError:
+                        return self.send({'error':'Invalid revision'}, 400)
+                    if channel:
+                        return self.send(channel.wait_snapshot(revision))
                 return self.send(channel.snapshot(poll=True) if channel else {'active':None, 'ready':False})
             if path.startswith('/overlay/'):
                 file = presentation_file(path.removeprefix('/overlay/')) or WEB/'overlay.html'

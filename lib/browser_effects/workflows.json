@@ -17,7 +17,7 @@
         "event": "browser_effect.play",
         "kind": "control"
       },
-      "detail": "The browser draws from current audio position for the entire sound duration and clears on the owning audio's ended event. Pause and seek reconstruct the same frame; the stock renderer clips artwork to the gameplay perimeter; feature presentations own their own layout. Approved arena/racing/muffin owners remain. The 85 other cues have contextual subjects, individually arranged supporting casts and staggered entrances. Pedro has seven dancing raccoons and a DJ stage; sad violin has an orchestra, glass cameos, notes and a score. No worker, source controller or animation timer is added. Feature-owned presentations may publish explicitly named artwork under token-scoped registration during startup; teardown cannot unregister a newer owner. The shared HTTP owner serves original file bytes, including JSON manifests, while serializing state API objects separately, without importing feature policy. Hooray keeps original audio and current gain while a dedicated bounded native-alpha foil renderer draws corner bursts, sparse confetti across the picture and gold border ribbons; original chroma-filter and transform settings remain preserved. The current culture pass authors distinct native performances for all 30 sounds behind ! 2 # Z T t h H after reviewing their actual local clips. Party/reaction owners supply contextual subjects, causal jokes, finite acts and peripheral sets; supporting cameos preserve approved main shows and recognizable photographic casts. Precomputed original-media envelopes and measured cadence guide illustration only, without live DSP or a new clock. Original audio duration, currentTime, pause, channel identity, personal data and cleanup remain unchanged. The follow-up choreography gives long sounds finite actions and held consequences: prop losses/catches, food grabs, a stolen Pedro record, and a snapped violin string. MuffinShow owns the local clip's final-die cue at approximately 6.24 seconds; all eight muffins collapse together and remain down until the original sound ends. Its 55-ms release retains the punchline without stretching audio. All acts reconstruct solely from currentTime, including backward seeks and fresh replays. The further meme-action pass adds Cena invisibility/autofocus, the hindsight slip, coffee-denial toaster jump, physical spill/failed undo, precise mute click, warded ambush, Starman last-hit deflection, Gary snack, Quack popup escape and the frog microphone topple. Cue-specific contact anchors live in culture-contacts.js and are shared with finite geometry review; no simulations, independent clocks or gameplay commands are introduced.",
+      "detail": "The browser draws from current audio position for the entire sound duration and clears on the owning audio's ended event. Pause and seek reconstruct the same frame; the stock renderer clips artwork to the gameplay perimeter; feature presentations own their own layout. Approved arena/racing/muffin owners remain. The 85 other cues have contextual subjects, individually arranged supporting casts and staggered entrances. Pedro has seven dancing raccoons and a DJ stage; sad violin has an orchestra, glass cameos, notes and a score. No worker, source controller or animation timer is added. Feature-owned presentations may publish explicitly named artwork under token-scoped registration during startup; teardown cannot unregister a newer owner. The shared HTTP owner serves original file bytes, including JSON manifests, while serializing state API objects separately, without importing feature policy. Hooray keeps original audio and current gain while a dedicated bounded native-alpha foil renderer draws corner bursts, sparse confetti across the picture and gold border ribbons; original chroma-filter and transform settings remain preserved. The current culture pass authors distinct native performances for all 30 sounds behind ! 2 # Z T t h H after reviewing their actual local clips. Party/reaction owners supply contextual subjects, causal jokes, finite acts and peripheral sets; supporting cameos preserve approved main shows and recognizable photographic casts. Precomputed original-media envelopes and measured cadence guide illustration only, without live DSP or a new clock. Original audio duration, currentTime, pause, channel identity, personal data and cleanup remain unchanged. The follow-up choreography gives long sounds finite actions and held consequences: prop losses/catches, food grabs, a stolen Pedro record, and a snapped violin string. MuffinShow owns the local clip's final-die cue at approximately 6.24 seconds; all eight muffins collapse together and remain down until the original sound ends. Its 55-ms release retains the punchline without stretching audio. All acts reconstruct solely from currentTime, including backward seeks and fresh replays. The further meme-action pass adds Cena invisibility/autofocus, the hindsight slip, coffee-denial toaster jump, physical spill/failed undo, precise mute click, warded ambush, Starman last-hit deflection, Gary snack, Quack popup escape and the frog microphone topple. Cue-specific contact anchors live in culture-contacts.js and are shared with finite geometry review; no simulations, independent clocks or gameplay commands are introduced. The channel owns a revision and bounded one-second condition wait. Playback/control mutations wake serialized browser requests immediately without holding the state lock while waiting. Legacy reads remain immediate; browser teardown aborts its request and cancels its timer. A two-second transport deadline bounds hung requests.",
       "steps": [
         {
           "id": "0",
@@ -56,7 +56,7 @@
         }
       ],
       "owner_hashes": {
-        "browser_effects": "da7fab21c1a7910cdd796e8741e36ee6760cf62751538e6c97a374e11dbf7000"
+        "browser_effects": "9bb34470bf1940ca4f1f5c597241fd7b1db47750c6a971d14116904ed6854b9a"
       },
       "edges": [
         {
@@ -85,7 +85,7 @@
         {
           "path": "lib/browser_effects/session.py",
           "symbol": "Channel.acknowledge",
-          "hash": "b8e27bceca03e2c94b018b2272631f8b984695f0d6366417004dbc233f5ae945"
+          "hash": "cb1233e18e812b970fa1b98baddb66c0668e3dfed8bfcb77984cf336c95407df"
         },
         {
           "path": "lib/browser_effects/presentations.py",
@@ -95,7 +95,12 @@
         {
           "path": "lib/browser_effects/http_server.py",
           "symbol": "handler",
-          "hash": "b0260366bfd2e55e249725af8ef8ebf86f9f007848549712b2794700640a1c2d"
+          "hash": "cf64ef323e4e44e51a4c3d2eb6ab23fe8443876f2455bb9324ddac3fed99de52"
+        },
+        {
+          "path": "lib/browser_effects/session.py",
+          "symbol": "Channel.wait_snapshot",
+          "hash": "2f73be976413a6757cb956b9954d1bce6a18cf77308fcf3d6238d54ba7fb40b5"
         }
       ]
     },

@@ -8,6 +8,8 @@ class Channel:
     def __init__(self, clock=time.monotonic):
         self.clock = clock
         self.lock = threading.RLock()
+        self.changed = threading.Condition(self.lock)
+        self.revision = 0
         self.item = None
         self.media = None
         self.last_poll = -1000
@@ -16,6 +18,20 @@ class Channel:
         self.last_playback = None
         self.started = threading.Event()
         self.done = threading.Event()
+
+    def _notify(self):
+        # Called only while the channel lock is held. Readers observe a complete
+        # generation; waiting releases that lock so playback never waits on HTTP.
+        self.revision += 1
+        self.changed.notify_all()
+
+    def wait_snapshot(self, after, timeout=1.0):
+        """Bounded change wait with the same browser-presence heartbeat as polls."""
+        with self.changed:
+            self.last_poll = self.clock()
+            self.changed.wait_for(lambda: self.revision != after,
+                                  timeout=max(0.0, min(1.0, timeout)))
+            return self.snapshot(poll=True)
 
     def begin(self, stem, media, effect):
         with self.lock:
@@ -27,6 +43,7 @@ class Channel:
             self.item = dict(id=secrets.token_urlsafe(24), stem=stem, effect=effect,
                              created=self.clock(), started=False, paused=False, paused_at=None, pause_total=0)
             self.last_playback = dict(id=self.item['id'], stem=stem, status='loading')
+            self._notify()
             return self.item['id']
 
     def snapshot(self, poll=False):
@@ -39,7 +56,7 @@ class Channel:
                 active = {k: self.item[k] for k in ('id', 'stem', 'effect', 'paused', 'started')}
                 active['elapsed'] = (self.item['paused_at'] if self.item['paused'] else now) - self.item['created'] - self.item['pause_total']
             return dict(active=active, ready=now-self.last_poll < 3, error=self.error,
-                        last_playback=self.last_playback)
+                        last_playback=self.last_playback, revision=self.revision)
 
     def acknowledge(self, playback_id, status):
         with self.lock:
@@ -57,7 +74,10 @@ class Channel:
                 self.done.set()
             else:
                 raise ValueError('Unknown playback status')
+            previous = self.last_playback
             self.last_playback = dict(id=playback_id, stem=self.item['stem'], status=status)
+            if previous != self.last_playback:
+                self._notify()
             return True
 
     def pause(self, paused):
@@ -71,6 +91,7 @@ class Channel:
                 self.item['pause_total'] += now-self.item['paused_at']
                 self.item['paused_at'] = None
             self.item['paused'] = paused
+            self._notify()
 
     def stop(self, playback_id=None):
         with self.lock:
@@ -81,6 +102,7 @@ class Channel:
             self.item = None
             self.media = None
             self.done.set()
+            self._notify()
 
     def matches(self, stem):
         with self.lock:
