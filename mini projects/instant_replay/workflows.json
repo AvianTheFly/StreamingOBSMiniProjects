@@ -196,7 +196,7 @@
           "label": "Acquire physical playback gate",
           "owner": "coordination",
           "kind": "action",
-          "detail": ""
+          "detail": " Inventory requests share one fresh directory-metadata snapshot for selection, sorting and file sizes, and one label generation; no long-lived file cache can hide a newly saved or removed replay."
         },
         {
           "id": "1",
@@ -242,10 +242,10 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "instant_replay": "34090057aa047e80f8a4d0d71804534029b2633b116c443ba6979773f529b533",
-        "media_workers": "99a1a00f5854b87301b5e62b0837f5e035bf87e45a4552403c603e0e3de1f064",
-        "coordination": "1bf723a6b7eb5bb30c91ed682b26757815ed275e05f71b3c9938ba24205a6910"
+        "instant_replay": "7f81e6e8026b37cd14c14ce5c1c20dd4ef40b6083b458753fb3e763e0f399928",
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "coordination": "3cb5cc7a5fb147f140f611e5961fa688dda4a070ef836d35a446549cc2f5b5bb",
+        "media_workers": "99a1a00f5854b87301b5e62b0837f5e035bf87e45a4552403c603e0e3de1f064"
       },
       "edges": [
         {
@@ -287,7 +287,7 @@
         {
           "path": "mini projects/instant_replay/inventory.py",
           "symbol": "replay_files",
-          "hash": "fd8dfadb4386df1bb79ee6077b4401eca0b08a911d9483e88a4fbe8f3d1ce18d"
+          "hash": "419d125a5d625fff2d061e1e4e4d66af2d2ca16d44399d11df1f8643c31dddcc"
         }
       ],
       "effects": [

@@ -1,6 +1,7 @@
 """Saved replay inventory, game/tag views, and clip lookup."""
 from __future__ import annotations
 from pathlib import Path
+from lib.file_inventory import media_entries
 from .config import CLIPS_DIR
 from .config import EDITED_DIR
 from .config import REPLAY_DIR
@@ -10,24 +11,31 @@ from .commands import _match_tag
 _REPLAY_MEDIA_EXTENSIONS = {".mkv", ".mp4", ".mov", ".webm"}
 
 
-def replay_files(root, *, highlights_only=False) -> list[Path]:
-    """One inventory for playback and offline management, with linked copies hidden."""
+def _replay_entries(root, *, highlights_only=False, labels=None):
+    """One fresh directory snapshot; filtering and sorting reuse its metadata."""
     root = Path(root)
     if not root.is_dir():
         return []
-    files = [path for path in root.iterdir() if path.is_file() and path.suffix.lower() in _REPLAY_MEDIA_EXTENSIONS]
+    files = list(media_entries(root, _REPLAY_MEDIA_EXTENSIONS))
     for folder in (root / 'clips', root / 'edited', root / 'replay-only', root / 'cuts'):
-        if folder.is_dir():
-            files.extend((path for path in folder.rglob('*') if path.is_file() and path.suffix.lower() in _REPLAY_MEDIA_EXTENSIONS))
-    files = [path for path in files if path.name.endswith(TRIMMED_SUFFIX) or not path.with_name(path.stem + TRIMMED_SUFFIX).is_file()]
+        files.extend(media_entries(folder, _REPLAY_MEDIA_EXTENSIONS, recursive=True))
+    paths = {path for path, _ in files}
+    files = [(path, stat) for path, stat in files if path.name.endswith(TRIMMED_SUFFIX) or path.with_name(path.stem + TRIMMED_SUFFIX) not in paths]
     from . import library
-    labels = library.read()['clips']
+    if labels is None:
+        labels = library.read()['clips']
     linked_sources = {str(Path(m['capture_source']).resolve()) for m in labels.values()
                       if m.get('capture_source') and Path(m.get('path', '')).is_file()}
-    files = [p for p in files if str(p.resolve()) not in linked_sources]
+    if linked_sources:
+        files = [(p, stat) for p, stat in files if str(p.resolve()) not in linked_sources]
     if highlights_only:
-        files = [p for p in files if library.highlight_candidate(labels.get(library.clip_id(p), {}))]
-    return sorted(files, key=lambda path: path.stat().st_mtime, reverse=True)
+        files = [(p, stat) for p, stat in files if library.highlight_candidate(labels.get(library.clip_id(p), {}))]
+    return sorted(files, key=lambda entry: entry[1].st_mtime, reverse=True)
+
+
+def replay_files(root, *, highlights_only=False) -> list[Path]:
+    """One inventory for playback and offline management, with linked copies hidden."""
+    return [path for path, _ in _replay_entries(root, highlights_only=highlights_only)]
 
 
 def _replay_files_on_disk(*, highlights_only=False) -> list[Path]:
@@ -48,10 +56,9 @@ class ReplayInventory:
         persisted = library.read()['clips']
         rows = []
         edited_root = Path(EDITED_DIR).resolve()
-        for path in _replay_files_on_disk():
+        for path, stat in _replay_entries(REPLAY_DIR, labels=persisted):
             try:
                 resolved = path.resolve()
-                stat = path.stat()
             except OSError:
                 continue
             key = str(resolved)
