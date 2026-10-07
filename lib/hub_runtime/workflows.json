@@ -17,7 +17,7 @@
         "event": "hub.started",
         "kind": "event"
       },
-      "detail": "OBS-independent features start immediately based on public REQUIRES_OBS=False metadata. Undeclared/invalid dependencies remain deferred; voice and remaining playback workers start once after OBS connects. The CLI keeps its explicit fail-fast option.",
+      "detail": "OBS-independent features start immediately based on public REQUIRES_OBS=False metadata. Undeclared/invalid dependencies remain deferred; voice and remaining playback workers start once after OBS connects. The CLI keeps its explicit fail-fast option. Native BLAS/OpenMP pools default to two threads after loading the environment and before feature imports; explicit thread settings are preserved and inherited by children. The launcher checks availability without initializing the native dependencies.",
       "steps": [
         {
           "id": "0",
@@ -56,7 +56,7 @@
         }
       ],
       "owner_hashes": {
-        "hub": "2651a208dfe2c15d06a55506164c7fc7795423742dfa750511fa1a7762484d50"
+        "hub": "ea792566db12b05a3104c630cd07731330eadcc22866dfb59b9e9e0e91bf32ee"
       },
       "edges": [
         {
@@ -102,6 +102,16 @@
           "path": "lib/hub_runtime/projects.py",
           "symbol": "partition_obs_projects",
           "hash": "6203dd34200c3c043bd95019af99f407b09bb4aa7b6a12134eeca8433353cec3"
+        },
+        {
+          "path": "main.py",
+          "symbol": "_configure_runtime",
+          "hash": "2fb413edc6145a4f47c8b4a42df509504e66cc95e83fdd19d380d2a9187b4487"
+        },
+        {
+          "path": "lib/hub_runtime/resources.py",
+          "symbol": "configure_native_threads",
+          "hash": "b6c2f07cfd5b2fa581ae328a3e8e66c7f59a452d63a2e6b23757ca519264d0a7"
         }
       ]
     },

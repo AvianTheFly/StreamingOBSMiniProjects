@@ -11,7 +11,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-py -3.11 -c "import faster_whisper, sounddevice" >nul 2>nul
+py -3.11 -c "import importlib.util; raise SystemExit(0 if all(importlib.util.find_spec(n) for n in ('faster_whisper', 'sounddevice')) else 1)" >nul 2>nul
 if errorlevel 1 (
     echo Python 3.11 is available, but the voice dependencies are not installed there.
     echo Expected this command to work:

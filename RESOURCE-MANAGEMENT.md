@@ -720,3 +720,39 @@ stable Hub memory and low CPU, rather than an ongoing runaway; this does not
 predict every gaming workload. See
 `output/RESOURCE-AUDIT-REPEAT-2026-10-02.txt` and its benchmark, test-log and runtime
 evidence files for scope, measurements and limitations.
+
+
+## October 6, 2026: gaming resource optimization
+
+Rollback checkpoint: `5a0a8ab`. Settings were snapshotted externally before work.
+Retained diagnostics (5,846 samples, October 4–6 UTC) include genuine 100% system
+CPU samples. Whole-machine Hub usage was 0.45% median, 2.14% p95, and 38.94% max.
+Several largest Hub peaks coincide with voice initialization and asset preparation;
+other saturated samples have low Hub CPU, so this is not proof of a single cause.
+OBS browser acceleration is deliberately disabled after earlier crashes.
+
+Step 1 configures default BLAS/OpenMP pools before feature imports, using two
+threads instead of the installed NumPy default of sixteen. Environment overrides
+remain authoritative; subprocesses inherit the budget. Whisper keeps the current
+small.en CUDA model, compute mode, and explicit inference thread budget.
+The batch launcher now tests availability without importing native dependencies
+in a throwaway Python process before starting the Hub.
+
+Fresh-process synthetic audio benchmark, 500 real Whisper feature extractions:
+
+| Pool | CPU seconds | Elapsed seconds | Maximum feature difference |
+| --- | ---: | ---: | ---: |
+| Previous default (16 BLAS threads) | 1.40625 | 0.61304 | reference |
+| Two threads | 0.56250 | 0.50386 | 1.19e-7 |
+| One thread (comparison only) | 0.50000 | 0.50299 | 5.96e-8 |
+
+Two threads used 60% less CPU time and 18% less elapsed time in this frontend
+fixture. These are not whole-system or gaming savings. Initialization/download
+cache effects are excluded from that comparison. Reproduce with
+`tools/benchmark_numeric_runtime.py --output <external-folder>`; it records native
+pools and verifies feature equivalence. Local evidence is in
+`LOCALAPPDATA/StreamingHub/diagnostics/resource-20261006/numeric-final/`.
+
+The workflow checker already reports many stale owner fingerprints inherited
+from the checkpoint. Only explanations reviewed for this work are restamped;
+those pre-existing failures are not hidden by weakening the checker.
