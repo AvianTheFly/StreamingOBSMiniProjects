@@ -133,6 +133,17 @@ class Collector:
         if self.tracker.enrichment_requested:
             self.tracker.enrichment_requested=False
             self.enrichment.retry()
+        if self.phase in ('InProgress', 'Reconnect'):
+            # Historical downloads, archive normalization and catalogue/rank
+            # refreshes can wait until gameplay ends. Keep queued intent intact;
+            # live observations and chat above retain their normal cadence.
+            with self.tracker.lock:
+                self.tracker.enrichment_status = dict(
+                    self.enrichment.snapshot(), deferred_for_gameplay=True,
+                    detail='Archive sync resumes after gameplay')
+                if self.pending or self.tracker.import_requested:
+                    self.tracker.history_status = 'Archive sync resumes after gameplay'
+            return
         if not self.stop.is_set():
             self.enrichment.tick()
             with self.tracker.lock:self.tracker.enrichment_status=self.enrichment.snapshot()

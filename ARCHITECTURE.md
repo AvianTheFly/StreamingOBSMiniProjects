@@ -49,6 +49,12 @@ later-cleared aperture, with a conservative seam/antialias margin. Deformed boun
 are checked each frame; layout policy, mesh detail and final aperture clearing
 remain with the feature. The default draw contract remains unchanged.
 
+League Stats' existing `collector.py` worker defers archive enrichment, history
+imports, rank refresh and catalogue downloads during InProgress/Reconnect. Live
+observations and chat handling retain their cadence; pending queues and manual
+refresh intent survive until the phase leaves gameplay. The public enrichment
+snapshot explains the deferral. No new game detector or worker is introduced.
+
 `lib/browser_effects/presentations.py` publishes explicitly named feature artwork
 during that feature's Hub lifetime. Identity tokens guard unregister; the shared
 HTTP server serves original file bytes (including JSON manifests) and serializes
