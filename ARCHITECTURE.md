@@ -5,6 +5,12 @@ packages own their policy and personal data. Shared infrastructure owns common
 resources, admission, and coordination. Compatibility facades retain old imports
 while implementation lives with its actual owner.
 
+`lib/browser_effects/web/visible-poll.js` owns cancellable read-only presentation
+polling, visibility and stale-response rejection. Existing Hub and League HTTP
+owners serve that exact shared module; it owns no media or feature state.
+Starting Soon and champion select stop requests while hidden and refresh upon
+visibility. Feature renderers retain their own artwork and playback policy.
+
 ## Dependency direction
 
 ```mermaid

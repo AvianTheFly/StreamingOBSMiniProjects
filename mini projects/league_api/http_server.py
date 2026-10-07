@@ -37,6 +37,8 @@ def make_handler(service, *, root: Path, port: int, load_config):
             if self.headers.get('Host') not in self.local_origins():
                 self.send_error(403); return
             path=unquote(urlparse(self.path).path)
+            if path == '/shared/visible-poll.js':
+                self.send_bytes((root.parents[1]/'lib'/'browser_effects'/'web'/'visible-poll.js').read_bytes(), 'text/javascript'); return
             if path == '/champ-select/state':
                 self.send_bytes(json.dumps(service.client_scenes.overlay_snapshot()).encode()); return
             if path == '/champ-select':

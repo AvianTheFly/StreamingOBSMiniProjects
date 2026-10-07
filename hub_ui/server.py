@@ -173,7 +173,9 @@ class _Handler(AudioRoutes, ProfileRoutes, ProjectRoutes, ControlRoutes, Transit
         self.end_headers()
 
     def _static(self, path: str):
-        if path == "/":
+        if path == '/shared/visible-poll.js':
+            fp = _APP_DIR.parents[1] / 'lib' / 'browser_effects' / 'web' / 'visible-poll.js'
+        elif path == "/":
             fp = _APP_DIR / "index.html"
         else:
             # This authored artifact may be stored on C: behind its project

@@ -200,7 +200,7 @@
           "label": "Update browser layers",
           "owner": "starting_soon",
           "kind": "output",
-          "detail": "Artwork, transparent message and transparent frame have separate URLs. Two bounded image layers reject stale loads. Unchanged displays skip DOM/layout work; off-scene artwork pauses while status stays current. Page exit cancels animation, polling and the bounded request. Highlight disable cancels playback through its existing owner."
+          "detail": "Artwork, transparent message and transparent frame have separate URLs. Two bounded image layers reject stale loads. Unchanged displays skip DOM/layout work. Off-scene artwork pauses, cancels the state request and owns no polling timer. Becoming visible immediately reads current state; responses from a hidden generation are ignored. Page exit cancels animation and transport. Highlight disable cancels playback through its existing owner."
         }
       ],
       "edges": [

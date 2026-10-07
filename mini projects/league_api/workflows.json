@@ -152,7 +152,7 @@
         "event": "league_client.phase",
         "kind": "poll"
       },
-      "detail": "Automatic champion presentation begins after completed bans or picks/finalization. Manual Champ select requires confirmed draft data and current manual intent, then persists through the draft. Manual Queue can hide it again. The overlay uses applied draft state even with automatic routing disabled. New phases clear manual overrides and withdraw obsolete deferred requests. The existing browser-recovery worker refreshes the installed draft browser once after HTTP startup, retrying while OBS is unavailable. Draft scene activation reloads its page so an early OBS launch cannot retain a failed page. Personal filters, dimensions and camera placement are preserved.",
+      "detail": "Automatic champion presentation begins after completed bans or picks/finalization. Manual Champ select requires confirmed draft data and current manual intent, then persists through the draft. Manual Queue can hide it again. The overlay uses applied draft state even with automatic routing disabled. Hidden documents stop state requests; visibility immediately refreshes current picks and chat, rejecting late hidden responses. New phases clear manual overrides and withdraw obsolete deferred requests. The existing browser-recovery worker refreshes the installed draft browser once after HTTP startup, retrying while OBS is unavailable. Draft scene activation reloads its page so an early OBS launch cannot retain a failed page. Personal filters, dimensions and camera placement are preserved.",
       "steps": [
         {
           "id": "0",
@@ -202,9 +202,9 @@
         }
       ],
       "owner_hashes": {
-        "league_api": "c81b58ea97b127823d99f2f5314d32bac84bb06d3b49a49ca0e206e3de485ede",
-        "coordination": "c4fc5a67e5e47be4bc18ef0c9359201377f1dcd8de6671d557968aab81c68b17",
-        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c"
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "league_api": "f52b3a6709092fb5d8fe12d02d10bd1516d8277394150c88ef05b78a2ed34867",
+        "coordination": "3cb5cc7a5fb147f140f611e5961fa688dda4a070ef836d35a446549cc2f5b5bb"
       },
       "edges": [
         {

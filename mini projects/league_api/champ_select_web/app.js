@@ -1,3 +1,4 @@
+import {pollVisible} from '/shared/visible-poll.js';
 const stage = document.querySelector('#stage');
 const names = { astral:'ASTRAL OBSERVATORY', tidal:'TIDAL VAULT', neon:'NEON CONCOURSE', frost:'FROST SANCTUM', verdant:'VERDANT ENGINE' };
 const keys = ['allies','enemies','allyBans','enemyBans'];
@@ -99,12 +100,5 @@ if (params.get('demo') === '1') {
     enemyBans:[sample(234,'Viego'),sample(107,'Rengar'),sample(121,'Kha’Zix'),sample(81,'Ezreal'),sample(11,'Master Yi')],
     localSlot:1,seconds:28},chat:[{id:'1',sender:'TEAM',body:'We have a strong front line.'},{id:'2',sender:'YOU',body:'I can take mid.'},{id:'3',sender:'TEAM',body:'Let’s lock this in.'}]});
 } else {
-  async function poll() {
-    try {
-      const response = await fetch('/champ-select/state', {cache:'no-store'});
-      if (response.ok) render(await response.json());
-    } catch { /* Keep last known picture during a short Hub reconnect. */ }
-    setTimeout(poll, 500);
-  }
-  poll();
+  pollVisible({url:'/champ-select/state',interval:500,onData:render});
 }

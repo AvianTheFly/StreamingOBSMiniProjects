@@ -12,7 +12,7 @@ const root=path.resolve(__dirname,'..'),web=path.join(root,'hub_ui/app'),out=pro
   await page.route('http://starting.test/**',route=>{
    const p=new URL(route.request().url()).pathname;
    if(p==='/api/starting-soon')return route.fulfill({json:state});
-   const file=p.startsWith('/starting-soon/art/')?path.join(root,'mini projects/starting_soon/art',path.basename(p)):path.join(web,p);
+   const file=p==='/shared/visible-poll.js'?path.join(root,'lib/browser_effects/web/visible-poll.js'):p.startsWith('/starting-soon/art/')?path.join(root,'mini projects/starting_soon/art',path.basename(p)):path.join(web,p);
    return route.fulfill({body:fs.readFileSync(file),contentType:file.endsWith('.css')?'text/css':file.endsWith('.js')?'text/javascript':file.endsWith('.png')?'image/png':'text/html'});
   });
   for(const name of state.available_artwork){

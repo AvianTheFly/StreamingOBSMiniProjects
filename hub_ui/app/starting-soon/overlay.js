@@ -1,10 +1,8 @@
 import {WorldDeck} from './world-deck.js';
+import {pollVisible} from '/shared/visible-poll.js';
 const $=id=>document.getElementById(id), query=new URLSearchParams(location.search);
-let loadedAt=0,fetching=false,draft={},lastState=null,viewSignature='',disposed=false,request=null,sourceVisible=true;
+let loadedAt=0,draft={},lastState=null,viewSignature='',disposed=false;
 const deck=new WorldDeck([$('bg1'),$('bg2')]);
-function visibility(){deck.setVisible(sourceVisible&&!document.hidden);}
-addEventListener('obsSourceVisibleChanged',e=>{sourceVisible=e.detail?.visible!==false;visibility();});
-document.addEventListener('visibilitychange',visibility);visibility();
 const demoPage=query.has('demo');
 const layerMode=['artwork','message','frame'].includes(query.get('layer'))?query.get('layer'):'full';
 document.documentElement.dataset.layer=layerMode;
@@ -60,14 +58,10 @@ addEventListener('message',e=>{
  if(!demoPage||e.source!==parent||e.origin!==location.origin||!e.data?.startingSoonPreview)return;
  const v=e.data.startingSoonPreview;draft=v.reset?{}:{...draft,...v};if(lastState)render(lastState);
 });
-async function refresh(){
- if(fetching||disposed)return;fetching=true;
- const controller=new AbortController();request=controller;
- const timeout=setTimeout(()=>controller.abort(),3000);
- try{const r=await fetch('/api/starting-soon',{cache:'no-store',signal:controller.signal});if(!r.ok)throw Error();const state=await r.json();if(disposed)return;lastState=state;loadedAt=Date.now();render(lastState);}
- catch{if(!disposed&&Date.now()-loadedAt>3000){document.body.classList.remove('playing');viewSignature='';}}
- finally{clearTimeout(timeout);if(request===controller)request=null;fetching=false;}
-}
-refresh();const poll=setInterval(refresh,750);
-addEventListener('pagehide',()=>{disposed=true;clearInterval(poll);request?.abort();deck.dispose();},{once:true});
+const poll=pollVisible({url:'/api/starting-soon',interval:750,
+ onVisibility:visible=>deck.setVisible(visible),
+ onData:state=>{lastState=state;loadedAt=Date.now();render(state);},
+ onError:()=>{if(Date.now()-loadedAt>3000){document.body.classList.remove('playing');viewSignature='';}}
+});
+addEventListener('pagehide',e=>{if(e.persisted)return;disposed=true;poll.dispose();deck.dispose();},{once:true});
 
