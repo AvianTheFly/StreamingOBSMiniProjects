@@ -542,7 +542,7 @@
         "label": "A ready living lobby is visible",
         "kind": "browser"
       },
-      "detail": "The original OBS painting stays beneath a world layer. Five selected worlds can paint versioned replacement artwork through that existing layer; saved live apertures are still cleared after the complete painting and every accent. The other worlds retain their original painted overlays. Feature-local chaos-cast assembles finite setup/payoff jokes, chaos-ink owns illustrated game props, and lobby-cameos adds painted-character performances through the public PaintedWorld.drawVisitor contract. LobbyResidents owns three decoded connected-alpha sprite caches per redesigned world, continuous room routines and perch handoff during cameos; late decode and teardown release the same presentation resources. Afterparty is independent and unchanged. Eleven ready worlds (Reef, Forge, Sanctuary, Sky Harbor, Storm Coast, Phoenix Observatory, Spirit Railway, Tavern, Future Lounge, Spirit Arcade and Aurora Camp) each supply their own painted landmark motion, ambience and finite themed guests. New invitations retain existing instances, automatic entrances use novelty and soft pressure, and switching the studio world replaces its single document while rejecting stale selections. Complete saved desktop, camera and chat rectangles are cleared after all accents. Hidden documents pause; native OBS unloads inactive sources; teardown releases clocks, instances and cached canvases. Finite off-air installation preserves original inputs, filters, transforms and the program scene. No audio, new Hub worker, socket or program-scene writer is introduced. Maintenance reruns enumerate installed groups and reject missing group children before any installation writes. Manual cues use the existing Hub SSE channel only in a visible native world document; private previews never subscribe. Cue age, world identity and bounded deduplication guard dispatch; hide/page exit closes the subscription.",
+      "detail": "The original OBS painting stays beneath a world layer. Five selected worlds can paint versioned replacement artwork through that existing layer; saved live apertures are still cleared after the complete painting and every accent. The other worlds retain their original painted overlays. Feature-local chaos-cast assembles finite setup/payoff jokes, chaos-ink owns illustrated game props, and lobby-cameos adds painted-character performances through the public PaintedWorld.drawVisitor contract. LobbyResidents owns three decoded connected-alpha sprite caches per redesigned world, continuous room routines and perch handoff during cameos; late decode and teardown release the same presentation resources. Afterparty is independent and unchanged. Eleven ready worlds (Reef, Forge, Sanctuary, Sky Harbor, Storm Coast, Phoenix Observatory, Spirit Railway, Tavern, Future Lounge, Spirit Arcade and Aurora Camp) each supply their own painted landmark motion, ambience and finite themed guests. New invitations retain existing instances, automatic entrances use novelty and soft pressure, and switching the studio world replaces its single document while rejecting stale selections. Complete saved desktop, camera and chat rectangles are cleared after all accents. Hidden documents pause; native OBS unloads inactive sources; teardown releases clocks, instances and cached canvases. Finite off-air installation preserves original inputs, filters, transforms and the program scene. No audio, new Hub worker, socket or program-scene writer is introduced. Maintenance reruns enumerate installed groups and reject missing group children before any installation writes. Manual cues use the existing Hub SSE channel only in a visible native world document; private previews never subscribe. Cue age, world identity and bounded deduplication guard dispatch; hide/page exit closes the subscription. Living-world browser sources explicitly enable OBS custom FPS so the authored 24 FPS source limit is honored independently of the 60 FPS stream. The finite frame-cap repair changes only the missing flag on matching existing sources, with rollback settings snapshots and off-air checks.",
       "steps": [
         {
           "id": "0",
@@ -602,17 +602,17 @@
         {
           "path": "mini projects/scene_voice_switcher/motion.py",
           "symbol": "layer",
-          "hash": "0861af4df715f8c4dac7682b4329cfe629cfd3373cd2a9fabebaef4e1cf93169"
+          "hash": "2723a43b7bb7d793c39c8eed8fcefd241e82778889fd120a6bab7d56439ad595"
         },
         {
           "path": "mini projects/scene_voice_switcher/presentation.py",
           "symbol": "plan",
-          "hash": "fb79d895bf515f5cf41fa9fcc39865e6b976eaefe361784934c21fe92ed3d3ed"
+          "hash": "4fa11df958ce87d9dd9733af03407ca818e9deaf453f6cbfb6b7d2abd73e36bc"
         },
         {
           "path": "tools/build_lobby_motion.py",
           "symbol": "build",
-          "hash": "867918e6c43e41ea0019645289648911d242c8c009f9348c10a4d707bcf169b3"
+          "hash": "4dee774b3167bc01e69cf09adb08894a5c8ddc8c4f3855c2b615982efb44c298"
         },
         {
           "path": "tools/install_lobby_motion.py",
@@ -621,8 +621,8 @@
         }
       ],
       "owner_hashes": {
-        "scene_voice_switcher": "d22677dc856ffd2f18ebc165dbb5a6d6dd8be248e85508bb1ef5ba04b6f9ad86",
-        "browser_effects": "b8947a7307b6b65abf8bd8dc1ef64fa24b0cdea6477cc2d0c84ad31d092efb4f"
+        "browser_effects": "9bb34470bf1940ca4f1f5c597241fd7b1db47750c6a971d14116904ed6854b9a",
+        "scene_voice_switcher": "1b7399e1d614bc5e611d122d3bfca36ec22edc28fe85c359862646c89b062319"
       }
     },
     {

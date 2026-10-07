@@ -790,3 +790,13 @@ The second full suite exposed an existing Windows HTTP reset caused by unread
 POST bodies in control routes. Those routes now consume and validate the body
 before dispatch. The original failing HTTP test plus malformed-body/no-dispatch
 checks pass; 37 related regressions passed after the fix.
+
+Step 4 enables the missing `fps_custom` flag on eleven living-world browser
+sources. Their existing authored 24 FPS limits now take effect independently of
+the unchanged 60 FPS stream. The feature plan also supplies the flag on future
+repairs. The off-air migration verified that this flag was the only changed
+input setting; it did not reinstall layouts, edit faders or select a scene.
+Rollback inputs are stored in `diagnostics/frame-caps-20261006-221908` under
+LOCALAPPDATA/StreamingHub; settings history was also snapshotted first.
+The matching lobby/layout tests passed 26 cases. Step 3's full offline run
+passed 1,054 tests in 171.345 seconds, including the HTTP body fix.

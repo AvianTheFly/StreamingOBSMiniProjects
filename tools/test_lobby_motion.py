@@ -19,6 +19,7 @@ class MotionTests(unittest.TestCase):
         self.assertTrue(spec['settings']['shutdown'])
         self.assertTrue(spec['settings']['restart_when_active'])
         self.assertEqual(spec['settings']['fps'],24)
+        self.assertTrue(spec['settings']['fps_custom'])
 
     def test_pilot_stacks_motion_after_painted_foreground_before_live_chat(self):
         data={'locations':{'ReefLobby':{'camera':[120,300,420,550],'extra_personal':'kept'}}}

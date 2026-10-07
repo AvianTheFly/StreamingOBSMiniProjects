@@ -21,5 +21,5 @@ def layer(name, placement):
     query = urlencode({'world': world, 'holes': json.dumps(holes, separators=(',', ':'))})
     return {'source': name + ' Living World', 'kind': 'browser_source', 'configure': True,
             'settings': {'url': 'http://127.0.0.1:7420/lobby-motion/index.html?' + query,
-                         'width': 1920, 'height': 1080, 'fps': 24,
+                         'width': 1920, 'height': 1080, 'fps': 24, 'fps_custom': True,
                          'shutdown': True, 'restart_when_active': True}}
