@@ -42,6 +42,10 @@ Spotify's media observer retains track properties between metadata events, with
 a five-second fallback read for missed notifications. Playback events still wake
 immediately; a half-second status heartbeat preserves freshness. Revision checks
 retain metadata changes arriving during an awaited read. No extra worker is added.
+Its browser cancels animation callbacks while invisible but continues the musical
+history on audio generations. Page exit aborts requests/deadlines and cancels
+retry scheduling; restored pages reject older responses. Transport failures back
+off from 250 ms to two seconds and recovery retains normal active cadence.
 
 Living-world owners pass their saved apertures to `PaintedPatch.draw` as optional
 destination occlusions. Shared mesh mechanics skip triangles fully covered by a

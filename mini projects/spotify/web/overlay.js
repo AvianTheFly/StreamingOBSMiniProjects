@@ -5,6 +5,7 @@ let canvas=document.getElementById('visualizer');
 let ctx=null;
 const title=document.getElementById('title'),artist=document.getElementById('artist');
 let data={playing:false,bands:[]},lastSuccess=0,frame=0,lastFrame=0,sourceVisible=true;
+let stopped=false,pollTimer=0,pending=null,pollGeneration=0,failures=0;
 const world=new ReactiveWorld({geometry:false}),journey=new VisualJourney();
 const musicFeed=new MusicFeed(world,journey);
 // Begin with the user's preferred high-tech instrument; the musical journey
@@ -38,12 +39,12 @@ function present(){
  widget.dataset.renderer='canvas';VisualStageRenderer.fallback(ctx,world,journey);ctx.restore();
 }
 function draw(now){
+ frame=0;if(stopped||!sourceVisible||document.hidden)return;
  if(!data.playing||performance.now()-lastSuccess>1600){hide();return;}
  frame=requestAnimationFrame(draw);if(lastFrame&&now-lastFrame<15)return;
  lastFrame=now;
  // Audio generations advance the instrument in poll(), independently of paints.
  // Musical history keeps advancing off scene; only invisible painting sleeps.
- if(!sourceVisible||document.hidden)return;
  clear();
  if(!world.active)return;
  widget.dataset.theme=journey.name;widget.dataset.morph=journey.blend.toFixed(3);
@@ -53,14 +54,19 @@ function draw(now){
  visualizerTiming.analysisMs=data.analysis_ms||0;
 }
 async function poll(){
+ if(stopped)return;const generation=pollGeneration;
  let next=16;
+ const request={controller:new AbortController(),timer:0};pending=request;
  try{
   const idle=!data.playing&&Number.isSafeInteger(data.revision);
   const audioWait=!idle&&data.playing&&Number.isSafeInteger(data.audio_revision);
   const query=audioWait?'?audio_after='+data.audio_revision+'&after='+data.revision:idle?'?after='+data.revision:'';
   const requested=performance.now();
-  const response=await fetch('/api/state'+query,{cache:'no-store',signal:AbortSignal.timeout(idle?2000:1000)});
-  if(!response.ok)throw Error('offline');data=await response.json();lastSuccess=performance.now();
+  request.timer=setTimeout(()=>request.controller.abort(),idle?2000:1000);
+  const response=await fetch('/api/state'+query,{cache:'no-store',signal:request.controller.signal});
+  if(!response.ok)throw Error('offline');const snapshot=await response.json();
+  if(stopped||generation!==pollGeneration)return;
+  data=snapshot;lastSuccess=performance.now();failures=0;
   visualizerTiming.receivedAt=lastSuccess;
   musicFeed.accept(data,lastSuccess);
   visualizerTiming.rttMs=audioWait?0:Math.min(20,lastSuccess-requested);
@@ -68,13 +74,25 @@ async function poll(){
   if(data.playing){
    if(title.textContent!==data.title)title.textContent=data.title;
    const artistName=data.artist||'Spotify';if(artist.textContent!==artistName)artist.textContent=artistName;
-   widget.hidden=false;if(!frame)frame=requestAnimationFrame(draw);
+   widget.hidden=false;startDrawing();
   }
   else{hide();if(Number.isSafeInteger(data.revision))next=0;}
- }catch{data.playing=false;delete data.revision;musicFeed.accept(data,performance.now());hide();}
+ }catch{
+  if(stopped||generation!==pollGeneration)return;
+  data.playing=false;delete data.revision;musicFeed.accept(data,performance.now());hide();
+  next=Math.min(2000,250*2**Math.min(3,failures++));
+ }finally{clearTimeout(request.timer);if(pending===request)pending=null;}
+ if(stopped||generation!==pollGeneration)return;
  // A successful revision request already yields at fetch. Avoid the browser
  // nested-timer clamp between successive capture notifications.
- if(next===0)queueMicrotask(poll);else setTimeout(poll,next);
+ if(next===0)queueMicrotask(()=>{if(generation===pollGeneration)poll();});else pollTimer=setTimeout(poll,next);
 }poll();
-window.addEventListener('obsSourceVisibleChanged',event=>{sourceVisible=event.detail.visible!==false;});
-window.addEventListener('pagehide',()=>{hide();radiance?.dispose();});
+function startDrawing(){if(!stopped&&sourceVisible&&!document.hidden&&data.playing&&!frame)frame=requestAnimationFrame(draw);}
+function visibility(){if(!sourceVisible||document.hidden){cancelAnimationFrame(frame);frame=0;lastFrame=0;}else startDrawing();}
+window.addEventListener('obsSourceVisibleChanged',event=>{sourceVisible=event.detail?.visible!==false;visibility();});
+document.addEventListener('visibilitychange',visibility);
+window.addEventListener('pagehide',()=>{
+ stopped=true;pollGeneration++;clearTimeout(pollTimer);pending?.controller.abort();clearTimeout(pending?.timer);
+ hide();radiance?.dispose();
+});
+window.addEventListener('pageshow',()=>{if(stopped){stopped=false;failures=0;poll();}});

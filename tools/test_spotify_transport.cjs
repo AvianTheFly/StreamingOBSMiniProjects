@@ -58,6 +58,7 @@ const server=http.createServer((request,response)=>{
   const hidden=await page.evaluate(()=>({...costs,phase:world.snapshot().phase}));
   assert(hidden.steps>10,'off-scene musical simulation must keep advancing');
   assert.equal(hidden.paints,0,'off-scene frames must skip all presentation work');
+  assert.equal(await page.evaluate(()=>frame),0,'invisible sources must release the animation callback');
   assert(hidden.phase.some((value,i)=>value>visible.phase[i]),'hidden frames must retain spectral travel');
   assert(requests-activeStart>10,'active signal polling must retain its cadence off scene');
   await page.evaluate(()=>window.dispatchEvent(new CustomEvent('obsSourceVisibleChanged',{detail:{visible:true}})));
@@ -65,11 +66,20 @@ const server=http.createServer((request,response)=>{
   publish({playing:false});await page.waitForFunction(()=>document.getElementById('widget').hidden);
   await page.waitForTimeout(150);publish(signal);await page.waitForFunction(()=>!document.getElementById('widget').hidden,null,{timeout:750});
   offline=true;await page.waitForFunction(()=>document.getElementById('widget').hidden);
+  const outageStart=requests;await page.waitForTimeout(2200);const outageRequests=requests-outageStart;
+  assert(outageRequests<=4,'an unavailable Hub must not cause a 60 Hz retry storm');
   offline=false;await page.waitForFunction(()=>!document.getElementById('widget').hidden);
+  await page.evaluate(()=>dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true})));
+  await page.waitForTimeout(50);const hiddenPageRequests=requests;
+  await page.waitForTimeout(400);assert.equal(requests,hiddenPageRequests,'page exit cancels request scheduling');
+  assert.equal(await page.evaluate(()=>frame),0);
+  await page.evaluate(()=>dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true})));
+  await page.waitForFunction(()=>!document.getElementById('widget').hidden);
+  await page.waitForFunction(()=>frame!==0);
   assert.deepEqual(errors,[]);
   console.log(JSON.stringify({passed:true,idleRequestsIn3Seconds:{before:oldIdle,after:newIdle},wakeMs,
    visible:{steps:visible.steps,paints:visible.paints,stepMs:visible.stepMs,paintMs:visible.paintMs},
-   hidden:{steps:hidden.steps,paints:hidden.paints,stepMs:hidden.stepMs,paintMs:hidden.paintMs},resume:true,reconnect:true}));
+   hidden:{steps:hidden.steps,paints:hidden.paints,stepMs:hidden.stepMs,paintMs:hidden.paintMs},outageRequestsIn2Seconds:outageRequests,pageExitRequests:0,resume:true,reconnect:true}));
  }finally{
   if(browser)await browser.close();for(const finish of [...pending])finish();
   await new Promise(resolve=>server.close(resolve));
