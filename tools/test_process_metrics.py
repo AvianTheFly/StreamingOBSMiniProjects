@@ -55,6 +55,17 @@ class ProcessMetricsTests(unittest.TestCase):
         self.assertIsNone(row['cpu_percent'])
         self.assertEqual(row['create_time'], 20)
 
+    def test_obs_browser_and_mux_costs_are_visible_without_command_line_access(self):
+        processes = [self.process(201, 'obs-browser-page.exe'), self.process(202, 'obs-ffmpeg-mux.exe')]
+        sampler = ProcessMetrics()
+        module = self.module(processes)
+        sampler.sample(module)
+        rows = sampler.sample(module)
+        self.assertEqual({row['name'] for row in rows}, {'obs-browser-page.exe', 'obs-ffmpeg-mux.exe'})
+        self.assertTrue(all(row['machine_cpu_percent'] == 10 for row in rows))
+        for process in processes:
+            process.cmdline.assert_not_called()
+
     def test_exit_and_access_denial_do_not_break_other_metrics(self):
         denied, exited, good = self.process(101), self.process(102), self.process(103)
         denied.cpu_percent.side_effect = psutil.AccessDenied(101)

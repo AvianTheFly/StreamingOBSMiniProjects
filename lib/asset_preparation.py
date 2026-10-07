@@ -13,6 +13,7 @@ from pathlib import Path
 import threading
 
 from lib.media_metadata import probe_media, flush_metadata_cache
+from lib.cpu_headroom import CpuHeadroom
 from lib.shared_media.media_startup import background_media_slot
 
 VIDEO_EXTS = {'.mp4', '.mkv', '.mov', '.m4v', '.ts', '.webm', '.avi', '.flv', '.ogv'}
@@ -35,9 +36,10 @@ def preparation_budget():
 
 
 class AssetPreparation:
-    def __init__(self, *, budget_bytes=None, head_bytes=8 * 1024 * 1024):
+    def __init__(self, *, budget_bytes=None, head_bytes=8 * 1024 * 1024, headroom=None):
         self.budget_bytes = preparation_budget() if budget_bytes is None else budget_bytes
         self.head_bytes = head_bytes
+        self._headroom = headroom if headroom is not None else CpuHeadroom()
         self._lock = threading.Lock()
         self._pending = deque()
         self._queued = set()
@@ -74,10 +76,13 @@ class AssetPreparation:
         with self._lock:
             return dict(queued=len(self._pending), probed=self._probed,
                         warmed_mb=round(self._warmed / 1048576, 1),
-                        budget_mb=round(self.budget_bytes / 1048576, 1), failures=self._failed)
+                        budget_mb=round(self.budget_bytes / 1048576, 1), failures=self._failed,
+                        waiting_for_cpu=self._headroom.waiting)
 
     def _prepare(self, path, stop_event):
         if path.suffix.lower() in VIDEO_EXTS:
+            if not self._headroom.wait(stop_event):
+                return
             with background_media_slot(stop_event) as allowed:
                 if not allowed:
                     return
@@ -90,6 +95,8 @@ class AssetPreparation:
             return
         with path.open('rb') as stream:
             while remaining and not stop_event.is_set():
+                if not self._headroom.wait(stop_event):
+                    return
                 with background_media_slot(stop_event) as allowed:
                     if not allowed:
                         return

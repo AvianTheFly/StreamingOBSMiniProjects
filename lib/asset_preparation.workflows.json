@@ -17,7 +17,7 @@
         "event": "assets.prepare",
         "kind": "background"
       },
-      "detail": "",
+      "detail": "One bounded worker primes metadata and compressed file heads. Optional probes and reads pause at 70% system CPU and resume below 55%; waits release promptly on shutdown and occur outside the decoder slot so live playback retains priority. File metadata persists in a bounded derived cache; the existing worker flushes trailing writes without rewriting unchanged snapshots.",
       "steps": [
         {
           "id": "0",
@@ -35,22 +35,21 @@
         },
         {
           "id": "2",
-          "label": "Share conversion budget",
-          "owner": "conversion",
+          "label": "Yield to live decoder startup",
+          "owner": "preparation",
           "kind": "action",
           "detail": ""
         },
         {
           "id": "3",
-          "label": "Reuse cached prepared media",
+          "label": "Reuse metadata and OS file cache",
           "owner": "preparation",
           "kind": "end",
           "detail": ""
         }
       ],
       "owner_hashes": {
-        "preparation": "a1ad7dcb631d968f17e1744c36663dd81899ef7aa8b767078bd44508d083af17",
-        "conversion": "b714ec8a6641880ed03bdde834c87c760b5b902d357ffd74361bc6101d768e07"
+        "preparation": "cc21d7557c1a8d925ddb60e6e1a5ab51993a4433311c225737c9fadc07707d65"
       },
       "edges": [
         {
@@ -70,7 +69,7 @@
         {
           "path": "lib/asset_preparation.py",
           "symbol": "AssetPreparation",
-          "hash": "8dd841e174853e9e8355ad2ace26b009d98278947db5041e4245e211ef78d3d4"
+          "hash": "d20378bc52ecdc6445badd4874021e8ece759133a2cc2fb904df7ea637e060de"
         }
       ]
     }

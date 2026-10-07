@@ -814,3 +814,18 @@ to text and clip placement still rendered, stale connection state recovered,
 and teardown aborted the pending request. Artwork drift/reveals pause off-scene;
 status remains current. Existing four-style animation, geometry, transparent
 layer, stale decode and reduced-motion checks also passed.
+
+Step 6 makes optional preparation cooperate with gameplay load: at 70% whole-
+machine CPU it pauses new background probes/reads, resuming below 55%. The
+existing worker samples nonblocking counters at most once per second after a
+250-ms initial measurement; it holds no playback admission lock while waiting.
+Foreground playback still works through lazy loading, and shutdown interrupts
+waits. This is admission control, not a cap on the game, OBS or live features.
+Sixteen preparation/diagnostic regressions passed, including pressure hysteresis,
+bounded shutdown and an available foreground decoder slot during deferred work.
+
+The existing process diagnostics now include `obs-browser-page.exe` and
+`obs-ffmpeg-mux.exe`. Earlier OBS-main-only samples omitted browser CPU, a material
+gap when acceleration is disabled. This adds no polling worker or command-line
+inspection. `tools/measure_runtime_resources.py` provides finite read-only
+captures of Hub/OBS/browser/game CPU and OBS rendering counters for comparison.

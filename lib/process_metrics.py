@@ -1,4 +1,4 @@
-"""Read-only CPU attribution for Python and finite media tools.
+"""Read-only CPU attribution for Python, OBS browser children and media tools.
 
 Called by the existing performance collector; owns no polling thread. Keep
 process identities and counters across samples, without inspecting command
@@ -10,7 +10,8 @@ import os
 import time
 
 PROCESS_NAMES = frozenset({'python.exe', 'pythonw.exe', 'py.exe', 'python',
-                           'python3', 'ffmpeg.exe', 'ffprobe.exe', 'ffmpeg', 'ffprobe'})
+                           'python3', 'ffmpeg.exe', 'ffprobe.exe', 'ffmpeg', 'ffprobe',
+                           'obs-browser-page.exe', 'obs-ffmpeg-mux.exe'})
 
 
 class ProcessMetrics:

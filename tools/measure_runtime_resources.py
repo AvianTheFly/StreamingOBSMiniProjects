@@ -2,6 +2,7 @@
 import argparse
 from datetime import datetime, timezone
 import json
+import os
 from pathlib import Path
 import statistics
 import sys
@@ -21,10 +22,11 @@ def measure(seconds):
     client=get_obs()
     tracked={}
     rows=[]
+    own_pid=os.getpid()
     psutil.cpu_percent()
     def discover():
         for process in psutil.process_iter(['pid','name','ppid','create_time']):
-            if process.pid==psutil.Process().pid or process.info['name'].lower() not in NAMES:
+            if process.pid==own_pid or (process.info['name'] or '').lower() not in NAMES:
                 continue
             identity=(process.pid,process.info['create_time'])
             if identity not in tracked:
