@@ -6,7 +6,6 @@ No URLs, credentials, audio, or transcription text are recorded.
 """
 from __future__ import annotations
 
-import csv
 from collections import deque
 from datetime import datetime, timezone
 import json
@@ -14,15 +13,11 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 from pathlib import Path
-import shutil
-import subprocess
 import threading
 import time
 from lib.process_metrics import ProcessMetrics
+from lib.gpu_metrics import GpuMetrics, GPU_FIELDS, parse_gpu_csv
 
-GPU_FIELDS = ("index", "utilization.gpu", "utilization.memory", "memory.used",
-              "memory.total", "temperature.gpu", "power.draw", "power.limit",
-              "clocks.gr", "clocks.mem", "utilization.encoder", "utilization.decoder")
 OBS_FIELDS = ("cpu_usage", "memory_usage", "active_fps", "average_frame_render_time",
               "render_skipped_frames", "render_total_frames", "output_skipped_frames",
               "output_total_frames")
@@ -61,14 +56,6 @@ def _wait_for_sample(stop_event, *, sampled_at=None):
             break
 
 
-def parse_gpu_csv(output: str) -> list[dict]:
-    result = []
-    for row in csv.reader(output.splitlines(), skipinitialspace=True):
-        if len(row) == len(GPU_FIELDS):
-            result.append(dict(zip(GPU_FIELDS, (x.strip() for x in row))))
-    return result
-
-
 def find_obs_process(psutil, port):
     """Prefer the connected server, rather than an older exiting OBS instance."""
     try:
@@ -90,7 +77,7 @@ def find_obs_process(psutil, port):
 class Collector:
     def __init__(self):
         self.client = None
-        self.smi = shutil.which("nvidia-smi")
+        self.gpu = GpuMetrics()
         self.process = None
         self.obs_process = None
         self._league_processes = {}
@@ -134,6 +121,10 @@ class Collector:
         return sorted(rows, key=lambda row: (row['name'], row['pid']))
 
     def close(self):
+        self.gpu.close()
+        self._close_obs()
+
+    def _close_obs(self):
         client, self.client = self.client, None
         if client is not None:
             try:
@@ -143,17 +134,7 @@ class Collector:
 
     def sample(self) -> dict:
         data = {"time": datetime.now(timezone.utc).isoformat(), "hub_pid": os.getpid()}
-        if self.smi:
-            try:
-                r = subprocess.run([self.smi, "--query-gpu=" + ",".join(GPU_FIELDS),
-                                    "--format=csv,noheader,nounits"],
-                                   capture_output=True, text=True, timeout=2,
-                                   creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
-                data["gpu"] = parse_gpu_csv(r.stdout) if r.returncode == 0 else []
-                if r.returncode:
-                    data["gpu_error"] = "nvidia-smi exit " + str(r.returncode)
-            except (OSError, subprocess.SubprocessError) as exc:
-                data["gpu_error"] = type(exc).__name__
+        data.update(self.gpu.sample())
         try:
             import psutil
             if self.process is None:
@@ -212,7 +193,7 @@ class Collector:
             data["obs"]["scene"] = self.client.get_current_program_scene().current_program_scene_name
         except Exception as exc:
             data["obs_error"] = type(exc).__name__
-            self.close()
+            self._close_obs()
         return data
 
 

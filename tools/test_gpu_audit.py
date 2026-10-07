@@ -191,7 +191,7 @@ class AuditTests(unittest.TestCase):
 
     def test_performance_log_excludes_voice_transcripts_and_consumer_errors(self):
         collector = Collector()
-        collector.smi = None
+        collector.gpu = Mock(sample=Mock(return_value={}))
         collector.client = Mock()
         diagnostics = {'ready': True, 'device': 'cpu', 'state': 'idle',
                        'history': [{'text': 'private phrase'}],
@@ -215,17 +215,18 @@ class AuditTests(unittest.TestCase):
 
     def test_obs_failure_still_records_gpu_and_closes_bad_connection(self):
         collector = Collector()
-        collector.smi = 'nvidia-smi'
+        collector.gpu = Mock(sample=Mock(return_value={'gpu': [{'utilization.gpu': '99'}]}))
         client = Mock()
         client.get_stats.side_effect = TimeoutError
         collector.client = client
-        with patch('lib.performance_monitor.subprocess.run', return_value=Mock(
-                returncode=0, stdout='0, 99, 10, 4000, 11264, 55, 150, 300, 1800, 7000, 39, 0')):
-            data = collector.sample()
+        data = collector.sample()
         self.assertEqual(data['gpu'][0]['utilization.gpu'], '99')
         self.assertEqual(data['obs_error'], 'TimeoutError')
         self.assertIsNone(collector.client)
         client.disconnect.assert_called_once()
+        collector.gpu.close.assert_not_called()  # OBS reconnects retain the GPU handle.
+        collector.close()
+        collector.gpu.close.assert_called_once()
         json.dumps(data)
 
 

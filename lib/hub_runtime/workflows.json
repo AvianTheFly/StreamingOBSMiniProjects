@@ -17,7 +17,7 @@
         "event": "hub.started",
         "kind": "event"
       },
-      "detail": "OBS-independent features start immediately based on public REQUIRES_OBS=False metadata. Undeclared/invalid dependencies remain deferred; voice and remaining playback workers start once after OBS connects. The CLI keeps its explicit fail-fast option. Native BLAS/OpenMP pools default to two threads after loading the environment and before feature imports; explicit thread settings are preserved and inherited by children. The launcher checks availability without initializing the native dependencies. Before starting features, hydrate the bounded derived metadata cache from LOCALAPPDATA; unchanged files avoid repeat ffprobe launches. Missing/invalid cache data falls back to ordinary probing. The existing preparation worker flushes trailing cache changes and never writes source assets.",
+      "detail": "OBS-independent features start immediately based on public REQUIRES_OBS=False metadata. Undeclared/invalid dependencies remain deferred; voice and remaining playback workers start once after OBS connects. The CLI keeps its explicit fail-fast option. Native BLAS/OpenMP pools default to two threads after loading the environment and before feature imports; explicit thread settings are preserved and inherited by children. The launcher checks availability without initializing the native dependencies. Before starting features, hydrate the bounded derived metadata cache from LOCALAPPDATA; unchanged files avoid repeat ffprobe launches. Missing/invalid cache data falls back to ordinary probing. The existing preparation worker flushes trailing cache changes and never writes source assets. The existing diagnostics worker lazily owns one read-only NVML handle, closes it on shutdown and retains it across OBS reconnects. Unsupported counters remain unknown. Driver failures release the handle and retry after 60 seconds; the CLI fallback is limited to one launch per five seconds even during media bursts, with cached sample age reported.",
       "steps": [
         {
           "id": "0",
@@ -56,7 +56,7 @@
         }
       ],
       "owner_hashes": {
-        "hub": "b3a1ef8aef5cf557945612d65aed97f32fd40653001ffc926721b1d83d967192"
+        "hub": "40bd807609f763027d6a9c5ba598e6d523b408028fbb059df52f91098d54ba4a"
       },
       "edges": [
         {
@@ -117,6 +117,11 @@
           "path": "lib/hub_runtime/resources.py",
           "symbol": "restore_media_metadata",
           "hash": "e5d573f7407236862fb71d65c480baaab685fbe985c884f2e64ec885bd6f8a05"
+        },
+        {
+          "path": "lib/gpu_metrics.py",
+          "symbol": "GpuMetrics.sample",
+          "hash": "ed48886e963406106b481eefada56b0752c1d2024fefba7fc7f810bd49a58916"
         }
       ]
     },
