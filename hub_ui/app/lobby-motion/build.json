@@ -101,7 +101,7 @@
   },
   "painted-world.js": {
     "source": "mini projects/scene_voice_switcher/web/painted-world.js",
-    "sha256": "11c86f011c948059cc04177a4c479cdc49bbe38379c38ad4075387f6f9fb5891"
+    "sha256": "00e01aa9a43f2a49eeb682414dac8d892513a9daf2dcf12e27da7a70f378be87"
   },
   "phoenix-observatory-guests.js": {
     "source": "mini projects/scene_voice_switcher/web/phoenix-observatory-guests.js",
@@ -125,7 +125,7 @@
   },
   "reef-scene.js": {
     "source": "mini projects/scene_voice_switcher/web/reef-scene.js",
-    "sha256": "99bfdb09ebaa18f463cf7b179d335b4bf8c5021e47dd6511c57203e0a29c78d9"
+    "sha256": "2c6db2496f8bf44236ce4bdd97fc536c2b7de111a79b2cdf8e0fc4c49bc45bd2"
   },
   "reef-visitors.js": {
     "source": "mini projects/scene_voice_switcher/web/reef-visitors.js",
@@ -169,7 +169,7 @@
   },
   "stage.js": {
     "source": "mini projects/scene_voice_switcher/web/stage.js",
-    "sha256": "c8719ae4ff9b9973f9d256019ef9d2959682cdb7a0317b29bb32bf4644dce3d0"
+    "sha256": "f62827b21ea619f6352eec3ad2017a56f8eb03c3725dd0a9345310bde3736975"
   },
   "storm-coast-guests.js": {
     "source": "mini projects/scene_voice_switcher/web/storm-coast-guests.js",
@@ -213,7 +213,7 @@
   },
   "shared/world-motion.js": {
     "source": "lib/browser_effects/web/world-motion.js",
-    "sha256": "54d5feb0d08dc5727f4e79ca4cd6c3a69f7b8fc6f7080f3df94b5a0002038dd3"
+    "sha256": "51085025dfef8503b80fe87c4862143aad3cdb1cbc69927ecb85053f33fed2e6"
   },
   "shared/display-frame.js": {
     "source": "lib/browser_effects/web/display-frame.js",

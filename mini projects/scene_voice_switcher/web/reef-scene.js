@@ -14,14 +14,14 @@ export class ReefMotion {
     this.base=document.createElement('canvas');this.base.width=1920;this.base.height=1080;this.base.getContext('2d').drawImage(image,0,0,1920,1080);
     this.patches=[new PaintedPatch(this.base,[384,110,270,158]),new PaintedPatch(this.base,[1266,76,174,116]),new PaintedPatch(this.base,[1760,789,160,250]),new PaintedPatch(this.base,[1140,547,126,116]),new PaintedPatch(this.base,[276,245,65,107]),new PaintedPatch(this.base,[1224,658,205,84])];this.ready=true;return this;
   }
-  draw(c,t,events=[]){
+  draw(c,t,events=[],holes=[]){
     const envelope=(u,v)=>Math.sin(u*Math.PI)**2*Math.sin(v*Math.PI)**2;
-    for(let i=0;i<2;i++)this.patches[i].draw(c,(u,v)=>{const edge=envelope(u,v),flipper=Math.exp(-((u-.63)**2/.07+(v-.68)**2/.055));return [Math.sin(t*.7+i)*3*edge,Math.sin(t*.85+i)*2*edge+Math.sin(t*1.8+i)*8*flipper*edge];});
-    this.patches[2].draw(c,(u,v)=>[Math.sin(t*1.1+v*2)*6*(1-v)*envelope(u,v),Math.sin(t*.9+u*3)*1.3*envelope(u,v)]);
-    this.patches[3].draw(c,(u,v)=>[Math.sin(t*1.3+v*3)*4*envelope(u,v),Math.sin(t*.7+u*2)*1.5*envelope(u,v)]);
-    this.patches[4].draw(c,(u,v)=>[Math.sin(t*.8)*3*v*envelope(u,v),Math.cos(t*.8)*.7*envelope(u,v)]);
+    for(let i=0;i<2;i++)this.patches[i].draw(c,(u,v)=>{const edge=envelope(u,v),flipper=Math.exp(-((u-.63)**2/.07+(v-.68)**2/.055));return [Math.sin(t*.7+i)*3*edge,Math.sin(t*.85+i)*2*edge+Math.sin(t*1.8+i)*8*flipper*edge];},holes);
+    this.patches[2].draw(c,(u,v)=>[Math.sin(t*1.1+v*2)*6*(1-v)*envelope(u,v),Math.sin(t*.9+u*3)*1.3*envelope(u,v)],holes);
+    this.patches[3].draw(c,(u,v)=>[Math.sin(t*1.3+v*3)*4*envelope(u,v),Math.sin(t*.7+u*2)*1.5*envelope(u,v)],holes);
+    this.patches[4].draw(c,(u,v)=>[Math.sin(t*.8)*3*v*envelope(u,v),Math.cos(t*.8)*.7*envelope(u,v)],holes);
     const chest=events.find(e=>e.kind==='treasure'),age=chest?t-chest.started:-1,open=age<0?0:Math.sin(Math.min(1,age/8)*Math.PI);
-    if(open>0)this.patches[5].draw(c,(u,v)=>[open*2*envelope(u,v),-open*12*(1-v)*envelope(u,v)]);
+    if(open>0)this.patches[5].draw(c,(u,v)=>[open*2*envelope(u,v),-open*12*(1-v)*envelope(u,v)],holes);
     c.save();oceanClip(c);c.globalCompositeOperation='screen';
     // Water highlights move above and between the dome's physical beams/panels.
     c.lineWidth=1.1;for(let row=0;row<10;row++){c.strokeStyle='#78edee'+(row%3===0?'22':'12');c.beginPath();for(let k=0;k<=32;k++){const x=300+k*40,y=85+row*64+Math.sin(k*.55+t*.55+row)*13+Math.sin(t*.35+row)*9;c.lineTo(x,y);}c.stroke();}

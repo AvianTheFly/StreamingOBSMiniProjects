@@ -43,6 +43,12 @@ a five-second fallback read for missed notifications. Playback events still wake
 immediately; a half-second status heartbeat preserves freshness. Revision checks
 retain metadata changes arriving during an awaited read. No extra worker is added.
 
+Living-world owners pass their saved apertures to `PaintedPatch.draw` as optional
+destination occlusions. Shared mesh mechanics skip triangles fully covered by a
+later-cleared aperture, with a conservative seam/antialias margin. Deformed bounds
+are checked each frame; layout policy, mesh detail and final aperture clearing
+remain with the feature. The default draw contract remains unchanged.
+
 `lib/browser_effects/presentations.py` publishes explicitly named feature artwork
 during that feature's Hub lifetime. Identity tokens guard unregister; the shared
 HTTP server serves original file bytes (including JSON manifests) and serializes

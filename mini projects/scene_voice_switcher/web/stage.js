@@ -29,7 +29,7 @@ function events(){
 }
 function draw(){
   if(!ready||disposed)return;const began=performance.now(),active=events();
-  m.clearRect(0,0,1920,1080);art.draw(m,time,active);
+  m.clearRect(0,0,1920,1080);art.draw(m,time,active,holes);
   for(const event of active){const age=time-event.started,spec=cues.find(x=>x.id===event.kind);if(!spec)continue;const artist=artists[event.kind];if(!artist)continue;
     m.save();m.globalAlpha=smooth(age/.6)*smooth((spec.life-age)/.75);world.clip?.(m,spec);artist(m,age,event,art);m.restore();}
   screenFrame(m,holes[0],world.id);

@@ -22,6 +22,14 @@ export class AmbientClock {
   active(t){const w=Math.floor(t/60);return [...this.plan(w-1),...this.plan(w)].filter(e=>t>=e.started&&t<e.started+e.life);}
   dispose(){this.cache.clear();}
 }
+function occluded(target,x,y,holes){
+  // The caller clears these destination rectangles after composition. Keep a
+  // two-pixel margin for the .6px seam overlap and antialiasing at their edges.
+  const [a,b,c]=target,left=Math.min(a[0],b[0],c[0])+x-2,right=Math.max(a[0],b[0],c[0])+x+2,
+    top=Math.min(a[1],b[1],c[1])+y-2,bottom=Math.max(a[1],b[1],c[1])+y+2;
+  for(const [hx,hy,hw,hh] of holes)if(left>=hx&&right<=hx+hw&&top>=hy&&bottom<=hy+hh)return true;
+  return false;
+}
 function triangle(c,image,mesh){
   const {s0,ux,uy,vx,vy,det,target}=mesh,[d0,d1,d2]=target;
   const ax=((d1[0]-d0[0])*vy-(d2[0]-d0[0])*uy)/det,cx=((d2[0]-d0[0])*ux-(d1[0]-d0[0])*vx)/det;
@@ -46,10 +54,15 @@ export class PaintedPatch {
       }
     }
   }
-  draw(c,deform){
+  draw(c,deform,occlusions=[]){
     const [x,y,w,h]=this.rect;
     for(let i=0;i<this.vertices.length;i++){const [px,py]=this.vertices[i],[dx,dy]=deform(px/w,py/h),target=this.projected[i];target[0]=px+dx;target[1]=py+dy;}
-    c.save();c.translate(x,y);for(const mesh of this.triangles)triangle(c,this.image,mesh);c.restore();
+    c.save();c.translate(x,y);
+    for(const mesh of this.triangles){
+      if(occlusions.length&&occluded(mesh.target,x,y,occlusions))continue;
+      triangle(c,this.image,mesh);
+    }
+    c.restore();
   }
   dispose(){this.image.width=this.image.height=1;this.vertices=[];this.projected=[];this.triangles=[];}
 }

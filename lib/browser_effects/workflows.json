@@ -112,7 +112,7 @@
         "label": "A feature loads the public mechanics",
         "kind": "browser"
       },
-      "detail": "AmbientClock plans finite weighted phrases with recent-guest weighting and soft pressure, retains at most four plans and starts no timer. PaintedPatch decodes a small crop once, caches fixed triangle connections and source coefficients, and reuses coordinate buffers for each feature-provided deformation. Drawing order and mesh detail stay unchanged; disposal releases the canvas and all mesh buffers. Shared helpers own no theme, cast, live display placement or scene policy. Finite build publication copies original mechanic bytes and records canonical hashes.",
+      "detail": "AmbientClock plans finite weighted phrases with recent-guest weighting and soft pressure, retains at most four plans and starts no timer. PaintedPatch decodes a small crop once, caches fixed triangle connections and source coefficients, and reuses coordinate buffers for each feature-provided deformation. Drawing order and mesh detail stay unchanged; disposal releases the canvas and all mesh buffers. Shared helpers own no theme, cast, live display placement or scene policy. Finite build publication copies original mechanic bytes and records canonical hashes. Feature-owned saved apertures are passed as optional destination occlusions. PaintedPatch skips only triangles whose current deformed bounds lie fully within a later-cleared aperture, including a conservative antialias/seam margin. Each frame rechecks geometry, preserving re-entry, pixel output, mesh density and custom placement.",
       "steps": [
         {
           "id": "0",
@@ -150,11 +150,11 @@
         {
           "path": "tools/build_lobby_motion.py",
           "symbol": "build",
-          "hash": "867918e6c43e41ea0019645289648911d242c8c009f9348c10a4d707bcf169b3"
+          "hash": "4dee774b3167bc01e69cf09adb08894a5c8ddc8c4f3855c2b615982efb44c298"
         }
       ],
       "owner_hashes": {
-        "browser_effects": "b8947a7307b6b65abf8bd8dc1ef64fa24b0cdea6477cc2d0c84ad31d092efb4f"
+        "browser_effects": "84cc95ab85b277890a7bb2f688932b3aa04b9b08eac8a43c35eeb7af8086e666"
       }
     }
   ]
