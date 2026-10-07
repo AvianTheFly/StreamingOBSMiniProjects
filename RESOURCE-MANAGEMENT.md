@@ -1,4 +1,72 @@
-# Latest codebase optimization pass — 2026-10-06
+# Passive gaming follow-up — 2026-10-06
+
+This pass searched the supported Hub's passive loops, OBS/browser presentation,
+voice capture, Spotify capture/relay, status/fader reconciliation, waiting-room
+policy, statistics, process priority and diagnostics. Five additional changes
+are deployed. The initial rollback checkpoint is `7e03aba`; tracked code was
+already clean, so that checkpoint is an explicit empty commit. Existing local
+output artifacts were preserved outside these commits.
+
+| Change | Verified result | Rollback commit |
+| --- | --- | --- |
+| Hidden Starting Soon and champion-select pages stop polling | Zero requests during hidden browser checks; immediate current-state refresh on return. Cancelled/late responses cannot repaint newer state. Shared transport also bounds deadlines and handles page restoration. | `89b6df5`, deadline cleanup `263ac62` |
+| GPU counters reuse the installed native driver interface | Twelve reads: median 61.92 ms with nvidia-smi launches versus 3.96 ms with NVML, about 94% less elapsed time. Native reads launch zero processes; the new Hub's diagnostics confirm NVML use. | `243934b` |
+| Inactive waiting-room work sleeps | 240 idle policy ticks performed zero settings/catalog reads. Status checks bypass editor catalogs and playlist/history copies; one catalog scan supplies both labels and availability. Controls still wake the queue immediately; automatic rotation resumes when the waiting-room session starts. | `3ade6b5` |
+| Invisible sound effects stop painting | Zero hidden draw calls while actual audio time advances and playing/completion acknowledgements remain available. Visible return uses the current audio position. Startup also succeeds when Chromium stops animation callbacks. | `521402c` |
+| League summaries group metric observations once | A 1,200-match fixture fell from 11.25 to 7.81 ms CPU per aggregate (30.6%). All fields matched the checkpoint across 102 dense/sparse/live/partial/empty comparisons; input records remained unchanged. | `4529d8a` |
+
+These are operation-specific measurements, not a measured whole-machine CPU or
+GPU reduction. No game was running during verification, so this pass does not
+establish a gaming FPS improvement or elimination of every 100% CPU incident.
+The currently visible lobby artwork remains substantial OBS browser work.
+
+Native diagnostics follow NVIDIA's documented [read-only device queries](https://docs.nvidia.com/deploy/nvml-api/latest/api/group__nvmlDeviceQueries.html)
+and [initialization/cleanup lifetime](https://docs.nvidia.com/deploy/nvml-api/latest/api/group__nvmlInitializationAndCleanup.html).
+No GPU settings or driver installation changes occur. Unsupported counters remain
+unknown. Driver failures release the handle, retry after 60 seconds, and use a
+CLI fallback at most once per five seconds, with explicit cached-sample age.
+OBS reconnects do not reopen the GPU handle. Browser visibility uses OBS's
+[documented events](https://github.com/obsproject/obs-browser#events).
+
+Validation and deployment:
+
+- Full offline suite: **1,078 tests passed in 167.124 seconds**. Architecture:
+  **416 modules, zero violations**. No tests were discarded or disabled.
+- Chromium checks passed for shared visibility transport, late responses,
+  page restoration, both hidden overlays, all existing waiting-room layouts and
+  reveals, real sound playback/pause/completion, hidden audio, transparent art,
+  server-loss cleanup and read-only desktop/mobile Hub views.
+- The workflow checker remains non-clean because of inherited stale proofs and
+  broad owner-scope flags elsewhere. Changed behavior explanations were reviewed
+  and specifically stamped; the checker was not weakened.
+- Old Hub 21824 and its descendants exited through normal console cleanup.
+  The supported `hub.py --no-browser` restarted hidden as **2792**, with exactly
+  one keyboard child **21860**, all **14 modules ready**, and small.en CUDA voice
+  ready. Asset preparation finished with zero failures. Existing desktop chat
+  stayed running.
+- All **64 checked configuration JSON files** and **37 browser input settings**
+  matched across deployment. Soundboard still has only `default`, with
+  `@ -> hooray`. Recording/replay paths remain `C:\StreamingMedia\Replays`.
+  OBS stayed on `Lobbies` at 1920x1080/60, with stream/record/replay buffer stopped
+  as found. No volume, transform, filter, encoder or output setting was edited.
+- The four affected idle browser inputs were refreshed to load current scripts.
+  Five Windows socket-abort traces occurred during startup/refresh and live UI
+  reconnects; no other traceback or module readiness failure was observed.
+
+Reproduce the finite benchmarks:
+
+```powershell
+py -3.11 tools/benchmark_gpu_metrics.py --output <output.json>
+py -3.11 tools/benchmark_stats_aggregation.py --reference 7e03aba --output <output.json>
+```
+
+Evidence is under `%LOCALAPPDATA%/StreamingHub/diagnostics/passive-gaming/` and
+adjacent `passive-*.log` / `passive-*.json` files. Settings snapshots remain in
+`%LOCALAPPDATA%/StreamingHub/settings-history/`. For rollback, snapshot the latest
+personal settings and revert the selected code commits, newest dependent change
+first. Do not reset personal files to the checkpoint or restore old fader values.
+
+# Earlier codebase optimization pass — 2026-10-06
 
 Five additional optimizations are implemented, committed separately and loaded
 in the supported Hub. The starting rollback checkpoint is `b13b9fb`. Personal
