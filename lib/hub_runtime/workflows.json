@@ -56,7 +56,7 @@
         }
       ],
       "owner_hashes": {
-        "hub": "f1457985d793411be23867bb750b5ed5cc2fe606bb5fc0a2197e76095472810c"
+        "hub": "b3a1ef8aef5cf557945612d65aed97f32fd40653001ffc926721b1d83d967192"
       },
       "edges": [
         {
@@ -143,7 +143,7 @@
           "label": "Call the feature interface",
           "owner": "hub",
           "kind": "action",
-          "detail": ""
+          "detail": "HTTP controls consume and validate their complete JSON body before dispatch; invalid bodies cannot trigger a feature action."
         },
         {
           "id": "2",
@@ -154,7 +154,7 @@
         }
       ],
       "owner_hashes": {
-        "hub": "37d8a0769f17a64890d5da38416b4377ad0ef16d04bf235dae60c6b0ebf0acae"
+        "hub": "b3a1ef8aef5cf557945612d65aed97f32fd40653001ffc926721b1d83d967192"
       },
       "edges": [
         {

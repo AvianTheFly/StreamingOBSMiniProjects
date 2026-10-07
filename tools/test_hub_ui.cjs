@@ -45,7 +45,12 @@ async function main() {
         throw error;
       });
       await page.locator('#currentScene').filter({ hasNotText: '—' }).waitFor();
-      await page.waitForFunction(() => !document.querySelector('[data-action="quick_replay"]').disabled);
+      await page.waitForFunction(() => ['true','false'].includes(document.querySelector('[data-action="quick_replay"]')?.dataset.available));
+      // A read-only live check cannot require a running replay buffer or idle
+      // capture worker. Disposable fixtures below exercise enabled actions.
+      const observed=await page.evaluate(async()=>fetch('/api/coordination').then(r=>r.json()));
+      if(observed.replay_buffer?.active===false)
+        assert(await page.locator('[data-action="quick_replay"]').isDisabled(),'Stopped replay buffer must disable live capture');
       await page.locator('.desk-audio-drawer > summary').click();
     await page.locator('.desk-audio-channel').first().waitFor();
       await page.screenshot({ path: path.join(output, 'live-desk.png'), animations: 'disabled' });
@@ -55,6 +60,8 @@ async function main() {
       await page.screenshot({path:path.join(output,'live-in-game.png'),animations:'disabled'});
       await chooseStage('game');
       for (const panel of ['scenes','clips','music','sounds','waiting']) {
+        if(panel==='scenes'&&!await page.locator('#deskStageMenu').evaluate(el=>el.open))
+          await page.locator('#deskStageMenu > summary').click();
         await page.locator(`[data-desk-panel="${panel}"]`).click();
         await page.waitForFunction(()=>!document.querySelector('#deskResultCount').textContent.includes('Loading'));
         assert.equal(await page.locator('#deskRetry').count(),0,`${panel} catalog must be available`);
@@ -71,7 +78,7 @@ async function main() {
       await page.locator('.mixer-channel').first().waitFor();
       await page.screenshot({ path: path.join(output, 'live-audio.png'), animations: 'disabled' });
       await page.locator('a[data-page="projects/scene_voice_switcher"]').click();
-      await page.locator('.scene-location').first().waitFor();
+      await page.locator('[data-location-card]').first().waitFor();
       await page.screenshot({ path: path.join(output, 'live-scenes.png'), animations: 'disabled' });
       await page.goto('http://127.0.0.1:7420/#projects/spotify');
       await page.locator('#genActions button').first().waitFor();
