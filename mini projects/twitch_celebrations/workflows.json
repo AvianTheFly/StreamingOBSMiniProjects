@@ -42,7 +42,7 @@
           "label": "OBS overlay ready?",
           "owner": "twitch_celebrations",
           "kind": "gate",
-          "detail": ""
+          "detail": " Service-owned notifications wake an idle browser as soon as a show or control changes. Waits release the state lock and end within one second. The browser owns one cancellable request, keeps active-show cadence, and supports legacy responses."
         },
         {
           "id": "3",
@@ -60,8 +60,8 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "twitch_celebrations": "2102fc1c30b84682f68fe7a6555cbda77e316f6183b083a049c394061cadb8f7"
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "twitch_celebrations": "2962f448cfc1bbbef8dcfb4f40051fafcb5606ab6fec617aac715897c034ec7a"
       },
       "edges": [
         {
@@ -91,6 +91,11 @@
           "path": "mini projects/twitch_celebrations/engine.py",
           "symbol": "Engine.snapshot",
           "hash": "ed0085aa946d3b6c2227c1439c5fe7ae0dc6865b3c3cf58baaba21bf8c052066"
+        },
+        {
+          "path": "mini projects/twitch_celebrations/service.py",
+          "symbol": "Service.wait_overlay",
+          "hash": "94ec0f86b74d68fd2a757fe3e5a14fd8a7b628b77ea08009e92d68b629219670"
         }
       ]
     },
@@ -128,7 +133,7 @@
           "label": "OBS overlay ready?",
           "owner": "twitch_celebrations",
           "kind": "gate",
-          "detail": ""
+          "detail": " Service-owned notifications wake an idle browser as soon as a show or control changes. Waits release the state lock and end within one second. The browser owns one cancellable request, keeps active-show cadence, and supports legacy responses."
         },
         {
           "id": "3",
@@ -146,8 +151,8 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "twitch_celebrations": "2102fc1c30b84682f68fe7a6555cbda77e316f6183b083a049c394061cadb8f7"
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "twitch_celebrations": "2962f448cfc1bbbef8dcfb4f40051fafcb5606ab6fec617aac715897c034ec7a"
       },
       "edges": [
         {
@@ -177,6 +182,11 @@
           "path": "mini projects/twitch_celebrations/engine.py",
           "symbol": "Engine.snapshot",
           "hash": "ed0085aa946d3b6c2227c1439c5fe7ae0dc6865b3c3cf58baaba21bf8c052066"
+        },
+        {
+          "path": "mini projects/twitch_celebrations/service.py",
+          "symbol": "Service.wait_overlay",
+          "hash": "94ec0f86b74d68fd2a757fe3e5a14fd8a7b628b77ea08009e92d68b629219670"
         }
       ]
     },
@@ -214,7 +224,7 @@
           "label": "OBS overlay ready?",
           "owner": "twitch_celebrations",
           "kind": "gate",
-          "detail": ""
+          "detail": " Service-owned notifications wake an idle browser as soon as a show or control changes. Waits release the state lock and end within one second. The browser owns one cancellable request, keeps active-show cadence, and supports legacy responses."
         },
         {
           "id": "3",
@@ -232,8 +242,8 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "twitch_celebrations": "2102fc1c30b84682f68fe7a6555cbda77e316f6183b083a049c394061cadb8f7"
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "twitch_celebrations": "2962f448cfc1bbbef8dcfb4f40051fafcb5606ab6fec617aac715897c034ec7a"
       },
       "edges": [
         {
@@ -263,6 +273,11 @@
           "path": "mini projects/twitch_celebrations/engine.py",
           "symbol": "Engine.snapshot",
           "hash": "ed0085aa946d3b6c2227c1439c5fe7ae0dc6865b3c3cf58baaba21bf8c052066"
+        },
+        {
+          "path": "mini projects/twitch_celebrations/service.py",
+          "symbol": "Service.wait_overlay",
+          "hash": "94ec0f86b74d68fd2a757fe3e5a14fd8a7b628b77ea08009e92d68b629219670"
         }
       ]
     },
@@ -300,7 +315,7 @@
           "label": "OBS overlay ready?",
           "owner": "twitch_celebrations",
           "kind": "gate",
-          "detail": ""
+          "detail": " Service-owned notifications wake an idle browser as soon as a show or control changes. Waits release the state lock and end within one second. The browser owns one cancellable request, keeps active-show cadence, and supports legacy responses."
         },
         {
           "id": "3",
@@ -318,8 +333,8 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "twitch_celebrations": "2102fc1c30b84682f68fe7a6555cbda77e316f6183b083a049c394061cadb8f7"
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "twitch_celebrations": "2962f448cfc1bbbef8dcfb4f40051fafcb5606ab6fec617aac715897c034ec7a"
       },
       "edges": [
         {
@@ -349,6 +364,11 @@
           "path": "mini projects/twitch_celebrations/engine.py",
           "symbol": "Engine.snapshot",
           "hash": "ed0085aa946d3b6c2227c1439c5fe7ae0dc6865b3c3cf58baaba21bf8c052066"
+        },
+        {
+          "path": "mini projects/twitch_celebrations/service.py",
+          "symbol": "Service.wait_overlay",
+          "hash": "94ec0f86b74d68fd2a757fe3e5a14fd8a7b628b77ea08009e92d68b629219670"
         }
       ]
     },
@@ -386,7 +406,7 @@
           "label": "OBS overlay ready?",
           "owner": "twitch_celebrations",
           "kind": "gate",
-          "detail": ""
+          "detail": " Service-owned notifications wake an idle browser as soon as a show or control changes. Waits release the state lock and end within one second. The browser owns one cancellable request, keeps active-show cadence, and supports legacy responses."
         },
         {
           "id": "3",
@@ -404,8 +424,8 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "twitch_celebrations": "2102fc1c30b84682f68fe7a6555cbda77e316f6183b083a049c394061cadb8f7"
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "twitch_celebrations": "2962f448cfc1bbbef8dcfb4f40051fafcb5606ab6fec617aac715897c034ec7a"
       },
       "edges": [
         {
@@ -435,6 +455,11 @@
           "path": "mini projects/twitch_celebrations/engine.py",
           "symbol": "Engine.snapshot",
           "hash": "ed0085aa946d3b6c2227c1439c5fe7ae0dc6865b3c3cf58baaba21bf8c052066"
+        },
+        {
+          "path": "mini projects/twitch_celebrations/service.py",
+          "symbol": "Service.wait_overlay",
+          "hash": "94ec0f86b74d68fd2a757fe3e5a14fd8a7b628b77ea08009e92d68b629219670"
         }
       ]
     },
@@ -527,11 +552,11 @@
         {
           "path": "mini projects/twitch_celebrations/main.py",
           "symbol": "run",
-          "hash": "9aedf3deb8416efffe5ad956ace4ed33186bb58857c2312bb9e6482139201bdf"
+          "hash": "2985d2981aba78d489612932f152868e6a6346eb32a6ddc72aa03defc20a5eaa"
         }
       ],
       "owner_hashes": {
-        "twitch_celebrations": "c88aa390bec7755d9289615ce4b87c7822aef54d0dd836f202e3462a368a74eb"
+        "twitch_celebrations": "2962f448cfc1bbbef8dcfb4f40051fafcb5606ab6fec617aac715897c034ec7a"
       }
     }
   ]

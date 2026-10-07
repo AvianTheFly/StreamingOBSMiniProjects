@@ -64,10 +64,16 @@ function tick(){
 }
 let previewEpoch=0;
 window.addEventListener('message',async event=>{if(!preview||event.origin!==location.origin||event.source!==parent)return;if(event.data.type==='preview'){const epoch=++previewEpoch;await artReady.catch(()=>{});if(epoch===previewEpoch)start(event.data.item,event.data.settings);}if(event.data.type==='stop'){previewEpoch++;stop();}});
+let pollTimer=0,request=null,pollRevision=-1,disposed=false,pollEpoch=0,artLoaded=false,polling=false;
 async function poll(){
- try{const response=await fetch('/api/overlay');if(!response.ok)throw Error();const data=await response.json();lastGood=performance.now();settings=data.settings;if(data.active?.id!==current?.id){if(data.active)start(data.active,data.settings);else stop();}}
- catch{if(performance.now()-lastGood>2500)stop();}
- setTimeout(poll,250);
+ if(preview||disposed||polling)return;
+ polling=true;const epoch=pollEpoch,owned=new AbortController();request=owned;
+ const deadline=setTimeout(()=>owned.abort(),1500);let delay=250;
+ try{const response=await fetch('/api/overlay?after='+pollRevision,{signal:owned.signal});if(!response.ok)throw Error();const data=await response.json();if(disposed||epoch!==pollEpoch)return;lastGood=performance.now();settings=data.settings;pollRevision=Number.isSafeInteger(data.revision)?data.revision:-1;if(data.active?.id!==current?.id){if(data.active)start(data.active,data.settings);else stop();}if(!data.active&&pollRevision>=0)delay=0;}
+ catch{if(!disposed&&epoch===pollEpoch&&performance.now()-lastGood>2500)stop();}
+ finally{clearTimeout(deadline);if(epoch===pollEpoch){request=null;polling=false;if(!disposed)pollTimer=setTimeout(poll,delay);}}
 }
+addEventListener('pagehide',()=>{disposed=true;pollEpoch++;polling=false;clearTimeout(pollTimer);request?.abort();request=null;stop();});
+addEventListener('pageshow',()=>{if(!disposed)return;disposed=false;pollRevision=-1;if(artLoaded)poll();});
 // Preload shared art before consuming a live alert, so the first welcome is complete.
-artReady.catch(()=>{}).then(()=>{if(!preview)poll();});
+artReady.catch(()=>{}).then(()=>{artLoaded=true;poll();});

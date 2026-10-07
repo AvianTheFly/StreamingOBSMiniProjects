@@ -22,19 +22,17 @@ class CelebrationsInterface(ProjectInterface):
     def revert(self):
         s = _live.get('service')
         if s:
-            with s.lock: s.engine.clear()
+            s.clear()
 
     def pause(self):
         s = _live.get('service')
         if s:
-            with s.lock:
-                s.engine.paused = True
-                s.engine.clear()
+            s.set_paused(True)
 
     def resume(self):
         s = _live.get('service')
         if s:
-            with s.lock: s.engine.paused = False
+            s.set_paused(False)
 
 interface = CelebrationsInterface()
 project_registry.register(interface)

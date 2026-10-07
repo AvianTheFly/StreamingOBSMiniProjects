@@ -2,8 +2,11 @@
 const {chromium}=require('playwright'),http=require('node:http'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),crypto=require('node:crypto');
 const root=path.resolve(__dirname,'..'),web=path.join(root,'mini projects/twitch_celebrations'),out=process.env.BORDER_REVIEW_ARTIFACT_DIR||path.join(root,'tmp_obs_debug');
 const types={'.js':'text/javascript','.css':'text/css','.html':'text/html','.wav':'audio/wav','.mp3':'audio/mpeg'};
-let live=null,online=true;
-const server=http.createServer((req,res)=>{const url=new URL(req.url,'http://localhost');if(url.pathname==='/api/overlay'){if(!online){res.writeHead(503);res.end();return;}res.setHeader('Content-Type','application/json');res.end(JSON.stringify({active:live,settings:{volume:.22,muted:true,custom:{}}}));return;}
+let live=null,online=true,waitMode=false,revision=0,requests=0;const waiting=new Set();
+const publish=value=>{live=value;revision++;for(const wake of [...waiting])wake();};
+const server=http.createServer((req,res)=>{const url=new URL(req.url,'http://localhost');if(url.pathname==='/api/overlay'){requests++;if(!online){res.writeHead(503);res.end();return;}
+ let timer;const send=()=>{clearTimeout(timer);waiting.delete(send);if(res.destroyed)return;res.setHeader('Content-Type','application/json');res.end(JSON.stringify({active:live,settings:{volume:.22,muted:true,custom:{}},...(waitMode?{revision}:{})}));};
+ if(waitMode&&!live&&Number(url.searchParams.get('after'))===revision){waiting.add(send);timer=setTimeout(send,1000);res.on('close',()=>{clearTimeout(timer);waiting.delete(send);});}else send();return;}
  const file=['/subtle.js','/optics.js'].includes(url.pathname)?path.join(root,'lib/browser_effects/web',url.pathname==='/optics.js'?'production.js':'subtle.js'):path.join(web,url.pathname==='/overlay'?'overlay.html':url.pathname.slice(1));if(!file.startsWith(web+path.sep)&&!['/subtle.js','/optics.js'].includes(url.pathname)){res.writeHead(403);res.end();return;}try{res.setHeader('Content-Type',types[path.extname(file)]||'application/octet-stream');res.end(fs.readFileSync(file));}catch{res.writeHead(404);res.end();}});
 const fakeAudio=()=>{window.audioLog=[];window.Audio=class{constructor(src){this.src=src;this.volume=1;this.currentTime=0;window.audioLog.push(this);}play(){this.played=true;return Promise.resolve();}pause(){this.paused=true;}};};
 (async()=>{await new Promise(r=>server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+server.address().port;let browser;try{
@@ -27,6 +30,16 @@ const fakeAudio=()=>{window.audioLog=[];window.Audio=class{constructor(src){this
  await page.evaluate(()=>window.postMessage({type:'stop'},location.origin));await page.waitForTimeout(120);assert.equal(await page.locator('#raidArt').count(),0);assert(await page.evaluate(()=>audioLog.every(a=>a.paused)));
  // Real polling, not preview: elapsed server time, disconnect and idle cleanup.
  live={id:'transport',kind:'raid',theme:'dragon',name:'Crew',count:42,elapsed:2,duration:8};await page.goto(base+'/overlay');await page.locator('#raidArt').waitFor({timeout:3000});assert.equal(await page.locator('#raidArt').count(),1);online=false;await page.waitForTimeout(2900);assert.equal(await page.locator('#raidArt').count(),0);online=true;live=null;
+ const legacyStart=requests;await page.waitForTimeout(2400);const legacyRequests=requests-legacyStart;
+ waitMode=true;await page.goto(base+'/overlay');await page.waitForTimeout(1200);
+ const startRequests=requests;await page.waitForTimeout(2400);const idleRequests=requests-startRequests;
+ assert(idleRequests<=3&&idleRequests<legacyRequests/2,'idle overlay should wait for notifications');
+ const wakeStart=Date.now();publish({id:'notified',kind:'raid',theme:'dragon',name:'Notified crew',count:42,elapsed:2,duration:8});
+ await page.locator('#raidArt').waitFor({timeout:2000});const wakeMs=Date.now()-wakeStart;assert(wakeMs<700,'queued event wakes a waiting browser');
+ publish(null);await page.waitForFunction(()=>!document.querySelector('#raidArt'));
+ await page.evaluate(()=>dispatchEvent(new PageTransitionEvent('pagehide')));await page.waitForTimeout(100);
+ const exitRequests=requests;await page.waitForTimeout(1300);assert.equal(requests,exitRequests,'page exit cancels transport');
+ console.log(JSON.stringify({legacyRequests,idleRequests,windowSeconds:2.4,wakeMs}));
  await page.close();
  const context=await browser.newContext({viewport:{width:1920,height:1080},recordVideo:{dir:out,size:{width:1920,height:1080}}});const preview=await context.newPage();await preview.addInitScript(fakeAudio);preview.on('pageerror',e=>errors.push(e.message));
  await preview.goto(base+'/overlay?preview');await preview.evaluate(base=>{document.body.innerHTML='';document.body.style.cssText='background:#121e25;display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px';for(const theme of ['crab','dragon','cat','frog']){const panel=document.createElement('div');panel.style.cssText='position:relative;background:radial-gradient(ellipse at 50% 50%,#25363b,#111c25);border:1px solid #31434c';const label=document.createElement('span');label.textContent=({crab:'HARBOR FLOTILLA',dragon:'LANTERN FLIGHT',cat:'COSMIC EXPRESS',frog:'LILY-PAD CARNIVAL'})[theme];label.style.cssText='position:absolute;top:45%;width:100%;text-align:center;color:#8397a0;font:18px Arial;letter-spacing:5px';panel.append(label);const frame=document.createElement('iframe');frame.dataset.theme=theme;frame.src=base+'/overlay?preview';frame.style.cssText='width:100%;height:100%;border:0;position:relative';panel.append(frame);document.body.append(panel);}},base);

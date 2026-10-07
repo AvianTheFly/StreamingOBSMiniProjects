@@ -3,7 +3,7 @@ import json
 import mimetypes
 import secrets
 from http.server import BaseHTTPRequestHandler
-from urllib.parse import urlparse, unquote
+from urllib.parse import urlparse, unquote, parse_qs
 from lib.http_files import serve_file
 
 
@@ -28,6 +28,13 @@ def handler(service, root, port):
             if not self.host(): return self.send({'error':'Invalid host'},403)
             path = urlparse(self.path).path
             if path in ('/api/state','/api/overlay'):
+                params = parse_qs(urlparse(self.path).query)
+                if path == '/api/overlay' and 'after' in params:
+                    try:
+                        after = int(params['after'][0])
+                    except ValueError:
+                        return self.send({'error':'Invalid overlay revision'},400)
+                    return self.send(service.wait_overlay(after))
                 return self.send(service.state(overlay=path.endswith('overlay')))
             if path == '/api/library':
                 return self.send([p.name for p in (root/'media').iterdir() if service.asset(p.name)])
@@ -69,7 +76,7 @@ def handler(service, root, port):
                         raise ValueError('Celebrations paused or queue full')
                 elif path == '/api/settings': service.save(body)
                 elif path == '/api/stop':
-                    with service.lock: service.engine.clear()
+                    service.clear()
                 elif path == '/api/connect': return self.send(service.twitch.connect())
                 elif path == '/api/obs': return self.send({'scene':service.attach_obs()})
                 else: return self.send({'error':'Not found'},404)
