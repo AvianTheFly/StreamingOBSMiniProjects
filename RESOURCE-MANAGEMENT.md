@@ -829,3 +829,18 @@ The existing process diagnostics now include `obs-browser-page.exe` and
 gap when acceleration is disabled. This adds no polling worker or command-line
 inspection. `tools/measure_runtime_resources.py` provides finite read-only
 captures of Hub/OBS/browser/game CPU and OBS rendering counters for comparison.
+
+Step 7 removes the intermediate 1920×1080 canvas from native lobby rendering:
+one fewer nominal 7.9 MiB RGBA surface and one fewer full-frame canvas copy per
+frame. Private editor previews retain their necessary background compositing.
+Real-art Chromium comparisons across all eleven worlds produced byte-identical
+RGBA pixels to the checkpoint stage at the same cue/time, preserved all three
+custom transparent apertures, and counted exactly one fewer full-frame copy.
+Two representative previews were also byte-identical with unchanged copy counts.
+Evidence: `resource-20261006/lobby-surface.log` in external diagnostics.
+
+Full Python validation after steps 1–6: **1,060 tests passed in 162.639 seconds**.
+No tests were discarded to hide a regression. New checks target observable
+behavior, lifetime and resource bounds; real-browser and media benchmarks provide
+separate evidence beyond the inherited tests. Step 7 is browser-only and has the
+pixel/compositing checks above plus the existing lobby publication regressions.

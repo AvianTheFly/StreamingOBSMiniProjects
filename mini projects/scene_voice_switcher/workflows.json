@@ -570,7 +570,7 @@
           "label": "Keep live display areas clear",
           "owner": "scene_voice_switcher",
           "kind": "gate",
-          "detail": "Clear complete saved rectangles after every accent; optional preview paints empty artwork behind the transparent layer."
+          "detail": "Draw the native OBS layer directly into its output canvas and clear complete saved rectangles after every accent. Only optional previews allocate a second full-frame surface to paint empty artwork behind the transparent layer."
         },
         {
           "id": "4",
@@ -622,7 +622,7 @@
       ],
       "owner_hashes": {
         "browser_effects": "9bb34470bf1940ca4f1f5c597241fd7b1db47750c6a971d14116904ed6854b9a",
-        "scene_voice_switcher": "1b7399e1d614bc5e611d122d3bfca36ec22edc28fe85c359862646c89b062319"
+        "scene_voice_switcher": "25e2654bcb5dcf624ed97ecd997a5624e294e824fecaf689b49e539361d7bc23"
       }
     },
     {

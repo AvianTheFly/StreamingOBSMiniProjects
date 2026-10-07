@@ -5,7 +5,12 @@ import {LiveActions} from './live-actions.js';
 import {screenFrame} from './screen-frame.js';
 const params=new URLSearchParams(location.search),preview=params.get('preview')==='1';
 const world=await loadWorld(params.get('world')||'reef'),{scene,cues,artists}=world;
-const canvas=document.querySelector('#stage'),c=canvas.getContext('2d'),surface=document.createElement('canvas');surface.width=1920;surface.height=1080;const m=surface.getContext('2d');
+const canvas=document.querySelector('#stage'),c=canvas.getContext('2d');
+// OBS already supplies the original painting behind this transparent layer.
+// Only the standalone preview needs a separate surface to composite over it.
+const surface=preview?document.createElement('canvas'):null;
+if(surface){surface.width=1920;surface.height=1080;}
+const m=surface?surface.getContext('2d'):c;
 document.title=world.label+' · Living lobby';canvas.setAttribute('aria-label','Animated '+world.label+' painting');
 const art=world.createMotion(),clock=new AmbientClock(cues,world.seed||71),manual=[],ambient=new Map(),decisions=new Map();
 const live=preview?null:new LiveActions(world.id,cue=>trigger(cue.action,cue.id));
@@ -30,7 +35,7 @@ function draw(){
   screenFrame(m,holes[0],world.id);
   // Saved live-camera, desktop and chat placement wins over every accent.
   for(const rect of holes)m.clearRect(...rect);
-  c.clearRect(0,0,1920,1080);if(preview)c.drawImage(art.base,0,0);c.drawImage(surface,0,0);
+  if(surface){c.clearRect(0,0,1920,1080);c.drawImage(art.base,0,0);c.drawImage(surface,0,0);}
   canvas.dataset.ready='true';canvas.dataset.time=time.toFixed(3);canvas.dataset.paused=String(paused);canvas.dataset.automatic=String(automatic);
   canvas.dataset.events=JSON.stringify(active.map(e=>({id:e.id,kind:e.kind,started:e.started,manual:!!e.manual})));
   canvas.dataset.paintMs=((Number(canvas.dataset.paintMs)||0)*.9+(performance.now()-began)*.1).toFixed(2);
@@ -46,6 +51,6 @@ function message(e){if(e.origin!==location.origin||e.source!==parent||e.data?.ty
 }
 function key(e){if(e.repeat||e.ctrlKey||e.metaKey||e.altKey)return;const index=Number(e.key)-1;if(Number.isInteger(index)&&index>=0&&index<cues.length){e.preventDefault();trigger(cues[index].id);}}
 document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();live?.stop();}else{start();if(ready)live?.start();}});window.addEventListener('message',message);window.addEventListener('keydown',key);
-window.addEventListener('pagehide',()=>{disposed=true;stop();live?.dispose();art.dispose();clock.dispose();manual.length=0;ambient.clear();decisions.clear();surface.width=surface.height=1;window.removeEventListener('message',message);window.removeEventListener('keydown',key);},{once:true});
+window.addEventListener('pagehide',()=>{disposed=true;stop();live?.dispose();art.dispose();clock.dispose();manual.length=0;ambient.clear();decisions.clear();if(surface)surface.width=surface.height=1;window.removeEventListener('message',message);window.removeEventListener('keydown',key);},{once:true});
 try{await art.load();if(disposed)art.dispose();else{ready=true;if(params.has('cue'))trigger(params.get('cue'),undefined,Math.max(0,Math.min(11,Number(params.get('age'))||0)));document.querySelector('#loading').hidden=true;draw();start();live?.start();}}
 catch(error){if(!disposed){document.querySelector('#loading').textContent='The lobby artwork could not load. Keep the Streaming Hub running.';console.error(error);}}
