@@ -309,7 +309,7 @@
           "label": "Return to selected or available rotating view",
           "owner": "hub",
           "kind": "end",
-          "detail": ""
+          "detail": " OBS requests only viewer fields, avoiding editor tables, charts and reply previews. Hidden documents and OBS sources cancel polling; returning starts a fresh request and rejects stale responses. Export reads the archive directly without building the desk report."
         }
       ],
       "edges": [
@@ -357,8 +357,8 @@
         }
       ],
       "owner_hashes": {
-        "league_stats": "042e2ac8caa8aff6c1076617d040f77e80317baa638c1dd8fac6cb6e0656cf28",
-        "hub": "2651a208dfe2c15d06a55506164c7fc7795423742dfa750511fa1a7762484d50"
+        "hub": "0238f85c641b60e97604fe174a9ef498843e73278b920821f2c61efae5eacc36",
+        "league_stats": "da52d5432d9f96ae8e6b1502ef17912b1becf420ff8b16f35ecdf00b8635d109"
       }
     }
   ]

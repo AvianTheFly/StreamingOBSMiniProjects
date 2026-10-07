@@ -2,7 +2,7 @@ import {n,chooseView,focus} from './model.js';
 const el=id=>document.getElementById(id),params=new URLSearchParams(location.search);
 document.documentElement.dataset.theme=['teal','violet','gold'].includes(params.get('theme'))?params.get('theme'):'teal';
 const period=['all','today','session'].includes(params.get('period'))?params.get('period'):'all';
-let busy=false,latest=null,expiry=null,signature='',timer=null,version=0,controller=null,stopped=true;
+let busy=false,latest=null,expiry=null,signature='',timer=null,version=0,controller=null,stopped=true,sourceVisible=true,pageShown=true;
 function render(s){
  const c=s.current||s.recap,m=c?.metrics||{},a=s.summary;
  el('champion').textContent=c?.champion||'LEAGUE STATS';
@@ -28,10 +28,13 @@ function showSpotlight(data){
 }
 async function poll(){
  if(busy||stopped)return;busy=true;const ticket=version,request=new AbortController();controller=request;
- try{const response=await fetch('/api/league-stats?period='+encodeURIComponent(period),{signal:request.signal});if(!response.ok)throw Error();const data=await response.json();if(ticket!==version||stopped)return;latest=data;document.body.dataset.offline='false';render(latest);}
+ try{const response=await fetch('/api/league-stats/overlay?period='+encodeURIComponent(period),{signal:request.signal});if(!response.ok)throw Error();const data=await response.json();if(ticket!==version||stopped)return;latest=data;document.body.dataset.offline='false';render(latest);}
  catch{if(ticket===version&&!stopped){el('state').textContent='HUB OFFLINE';el('state').dataset.live='false';document.body.dataset.offline='true';showSpotlight(null);}}
  finally{if(ticket===version){busy=false;controller=null;}}
 }
-function activate(){if(!stopped)return;stopped=false;version++;poll();timer=setInterval(poll,2000);}
-addEventListener('pagehide',()=>{stopped=true;version++;controller?.abort();controller=null;busy=false;clearInterval(timer);timer=null;clearTimeout(expiry);});
-addEventListener('pageshow',activate);activate();
+function activate(){if(!stopped||!sourceVisible||!pageShown||document.hidden)return;stopped=false;version++;poll();timer=setInterval(poll,2000);}
+function deactivate(){stopped=true;version++;controller?.abort();controller=null;busy=false;clearInterval(timer);timer=null;clearTimeout(expiry);}
+addEventListener('obsSourceVisibleChanged',event=>{sourceVisible=event.detail?.visible!==false;if(sourceVisible)activate();else deactivate();});
+document.addEventListener('visibilitychange',()=>document.hidden?deactivate():activate());
+addEventListener('pagehide',()=>{pageShown=false;deactivate();});
+addEventListener('pageshow',()=>{pageShown=true;activate();});activate();

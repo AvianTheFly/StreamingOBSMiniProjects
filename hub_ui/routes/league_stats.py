@@ -10,10 +10,12 @@ class LeagueStatsRoutes:
         params = parse_qs(urlparse(self.path).query)
         filters = {key:params[key][0] for key in ('account','period','champion','queue','session_id') if key in params}
         try:
-            data = api.state(**filters)
             if path=='/api/league-stats':
+                data = api.state(**filters)
                 data['chat'] = twitch_chat.status()
                 self._json(200,data)
+            elif path=='/api/league-stats/overlay':
+                self._json(200,api.overlay_state(**filters))
             elif path=='/api/league-stats/export':
                 # Export every filtered record, not just the 50 shown in the UI.
                 data = api.export(**filters)

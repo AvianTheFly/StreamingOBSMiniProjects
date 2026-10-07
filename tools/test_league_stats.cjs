@@ -43,7 +43,9 @@ state.reply_previews=[{topic:'cs',command:'!stats cs',label:'🌾 Farming',text:
      if(u.pathname.endsWith('/review')){if(delayReview)await new Promise(resolve=>{releaseReview=resolve;});const m=state.matches.find(m=>m.id===body.id);if(m)m.review={note:body.note,excluded:body.excluded,revision:(m.review?.revision||0)+1};return route.fulfill({json:{ok:true,revision:m?.review.revision}});}
      return route.fulfill({json:{ok:true,text:'Observation counted'}});
     }
-    queries.push(u.search);return route.fulfill({json:state});
+    queries.push(u.search);
+    const viewerKeys=['current','summary','ranked','recap','progress','session_summary','session_insights','live_progress','spotlight'];
+    return route.fulfill({json:u.pathname.endsWith('/overlay')?Object.fromEntries(viewerKeys.map(k=>[k,state[k]])):state});
    }
    if(u.pathname==='/test')return route.fulfill({contentType:'text/html',body:'<!doctype html><html><head><link rel="stylesheet" href="/css/main.css"></head><body style="overflow:auto;height:auto;display:block"><main style="max-width:1300px;margin:25px auto;padding:20px" id="page"></main><div id="toasts"></div><script type="module">import {mount} from "/js/pages/league-stats.js";await mount(document.getElementById("page"));</script></body></html>'});
    const file=path.resolve(web,'.'+u.pathname);
@@ -155,6 +157,16 @@ state.reply_previews=[{topic:'cs',command:'!stats cs',label:'🌾 Farming',text:
   await page.waitForFunction(()=>document.getElementById('state')?.textContent==='SESSION');
   assert.match(await page.locator('#misses').innerText(),/Cannon —/);assert.doesNotMatch(await page.locator('#misses').innerText(),/Cannon 0/);
   assert.equal(await page.locator('html').getAttribute('data-theme'),'teal');
+  await page.waitForTimeout(100);
+  await page.evaluate(()=>dispatchEvent(new CustomEvent('obsSourceVisibleChanged',{detail:{visible:false}})));
+  const hiddenRequests=queries.length;await page.waitForTimeout(2300);
+  assert.equal(queries.length,hiddenRequests,'off-scene stats must stop polling');
+  state.summary={...summary,wins:19};
+  await page.evaluate(()=>dispatchEvent(new CustomEvent('obsSourceVisibleChanged',{detail:{visible:true}})));
+  await page.waitForFunction(()=>document.getElementById('record').textContent.includes('19 W'));
+  await page.evaluate(()=>dispatchEvent(new PageTransitionEvent('pagehide')));
+  const stoppedRequests=queries.length;await page.waitForTimeout(2300);
+  assert.equal(queries.length,stoppedRequests,'page exit must release the poll');
   assert.deepEqual(errors,[]);
   console.log('League Stats browser: chat previews and drafts, dashboard, helpers, sessions, reviews, filters, mobile and overlay passed');
  }finally{await browser.close();}

@@ -288,11 +288,9 @@ class Tracker:
             records = self._selection(filters,include_excluded=True)
             return dict(exported_at=self.clock(), matches=copy.deepcopy([analytics.public(r) for r in records]))
 
-    def snapshot(self, **filters):
+    def snapshot(self, *, overlay=False, **filters):
         with self.lock:
-            all_records = list(self.records.values())
             records = self._selection(filters)
-            review_records = self._selection(filters,include_excluded=True)
             session_records = self._selection({'period':'session'})
             session_summary = analytics.aggregate(session_records)
             session_insights = insights.report(session_records)
@@ -301,21 +299,30 @@ class Tracker:
             recap=presentation.recap(session_records)
             progress=presentation.progress(session_records,self.settings)
             current = self._current_snapshot()
-            viewer_facts=audience.facts(self._selection({}),current)
-            return dict(status=self.status, error=self.error, history_status=self.history_status,
+            active = self.community.snapshot()
+            # An OBS card needs neither archive tables nor private chat previews.
+            # Lifetime/item/lane facts are useful only during a viewer request.
+            viewer_facts=audience.facts(self._selection({}),current) if not overlay or active else {}
+            summary = session_summary if filters == {'period':'session'} else analytics.aggregate(records)
+            result = dict(current=current, summary=summary, ranked=ranked, recap=recap, progress=progress,
+                          session_summary=session_summary, session_insights=session_insights,
+                          live_progress=presentation.live_progress(current,self.settings),
+                          spotlight=spotlight(active,session_summary,session_insights,current,
+                                              ranked=ranked,recap=recap,progress=progress,
+                                              **{k:v for k,v in viewer_facts.items() if k!='current'}))
+            if overlay:
+                return copy.deepcopy(result)
+            all_records = list(self.records.values())
+            review_records = self._selection(filters,include_excluded=True)
+            result.update(status=self.status, error=self.error, history_status=self.history_status,
                         settings=copy.deepcopy(self.settings), account=self.account, account_name=self.account_name,
-                        accounts=sorted({r['account'] for r in all_records}), current=current,
+                        accounts=sorted({r['account'] for r in all_records}),
                         account_labels=presentation.account_labels(all_records,self.store.metadata('riot_ids'),self.account,self.account_name),
-                        summary=analytics.aggregate(records), insights=insights.report(records),
+                        insights=session_insights if filters == {'period':'session'} else insights.report(records),
                         sessions=copy.deepcopy(self.sessions.state),
                         enrichment=copy.deepcopy(self.enrichment_status),coverage=presentation.readiness(all_records,self.account),
-                        ranked=ranked,recap=recap,progress=progress,
-                        session_summary=session_summary,session_insights=session_insights,
-                        form=presentation.form(records),live_progress=presentation.live_progress(current,self.settings),
+                        form=presentation.form(records),
                         reply_previews=chat_replies.catalog(session_summary,session_insights,ranked=ranked,recap=recap,progress=progress,**viewer_facts),
-                        spotlight=spotlight(self.community.snapshot(),session_summary,session_insights,current,
-                                            ranked=ranked,recap=recap,progress=progress,
-                                            **{k:v for k,v in viewer_facts.items() if k!='current'}),
                         community_activity=copy.deepcopy(self.community.activity),
                         breakdowns={k:analytics.breakdown(records,k) for k in ('champion','enemy_adc','enemy_support','ally_support','ally_adc')},
                         items=analytics.items(records),
@@ -324,3 +331,4 @@ class Tracker:
                         queues=sorted({str(r.get('queue')) for r in all_records if r.get('queue') is not None}),
                         archive_path=str(self.store.path), last_helper=copy.deepcopy(self.last_helper),
                         import_busy=self.import_busy)
+            return result

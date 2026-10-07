@@ -29,6 +29,11 @@ def state(**filters):
     return provider().snapshot(**filters)
 
 
+def overlay_state(**filters):
+    """Current viewer cards without archive tables or editor-only calculations."""
+    return provider().snapshot(overlay=True, **filters)
+
+
 def export(**filters):
     return provider().export(**filters)
 
