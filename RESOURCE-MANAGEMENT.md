@@ -52,6 +52,11 @@ Validation and deployment:
 - The four affected idle browser inputs were refreshed to load current scripts.
   Five Windows socket-abort traces occurred during startup/refresh and live UI
   reconnects; no other traceback or module readiness failure was observed.
+- Deployment verification finished October 7. The final 15-second off-air sample
+  measured 15.75% system CPU, 0.438% Python, 1.104% OBS main and 6.478% OBS browser
+  processes (percentages of the whole machine). Average OBS render time was
+  0.828 ms, with **seven new skipped render frames**. This uncontrolled sample
+  shows remaining rendering contention and is not a before/after FPS comparison.
 
 Reproduce the finite benchmarks:
 
