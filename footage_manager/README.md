@@ -1,5 +1,43 @@
 # Footage Desk
 
+## Find moments in future recordings
+
+Open **Run Footage Desk.bat**, use **Scan folders** after adding footage, then
+**Find moments**. Choose the open recording or all new/changed recordings.
+The fast local pass marks approximate games, breaks (including the supplied tavern
+background), and voice spikes. Review the pink highlights and blue games on the
+recording timeline, adjust a selection, and keep/extract only what you choose.
+Files under 10 minutes are excluded. Completed unchanged sources are skipped,
+including estimates made by an older detector version. Detailed results & settings
+still provides explicit reanalysis, finer sampling and manual audio-track selection.
+
+No ChatGPT, account, API key or uploads are required. This is a repeatable local
+program; its OCR and speech-activity components use installed CPU models. It does
+not judge whether a moment is entertaining. Loud speech is a review cue; mixed
+audio may include other people. Estimates may miss events between visual samples.
+Analysis never creates personal keep decisions, extracts clips or deletes footage.
+
+For command-line use, leave Footage Desk open and run from this checkout:
+
+```powershell
+py -3.11 -B -X utf8 footage_manager/find_moments.py --scan --wait
+```
+
+Or double-click **Find Footage Moments.bat** after opening Footage Desk. The command
+waits for a scan of saved folders, queues only new/changed eligible files and prints
+progress. `--status` only reports the pending count; repeat `--id 123` to limit it
+to specific library IDs. Omit `--wait` to return after queuing. Ctrl+C stops waiting;
+use **Cancel job** in the desk to cancel processing. The command shares the app's
+single worker and checkpoints, and rejects another checkout on the same port.
+It does not start a watcher or schedule. Completed estimates survive restarts;
+rerunning resumes unfinished recordings from available checkpoints.
+
+Install the optional detectors once if needed:
+
+```powershell
+py -3.11 -m pip install -r footage_manager/requirements-analysis.txt
+```
+
 The desk has three stages: **Review recordings**, **Saved clips**, and **Clear space**.
 The review screen keeps the entire recording timeline visible, with separate rows
 for pink voice highlights, blue games and green saved clips. Click a highlight or
@@ -223,3 +261,34 @@ steps pause playback for fine positioning. IN/OUT fields support milliseconds;
 Go to IN/OUT lets you check both boundaries before saving. Browser frame steps
 seek by nominal frame duration, so variable-frame-rate footage may require precise
 trimming in your final editor. Fast lossless export still follows keyframes.
+
+## Explicit storage cleanup maintenance
+
+The public cleanup preview uses completed current-source analysis only. Retention
+keeps wins, unknown outcomes, and defeats with at least four voice spikes, with
+30 seconds around game borders. Quiet known defeats are removable. Personal
+keepers survive. Gaps containing gameplay or only desktop/Alt-Tab evidence remain
+protected; only observed lobby/loadout/result sections justify gap removal.
+Unanalysed recordings, short recordings and unsupported layouts remain untouched.
+
+`POST /api/cleanup` requires a nonempty `ids` list and the explicit authorization
+`DELETE ORIGINALS AFTER VERIFIED EXPORTS`. This is permanent deletion maintenance,
+not the ordinary manual Trash workflow. The existing worker exports retained
+regions with all tracks into `.footage-kept/<source-id>` beside the source, verifies
+exports, rechecks source/review signatures and permanently removes that original.
+The dot-prefixed output is excluded by the normal scan. Completed exports remain
+in Saved clips. Jobs show progress and support cancellation between media checks.
+
+No footage or catalogue backups are made by this maintenance. A metadata-only
+ledger in `%LOCALAPPDATA%/FootageDesk/cleanup` records decisions, retained paths,
+completed deletion and actual savings. `--no-startup-backup` permits the app to be
+restarted for explicitly requested no-backup maintenance; normal startup keeps its
+existing catalogue-snapshot behavior. An interrupted job must be inspected and
+requeued explicitly; completed retained files can be reused while the same original
+and review decisions remain current.
+
+Explicit cleanup requests may supply `voice_spike_minimum` (1–100). Eight means losses with seven or fewer spikes are removed; wins and unknown outcomes remain protected. The same finite worker revises generated keepers from deleted originals, retaining original timestamp metadata and all tracks. Personal keepers remain protected. Existing exports are removed only after any replacement spans verify; no backup is created. Repeated failed revisions preserve their old input and report errors.
+
+Explicit `win_voice_spike_minimum` (0–100, default zero) can remove low-vocal confirmed victories. The authorized combined policy is ten for wins and sixteen for losses. Unknown outcomes, missing audio measurements and personal keepers remain protected. The same policy applies to online sources and previously retained exports.
+
+An explicit `unknown_voice_spike_minimum` (0–100, default zero) can remove low-vocal unknown outcomes without reclassifying them as losses. Current authorization keeps wins at twenty, losses at thirty and unknowns at twenty-five. Missing voice measurements remain protected. The policy applies equally to online sources and generated retained clips; recordings under ten minutes remain excluded.

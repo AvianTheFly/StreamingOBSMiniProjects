@@ -6,6 +6,7 @@ import numpy as np
 import psutil
 
 from .audio_analysis import AudioAnalysis
+from .audio_level import AudioLevel
 from .audio_channel import AudioChannel
 from .process_audio import capture_process, spotify_pid
 
@@ -27,6 +28,7 @@ def capture_worker(channel, stop):
                 raise RuntimeError('Waiting for the Spotify desktop process')
             process = psutil.Process(pid)
             with capture_process(pid) as read:
+                level = AudioLevel()
                 channel.set_status(pid)
                 window = np.empty((0, 2), dtype=np.float32)
                 check_at = time.monotonic()+2
@@ -43,11 +45,14 @@ def capture_worker(channel, stop):
                             break
                         check_at = now+2
                     if packet.size:
+                        # Compensate before DSP and before assembling windows:
+                        # all features observe the same visual-only PCM gain.
+                        packet = level.apply(packet)
                         window = (packet[-2048:].copy() if len(packet) >= 2048 else
                                   np.concatenate((window[-(2048-len(packet)):], packet)))
                     if packet.size and len(window) == 2048:
                         began = time.perf_counter()
-                        bands, features = analysis.analyze(window, realtime=True)
+                        bands, features = analysis.analyze(window, realtime=True, hop_seconds=len(packet)/44100)
                         channel.publish_audio(bands, features, getattr(read, 'sample_end', began),
                                               (time.perf_counter()-began)*1000,
                                               getattr(read, 'timestamp_valid', False))

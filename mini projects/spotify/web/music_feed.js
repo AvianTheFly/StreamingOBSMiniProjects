@@ -33,6 +33,7 @@
     this.calibrationAge+=dt;
    }
    const calibrated={...input,loudness:clamp(level*this.gain),
+    lead_level:clamp(input.lead_level*this.gain),attack_level:clamp(input.attack_level*this.gain),air_level:clamp(input.air_level*this.gain),
     voice_levels:input.voice_levels?.map(v=>clamp(v*this.gain)),
     waveform:input.waveform?.map(v=>clamp(v*this.gain,-1,1))};
    this.world.step(calibrated,dt);this.journey.step(this.world,dt,calibrated);

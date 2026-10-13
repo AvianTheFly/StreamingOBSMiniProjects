@@ -5,6 +5,8 @@ import time
 import math
 from .media_pool import MediaPicker
 from .death_reactions import DeathReactions
+from .item_purchases import ItemPurchases
+from .purchase_recipes import inventory as item_counts
 from .production import ProductionDirector
 from .production.objectives import element
 
@@ -41,18 +43,18 @@ def aliases(player):
     return result-{''}
 
 def inventory(player):
-    result=Counter()
-    for item in player.get('items',[]):
-        result[str(item.get('itemID'))]+=int(item.get('count',1))
-    return result
+    counts=item_counts(player)
+    return None if counts is None else Counter({str(key):count for key,count in counts.items()})
 
 class Engine:
-    def __init__(self, config=None, clock=time.monotonic, production_settings=None):
+    def __init__(self, config=None, clock=time.monotonic, production_settings=None, item_catalog=None):
         self.config=config or defaults(); self.clock=clock
+        self.purchases=ItemPurchases(item_catalog, clock)
         self.production=ProductionDirector(production_settings, clock)
         self.slots=[]; self.serial=0; self.reset()
 
     def reset(self):
+        self.purchases.clear()
         self.production=ProductionDirector(self.production.settings, self.clock)
         self.death_reactions = DeathReactions()
         self.media_picker = MediaPicker()
@@ -62,6 +64,7 @@ class Engine:
         self.last_autoplay=-float("inf")
 
     def clear(self, production=True):
+        if production or self.config.get('paused'): self.purchases.clear()
         if production or not self.production.settings['enabled']:
             self.death_reactions.reset()
             self.death_visual=None
@@ -144,6 +147,10 @@ class Engine:
         def local_name(name): return bool(name and name in names)
         def event_id(e): return (e.get('EventID'),e.get('EventTime'),e.get('EventName'))
         initial=self.previous is None or baseline
+        purchase_enabled=not self.config.get('paused') and self.production.settings.get('item_purchases',True)
+        if initial or not purchase_enabled or any(e.get('EventName')=='GameEnd' for e in events):
+            self.purchases.clear()
+            purchase_enabled=False
         out=[]
         def emit(key,detail='',family=None):
             out.append({'key':key,'title':key.replace('_',' ').title(),'detail':str(detail),
@@ -217,6 +224,8 @@ class Engine:
             old_local=next((p for p in old.get('allPlayers',[]) if aliases(p)&names),{})
             dt=t-self.game_time
             if local and old_local and 0<dt<=3:
+                if purchase_enabled:
+                    self.purchases.observe(old_local,local,old_active,active,game_time=t)
                 def values(a,p):
                     s=a.get('championStats',{}); scores=p.get('scores',{})
                     return {'health_percent':100*s['currentHealth']/s['maxHealth'] if s.get('maxHealth') and s.get('currentHealth') is not None else None,
@@ -244,15 +253,18 @@ class Engine:
                 for slot,ability in active.get('abilities',{}).items():
                     rank=ability.get('abilityLevel',0); before=old_active.get('abilities',{}).get(slot,{}).get('abilityLevel',0)
                     if rank>before: emit('ultimate_learned' if slot=='R' and before==0 else 'ability_rank_up',f'{slot} rank {rank}','power')
-                added=inventory(local)-inventory(old_local); removed=inventory(old_local)-inventory(local)
-                gold_delta=active.get('currentGold',0)-old_active.get('currentGold',0)
+                old_items,new_items=inventory(old_local),inventory(local)
+                added=new_items-old_items if old_items is not None and new_items is not None else Counter()
+                removed=old_items-new_items if old_items is not None and new_items is not None else Counter()
+                gold_pair=(active.get('currentGold'),old_active.get('currentGold'))
+                gold_delta=gold_pair[0]-gold_pair[1] if all(type(g) in (int,float) and math.isfinite(g) for g in gold_pair) else 0
                 if added: emit('inventory_added',', '.join(added),'inventory')
                 if removed: emit('inventory_removed',', '.join(removed),'inventory')
                 if added and gold_delta<-50: emit('possible_purchase','Inventory gained and gold fell','inventory')
                 if added and removed:
                     emit('possible_item_upgrade','Inventory replaced items; recipe not verified','inventory')
                     if level>old_level: emit('possible_power_spike','Level and inventory increased','power')
-                consumables={str(i.get('itemID')) for i in old_local.get('items',[]) if i.get('consumable')}
+                consumables={str(i.get('itemID')) for i in old_local.get('items',[]) if i.get('consumable')} if old_items is not None else set()
                 if removed.keys()&consumables and not added and gold_delta<=5:
                     emit('possible_consumable_use','Consumable count decreased','inventory')
                 before_stats=old_active.get('championStats',{}); before_hp=before_stats.get('currentHealth')
@@ -280,6 +292,8 @@ class Engine:
                 if scores.get('wardScore',0)-prior_scores.get('wardScore',0)>=1: emit('vision_activity','Ward score increased; placement unknown')
                 if local.get('position')=='JUNGLE' and cs-prior_cs>=4: emit('possible_jungle_activity','CS jump; specific camp unknown')
             if not 0<dt<=3: self.low_at=None
+            if not local or not old_local or dt<0 or dt>3:
+                self.purchases.discard_evidence()
             involved=[e for e in self.kills if local_name(e.get('KillerName')) or local_name(e.get('VictimName')) or any(local_name(n) for n in e.get('Assisters',[]))]
             if involved and not local.get('isDead') and len(self.kills)>=3 and any(e.get('EventName')=='ChampionKill' and 0<=t-float(e.get('EventTime',0))<=2 for e in self.kills):
                 emit('possible_teamfight',f'{len(self.kills)} champion deaths within 20 seconds','fight')

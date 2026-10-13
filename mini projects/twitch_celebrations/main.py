@@ -40,6 +40,8 @@ def run(input_queue, stop_event, *, startup_event=None):
         print(f'[twitch_celebrations] Ready: http://127.0.0.1:{PORT}',flush=True)
         stop_event.wait()
     finally:
+        from lib.twitch_clips import join as join_clips
+        join_clips()
         clip_sessions.unregister(service)
         chat_sessions.unregister(service)
         service.close()

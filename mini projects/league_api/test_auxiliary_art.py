@@ -5,6 +5,8 @@ import unittest
 from .engine import Engine, defaults
 from .main import Service, ROOT
 from .match_screens import MatchScreens
+from .match_timing import MatchTiming
+from .production.stance_accent import StanceAccent
 from .production.config import DEFAULTS
 from .test_engine import snapshot, event
 
@@ -18,6 +20,9 @@ class AuxiliaryArtTests(unittest.TestCase):
     def service(self):
         service=Service.__new__(Service)
         service.lock=threading.RLock();service.engine=self.engine
+        service.purchase_permission=threading.Event();service.purchase_permission.set()
+        service.match_timing=MatchTiming(lambda:self.now)
+        service.stance_accent=StanceAccent(lambda:self.now)
         service.match_screens=MatchScreens(ROOT/'media'/'match-screens',self.engine.production.settings,lambda:self.now)
         service.status='Test';service.error=None;service.media_errors=[]
         return service

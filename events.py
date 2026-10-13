@@ -22,14 +22,16 @@ The following event names are used by the hub infrastructure.  Projects that
 produce or consume these MUST use the exact names below.
 
   "game.connected"
-      Emitted by:  league (when the League Live Client API becomes reachable)
+      Emitted by:  league_api on the opening image's observed GameStart clock;
+                   league only as a standalone fallback
       Consumed by: scene_voice_switcher (switches to GAME_SCENE = "Test")
-      Payload:     {} (no data)
+      Payload:     optional owner and manual_revision
 
   "game.disconnected"
-      Emitted by:  league (when the League Live Client API goes unreachable)
+      Emitted by:  league_api when the observed result image starts;
+                   league only as a standalone fallback
       Consumed by: scene_voice_switcher (switches back to LOBBIES_SCENE)
-      Payload:     {} (no data)
+      Payload:     optional owner and manual_revision
 
   "sfx.play"
       Emitted by:  any project that needs a sound effect played

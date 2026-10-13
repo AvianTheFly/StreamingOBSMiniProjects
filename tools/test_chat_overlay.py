@@ -19,6 +19,32 @@ import threading
 
 
 class ChatSettingsTest(unittest.TestCase):
+    def test_literal_words_preserve_the_library_and_other_preferences(self):
+        with tempfile.TemporaryDirectory() as folder, patch.object(settings, 'PATH', Path(folder) / 'chat.json'), patch.object(settings.SettingsBackups, 'snapshot'):
+            settings.PATH.write_text(json.dumps({'channel': 'my_channel', 'personal': 42, 'replacements': {'milk': 'https://example.com/milk.png'}}))
+            result = settings.save({'literal_words': ['I', 'milk', 'good morning']})
+            self.assertEqual(result['literal_words'], ['I', 'milk', 'good morning'])
+            self.assertEqual(result['personal'], 42)
+            self.assertEqual(result['replacements']['milk'], 'https://example.com/milk.png')
+            original = settings.PATH.read_bytes()
+            for value in ('milk', [None], [''], ['line\nbreak'], ['x'] * 501):
+                with self.assertRaises(ValueError):
+                    settings.save({'literal_words': value})
+                self.assertEqual(settings.PATH.read_bytes(), original)
+
+    def test_text_replacements_preserve_other_preferences_and_reject_bad_values(self):
+        with tempfile.TemporaryDirectory() as folder, patch.object(settings, 'PATH', Path(folder) / 'chat.json'), patch.object(settings.SettingsBackups, 'snapshot') as backup:
+            settings.PATH.write_text(json.dumps({'channel': 'my_channel', 'personal': 42, 'replacements': {'gg': 'https://example.com/gg.png'}}))
+            result = settings.save({'text_replacements': {'god': 'gyatt 😂'}})
+            self.assertEqual(result['personal'], 42)
+            self.assertEqual(result['replacements'], {'gg': 'https://example.com/gg.png'})
+            backup.assert_called_once()
+            original = settings.PATH.read_bytes()
+            for value in ({'god': ''}, {'two words': 'x'}, {'god': '\n'}, []):
+                with self.assertRaises(ValueError):
+                    settings.save({'text_replacements': value})
+                self.assertEqual(settings.PATH.read_bytes(), original)
+
     def test_local_chaos_pack_survives_provider_outage_and_preserves_personal_data(self):
         asset = dict(id='party-id', url='https://cdn.test/rave.webp', animated=True, frames=20)
         with tempfile.TemporaryDirectory() as folder, patch.object(chaos_pack, 'PATH', Path(folder) / 'pack.json'), patch.object(chaos_pack.SettingsBackups, 'snapshot'):
@@ -37,14 +63,18 @@ class ChatSettingsTest(unittest.TestCase):
                 chaos_pack.install({'emotes': {}, 'aliases': {}})
             self.assertEqual(chaos_pack.PATH.read_bytes(), original)
 
-    def test_installed_chaos_manifest_covers_every_requested_animation(self):
-        pack = chaos_pack.read()
-        if not pack['emotes']:
-            self.skipTest('Optional personal chaos library is not installed')
-        for name in chaos_pack.REQUESTED:
-            self.assertIn(name, pack['emotes'])
-            self.assertGreater(pack['emotes'][name]['frames'], 1)
-        self.assertTrue(all(settings.image_url(asset['url']) for asset in pack['emotes'].values()))
+    def test_personal_sticker_subset_is_served_without_reinstalling_defaults(self):
+        with tempfile.TemporaryDirectory() as folder, patch.object(chaos_pack, 'PATH', Path(folder) / 'pack.json'):
+            pack = {'title': 'My choices', 'emotes': {
+                'MyDance': {'url': 'https://cdn.test/dance.webp', 'frames': 12}},
+                'aliases': {'dance': 'MyDance', 'removed': 'DeletedSticker'}, 'personal': 42}
+            chaos_pack.PATH.write_text(json.dumps(pack))
+            original = chaos_pack.PATH.read_bytes()
+            emotes, aliases, title = chaos_pack.catalog_entries()
+            self.assertEqual(emotes, pack['emotes'])
+            self.assertEqual(aliases, {'dance': 'https://cdn.test/dance.webp'})
+            self.assertEqual(title, 'My choices')
+            self.assertEqual(chaos_pack.PATH.read_bytes(), original)
 
     def test_auto_launch_waits_for_own_server_and_reuses_single_worker(self):
         startup = ChatStartup()

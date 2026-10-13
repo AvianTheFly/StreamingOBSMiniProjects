@@ -30,6 +30,7 @@ class MediaMetadata:
     width: int = 0
     height: int = 0
     fps: float = 0
+    has_audio: bool | None = False
 
     @property
     def dimension_key(self):
@@ -38,24 +39,25 @@ class MediaMetadata:
 
 def _read_metadata(path: str) -> MediaMetadata:
     proc = subprocess.run(
-        ['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-show_entries',
-         'stream=codec_name,width,height,avg_frame_rate', '-of', 'json', path],
+        ['ffprobe', '-v', 'error', '-show_entries',
+         'stream=codec_type,codec_name,width,height,avg_frame_rate', '-of', 'json', path],
         capture_output=True, text=True, timeout=3,
         creationflags=(getattr(subprocess, 'CREATE_NO_WINDOW', 0) |
                        getattr(subprocess, 'BELOW_NORMAL_PRIORITY_CLASS', 0)))
     if proc.returncode:
         raise ValueError('Media metadata unavailable')
     streams = json.loads(proc.stdout or '{}').get('streams') or []
-    if not streams:
-        return MediaMetadata()
-    stream = streams[0]
+    has_audio = any(s.get('codec_type') == 'audio' for s in streams)
+    stream = next((s for s in streams if s.get('codec_type') == 'video'), {})
+    if not stream:
+        return MediaMetadata(has_audio=has_audio)
     try:
         fps = float(Fraction(stream.get('avg_frame_rate') or '0'))
     except (ValueError, ZeroDivisionError):
         fps = 0
     return MediaMetadata(codec=str(stream.get('codec_name') or ''),
                          width=int(stream.get('width') or 0),
-                         height=int(stream.get('height') or 0), fps=fps)
+                         height=int(stream.get('height') or 0), fps=fps, has_audio=has_audio)
 
 
 def probe_media(path: str | Path) -> MediaMetadata:
@@ -89,9 +91,10 @@ def probe_media(path: str | Path) -> MediaMetadata:
 def _cached(key):
     """Caller holds the cache lock; metadata values are immutable."""
     result = _cache.get(key)
-    if result is not None:
+    if result is not None and result.has_audio is not None:
         _cache.move_to_end(key)
-    return result
+        return result
+    return None  # Older disk records need one complete stream probe.
 
 
 def clear_metadata_cache():
@@ -119,7 +122,7 @@ def configure_metadata_cache(path=None):
         _cache_revision += 1
         for row in rows:
             key = (row['path'],row['mtime_ns'],row['size'])
-            _cache.setdefault(key,MediaMetadata(**row['metadata']))
+            _cache.setdefault(key,MediaMetadata(**{'has_audio': None, **row['metadata']}))
         while len(_cache) > _CACHE_LIMIT:
             _cache.popitem(last=False)
 

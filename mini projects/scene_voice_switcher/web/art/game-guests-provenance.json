@@ -1,0 +1,37 @@
+{
+  "tool": "Built-in image_gen",
+  "date": "2026-10-10",
+  "sources": [
+    {
+      "game": "Getting Over It with Bennett Foddy",
+      "url": "https://www.foddy.net/blog/2017/09/getting-over-it/",
+      "use": "Hammer and cauldron climbing choreography; planted contact and failed ascent."
+    },
+    {
+      "game": "Untitled Goose Game",
+      "url": "https://untitled.goose.game/",
+      "use": "Mischievous goose; user specifically requested the knife-carrying meme."
+    },
+    {
+      "game": "Hollow Knight: Silksong",
+      "url": "https://hollowknightsilksong.com/",
+      "use": "Hornet, needle and silk leap."
+    },
+    {
+      "game": "R.E.P.O.",
+      "url": "https://store.steampowered.com/app/3241660/REPO/",
+      "use": "Inspiration for an original salvage robot fumbling a valuable cup; not presented as an exact official model."
+    }
+  ],
+  "prompts": [
+    {
+      "file": "game-guests-v1.png",
+      "prompt": "Create a production sprite atlas on transparent background, 3 columns by 4 rows, exactly evenly spaced square cells, no overlap between cells, generous empty transparent margins. Portrait 3:4 canvas. Each row contains the SAME well-known videogame character in THREE distinct animation poses, consistent scale within its row. Characters should be small charming polished 3D toy-like illustrated cameos with clean silhouettes, soft warm/cool dimensional shading and crisp readable eyes. NO shadows on ground, NO scenery, NO text, labels, dividers, grid lines, logos, speech bubbles or accessories crossing cell edges. Full bodies, centered in each cell. Row 1 Kirby: column1 cheerful neutral pink round Kirby red feet, column2 inhaling with wide open round mouth arms forward, column3 comically puffed cheeks with surprised eyes. Row 2 Mario Boo ghost: column1 shy white round Boo ghost with tiny arms, column2 delighted tongue-out laughing, column3 Boo hiding face with both hands blushing, characteristic little tail. Row 3 red Among Us crewmate: column1 neutral red crewmate with cyan glass visor and backpack, column2 leaning forward reaching with detached red mitt hand doing a repair, column3 startled backwards lean with raised hands, NO weapons. Row 4 Minecraft Creeper: column1 classic green pixel/block creeper four feet and black face, column2 crouched/compressed as if winding up a hop, column3 springing upward with legs tucked, do not explode. Keep Minecraft block aesthetic with beveled voxel details. Each row one character only repeated 3 poses. All 12 separate figures isolated on TRUE TRANSPARENCY. These sprites will be cropped by fixed cell and animated as tiny background Easter eggs in colorful illustrated streaming rooms. Recognizable accurate character designs, charming, no scary details."
+    },
+    {
+      "file": "game-stunts-v1.png",
+      "prompt": "Create a production character sprite atlas: exactly 3 columns by 4 rows, 12 isolated full-body cartoon game-character sprites, equal square cells with wide transparent gaps, portrait 3:4 aspect ratio, real alpha transparency. No text, no labels, no panels, no background, no shadows on a floor. Polished colorful tiny 3D toy illustration sprites with strong clean silhouettes and consistent size across each row. Row 1: mischievous white goose from Untitled Goose Game carrying a small kitchen knife sideways in its orange beak, comic stolen kitchen utensil, not attacking anyone. Three poses: standing facing right; crouching low with beak forward; running right with wings slightly spread. Knife stays in beak, entire goose and knife fit inside each cell. Row 2: the adult man sitting waist-deep in a round black iron cauldron from Getting Over It, muscular bare shoulders and short dark hair, lower body completely inside the pot, no legs visible. Three poses: upright and determined with hands together at chest; leaning right with both hands extended to the right; leaning left with a surprised expression and hands extended above. IMPORTANT do NOT include his hammer, the animation draws it separately to meet the furniture exactly. Row 3: Hornet from Hollow Knight Silksong, white pointed two-horn mask with dark eye holes, flowing red cloak, slim black insect legs, carrying her slender sewing needle. Three poses: poised standing; elegant midair leap with cloak streaming; landing in a crouch. Row 4: a small funny R.E.P.O.-style salvage robot, squat yellow orange cylindrical body, two large round protruding white eyes with black pupils, short black wheeled feet, short mechanical arms. Three poses: idle looking curious; carrying a shiny little gold cup with both arms; startled leaning backward with eyes wide. Keep all 12 figures completely separated by transparency; no scenery or extra scattered marks. These are harmless comic tiny cameos for streaming lobby rooms."
+    }
+  ],
+  "preparation": "tools/prepare_game_guests.cjs preserves original sheets and derives 24 separate connected-alpha poses."
+}

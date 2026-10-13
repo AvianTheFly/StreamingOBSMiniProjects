@@ -4,7 +4,7 @@
     "label": "Twitch chat connection",
     "group": "Inputs",
     "icon": "chat",
-    "description": "Read fresh Twitch identities and deliver optional authorized threaded replies.",
+    "description": "Read fresh Twitch identities and deliver authorized replies or announcements through one sender.",
     "separate": false
   },
   "flows": [
@@ -49,8 +49,8 @@
         }
       ],
       "owner_hashes": {
-        "league_stats": "042e2ac8caa8aff6c1076617d040f77e80317baa638c1dd8fac6cb6e0656cf28",
-        "chat_transport": "0935a6133944e3e1e86d0907df4ab370f44fc52849f30badeccb42826fcda23d"
+        "chat_transport": "20a8cca880d0e430f475a1d231b8178e828ad3cf30b5b0afd7ba1a867712979a",
+        "league_stats": "20fd3b76ad13c4336afce2bcecbbcce66b029c47815f18e6002ed68dbdf9a7c5"
       },
       "edges": [
         {
@@ -82,7 +82,7 @@
         "label": "An accepted command needs a reply",
         "kind": "control"
       },
-      "detail": "",
+      "detail": "Threaded replies and unthreaded announcements share the same bounded queue, channel authorization, pacing, expiry and lifecycle guards. Announcements omit the optional reply-parent field. Failed or uncertain writes are never retried.",
       "steps": [
         {
           "id": "0",
@@ -164,7 +164,7 @@
         {
           "path": "lib/twitch_chat_replies.py",
           "symbol": "ReplySender",
-          "hash": "ac008f448b6f5f7ac420f47382a5aabfb9fe594bf9b345915e67ed985c2328b2"
+          "hash": "f242074e849496579623e6052a3e1482b2bc0ead402999a34a05772fbc4c83e1"
         },
         {
           "path": "lib/twitch_chat.py",
@@ -173,7 +173,7 @@
         }
       ],
       "owner_hashes": {
-        "chat_transport": "0935a6133944e3e1e86d0907df4ab370f44fc52849f30badeccb42826fcda23d"
+        "chat_transport": "20a8cca880d0e430f475a1d231b8178e828ad3cf30b5b0afd7ba1a867712979a"
       }
     }
   ]

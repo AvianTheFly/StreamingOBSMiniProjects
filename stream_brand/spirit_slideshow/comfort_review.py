@@ -7,7 +7,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 from .calm import GRADE
 from .render import STEM, run
-from .review import raw, GENERATED
+from .review import raw, generation_originals
 from .timeline import fingerprint
 from .presentation import sheets
 
@@ -34,7 +34,7 @@ def measurements(decoded):
 def inspect(output, previous):
     output = Path(output)
     plan = json.loads((output/'slideshow-plan.json').read_text(encoding='utf-8'))
-    originals = {fingerprint(p): str(p) for p in GENERATED.glob('*.png')}
+    originals = generation_originals(output)
     current = frames(output/f'{STEM}-40s.mp4')
     d = plan['calm_edit']['dissolve_frames']
     sources, errors, holds = [], [], []

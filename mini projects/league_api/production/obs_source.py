@@ -51,6 +51,8 @@ def recover_overlay(service):
             try:
                 from ..champ_select_obs import recover_browser
                 recover_browser(obs.get_obs())
+                from ..stage_obs import recover
+                recover(obs.get_obs())
                 draft_recovered = True
             except Exception:
                 pass  # Retry on this existing bounded worker while OBS is unavailable.

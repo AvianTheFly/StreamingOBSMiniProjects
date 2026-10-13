@@ -113,6 +113,18 @@ class DeliveryTests(unittest.TestCase):
         self.assertTrue(self.sender.snapshot()['last']['sent'])
         self.assertNotIn('secret',str(self.sender.snapshot()))
 
+    def test_announcement_uses_same_sender_without_reply_parent(self):
+        allowed = [True]
+        self.assertTrue(self.sender.enqueue('owner','Five commands',None,allowed=lambda:allowed[0]))
+        self.sender.deliver(self.sender.inbox.get_nowait())
+        self.assertNotIn('reply_parent_message_id',self.post.call_args.kwargs['json'])
+        self.assertEqual(self.post.call_args.kwargs['json']['message'],'Five commands')
+        self.post.reset_mock()
+        self.assertTrue(self.sender.enqueue('owner','Five commands',None,allowed=lambda:allowed[0]))
+        allowed[0] = False
+        self.sender.deliver(self.sender.inbox.get_nowait())
+        self.post.assert_not_called()
+
     def test_stale_channel_session_stop_and_disable_drop(self):
         for reason in ('expiry','channel','session','stop','disable'):
             with self.subTest(reason=reason):

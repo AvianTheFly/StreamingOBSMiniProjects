@@ -1,0 +1,72 @@
+Workflow map: 31 modules, 89 behaviors, 117 source facts
+browser_effects.play: review changed owner scope browser_effects
+browser_effects.world_motion: review tools/build_lobby_motion.py / build
+browser_effects.world_motion: review changed owner scope browser_effects
+coordination.admission: review changed owner scope media_workers, coordination
+coordination.finish: review changed owner scope coordination
+coordination.scene: review changed owner scope coordination
+coordination.outside: review changed owner scope obs, coordination
+coordination.session_return: review changed owner scope coordination
+keyboard.keys: review changed owner scope hub
+hub.startup: review changed owner scope hub
+hub.controls: review changed owner scope hub
+hub.workflow: review changed owner scope hub
+hub.source_review: review changed owner scope hub
+hub.presentation_events: review changed owner scope hub
+transitions.cut: review changed owner scope obs, coordination
+settings_history.backup: review changed owner scope hub
+media_workers.replace: review changed owner scope media_workers
+chat_transport.message: review changed owner scope league_stats
+rewards.redeem: review changed owner scope obs
+league.kill: review changed owner scope coordination, league
+league.sfx: review changed owner scope coordination, league
+league_api.queue: review changed owner scope league_api
+league_api.champions: review mini projects/league_api/champ_select.py / ChampSelectState
+league_api.champions: review mini projects/league_api/http_server.py / make_handler
+league_api.champions: review changed owner scope league_api
+league_api.idle: review changed owner scope league_api
+league_api.kill: review changed owner scope league_api
+league_api.death: review changed owner scope league_api
+league_api.respawn: review changed owner scope league_api
+league_api.objectives: review changed owner scope league_api
+league_api.progress: review changed owner scope league_api
+league_api.result: review changed owner scope league_api
+league_api.stage_art: review changed owner scope league_api
+league_api.manual_stage: review changed owner scope league_api
+league_api.queue_timer: review mini projects/league_api/http_server.py / make_handler
+league_api.queue_timer: review changed owner scope league_api
+league_api.replay_viewing: review changed owner scope league_api
+league_api.udyr_accent: review changed owner scope league_api
+league_api.purchases: review changed owner scope league_api
+league_stats.game: review changed owner scope league_stats
+league_stats.chat: review changed owner scope league_stats
+league_stats.disconnect: review mini projects/league_stats/service.py / Tracker.postgame_report
+league_stats.disconnect: review changed owner scope league_stats
+league_stats.viewer_views: review changed owner scope hub, league_stats
+love_me.sequence: review changed owner scope obs, coordination
+scene_voice_switcher.start: review changed owner scope coordination, scene_voice_switcher
+scene_voice_switcher.end: review changed owner scope coordination, scene_voice_switcher
+scene_voice_switcher.manual: review changed owner scope scene_voice_switcher, coordination
+scene_voice_switcher.passage: review changed owner scope obs, scene_voice_switcher
+scene_voice_switcher.layout: review changed owner scope scene_voice_switcher
+scene_voice_switcher.motion: review tools/build_lobby_motion.py / build
+scene_voice_switcher.motion: review changed owner scope scene_voice_switcher
+scene_voice_switcher.effect: review changed owner scope hub, scene_voice_switcher
+scene_voice_switcher.display: review changed owner scope scene_voice_switcher
+sound_effects.trigger: review changed owner scope coordination
+soundboard.trigger: review changed owner scope coordination
+soundboard.random: review changed owner scope soundboard, media_workers
+specific_song.trigger: review changed owner scope obs, media_workers
+spotify.interruption: review changed owner scope spotify, hub
+starting_soon.intro: review changed owner scope scene_voice_switcher
+tik_tok.trigger: review changed owner scope coordination
+twitch_celebrations.subscribe: review changed owner scope twitch_celebrations
+twitch_celebrations.gift: review changed owner scope twitch_celebrations
+twitch_celebrations.cheer: review changed owner scope twitch_celebrations
+twitch_celebrations.follow: review changed owner scope twitch_celebrations
+twitch_celebrations.chat_authorization: review changed owner scope twitch_celebrations
+obs.observation: review changed owner scope obs, coordination
+lobby_screens.import: review changed owner scope lobby_screens
+lobby_screens.party: review changed owner scope lobby_screens
+lobby_screens.ambient: review changed owner scope lobby_screens
+voice.capture: review changed owner scope hub

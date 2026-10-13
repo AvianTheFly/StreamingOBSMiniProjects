@@ -63,6 +63,14 @@ def create_project_interface(
             getter = live_state.get("volume_state")
             return getter() if getter else {}
 
+        def asset_catalog(self) -> list[dict]:
+            controls = live_state.get('asset_controls')
+            return controls.catalog() if controls else []
+
+        def play_asset(self, source: str) -> dict:
+            controls = live_state.get('asset_controls')
+            return controls.play(source) if controls else {'ok': False, 'error': 'Media feature is not ready'}
+
     interface = _GenericMediaInterface()
     project_registry.register(interface)
     return interface

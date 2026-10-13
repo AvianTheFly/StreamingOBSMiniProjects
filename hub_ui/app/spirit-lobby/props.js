@@ -33,7 +33,7 @@ export class Props {
     }
   }
   desk(c,t,config,colors) {
-    c.save();c.translate(242,110);
+    c.save();
     shadow(c,960,881,380,30);
     // Keep the original brass, jade and moss console in front of the camera.
     c.save();c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';c.drawImage(this.booth,594,650,732,305);c.restore();

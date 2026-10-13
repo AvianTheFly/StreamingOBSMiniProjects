@@ -44,7 +44,7 @@ class AssetPreparationTests(unittest.TestCase):
                 entered.set()
                 self.assertTrue(release.wait(2))
                 return SimpleNamespace(returncode=0, stdout=json.dumps({'streams': [{
-                    'codec_name': 'h264', 'width': 640, 'height': 360, 'avg_frame_rate': '30/1'}]}))
+                    'codec_type': 'video', 'codec_name': 'h264', 'width': 640, 'height': 360, 'avg_frame_rate': '30/1'}]}))
             with patch.object(media_metadata.subprocess, 'run', side_effect=probe) as run, \
                  patch.dict('os.environ', HUB_MEDIA_DECODE_MODE='auto'):
                 first = threading.Thread(target=lambda: results.append(layout_rules.probe_dimension_key(path)))

@@ -15,6 +15,28 @@ from .presentation import sheets
 GENERATED = Path('C:/Users/Michael/.codex/generated_images/01a104b1-c082-7921-a920-617bfec4e788')
 
 
+def generation_originals(output):
+    """Resolve original tool files across a version's nested provenance logs."""
+    originals = {fingerprint(p): str(p) for p in GENERATED.glob('*.png')}
+    log = json.loads((Path(output)/'generation-log.json').read_text(encoding='utf-8-sig'))
+
+    def visit(value):
+        if isinstance(value, dict):
+            original = value.get('original')
+            if isinstance(original, str):
+                path = Path(original)
+                if path.suffix.lower() == '.png' and path.is_file():
+                    originals[fingerprint(path)] = str(path)
+            for child in value.values():
+                visit(child)
+        elif isinstance(value, list):
+            for child in value:
+                visit(child)
+
+    visit(log)
+    return originals
+
+
 def raw(args, kind):
     response = jobs.run(args, kind=kind, weight=1, timeout=180, text=False)
     if response.returncode:
@@ -27,7 +49,7 @@ def inspect(output=OUTPUT):
     plan = json.loads((output/'slideshow-plan.json').read_text(encoding='utf-8'))
     source_root = Path(plan.get('source_root', SOURCE))
     count = len(plan['shots'])
-    originals = {fingerprint(p): str(p) for p in GENERATED.glob('*.png')}
+    originals = generation_originals(output)
     sources = []
     for shot in plan['shots']:
         assert fingerprint(output/shot['file']) == fingerprint(source_root/shot['file']) == shot['sha256']

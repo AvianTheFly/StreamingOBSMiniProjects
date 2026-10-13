@@ -21,7 +21,13 @@ async function request(path, body) {
   return data;
 }
 let clientBusy = false;
-for (const [key, name] of [['astral','Astral Observatory'],['tidal','Tidal Vault'],['neon','Neon Concourse'],['frost','Frost Sanctum'],['verdant','Verdant Engine']]) {
+document.querySelector('#purchasePreview').addEventListener('click',async event=>{
+  event.target.disabled=true;
+  try {await request('/purchases/preview',{item_id:3078});notice.textContent='Trinity Force queued on the League gameplay overlay.';}
+  catch(error) {notice.textContent=error.message;}
+  finally {event.target.disabled=false;}
+});
+for (const [key, name] of [['bear','Thunderclaw'],['turtle','Jade Aegis'],['ram','Golden Summit'],['phoenix','Ash & Aurora']]) {
   const link = document.createElement('a'); link.className = 'theme-card';
   link.href = `/champ-select?demo=1&theme=${key}`; link.target = '_blank'; link.rel = 'noopener';
   const img = document.createElement('img'); img.src = `/champ-select/backgrounds/${key}.jpg`; img.alt = '';

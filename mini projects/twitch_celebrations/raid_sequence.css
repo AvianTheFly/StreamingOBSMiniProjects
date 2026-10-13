@@ -1,26 +1,13 @@
-/* Raid art lives at the perimeter; the personalized name remains the hero. */
+/* The announcement owns only the top strip; acts stay outside gameplay. */
 #raidLayers{position:absolute;inset:0;overflow:hidden;pointer-events:none}
-#raidArt{width:100%;height:100%;position:absolute;inset:0}
-.raid #rim,.raid #particles{display:none}
-.raid #banner{top:1.8%;left:30%;width:40%;height:11.5%;border:0;border-radius:24px;background:linear-gradient(110deg,#16182898,#30223d70);box-shadow:none;gap:6px;backdrop-filter:blur(2px);transition:transform .65s,opacity .5s}
-.raid #name{font-family:'Trebuchet MS',Arial,sans-serif;font-size:clamp(18px,2.1vw,42px);font-weight:900;letter-spacing:-.045em;color:#fff7e9;text-shadow:0 2px 12px #0b112780}
-.raid #kicker{font-size:clamp(9px,.7vw,15px);letter-spacing:.16em;font-weight:800}
-.raid #detail{font-size:clamp(9px,.8vw,17px);color:#e9e6f1d9}
-#raidBadge{position:absolute;bottom:1.2%;left:42%;width:16%;height:6.3%;display:flex;gap:8px;justify-content:center;align-items:center;border-radius:28px;background:linear-gradient(120deg,#19203388,#25233950);color:#fff4de;opacity:0;transform:translateY(120%);transition:transform .65s,opacity .55s;font-family:'Trebuchet MS',Arial,sans-serif}
-#raidCount{font-size:clamp(20px,1.9vw,37px);line-height:1;font-weight:900}
-#raidBadge span{font-size:clamp(8px,.55vw,12px);max-width:42%;letter-spacing:.13em;line-height:1.5;color:var(--accent)}
-.raid .mascot{width:5.3%;height:10%;opacity:.86;filter:drop-shadow(0 3px 8px #10152745);animation:raid-arrive .65s cubic-bezier(.2,.8,.3,1) both}
-.raid .mascot:nth-child(even){animation-delay:.1s}
-.raid .mascot .dance{animation:raid-sway 1.6s ease-in-out infinite alternate}
-.raid #encore{bottom:9%;font-size:clamp(10px,.75vw,16px);letter-spacing:.12em;color:#ffebd4;transform:translateY(12px);transition:opacity .65s,transform .65s}
-.raid[data-raid-phase=incoming] #banner{transform:translateY(-160%);opacity:0}
-.raid[data-raid-phase=incoming] #cast{opacity:0}
-.raid:not([data-raid-phase=incoming]) #raidBadge{opacity:1;transform:translateY(0)}
-.raid[data-raid-phase=welcome] #encore{opacity:1;transform:translateY(0)}
-.raid[data-raid-phase=exit]{opacity:0;transition:opacity .6s}
-.raid[data-raid-phase=exit] #banner{transform:translateY(-160%);opacity:0}
-.raid[data-raid-phase=exit] #raidBadge{opacity:0;transform:translateY(50%)}
-@keyframes raid-arrive{from{opacity:0;transform:translateY(25px) scale(.8)}to{opacity:.86;transform:translateY(0) scale(1)}}
-@keyframes raid-sway{from{transform:translateY(0) rotate(-5deg)}to{transform:translateY(-6%) rotate(5deg)}}
-@media(prefers-reduced-motion:reduce){.raid *{animation:none!important;transition:none!important}.raid .mascot{opacity:.86}.raid[data-raid-phase=incoming] #cast{opacity:0}}
-.raid[data-raid-phase=remix] .mascot .dance{animation:raid-wiggle 1.2s ease-in-out infinite alternate}.raid[data-raid-phase=finale] .mascot .dance{animation:raid-cheer 1.3s ease-in-out infinite alternate}.raid[data-raid-phase=welcome] .mascot .dance{animation-duration:2.6s}@keyframes raid-wiggle{from{transform:translateX(-4%) rotate(-7deg)}to{transform:translateX(4%) rotate(7deg)}}@keyframes raid-cheer{from{transform:translateY(0) scale(.97)}to{transform:translateY(-9%) scale(1.03)}}
+#raidParty{width:100%;height:100%;position:absolute;inset:0}
+.raid #banner,.raid #encore,.raid #cast,.raid #rim,.raid #particles,.raid #raidBadge{display:none!important}
+#raidAnnouncement{position:absolute;inset:0 18% auto;height:15.4%;overflow:hidden;display:flex;justify-content:center;align-items:flex-start;padding:1vh 1vw 0}
+#raidAnnouncementCard{position:relative;min-width:0;width:100%;max-height:100%;padding:.65vh 1.3vw .8vh;text-align:center;border:2px solid #ffce6c;border-radius:9px 9px 30px 30px;background:linear-gradient(110deg,#321c51f5,#151f38f5 55%,#323960f5);box-shadow:inset 0 -5px #b273d550,0 4px 20px #eb71a936;font-family:'Trebuchet MS',Arial,sans-serif;transform-origin:50% 0;color:#fff1d7;will-change:transform,opacity}
+#raidAnnouncementCard:before,#raidAnnouncementCard:after{content:'';position:absolute;top:17%;width:5px;height:65%;background:linear-gradient(#ff72b8,#ffe187,#5bf2dd);border-radius:8px}
+#raidAnnouncementCard:before{left:10px}#raidAnnouncementCard:after{right:10px}
+#raidIntro{font-size:clamp(9px,1.05vw,22px);font-weight:900;letter-spacing:.16em;line-height:1.2;color:#ffd776}
+#raidName{max-width:100%;white-space:nowrap;font-size:clamp(20px,3.4vw,66px);font-weight:900;letter-spacing:-.04em;line-height:1.12;color:#fff8ee;text-shadow:3px 3px #a14991;margin:.1vh 0 .2vh}
+#raidCrew{font-size:clamp(10px,1.2vw,25px);line-height:1.18;color:#bcf9eb;font-weight:700}
+#raidCrew strong{color:#ffe081;font-size:1.18em}
+@media(prefers-reduced-motion:reduce){.raid *,.raid{animation:none!important;transition:none!important}}

@@ -1008,13 +1008,13 @@
       "command": "!clip",
       "aliases": [],
       "response": "",
-      "category": "Needs your details or integration",
-      "status": "disabled",
-      "note": "A working clip-creation integration; !clips above only opens the clip library.",
-      "permission": "everyone",
-      "cooldown": 30,
-      "enabled": false,
-      "kind": "text"
+      "category": "Stream tools",
+      "status": "enabled",
+      "note": "You and your moderators request a full 60-second Twitch clip. Nearby replay saves and !clip share one clip and a 90-second window; chat receives the same confirmed link. Titles use your save label or stream title, game, and date/time. Twitch-shortened clips are reported honestly without creating duplicates.",
+      "permission": "moderator",
+      "cooldown": 90,
+      "enabled": true,
+      "kind": "clip"
     },
     {
       "command": "!emotes",
@@ -1095,5 +1095,6 @@
       "url": "https://www.reddit.com/r/Udyrmains/comments/1r43rdr/the_objectively_best_lane_udyr_build/",
       "finding": "Existing panel destination; identifies the same Riot ID and Twitch channel."
     }
-  ]
+  ],
+  "announcements_enabled": true
 }

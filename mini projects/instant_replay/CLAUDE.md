@@ -72,8 +72,7 @@ reveal finishes. Cancellation or a newer scene choice rejects the handoff.
 `quick replay` / `replay that` captures and replays the last 15 seconds locally.
 `quick replay 30` changes the duration (3–120 seconds). The Hub offers 5, 10, 15,
 30 and 60 seconds. These cuts use stream copy with all audio tracks; their start
-can include a preceding keyframe. They do not request Twitch clips or consume
-a pending manual mark. The original OBS buffer remains intact.
+can include a preceding keyframe. They do not request Twitch clips. The original OBS buffer remains intact.
 
 `save`, `save win`, and `save and replay` retain the serious capture path:
 anchor-aware encoding, a Twitch clip request, and highlight-candidate status.
@@ -82,7 +81,16 @@ including Save & replay; transcription time is excluded. Runtime controls are
 published after setup and withdrawn together on shutdown by their own generation.
 Older clips retain their eligibility. No existing clip is silently reclassified.
 
-Library metadata `purpose` is `highlight` or `replay_only`. A replay-only cut and
+Library metadata `purpose` is `highlight`, `replay_only` or `review_later`.
+`mark` saves the last 60 seconds for later review; `mark 30` and `mark full`
+choose a different duration or the whole buffer. It no longer sets a start point.
+Marked cuts and their raw originals stay out of every automatic replay selection,
+game archiving and highlights. They remain available in future Footage Desk review.
+Keeping a marked clip does not change its purpose; choose Replay ready explicitly
+to promote it. The independent `review_state` is pending, kept or dismissed.
+Set aside preserves the file, excludes it from automatic replay and can be restored.
+The visual Clip desk offers queue tabs, on-demand thumbnails, one local player,
+Keep / Set aside / Next and optional trim, notes and compilation controls. A replay-only cut and
 its raw OBS copy are classified together; the cut links `capture_source` so the
 library can hide its duplicate. Offline management uses the same inventory
 as runtime playback; a missing cut makes its retained original visible again
@@ -90,8 +98,7 @@ without changing capture intent. Replay-only cuts live in `REPLAY_DIR/replay-onl
 and stay out of game-end archiving, automatic highlights, showcase latest,
 shuffle, other presentations' default catalogs and Footage Desk's review pool.
 Explicit playback and compilations can still include a deliberately chosen cut.
-Trims inherit their source's purpose. The library's purpose control and bulk
-Keep for highlights / Replay only actions are reversible and revision checked;
+Trims inherit their source's purpose. The library's purpose and review controls are reversible and revision checked;
 they preserve titles, notes, favorites, volumes and unknown metadata. Promotion
 adds the chosen cut to future review without sending a retroactive Twitch clip.
 During playback, **Keep this clip** promotes the displayed replay-only cut;
@@ -157,10 +164,10 @@ Press `|`, then speak one of these short commands:
 
 | Command | Result |
 |---|---|
-| `mark` | Set the start of the next capture |
+| `mark` / `mark 30` / `mark full` | Save the last 60 seconds, another duration or the whole buffer for later review; excluded from automatic replay |
 | `save` / `save 30` / `save full` | Save the game moment, N seconds, or the whole buffer; `save win` adds a tag |
 | `quick replay` / `replay that` | Capture a local replay-only moment and play it |
-| `quick replay 30` | Replay the last 30 seconds without a Twitch clip |
+| `quick replay 30` | Replay the last 60 seconds without a Twitch clip |
 | `replay` | Force the latest clip to show as an instant replay |
 | `save and replay` | Capture this moment, then replay its successful finished cut |
 | `showcase` | Show the latest saved clip in the cinema layout |
@@ -177,15 +184,20 @@ button ends the whole sequence.
 **Play-after-save:** Say `"play"` within `PLAY_AFTER_SAVE_WINDOW` seconds of a save
 and it auto-fires once the trim finishes — no need to wait.
 
-## Clip trimming logic (save without a manual mark)
+## Highlight capture trimming logic
+
+Kill and death pre-roll are 30 seconds; kills separated by at most 30 seconds
+share the first-kill anchor. OBS stores 75 seconds, providing a full minute plus
+15 seconds of voice/save headroom. Press `|`, then say `mark` to save 60 seconds
+ending at that original button press. Shorter buffers still save the available
+footage, and explicit durations beyond the buffer cannot recover older footage.
 
 Priority (highest first):
 1. `"save full"` → entire buffer
 2. `"save 30"` → explicit seconds from end
-3. Manual mark → time since mark was set
-4. Kill anchor → first kill in streak − KILL_PRE_ROLL_SECONDS
-5. Death anchor → last death − DEATH_PRE_ROLL_SECONDS
-6. No anchor → entire buffer
+3. Kill anchor → first kill in streak − KILL_PRE_ROLL_SECONDS
+4. Death anchor → last death − DEATH_PRE_ROLL_SECONDS
+5. No anchor → entire buffer
 
 ## Audio muting
 

@@ -6,7 +6,7 @@ import math
 DEFAULTS = dict(revision=0, enabled=False, dragon_ambience=True, objectives=True,
                 combat=True, structures=True, opacity=.8, edge_width=56,
                 burst_seconds=2.7, spacing_seconds=4, survival=True, progression=True,
-                economy=True, lifecycle=True, inferred=False, custom_rules=True,
+                economy=True, lifecycle=True, inferred=False, custom_rules=True, item_purchases=True,
                 intensity=1.15, event_options={}, match_screens=False,
                 result_delay_seconds=1.5, result_hold_seconds=5, start_hold_seconds=5)
 
@@ -18,7 +18,7 @@ def validate(settings):
     if type(result['revision']) is not int or result['revision'] < 0:
         raise ValueError('Invalid production revision')
     for key in ('enabled', 'dragon_ambience', 'objectives', 'combat', 'structures',
-                'survival', 'progression', 'economy', 'lifecycle', 'inferred', 'custom_rules', 'match_screens'):
+                'survival', 'progression', 'economy', 'lifecycle', 'inferred', 'custom_rules', 'match_screens', 'item_purchases'):
         if type(result[key]) is not bool:
             raise ValueError(key + ' must be true or false')
     for key, low, high in (('opacity', .2, 1), ('edge_width', 24, 84),

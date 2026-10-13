@@ -19,6 +19,10 @@
     </header>
     <p id="notice" role="status" aria-live="polite"></p>
     <section>
+      <div class="section-head"><h2>Item purchases</h2><button type="button" id="purchasePreview">Preview Trinity Force in OBS</button></div>
+      <p class="muted">New purchases pop above your item HUD with their artwork, name and a soft ka-ching. Rapid purchases play one at a time. Inventory additions plus a gold drop infer purchases; free upgrades and reconnect history stay quiet. Uses the League alerts volume and pause controls.</p>
+    </section>
+    <section>
       <div class="section-head"><h2>League client scenes</h2><span id="clientStatus">Connecting…</span></div>
       <label><input type="checkbox" id="clientEnabled" /> Automatically switch queue and champion select scenes</label>
       <label>Between games
@@ -32,16 +36,15 @@
       <p id="clientError" role="status"></p>
     </section>
     <section>
-      <div class="section-head"><h2>Champion select worlds</h2><a href="/champ-select?demo=1&theme=astral" target="_blank" rel="noopener">Open full-size preview ↗</a></div>
+      <div class="section-head"><h2>Champion select worlds</h2><a href="/champ-select?demo=1&theme=bear" target="_blank" rel="noopener">Open full-size preview ↗</a></div>
       <p class="muted">Five picks and five bans per team. Allies stay left; opponents stay right. The existing FaceCamWithProps scene stays in the upper center, with League team chat below it. The custom screen appears only after both teams finish banning.</p>
       <label>Theme each draft
         <select id="clientTheme">
-          <option value="random">Random from all five</option>
-          <option value="astral">Astral Observatory</option>
-          <option value="tidal">Tidal Vault</option>
-          <option value="neon">Neon Concourse</option>
-          <option value="frost">Frost Sanctum</option>
-          <option value="verdant">Verdant Engine</option>
+          <option value="random">Random from all four</option>
+          <option value="bear">Thunderclaw</option>
+          <option value="turtle">Jade Aegis</option>
+          <option value="ram">Golden Summit</option>
+          <option value="phoenix">Ash &amp; Aurora</option>
         </select>
       </label>
       <div class="theme-gallery" id="themeGallery"></div>
@@ -53,6 +56,7 @@
       </div>
       <form id="settings">
         <div class="toggles">
+          <label><input type="checkbox" name="item_purchases" />Item purchase pops &amp; quiet ka-ching</label>
           <label><input type="checkbox" name="enabled" />Enable production borders</label>
           <label><input type="checkbox" name="dragon_ambience" />Dragon atmosphere</label>
           <label><input type="checkbox" name="objectives" />Team objectives & aces</label>

@@ -5,15 +5,17 @@ const edgeStart=/^[^\p{L}\p{N}_]+/u,edgeEnd=/[^\p{L}\p{N}_]+$/u;
 const folded=value=>value.toLocaleLowerCase().replace(/\s+/g,' ').trim();
 const own=(object,key)=>Object.prototype.hasOwnProperty.call(object,key)?object[key]:undefined;
 
-export function compileStickers(replacements,{natural=true,limit=6}={}){
+export function compileStickers(replacements,{natural=true,limit=6,literalWords=[]}={}){
+ const literals=new Set(literalWords.map(folded));
  const phrases=new Map();
  for(const [alias,url] of Object.entries(replacements||{})){
   const key=folded(alias),words=key.split(' ');
+  if(literals.has(key))continue;
   if(!phrases.has(words[0]))phrases.set(words[0],[]);
   phrases.get(words[0]).push({key,words,url});
  }
  for(const entries of phrases.values())entries.sort((a,b)=>b.words.length-a.words.length);
- return {replacements:replacements||{},phrases,natural,remaining:limit};
+ return {replacements:replacements||{},phrases,natural,remaining:limit,literals};
 }
 
 export function stickerFragments(value,emotes,rules,safeImage){
@@ -22,13 +24,16 @@ export function stickerFragments(value,emotes,rules,safeImage){
   const token=tokens[at];if(!token)continue;
   const exact=own(rules.replacements,token),emote=own(emotes,token);
   if(protectedToken.test(token)){out.push({text:token});continue;}
+  const lead=token.match(edgeStart)?.[0]||'',core=token.slice(lead.length).replace(edgeEnd,'');
+  // Saved ordinary words stay readable even when a provider has that exact code.
+  // Explicit punctuation aliases (such as :O) can still express a reaction.
+  if(rules.literals.has(folded(token))||(rules.literals.has(folded(core))&&!safeImage(exact))){out.push({text:token});continue;}
   const exactPart=()=>{
    if(safeImage(exact)&&rules.remaining>0){out.push({url:exact,alt:token,provider:'Custom'});rules.remaining--;}
    else if(emote&&safeImage(emote.url))out.push({...emote,alt:token});
    else out.push({text:token});
   };
   if(!rules.natural||!token.trim()||rules.remaining<=0){exactPart();continue;}
-  const lead=token.match(edgeStart)?.[0]||'',core=token.slice(lead.length).replace(edgeEnd,'');
   let match=null;
   for(const entry of rules.phrases.get(folded(core))||[]){
    // Exact native codes keep provider metadata (including zero-width layers).

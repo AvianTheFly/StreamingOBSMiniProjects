@@ -81,6 +81,11 @@ currently visible location; retries with an active lobby are handled by caller.
     if hide_screen:
         from lib.display_capture import set_visible
         set_visible(False, client=client)
+        # Published explicit content takes precedence over legacy desktop privacy.
+        # Default Udyr stays private; Desktop/Client are deliberate Hub choices.
+        if plan and plan.get('display_content'):
+            from lib.display_capture import apply_content
+            apply_content(plan['display_content'], client=client)
     for item, enabled in updates:
         if item['sceneItemEnabled'] != enabled:
             client.set_scene_item_enabled(scene, item['sceneItemId'], enabled)

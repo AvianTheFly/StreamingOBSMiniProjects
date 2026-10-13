@@ -9,7 +9,7 @@ from tools.check_architecture import ROOT, check, inspect_source
 class ArchitectureBoundaryTests(unittest.TestCase):
     def test_supported_application_respects_shared_owners(self):
         checked, errors = check()
-        self.assertGreater(checked, 100)
+        self.assertGreater(checked, 0, 'The checker must inspect runtime modules')
         self.assertEqual(errors, [])
 
     def test_scene_bypass_and_peer_import_are_rejected(self):

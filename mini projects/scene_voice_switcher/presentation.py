@@ -1,7 +1,7 @@
 """Explicit layout repair for owned lobby layers; no program-scene writes."""
 from lib.display_capture import CAPTURE_SCENE
 from . import settings
-from .layouts import ART, LAYOUTS, FLAT_LOCATIONS
+from .layouts import LAYOUTS, FLAT_LOCATIONS, SPIRIT_ART, artwork, foreground
 from lib.coordination.lobby_layout import apply_layout, transform_matches
 from lib.coordination.lobbies import lobby_catalog
 from .motion import layer as motion_layer
@@ -33,6 +33,7 @@ def place(client, owner, item_id, rect, *, stretch=False, fill=False):
 
 def plan(name, data=None):
     """Publish feature policy as complete data, never callbacks into this package."""
+    data = settings.read() if data is None else data
     spec=settings.location(name,data); stem=LAYOUTS[name][0]
     layers=[]
     holes=json.dumps([spec[key] for key in ('screen','camera','chat')],separators=(',',':'))
@@ -40,8 +41,8 @@ def plan(name, data=None):
         layers.append({'source':'Hub Spirit Afterparty','configure':True,'url_query':{'holes':holes},
                        'transform':transform((0,0,1920,1080),stretch=True)})
     else:
-        layers.append({'source':name+' Base','kind':'image_source',
-                       'settings':{'file':str(ART/f'{stem}-base.png')},
+        layers.append({'source':name+' Base','kind':'image_source','configure':name in SPIRIT_ART,
+                       'settings':{'file':str(artwork(name))},
                        'transform':transform((0,0,1920,1080),stretch=True)})
     camera=transform(spec['camera'],fill=True)
     if name == 'Spirit Afterparty':
@@ -51,17 +52,20 @@ def plan(name, data=None):
         layers.append({'source':'Hub Spirit Afterparty Foreground','configure':True,'url_query':{'holes':holes},
                        'transform':transform((0,0,1920,1080),stretch=True)})
     elif name not in FLAT_LOCATIONS:
-        layers.append({'source':name+' Foreground','kind':'image_source',
-                       'settings':{'file':str(ART/f'{stem}-foreground-cutout.png')},
+        layers.append({'source':name+' Foreground','kind':'image_source','configure':name in SPIRIT_ART,
+                       'settings':{'file':str(foreground(name))},
                        'transform':transform((0,0,1920,1080),stretch=True)})
     # Desktop stays above furniture cutouts; the camera remains behind them.
-    layers.append({'source':CAPTURE_SCENE,'transform':transform(spec['screen'])})
+    if name != 'Spirit Afterparty':
+        layers.append({'source':CAPTURE_SCENE,'transform':transform(spec['screen'])})
     animated=motion_layer(name,spec)
     if animated:
         layers.append({**animated,'transform':transform((0,0,1920,1080),stretch=True)})
     layers.append({'source':chat_source(name),'kind':'browser_source','configure':True,
                    'settings':chat_settings(spec['chat']),'transform':transform(spec['chat'],stretch=True)})
-    return {'layers':layers,'hide':['Hub Lobby Chat'],
+    from .screen_content import blueprint
+    return {'layers':layers,'hide':['Hub Lobby Chat', *([CAPTURE_SCENE] if name == 'Spirit Afterparty' else [])],
+            'display_content':blueprint(data),
             'link_transform':transform((0,0,1920,1080),stretch=True)}
 
 def restore(client,name):
@@ -93,6 +97,6 @@ def describe(client,name):
             misplaced.append(source)
     return {'source':name,'label':LAYOUTS[name][1],'description':LAYOUTS[name][2],
             'managed':True,'rotation':bool(spec['rotation']),'layout':spec,
-            'art_url':('/api/projects/scene_voice_switcher/artwork?source='+name) if LAYOUTS[name][0] else '/spirit-lobby/art/clubhouse-clean.webp',
+            'art_url':('/api/projects/scene_voice_switcher/artwork?source='+name) if LAYOUTS[name][0] else '/spirit-lobby/art/clubhouse-aligned.png',
             'ready':not missing and not hidden and not misplaced,'missing':missing,
             'hidden':hidden,'misplaced':misplaced}

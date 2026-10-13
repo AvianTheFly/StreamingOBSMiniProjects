@@ -194,7 +194,7 @@ class FootageTests(unittest.TestCase):
         thread.start()
         base = f'http://127.0.0.1:{server.server_port}'
         try:
-            for resource in ('workflow.js', 'workflow.css', 'clip_editor.js', 'clip_drag.js', 'clip_history.js', 'clip_editor.css', 'recording_timeline.js', 'timeline_review.css'):
+            for resource in ('find_moments.js', 'workflow.js', 'workflow.css', 'clip_editor.js', 'clip_drag.js', 'clip_history.js', 'clip_editor.css', 'recording_timeline.js', 'timeline_review.css'):
                 with urllib.request.urlopen(base+'/'+resource) as response:
                     self.assertEqual(200,response.status)
                     self.assertTrue(response.read())
@@ -202,6 +202,8 @@ class FootageTests(unittest.TestCase):
                 self.assertIn('reviewSourceRange',response.read().decode('utf-8'))
             with urllib.request.urlopen(base+f'/api/analysis-between-marks?id={self.id}') as response:
                 self.assertEqual('ineligible',json.load(response)['state'])
+            with urllib.request.urlopen(base+'/api/analysis-plan') as response:
+                self.assertNotIn(self.id, json.load(response)['eligible_ids'])
             request = urllib.request.Request(base+f'/media?id={self.id}', headers={'Range':'bytes=100-199'})
             with urllib.request.urlopen(request) as response:
                 self.assertEqual(206, response.status)

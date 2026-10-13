@@ -1,5 +1,6 @@
 // Click-through windows receive no DOM mouse events. Read normalized OS pointer
 // coordinates from the Hub instead; no mouse hooks, focus changes or input capture.
+import {pollVisible} from '/shared/visible-poll.js';
 export function applyReadability(messages, settings, pointer){
  const desktop=settings.focus_mode==='desktop'||(settings.focus_mode!=='game'&&pointer.game===false);
  const x=pointer.x===null?null:pointer.x*innerWidth,y=pointer.y===null?null:pointer.y*innerHeight;
@@ -12,20 +13,18 @@ export function applyReadability(messages, settings, pointer){
 }
 
 export function watchReadability(messages,getSettings,{preview=false}={}){
- let busy=false,stopped=false,last={game:true,x:null,y:null};
+ let last={game:true,x:null,y:null};
  const apply=()=>applyReadability(messages,getSettings(),last);
- async function tick(){
-  if(busy||stopped)return;
-  busy=true;
-  try{if(!preview){const response=await fetch('/api/chat/pointer',{cache:'no-store'});if(!response.ok)throw Error();last=await response.json();}apply();}
-  catch{last={game:true,x:null,y:null};apply();}
-  finally{busy=false;}
- }
+ const move=event=>{last={game:true,x:event.clientX/innerWidth,y:event.clientY/innerHeight};apply();};
+ const leave=()=>{last={game:true,x:null,y:null};apply();};
  if(preview){
-  window.addEventListener('pointermove',event=>{last={game:true,x:event.clientX/innerWidth,y:event.clientY/innerHeight};apply();});
-  window.addEventListener('pointerleave',()=>{last={game:true,x:null,y:null};apply();});
+  window.addEventListener('pointermove',move);
+  window.addEventListener('pointerleave',leave);
  }
+ const poller=preview?null:pollVisible({url:'/api/chat/pointer',interval:250,timeout:2000,
+  onData:value=>{last=value;apply();},onError:leave});
  const observer=new MutationObserver(apply);observer.observe(messages,{childList:true});
- const timer=setInterval(tick,250);tick();
- window.addEventListener('beforeunload',()=>{stopped=true;clearInterval(timer);observer.disconnect();});
+ const dispose=()=>{poller?.dispose();observer.disconnect();window.removeEventListener('pointermove',move);window.removeEventListener('pointerleave',leave);};
+ window.addEventListener('beforeunload',dispose,{once:true});
+ return {dispose};
 }

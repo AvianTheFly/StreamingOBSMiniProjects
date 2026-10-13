@@ -7,7 +7,7 @@
  const TAU=Math.PI*2,clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
  const mix=(a,b,t)=>a+(b-a)*t;
  const Palette=typeof module!=='undefined'&&module.exports?require('./stage_palette.js'):root.VisualPalette;
- const Spirits=typeof module!=='undefined'&&module.exports?require('./stage_spirits.js'):root.VisualSpiritStages;
+ const Designs=typeof module!=='undefined'&&module.exports?require('./stage_designs.js'):root.VisualStageDesigns;
  const color=(stage,t,j)=>Palette.color(stage,t,j);
  const neutral={open:.5,twist:0,depth:.5,contour:.5};
  const evolution=j=>j.evolution||neutral;
@@ -49,11 +49,11 @@
   for(let n=0;n<11;n++){
    const u=(n/11+t*.13)%1;
    const r=8+Math.pow(u,1.65)*(173+m.spring*37);
-   const turn=t*.10+(1-u)*(.42+m.width*.48+e.twist*1.1)+m.snap*.035;
+   const turn=t*.10+(1-u)*(.42+m.width*.48+e.twist*1.1)+m.snap*.035+(m.dance?.at(3,1-u)||0)*.35;
    const center=[Math.sin(t*.38+(1-u)*e.depth*2)*(1-u)*28+m.balance*(1-u)*11,Math.cos(t*.27)*(1-u)*16*e.open],pts=[];
    for(let i=0;i<=72;i++){
     const a=i/72*TAU,voice=Math.floor((i%72)/9),local=m.presenceVoices?.[voice]??m.voices?.[voice]??0,phase=m.flowPhases?.[voice]||t;
-    const rr=section(a,r)*(1+local*.045*Math.sin(a*3+phase*.17));
+    const rr=section(a,r)*(1+local*.045*Math.sin(a*3+phase*.17)+(m.dance?.at(voice,1-u)||0)*.08);
     const p=rot([Math.cos(a)*rr,Math.sin(a)*rr*(.47+e.open*.3),0],0,0,turn);
     pts.push([center[0]+p[0],center[1]+p[1],(1-u)*190-24]);
    }
@@ -77,27 +77,6 @@
   for(let i=0;i<=72;i++){const a=i/72*TAU,r=section(a,radius),p=rot([Math.cos(a)*r,Math.sin(a)*r*(.47+e.open*.3),0],0,0,t*.1);gate.push(p);}
   path(s,gate,color(0,1,j),1.1+m.kick*.6,.28+m.kick*.7,j);
  }
- function interference(s,w,j){
-  const t=j.travel,m=j.motion,e=evolution(j);
-  for(let family=0;family<2;family++){
-   const lanes=[];
-   for(let lane=0;lane<5;lane++){
-    const pts=[],offset=(lane-2)*4;
-    for(let i=0;i<=112;i++){
-     const u=i/112,env=Math.sin(Math.PI*u),x=(u-.5)*(320+m.width*24);
-     const phase=u*TAU*(.75+e.contour*.7)+t*.6+family*(1.2+e.open*1.8);
-     const mass=14+e.open*22+m.mid*27+m.spring*26;
-     const y=Math.sin(phase)*env*mass+offset+sample(w.wave,u)*env*(3+m.snap*9)
-       +Math.sin(u*TAU*2-t*.35)*env*m.high*4;
-     const z=Math.sin(u*TAU+family*2+e.twist)*e.depth*44;
-     pts.push(project(rot([x,y,z],e.twist*.32,Math.sin(u*Math.PI)*e.twist*.18)));
-    }lanes.push(pts);
-   }
-   const c=color(1,family===0?.22:1,j);
-   for(let i=0;i<112;i++)s.face([lanes[1][i],lanes[1][i+1],lanes[3][i+1],lanes[3][i]],c,.15);
-   for(let lane=0;lane<5;lane++)path(s,lanes[lane],c,lane===2?1.05:.45,lane===2?.9:.44,j,family*2+lane*.18);
-  }
- }
  function orbit(s,w,j){
   const t=j.travel,m=j.motion,e=evolution(j),segments=[],traces=[];
   for(let ring=0;ring<5;ring++){
@@ -105,7 +84,8 @@
    const r=34+ring*10+m.bass*9+m.spring*23,c=color(2,ring===1?1:.18+ring*.25,j);
    const inner=[],outer=[];
    for(let i=0;i<=112;i++){
-    const a=i/112*TAU,tilt=ring*(.22+e.open*1.05)+t*.12,twist=ring*.55-t*.17+m.snap*.12;
+    const g=m.dance?.at(ring+1,.5-.5*Math.cos(i/112*TAU))||0,partner=m.dance?.at(6-ring,.35)||0;
+    const a=i/112*TAU,tilt=ring*(.22+e.open*1.05)+t*.12+g*.45,twist=ring*.55-t*.17+m.snap*.12-partner*.4;
     for(const [pts,rad] of [[inner,r-2-local*3.5],[outer,r+2+local*3.5]]){
      const breathing=1+Math.cos(a*2+ring*.45+phase*.09)*e.contour*.16;
      pts.push(project(rot([Math.cos(a)*rad*breathing,Math.sin(a)*rad*(.66+e.open*.45),
@@ -132,63 +112,18 @@
    path(s,[...pts,pts[0]],color(2,.85,j),.6,.65,j,id*.4,`orbit-core-${id}`);
   }
  }
- function crystal(s,w,j){
-  const t=j.travel,m=j.motion,e=evolution(j),size=43+m.bass*12+m.spring*36;
-  const raw=[[0,-1,0],[1,0,0],[0,0,1],[-1,0,0],[0,0,-1],[0,1,0]];
-  const faces=[[0,1,2],[0,2,3],[0,3,4],[0,4,1],[5,2,1],[5,3,2],[5,4,3],[5,1,4]];
-  const sorted=[];
-  for(let cluster=0;cluster<5;cluster++){
-   const a=(cluster-1)/4*TAU+t*.16,r=65+e.open*34+m.spring*16;
-   const center=cluster===0?[0,0,0]:[Math.cos(a)*r,Math.sin(a)*r*(.3+e.contour*.5),Math.sin(a+e.twist)*e.depth*55];
-   const scale=cluster===0?size:14+m.mid*7+m.snap*4;
-   const points=raw.map(p=>{const shape=[p[0]*(1.1-e.contour*.35)+p[1]*e.twist*.18,p[1]*(.65+e.contour*.65),p[2]*(.65+e.depth*.6)];
-    const q=rot(shape.map(v=>v*scale),.22+Math.sin(t*.12+cluster)*.35,t*.21+m.snap*.14,t*.07+cluster*.4);
-    return project(q.map((v,k)=>v+center[k]));});
-   for(let i=0;i<faces.length;i++)sorted.push({pts:faces[i].map(k=>points[k]),i,cluster});
-  }
-  sorted.sort((a,b)=>b.pts.reduce((s,p)=>s+p[2],0)-a.pts.reduce((s,p)=>s+p[2],0));
-  for(const {pts,i,cluster} of sorted){
-   const key=`crystal-${cluster}-${i}`,c=color(3,cluster===0?(i%3===0?.65:.15):.65,j);
-   const light=.6+.4*(.5+.5*Math.cos(j.lamp*1.2-i*.65-cluster));
-   s.face(pts,c,(.20+(i%3)*.10)*light,key);
-   path(s,[...pts,pts[0]],color(3,i%4===0?1:.35,j),cluster===0?.9:.65,.84,j,i*.2+cluster,key);
-  }
-  for(let bracket=0;bracket<3;bracket++){
-   const pts=[],r=77+bracket*7+m.spring*13;
-   for(let i=0;i<=22;i++){const a=(bracket/3+i/22*.18)*TAU-t*.15;pts.push([Math.cos(a)*r,Math.sin(a)*r*.73]);}
-   path(s,pts,color(3,bracket===1?1:.4,j),.8,.6,j,bracket);
-  }
- }
- function dunes(s,w,j){
-  const t=j.travel,m=j.motion,e=evolution(j),rows=20,cols=64,grid=[];
-  for(let r=0;r<rows;r++){
-   const z=r/(rows-1),history=j.history[Math.max(0,j.history.length-1-r*2)]||w.bands,line=[];
-   for(let i=0;i<=cols;i++){
-    const u=i/cols,x=(u-.5)*(328-z*155),env=Math.sin(u*Math.PI);
-    const terrain=env*(Math.sin(u*(5+e.contour*6)+t*.23-z*3)*(7+e.open*14)+Math.cos(u*15-t*.17+z*4)*5);
-    const wavefront=Math.exp(-Math.pow((z-j.motion.kickAge*.85)/.19,2))*m.spring*21;
-    line.push([x+Math.sin(z*3+u*2)*e.twist*z*19,66-z*(91+e.depth*39)-terrain-Math.sqrt(sample(history,u))*13-wavefront,r]);
-   }grid.push(line);
-  }
-  for(let r=rows-1;r>=0;r--){
-   const z=r/(rows-1),c=color(4,.08+(1-z)*.5,j),line=grid[r];
-   if(r>0)for(let i=0;i<cols;i+=2)s.face([line[i],line[i+2],grid[r-1][i+2],grid[r-1][i]],c,.075);
-   path(s,line,c,r===0?1:.55,.36+(1-z)*.5,j,z*2);
-  }
-  const cx=64*Math.sin(t*.065)+m.balance*8,cy=-65,r=12+m.bass*3,pts=circle(r,cx,cy);
-  s.face(pts,color(4,.85,j),.13);path(s,pts,color(4,1,j),.7,.68,j);
- }
  function petals(s,w,j){
   const t=j.travel,m=j.motion,e=evolution(j);
   for(let petal=0;petal<8;petal++){
-   const angle=petal/8*TAU+t*.11+m.snap*.1,center=28+e.open*23+m.spring*25+m.bass*10;
+   const g=m.dance?.at(petal,0)||0,answer=m.dance?.at((petal+1)%8,.28)||0;
+   const angle=petal/8*TAU+t*.11+m.snap*.1+(g-answer)*.2,center=28+e.open*23+m.spring*25+m.bass*10+answer*10;
    const width=20+e.contour*18+m.mid*8,height=6+e.open*10+m.width*4;
    const contours=[];
    for(let layer=0;layer<4;layer++){
     const pts=[],scale=1-layer*.16;
     for(let i=0;i<=64;i++){
      const a=i/64*TAU,px=Math.cos(a)*width*scale,py=Math.sin(a)*height*scale;
-     const leaf=rot([px,py,Math.sin(a)*e.depth*14],e.twist*.75,e.depth*.5, e.twist*.6);
+     const leaf=rot([px,py,Math.sin(a)*e.depth*14],e.twist*.75+g,e.depth*.5+answer*.5, e.twist*.6);
      const p=rot([center+leaf[0],leaf[1],leaf[2]+Math.sin(petal/8*TAU+e.twist)*e.depth*28],Math.sin(t*.14)*.25,0,angle);
      pts.push(project([p[0]*1.45,p[1],p[2]]));
     }contours.push(pts);
@@ -199,58 +134,6 @@
    for(let layer=0;layer<4;layer++)path(s,contours[layer],c,layer===0?1:.45,layer===0?.85:.4,j,petal*.7+layer*.22);
   }
  }
- function architecture(s,w,j){
-  const t=j.travel,m=j.motion,e=evolution(j),towers=[];
-  const pose=p=>project(rot(p,-.25-e.depth*.4,.2+Math.sin(t*.12)*.13+m.balance*.12,0));
-  // Two staggered banks, one tower per register. Foreground is current sound;
-  // the quieter rear bank carries recent phrasing. No duplicate face outlines.
-  for(let row=0;row<2;row++)for(let voice=0;voice<8;voice++){
-   const index=row*8+voice,u=voice/7,band=sample(w.bands,u),current=m.presenceVoices?.[voice]??m.voices?.[voice]??Math.sqrt(band);
-   const local=row===0?current:(j.space?j.space.at(voice,.65,current):current);
-   const height=9+local*(row===0?90:48)+Math.sqrt(band)*6;
-   const kick=row===0?m.spring*20:0;
-   const spread=30+e.open*3,stereo=m.voiceWidths?.[voice]||m.width;
-   const center=[(voice-3.5)*spread+(row===1?12:0)+(m.voiceBalances?.[voice]||0)*3,row===0?57:12,
-    row===0?-32:38+e.depth*15+stereo*5],pts=[];
-   for(const dy of [0,-height-kick])for(const [dx,dz] of [[-7,-5],[7,-5],[7,5],[-7,5]])
-    pts.push(pose([center[0]+dx+dy*e.twist*.12,center[1]+dy,center[2]+dz]));
-   towers.push({pts,index,row,c:color(6,.08+voice*.07,j),local,center,height,z:center[2]});
-  }
-  towers.sort((a,b)=>b.z-a.z);
-  for(const {pts,c,index,row,local,center,height} of towers){
-   const alpha=row===0?.64:.3;
-   for(const [side,ids] of [[0,[4,5,6,7]],[1,[0,1,5,4]],[2,[1,2,6,5]]])
-    s.face(ids.map(i=>pts[i]),c,alpha,`city-${index}-${side}`);
-   path(s,[0,1,2,6,7,4,0].map(i=>pts[i]),c,row===0?1:.78,row===0?.95:.58,j,index*.22,`city-outline-${index}`);
-   path(s,[1,5,4].map(i=>pts[i]),c,.42,.36,j,index*.22,`city-seam-${index}`);
-   path(s,[pts[5],pts[6]],c,.42,.36,j,index*.22,`city-crown-${index}`);
-   if(row===0){
-    const a=pose([center[0],center[1]-height*.22,center[2]-5.1]);
-    const b=pose([center[0],center[1]-height*(.22+local*.5),center[2]-5.1]);
-    s.line(a,b,color(6,1,j),.55,.38+local*.24,`city-register-${index}`);
-   }
-  }
- }
- function choreography(s,w,j){
-  const t=j.travel,m=j.motion,e=evolution(j);
-  for(let dancer=0;dancer<2;dancer++){
-   const lines=[];
-   for(let lane=0;lane<3;lane++){
-    const pts=[],offset=(lane-1)*2.1;
-    for(let i=0;i<=128;i++){
-     const u=i/128*TAU,phase=t*.58+dancer*Math.PI;
-     const x=mix(Math.sin(u+phase),Math.sin(u*2+phase),e.contour)*(69+m.width*19+m.spring*27)+Math.sin(u*3-phase*.7)*12;
-     const y=mix(Math.cos(u*2+phase*.6),Math.cos(u*3+phase*.6),e.open)*(32+m.mid*11)+Math.sin(u+phase)*8+offset;
-     pts.push(project(rot([x,y,Math.sin(u*2+phase)*(10+e.depth*40)],Math.sin(t*.12)*.18+e.twist*.25,t*.08+m.snap*.04)));
-    }lines.push(pts);
-   }
-   const c=color(7,dancer===0?.3:1,j);
-   for(let i=0;i<128;i++)s.face([lines[0][i],lines[0][i+1],lines[2][i+1],lines[2][i]],c,.15);
-   for(let lane=0;lane<3;lane++)path(s,lines[lane],c,lane===1?1.0:.45,lane===1?.9:.42,j,dancer*2+lane*.18);
-  }
- }
- // A suspended architectural membrane. Frequency history is its relief, while
- // low-end pressure bows the whole grid and sends a physical wave outwards.
  function lattice(s,w,j){
   const t=j.travel,m=j.motion,e=evolution(j),grid=[],rows=13,cols=16;
   for(let row=0;row<rows;row++){
@@ -260,7 +143,7 @@
     const radius=Math.hypot((u-.5)*1.5,v-.5),edge=Math.sin(u*Math.PI)*Math.sin(v*Math.PI);
     const pressure=Math.cos(radius*5-e.open*2)*(12+m.bass*23+m.spring*64);
     const relief=(Math.sqrt(sample(history,u))-.25)*(18+m.snap*17);
-    const y=(Math.sin(u*TAU+e.twist)*Math.cos(v*Math.PI)*(6+e.contour*24)+pressure+relief)*edge;
+    const y=(Math.sin(u*TAU+e.twist)*Math.cos(v*Math.PI)*(6+e.contour*24)+pressure+relief+(m.dance?.at(u*7,v)||0)*26)*edge;
     line.push(project(rot([x,y,z+Math.sin(u*Math.PI)*e.twist*25],.67+e.depth*.24,e.twist*.23,Math.sin(t*.12)*.09),.88));
    }grid.push(line);
   }
@@ -276,43 +159,13 @@
   for(const [r,c,dr,dc] of [[0,0,1,1],[0,cols,1,-1],[rows-1,0,-1,1],[rows-1,cols,-1,-1]])
    path(s,[grid[r+dr][c],grid[r][c],grid[r][c+dc]],color(8,1,j),1.6,.9,j,r+c,`lattice-corner-${r}-${c}`);
  }
- // Eight frequency voices form separated, clean waveform sheets. Local waveform
- // displacement is separate from their slow folding and stereo separation.
- function waveformLoom(s,w,j){
-  const t=j.travel,m=j.motion,e=evolution(j),sheets=[];
-  for(let lane=0;lane<8;lane++){
-   const edges=[[],[]],voice=m.presenceVoices?.[lane]??m.voices?.[lane]??Math.sqrt(sample(w.bands,lane/7));
-   const offset=(lane-3.5)*(11+e.open*2),z=(lane-3.5)*(7+e.depth*7+(m.voiceWidths?.[lane]||0)*3);
-   const localPhase=m.flowPhases?.[lane]||t,pan=m.voiceBalances?.[lane]||0;
-   for(let i=0;i<=96;i++){
-    const u=i/96,env=Math.sin(u*Math.PI),phase=u*TAU*(.8+e.contour*.7)+t*.24;
-    const amplitude=4+voice*37+m.spring*23;
-    const memory=j.space?j.space.at(lane,(1-u)*2.4,voice):voice;
-    const wave=(sample(w.wave,u-.012)+sample(w.wave,u)*2+sample(w.wave,u+.012))/4;
-    const articulation=Math.sin(u*TAU*1.5+localPhase*.24)*voice*5+(memory-voice)*9;
-    const y=offset+Math.sin(phase)*env*amplitude+articulation*env+wave*env*(1+m.snap*2);
-    const x=(u-.5)*(282+m.width*15)+Math.cos(phase)*env*e.twist*6+pan*env*3;
-    const fold=z+Math.sin(u*TAU+t*.08)*env*(8+e.depth*14);
-    for(let edge=0;edge<2;edge++)edges[edge].push(project(rot([x,y+(edge-.5)*(2.6+voice*4)*env,fold],e.twist*.16,e.twist*.06),.88));
-   }
-   sheets.push({edges,lane,z});
-  }
-  sheets.sort((a,b)=>b.z-a.z);
-  for(const {edges,lane} of sheets){
-   const c=color(9,.12+lane*.075,j);
-   for(let i=0;i<96;i++)s.face([edges[0][i],edges[0][i+1],edges[1][i+1],edges[1][i]],c,.46,`loom-sheet-${lane}-${i}`);
-   path(s,edges[0],c,lane===3?1.2:.82,lane===3?.98:.86,j,lane*.55,`loom-edge-${lane}-0`);
-   path(s,edges[1],c,.32,.25,j,lane*.55,`loom-edge-${lane}-1`);
-  }
- }
- // A double helix with spectrum-bearing rungs. Coil radius carries kick mass;
- // pitch and cross-section evolve continuously instead of rotating a rigid DNA.
+ // Paired rails exchange torsion along the same connected helix rungs.
  function helix(s,w,j){
   const t=j.travel,m=j.motion,e=evolution(j),strands=[];
   for(let strand=0;strand<2;strand++){
    const rails=[[],[],[]];
    for(let i=0;i<=120;i++){
-    const u=i/120,env=.68+.32*Math.sin(u*Math.PI),a=u*TAU*(1.35+e.contour*1.1)+strand*Math.PI+t*.3;
+    const u=i/120,env=.68+.32*Math.sin(u*Math.PI),a=u*TAU*(1.35+e.contour*1.1)+strand*Math.PI+t*.3+(m.dance?.at(u*7,u)||0)*.9;
     const voice=Math.min(7,Math.floor(u*8)),local=m.presenceVoices?.[voice]??m.voices?.[voice]??m.mid;
     const radius=(21+e.open*13+m.bass*8+m.spring*29+local*7)*env;
     const wave=(sample(w.wave,u-.02)+sample(w.wave,u)+sample(w.wave,u+.02))/3*(2+m.snap*6),axis=(u-.5)*(250+m.width*22);
@@ -338,7 +191,7 @@
  function shell(s,w,j){
   const t=j.travel,m=j.motion,e=evolution(j),major=31+e.open*24+m.spring*34+m.bass*9,minor=16+(1-e.open)*19+m.mid*5;
   const point=(a,b)=>{
-   const turn=b+Math.sin(a)*e.twist*.85,power=.55+e.contour*.45;
+   const turn=b+Math.sin(a)*e.twist*.85+(m.dance?.at((.5+.5*Math.sin(a))*7,.5-.5*Math.cos(b))||0)*.65,power=.55+e.contour*.45;
    const signed=x=>Math.sign(x)*Math.pow(Math.abs(x),power);
    const ripple=1+Math.cos(a*3+e.twist)*e.contour*.12;
    const r=(major+signed(Math.cos(turn))*minor)*ripple;
@@ -361,14 +214,15 @@
    }
   }
  }
- const renderers=[prism,interference,orbit,crystal,dunes,petals,architecture,choreography,lattice,waveformLoom,helix,shell];
- renderers.push(...Spirits.create({TAU,mix,color,path,project,rot,evolution}));
+ const designs=Designs.create({TAU,mix,color,path,project,rot,evolution});
+ const renderers=[prism,designs.vortex,orbit,designs.folded,designs.aurora,petals,
+  designs.knot,designs.medusa,lattice,designs.mandala,helix,shell];
  // A coherent displacement field lets every authored silhouette carry the
  // sustained spectrum. Identical points stay joined, including facet edges;
  // it never invents an onset, advances a clock, or changes primitive identity.
  // Local musical motion is subordinate to the scene's authored silhouette.
  // Fluid contours can bend farther than rigid towers or recognizable animals.
- const bendLimits=[6,9,5,3,7,5,2,8,6,4.5,6,5,4,3,3,2.5,3];
+ const bendLimits=[6,9,5,4,7,5,6,8,6,4.5,6,5];
  function flowingPoint(p,m,stage){
   if(!m.strings)return p;
   const x=p[0],y=p[1],z=p[2]||0,u=(x+180)/360,lane=(y+85)/170*7;

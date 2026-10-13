@@ -78,6 +78,16 @@ class ReplayTrimTests(unittest.TestCase):
         self.assertEqual(hashlib.sha256(self.source.read_bytes()).hexdigest(), self.original)
         self.assertEqual(list(self.root.rglob("*.partial")), [])
 
+    def test_review_cut_inherits_intent_notes_and_personal_fields(self):
+        library.remember_capture(self.source,purpose='review_later',tag='escape')
+        data=library.read();data['clips'][library.clip_id(self.source)].update(notes='Interesting later',custom={'personal':True});library._write(data)
+        result=self.cut();self.assertEqual(result['status'],'ready')
+        meta=library.read()['clips'][library.clip_id(result['path'])]
+        self.assertEqual((meta['purpose'],meta['review_state'],meta['notes'],meta['tag']),('review_later','pending','Interesting later','escape'))
+        self.assertEqual(meta['custom'],{'personal':True})
+        self.assertEqual(library.replay_paths([result['path']]),[])
+        self.assertEqual(hashlib.sha256(self.source.read_bytes()).hexdigest(),self.original)
+
     def test_encoder_failure_does_not_publish_partial_clip(self):
         with patch.object(replay_trim, "_duration", return_value=4), \
              patch.object(replay_trim.jobs, "run", return_value=subprocess.CompletedProcess([], 1)):

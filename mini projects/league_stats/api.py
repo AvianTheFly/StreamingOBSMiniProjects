@@ -38,12 +38,18 @@ def export(**filters):
     return provider().export(**filters)
 
 
+def postgame():
+    return provider().postgame_report()
+
+
 def save(patch):
     return provider().save_settings(patch)
 
 
 def action(key, body):
     tracker = provider()
+    if key=='postgame-control':
+        return tracker.control_postgame(body)
     if key=='import':
         return tracker.request_import()
     if key=='enrichment':

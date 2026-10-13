@@ -9,10 +9,11 @@
   const presence=m.pacing.sustainedPresence??m.pacing.presence;
   // Immediate expansion belongs to a measured low-frequency attack. The
   // released spring moves local structure; it cannot invert the onset's size.
-  return .96+presence*.16+m.kick*.09+Math.max(0,m.spring)*.025;
+  return 1.20+presence*.16+m.kick*.09+Math.max(0,m.spring)*.025;
  }
  function compose(sink,world,journey){
   const camera=VisualDepth.camera(journey);
+  const articulation=typeof VisualArticulation!=='undefined'?VisualArticulation.create(journey.motion):null;
   const decorate=target=>{
    // Preserve space around metadata and give every stage a gradual edge exit.
    const expression=journey.motion.pacing;
@@ -26,15 +27,24 @@
     return camera([x*cos-y*sin+m.balance*5,x*sin+y*cos+expression.release*4-m.spring*26+m.kick*4+vibration*.7,
      (p[2]||0)*(.75+expression.fullness*.3+expression.expanse*.15)]);
    };
-   const grade=c=>c.map((v,i)=>v*(1-journey.warmth*.05)+[1,.7,.43][i]*journey.warmth*.05);
-   const ink=.20+.80*Math.pow(journey.energy,.45),surfaceInk=.15+.85*Math.pow(journey.energy,.7);
+   const sample=p=>articulation?articulation.sample(p):{point:p,presence:0,light:0};
+   const grade=(c,light=0)=>c.map((v,i)=>Math.min(1,(v*(1-journey.warmth*.05)+[1,.7,.43][i]*journey.warmth*.05)*(.8+light*.75)));
+   // Keep the authored sculpture readable over live game footage. Musical
+   // intensity still lifts coverage; the drawing floor is not an audio gain.
+   const ink=.50+.50*Math.pow(journey.energy,.45),surfaceInk=.45+.55*Math.pow(journey.energy,.7);
    const adapter={
-    line(a,b,c,width,alpha,key){target.line(point(a),point(b),grade(c),width,
-     Math.min(.98,alpha*1.35)*ink*(width<.7?.35+expression.fullness*.5:1),key);},
-    face(points,c,alpha,key){const posed=points.map(point);target.face(posed,grade(c),Math.min(.88,alpha*1.5)*surfaceInk,key);}
+    line(a,b,c,width,alpha,key){const aa=sample(a),bb=sample(b),light=(aa.light+bb.light)/2;
+     target.line(point(aa.point),point(bb.point),grade(c,light),width*(1+light*.45),
+     Math.min(.98,alpha*1.35*(.8+light*.7))*ink*(width<.7?.35+expression.fullness*.5:1),key);},
+    face(points,c,alpha,key){const posed=points.map(sample),light=posed.reduce((s,p)=>s+p.light,0)/posed.length;
+     target.face(posed.map(p=>point(p.point)),grade(c,light),Math.min(.88,alpha*1.5*(.75+light*.85))*surfaceInk,key);}
    };
-   if(target.stroke)adapter.stroke=(points,colors,widths,alphas,key)=>target.stroke(points.map(point),colors.map(grade),widths,
-    alphas.map((a,i)=>Math.min(.98,a*1.45)*ink*(widths[i]<.7?.35+expression.fullness*.5:1)),key);
+   if(target.stroke)adapter.stroke=(points,colors,widths,alphas,key)=>{
+    const posed=points.map(sample);
+    target.stroke(posed.map(p=>point(p.point)),colors.map((c,i)=>grade(c,posed[i].light)),
+     widths.map((w,i)=>w*(1+posed[i].light*.45)),
+     alphas.map((a,i)=>Math.min(.98,a*1.45*(.8+posed[i].light*.7))*ink*(widths[i]<.7?.35+expression.fullness*.5:1)),key);
+   };
    return adapter;
   };
   VisualDepth.render(decorate(sink),world,journey);
@@ -48,7 +58,7 @@
    if(!this.gl)throw Error('WebGL2 unavailable');
    this.resources=[];this.vertices=new Float32Array(CAPACITY*STRIDE);this.ordered=new Float32Array(CAPACITY*STRIDE);
    this.strokeSides=new Float64Array((CAPACITY/6+1)*5);
-   this.commands=[];this.count=0;this.frames=0;this.lost=false;this.disposed=false;
+   this.commands=[];this.commandPool=[];this.drawOrder=[];this.upload=null;this.count=0;this.frames=0;this.lost=false;this.disposed=false;
    this.coverageCopies=true;
    this.onLost=e=>{e.preventDefault();this.lost=true;};this.onRestore=()=>this.dispose();
    this.canvas.addEventListener('webglcontextlost',this.onLost);this.canvas.addEventListener('webglcontextrestored',this.onRestore);
@@ -128,16 +138,19 @@
    this.vertices[i++]=z;this.vertices[i]=material;
   }
   batch(start,z,kind=1){
-   if(this.count>start)this.commands.push({start,end:this.count,z,kind});
+   if(this.count<=start)return;
+   const i=this.commands.length;if(i>=CAPACITY/3)throw Error('Stage command capacity exceeded');
+   const q=this.commandPool[i]||(this.commandPool[i]={start:-1,end:-1,z:0,kind:0,ordinal:i,data:null});
+   if(q.start!==start||q.end!==this.count){q.start=start;q.end=this.count;q.data=this.vertices.subarray(start*STRIDE,this.count*STRIDE);}
+   q.z=z;q.kind=kind;this.commands.push(q);
   }
   line(a,b,c,width,alpha){
    if(alpha<.002)return;const dx=b[0]-a[0],dy=b[1]-a[1],length=Math.hypot(dx,dy);
    if(length<.001)return;
    const start=this.count;
    const nx=-dy/length*width,ny=dx/length*width;
-   const p=[a[0]-nx,a[1]-ny,a[2]||0],q=[a[0]+nx,a[1]+ny,a[2]||0],r=[b[0]-nx,b[1]-ny,b[2]||0],s=[b[0]+nx,b[1]+ny,b[2]||0];
-   this.vertex(p,c,alpha,-1);this.vertex(q,c,alpha,1);this.vertex(r,c,alpha,-1);
-   this.vertex(r,c,alpha,-1);this.vertex(q,c,alpha,1);this.vertex(s,c,alpha,1);
+   this.vertexValues(a[0]-nx,a[1]-ny,a[2]||0,c,alpha,-1);this.vertexValues(a[0]+nx,a[1]+ny,a[2]||0,c,alpha,1);this.vertexValues(b[0]-nx,b[1]-ny,b[2]||0,c,alpha,-1);
+   this.vertexValues(b[0]-nx,b[1]-ny,b[2]||0,c,alpha,-1);this.vertexValues(a[0]+nx,a[1]+ny,a[2]||0,c,alpha,1);this.vertexValues(b[0]+nx,b[1]+ny,b[2]||0,c,alpha,1);
    this.batch(start,((a[2]||0)+(b[2]||0))/2);
   }
   stroke(points,colors,widths,alphas,key,copies=1){
@@ -171,9 +184,9 @@
   }
   face(points,c,alpha,key,copies=1){
    for(let i=1;i<points.length-1;i++){
-    const start=this.count,triangle=[points[0],points[i],points[i+1]];
-    for(const p of triangle)this.vertex(p,c,alpha,0,copies,1);
-    this.batch(start,triangle.reduce((v,p)=>v+(p[2]||0)/3,0),0);
+    const start=this.count,a=points[0],b=points[i],cPoint=points[i+1];
+    this.vertex(a,c,alpha,0,copies,1);this.vertex(b,c,alpha,0,copies,1);this.vertex(cPoint,c,alpha,0,copies,1);
+    this.batch(start,((a[2]||0)/3+(b[2]||0)/3)+(cPoint[2]||0)/3,0);
    }
   }
   paint(ctx,world,journey){
@@ -181,8 +194,12 @@
    this.count=0;this.commands.length=0;const lens=compose(this,world,journey);
    // Transparent facets and contours share one back-to-front order. Far-side
    // lines no longer float over the front of a sculpture. Buffers stay fixed.
-   this.commands.sort((a,b)=>b.z-a.z||a.kind-b.kind);let offset=0;
-   for(const q of this.commands){const data=this.vertices.subarray(q.start*STRIDE,q.end*STRIDE);this.ordered.set(data,offset);offset+=data.length;}
+   // Keep the previous ordering as the next sort's starting point. Depth still
+   // changes every paint; original insertion order explicitly resolves ties.
+   // This preserves transparent overlap while reusing the nearly sorted list.
+   if(this.drawOrder.length!==this.commands.length)this.drawOrder=this.commands.slice();
+   this.drawOrder.sort((a,b)=>b.z-a.z||a.kind-b.kind||a.ordinal-b.ordinal);let offset=0;
+   for(const q of this.drawOrder){this.ordered.set(q.data,offset);offset+=q.data.length;}
    const gl=this.gl;gl.viewport(0,0,WIDTH,HEIGHT);gl.clear(gl.COLOR_BUFFER_BIT);
    gl.useProgram(this.program);gl.bindVertexArray(this.vao);gl.bindBuffer(gl.ARRAY_BUFFER,this.buffer);
    gl.uniform3f(this.lensState,lens.focal,lens.framing,lens.pivot);
@@ -190,13 +207,16 @@
    gl.uniform4f(this.materialState,journey.motion.tonal,journey.motion.balance,journey.motion.high,journey.travel);
    gl.uniform3f(this.textureState,(journey.motion.roughness||0)*journey.motion.body,
     (journey.motion.grain||0)*journey.motion.body,journey.motion.texturePhase||0);
-   gl.bufferSubData(gl.ARRAY_BUFFER,0,this.ordered.subarray(0,this.count*STRIDE));gl.drawArrays(gl.TRIANGLES,0,this.count);
+   if(!this.upload||this.upload.length!==this.count*STRIDE)this.upload=this.ordered.subarray(0,this.count*STRIDE);
+   gl.bufferSubData(gl.ARRAY_BUFFER,0,this.upload);gl.drawArrays(gl.TRIANGLES,0,this.count);
    if(ctx)ctx.drawImage(this.canvas,-200,-110,400,220);this.frames++;return true;
   }
   dispose(){
    if(this.disposed)return;this.disposed=true;
    this.canvas.removeEventListener('webglcontextlost',this.onLost);this.canvas.removeEventListener('webglcontextrestored',this.onRestore);
    for(const [kind,resource] of this.resources)this.gl['delete'+kind](resource);this.resources.length=0;
+   this.commands.length=this.commandPool.length=this.drawOrder.length=0;this.upload=null;
+   this.vertices=this.ordered=this.strokeSides=null;
   }
   status(){return {available:!this.disposed&&!this.lost,frames:this.frames,resources:this.resources.length,vertices:this.count,capacity:CAPACITY,resolution:[WIDTH,HEIGHT],direct:this.direct,bloom:false};}
  }

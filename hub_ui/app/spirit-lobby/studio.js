@@ -5,7 +5,7 @@ import {PartyStudio} from './party-studio.js';
 const form=document.querySelector('#controls'),preview=document.querySelector('#preview'),url=document.querySelector('#url');
 let paused=false;
 const initial=readConfig();if(initial.quality==='high')initial.quality='standard';
-for(const name of ['mode','party','title','subtitle','energy','palette','background','speed','quality','penguinOpacity','leftTitle','leftSubtitle','rightTitle','rightSubtitle'])form.elements[name].value=initial[name];
+for(const name of ['mode','party','title','subtitle','energy','palette','speed','quality','penguinOpacity','leftTitle','leftSubtitle','rightTitle','rightSubtitle'])form.elements[name].value=initial[name];
 function update(){
   const params=new URLSearchParams(new FormData(form));const link=new URL('index.html',location.href);link.search=params.toString();
   document.querySelector('#open').href=link.href;

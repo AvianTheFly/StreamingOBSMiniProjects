@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import os
 import time
+from lib.process_inventory import process_snapshot
 
 PROCESS_NAMES = frozenset({'python.exe', 'pythonw.exe', 'py.exe', 'python',
                            'python3', 'ffmpeg.exe', 'ffprobe.exe', 'ffmpeg', 'ffprobe',
@@ -15,33 +16,35 @@ PROCESS_NAMES = frozenset({'python.exe', 'pythonw.exe', 'py.exe', 'python',
 
 
 class ProcessMetrics:
-    def __init__(self, *, clock=time.monotonic):
+    def __init__(self, *, clock=time.monotonic, snapshot=process_snapshot):
         self._clock = clock
         self._scan_at = 0.0
         self._tracked = {}
+        self._snapshot = snapshot
 
     def sample(self, psutil):
         now = self._clock()
         if now >= self._scan_at:
             found = {}
-            for process in psutil.process_iter(['pid', 'name', 'ppid', 'create_time']):
-                info = process.info
-                name = (info['name'] or '').lower()
+            for entry in self._snapshot():
+                name = entry.name.lower()
                 if name not in PROCESS_NAMES:
                     continue
-                identity = (process.pid, info['create_time'])
-                previous = self._tracked.get(identity)
-                if previous is not None and previous['process'].is_running():
-                    found[identity] = previous
-                    continue
                 try:
+                    process = psutil.Process(entry.pid)
+                    identity = (process.pid, process.create_time())
+                    previous = self._tracked.get(identity)
+                    if previous is not None and previous['process'].is_running():
+                        previous['threads'] = entry.threads
+                        found[identity] = previous
+                        continue
                     process.cpu_percent()  # Prime: the first reading is unknown.
                     found[identity] = dict(process=process, name=name,
-                                           ppid=info['ppid'], primed=False)
+                                           ppid=entry.parent, threads=entry.threads, primed=False)
                 except (psutil.NoSuchProcess, psutil.AccessDenied, OSError):
                     continue
             self._tracked = found
-            self._scan_at = now + 5
+            self._scan_at = self._clock() + 5
         cores = psutil.cpu_count() or 1
         rows = []
         for identity, tracked in list(self._tracked.items()):
@@ -54,7 +57,7 @@ class ProcessMetrics:
                         is_hub=process.pid == os.getpid(), cpu_percent=cpu,
                         machine_cpu_percent=round(cpu / cores, 2) if cpu is not None else None,
                         rss_mb=round(process.memory_info().rss / 1048576, 1),
-                        threads=process.num_threads()))
+                        threads=tracked['threads']))
                 tracked['primed'] = True
             except (psutil.NoSuchProcess, psutil.AccessDenied, OSError):
                 self._tracked.pop(identity, None)

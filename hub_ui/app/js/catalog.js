@@ -27,7 +27,7 @@ export function icon(name, className = '') {
 }
 export const FEATURES = {
   twitch_commands: { label: 'Chat commands', icon: 'chat', group: 'Automatic & community', description: 'Edit your Twitch replies, aliases, permissions and cooldowns.', keywords: 'bot opgg discord commands twitch' },
-  instant_replay: { label: 'Replay studio', icon: 'replay', group: 'Clips & media', description: 'Save moments, preview clips and build highlights.', keywords: 'instant replay recording trim clip' },
+  instant_replay: { label: 'Manage clips', icon: 'replay', group: 'Clips & media', description: 'Trim clips, add notes and build montages.', keywords: 'instant replay recording trim clip montage compilation' },
   starting_soon: { label: 'Starting soon', icon: 'play', group: 'On screen', description: 'Set the mood with a waiting room and clip playlist.' },
   specific_song: { label: 'Music', icon: 'music', group: 'Clips & media', description: 'Find a song, play it and manage your music library.' },
   soundboard: { label: 'Soundboard', icon: 'soundboard', group: 'Clips & media', description: 'Trigger your sounds and effects. Edit keys and phrases.' },

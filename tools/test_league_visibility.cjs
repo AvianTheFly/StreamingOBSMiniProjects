@@ -11,7 +11,7 @@ const root=path.resolve(__dirname,'../mini projects/league_api/production/web');
    const p=new URL(route.request().url()).pathname;
    if(p==='/')return route.fulfill({contentType:'text/html',body:'<div id="stage"></div><script type="module">import "/overlay.js";import "/match-screens.js";</script>'});
    if(p.startsWith('/match-art/'))return route.fulfill({contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080"><rect width="1920" height="1080" fill="red"/></svg>'});
-   if(p==='/scene.js')return route.fulfill({contentType:'text/javascript',body:'window.calls={draws:0,clears:0};export class ProductionScene{constructor(){this.ready=Promise.resolve();}draw(s){calls.draws++;calls.last=s;}clear(){calls.clears++;}}'});
+   if(p==='/scene.js')return route.fulfill({contentType:'text/javascript',body:'import {StanceAccent} from "./stance-accent.js";window.calls={draws:0,clears:0};export class ProductionScene{constructor(){this.ready=Promise.resolve();this.stanceAccent=new StanceAccent();}draw(s){calls.draws++;calls.last=s;}clear(){calls.clears++;}}'});
    return route.fulfill({contentType:'text/javascript',body:fs.readFileSync(path.join(root,path.basename(p)))});
   });
   await page.goto('http://visibility.test/');await page.waitForFunction(()=>window.leagueMatchScreens);

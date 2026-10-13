@@ -31,7 +31,7 @@
           "label": "Remember kill / death anchor",
           "owner": "instant_replay",
           "kind": "action",
-          "detail": ""
+          "detail": "Kills up to 30 seconds apart share the first-kill anchor. Highlights retain 30 seconds before that first kill, or before a death when no kill anchor applies."
         },
         {
           "id": "2",
@@ -42,7 +42,7 @@
         }
       ],
       "owner_hashes": {
-        "instant_replay": "34090057aa047e80f8a4d0d71804534029b2633b116c443ba6979773f529b533"
+        "instant_replay": "1067a8f9ab3dfc22ac30675c89073576bd403c559800328cfe9e7c5a87a06101"
       },
       "edges": [
         {
@@ -79,7 +79,7 @@
         "event": "replay.save",
         "kind": "event"
       },
-      "detail": "Replay-only and serious captures keep the original voice trigger timestamp for their cutoff. Controls are published after startup and withdrawn by their own runtime generation.",
+      "detail": "Voice captures preserve their original trigger cutoff. Mark is a new independent review save, never a start point for a later save. Controls are published after startup and withdrawn by their runtime generation.",
       "steps": [
         {
           "id": "0",
@@ -93,7 +93,7 @@
           "label": "Choose capture purpose and duration",
           "owner": "instant_replay",
           "kind": "gate",
-          "detail": "Replay only: 3–120 seconds, default 15. Serious: explicit duration → mark → kill → death → buffer."
+          "detail": "Replay only: 3–120 seconds, default 15. Spoken mark via |: last 60 seconds by default, explicit 3–120 or full buffer. Highlight: explicit duration → kill → death → buffer, with 30-second pre-roll for kills and deaths. OBS stores 75 seconds for a useful minute plus voice/save headroom."
         },
         {
           "id": "2",
@@ -107,28 +107,28 @@
           "label": "Request Twitch for serious saves",
           "owner": "twitch_clips",
           "kind": "action",
-          "detail": "Replay-only capture does not call Twitch."
+          "detail": "Only highlight saves request a titled 60-second Twitch clip, passing the optional spoken save tag. Review-later and replay-only captures remain local. One worker and 90-second window coordinate with moderator !clip; chat reuses the existing clip. Twitch failures or short published clips never block the local save."
         },
         {
           "id": "4",
           "label": "Copy replay / encode serious cut",
           "owner": "conversion",
           "kind": "action",
-          "detail": "All audio tracks and originals are retained. Replay only preserves the pending mark."
+          "detail": "All audio tracks and originals are retained. Review-later and replay-only cuts use stream copy; a preceding keyframe can add lead-in."
         },
         {
           "id": "5",
           "label": "Persist purpose and capture result",
           "owner": "instant_replay",
           "kind": "end",
-          "detail": "The small cut and raw copy are excluded from automatic review; success/error feedback is published."
+          "detail": "Both original and cut retain capture purpose. Marked clips enter the pending review queue and never the automatic replay registry. Replay-only files are excluded from future footage review."
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
+        "twitch_clips": "2fde67d62597cc39d8a19e01fc620734354b4fc9b4f2a12c1d71c0d3bc75d287",
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
         "conversion": "b714ec8a6641880ed03bdde834c87c760b5b902d357ffd74361bc6101d768e07",
-        "instant_replay": "34090057aa047e80f8a4d0d71804534029b2633b116c443ba6979773f529b533",
-        "twitch_clips": "6cb4d1a0bfd46acfcee2107dc15ef18af573b5c472fa2821ac55c09974be6e37"
+        "instant_replay": "1067a8f9ab3dfc22ac30675c89073576bd403c559800328cfe9e7c5a87a06101"
       },
       "edges": [
         {
@@ -157,12 +157,17 @@
         {
           "path": "mini projects/instant_replay/capture.py",
           "symbol": "ReplayCapture._on_save",
-          "hash": "3022c2fda809911eb715858aeed5b87a9ffe79396f174ced9b5b873d56f85f11"
+          "hash": "908983acce9e2c2106c2e423781646178c7668719504c24de849357b11924916"
         },
         {
           "path": "mini projects/instant_replay/main.py",
           "symbol": "run",
-          "hash": "7157049cf70046f6ecb6f66cc4515bc4d9b6d2b1472b9e7d35a2183707f9d18b"
+          "hash": "1795059cba727e1608167b6980013adb98577f4e5b0b7297d2a8c9e835d982c5"
+        },
+        {
+          "path": "mini projects/instant_replay/capture.py",
+          "symbol": "ReplayCapture._on_mark",
+          "hash": "c91a45b0b3d28aee4400c64d8d05c2b8545a7dbb328b389fe0f84618593ed122"
         }
       ],
       "effects": [
@@ -170,7 +175,7 @@
           "resource": "clips",
           "intent": "Save a local moment and its capture result",
           "role": "write",
-          "protection": "The capture owner admits one save. Serious captures can request a companion Twitch clip; replay-only capture does not."
+          "protection": "The capture owner admits one save. Only serious highlights request Twitch. Marked files are excluded from automatic replay but remain available for later review."
         },
         {
           "resource": "jobs",
@@ -189,14 +194,14 @@
         "event": "source.playback",
         "kind": "event"
       },
-      "detail": "Explicit replay always selects Quick Replay. Short Move/Wipe/Fade handles entry and owned return; showcase retains its selected full transition. Browser handoff cues keep live/camera visible between clips. Offline and runtime management share the same inventory and linked-copy visibility.",
+      "detail": "Explicit replay always selects Quick Replay. Short Move/Wipe/Fade handles entry and owned return; showcase retains its selected full transition. Browser handoff cues keep live/camera visible between clips. Offline and runtime management share the same inventory and linked-copy visibility. The existing source worker consumes a revision/session-scoped upcoming queue. Random playback publishes six actual next choices and refills until stopped. Drag/drop and buttons edit only upcoming entries; current clips and stale sessions cannot be changed. Final cleanup closes queue admission before releasing the source.",
       "steps": [
         {
           "id": "0",
           "label": "Acquire physical playback gate",
           "owner": "coordination",
           "kind": "action",
-          "detail": " Inventory requests share one fresh directory-metadata snapshot for selection, sorting and file sizes, and one label generation; no long-lived file cache can hide a newly saved or removed replay."
+          "detail": "All automatic latest/tag/highlight/shuffle/game selections apply library eligibility: review-later and set-aside clips are excluded. Explicitly selected paths and saved compilations remain deliberate choices. Inventory requests share a fresh directory snapshot and linked originals are hidden while their cut exists. Trashed clips are excluded from both automatic and deliberate playback. Saved sequences retain their full order; new live additions are limited to 200."
         },
         {
           "id": "1",
@@ -242,10 +247,10 @@
         }
       ],
       "owner_hashes": {
-        "instant_replay": "7f81e6e8026b37cd14c14ce5c1c20dd4ef40b6083b458753fb3e763e0f399928",
+        "media_workers": "430dcd38f7473e0ef7852463e4282093c752c1e3ce682b8b599edad0ed625c55",
         "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
-        "coordination": "3cb5cc7a5fb147f140f611e5961fa688dda4a070ef836d35a446549cc2f5b5bb",
-        "media_workers": "99a1a00f5854b87301b5e62b0837f5e035bf87e45a4552403c603e0e3de1f064"
+        "instant_replay": "1067a8f9ab3dfc22ac30675c89073576bd403c559800328cfe9e7c5a87a06101",
+        "coordination": "75830bfb9b0c501c3bde2e42d470c914410b3e8310d04af7c61f48505744b6d5"
       },
       "edges": [
         {
@@ -277,7 +282,7 @@
         {
           "path": "mini projects/instant_replay/playback.py",
           "symbol": "ReplayPlayback._play_all_clips_sequential",
-          "hash": "0cc20404f3599a8de3edc56fb2d39016b0f42774f3fc5c48f66805f9426a0372"
+          "hash": "65e372cb0d7560ad9e5978211fd24d96de08afca55a1fa514ba5d8239701e6de"
         },
         {
           "path": "mini projects/instant_replay/source_playback.py",
@@ -288,6 +293,26 @@
           "path": "mini projects/instant_replay/inventory.py",
           "symbol": "replay_files",
           "hash": "419d125a5d625fff2d061e1e4e4d66af2d2ca16d44399d11df1f8643c31dddcc"
+        },
+        {
+          "path": "mini projects/instant_replay/selection.py",
+          "symbol": "ReplaySelection._on_play",
+          "hash": "3981f44984fa24e5da7f7ae6c3f20089e5196e011800bde4bc516d55c77d6a31"
+        },
+        {
+          "path": "mini projects/instant_replay/play_queue.py",
+          "symbol": "ReplayQueue.take",
+          "hash": "66bac2c64080f434ec5b54dde8ab83745efe2a5b18fabcdc715cf3cc66a96bd6"
+        },
+        {
+          "path": "mini projects/instant_replay/play_queue.py",
+          "symbol": "ReplayQueue.edit",
+          "hash": "e7a497b532746dc3ee5ac5a8180d31bb8d81997f35e85e992135319b87f2989b"
+        },
+        {
+          "path": "mini projects/instant_replay/play_queue.py",
+          "symbol": "ReplayQueue.close",
+          "hash": "43a392932049a9da00be0f5304b2a40e6c3a0569e987f1af16961bea90908f0a"
         }
       ],
       "effects": [
@@ -339,11 +364,11 @@
         "event": "game.disconnected",
         "kind": "poll"
       },
-      "detail": "",
+      "detail": "The replay tracker reads image-clock running/generation state through the shared game policy, so the ending image start closes the game even while its HTTP API remains reachable. Temporary socket failures do not close a published running match or replay old kill anchors. New generations clear event IDs and anchors. Standalone tracking uses the shared GameStart/GameEnd interpreter. The existing thirty-second archive delay and previous-game clip retention are preserved.",
       "steps": [
         {
           "id": "0",
-          "label": "Detect game disconnected",
+          "label": "Observe the image-clock game ending",
           "owner": "instant_replay",
           "kind": "action",
           "detail": ""
@@ -367,7 +392,7 @@
           "label": "Archive highlight candidates",
           "owner": "instant_replay",
           "kind": "action",
-          "detail": "Replay-only files are excluded. Archived paths retain aliases for the previous-game list."
+          "detail": "Replay-only, review-later and set-aside files are excluded. Archived paths retain aliases for the previous-game list."
         },
         {
           "id": "4",
@@ -378,7 +403,7 @@
         }
       ],
       "owner_hashes": {
-        "instant_replay": "34090057aa047e80f8a4d0d71804534029b2633b116c443ba6979773f529b533"
+        "instant_replay": "1067a8f9ab3dfc22ac30675c89073576bd403c559800328cfe9e7c5a87a06101"
       },
       "edges": [
         {
@@ -402,12 +427,17 @@
         {
           "path": "mini projects/instant_replay/main.py",
           "symbol": "run",
-          "hash": "7157049cf70046f6ecb6f66cc4515bc4d9b6d2b1472b9e7d35a2183707f9d18b"
+          "hash": "1795059cba727e1608167b6980013adb98577f4e5b0b7297d2a8c9e835d982c5"
         },
         {
           "path": "mini projects/instant_replay/cleanup.py",
           "symbol": "run_for_game",
           "hash": "5e257ae67fce1fa39dbc9c3519a60a2fc410466b026f481df84a99850794ab67"
+        },
+        {
+          "path": "mini projects/instant_replay/kill_tracker.py",
+          "symbol": "KillTracker._observe_match",
+          "hash": "94bb2983c2adf14f89f4d4ef558c0a4c44756a546db9dd7af115c328628e5892"
         }
       ],
       "effects": [
@@ -415,7 +445,7 @@
           "resource": "clips",
           "intent": "Archive last-game highlight candidates",
           "role": "write",
-          "protection": "Archive waits 30 seconds. Replay-only files stay excluded; saved files retain their identities.",
+          "protection": "Archive waits 30 seconds. Review-later, replay-only and set-aside files stay excluded; saved files retain their identities.",
           "cases": {
             "normal": {
               "status": "effect",
@@ -436,6 +466,128 @@
           }
         }
       ]
+    },
+    {
+      "id": "instant_replay.review",
+      "label": "Review saved clips",
+      "topic": "Clip desk",
+      "trigger": {
+        "label": "Review, keep or trim a clip",
+        "event": "replay.review",
+        "kind": "control"
+      },
+      "detail": "A thumbnail library and montage gallery allocate one private editor only when selected. Notes and trim drafts guard editor close/navigation. All clips, Favorites and Trash are the primary views; review states and purposes remain separate filters. Delete moves clips to recoverable library Trash and preserves original media, personal metadata and montage membership. The API snapshots settings, serializes the current-entry check with library writes, and removes deleted upcoming entries from the same playback queue. Restore reverses the Trash flag. Private previews never start OBS playback.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Browse thumbnails and save types",
+          "owner": "instant_replay",
+          "kind": "action",
+          "detail": "Only visible cards request cached stills. One selected clip owns its preview and releases playback/polling when closed. Capture availability reads the existing coordinator buffer snapshot; the page offers the public Hub Start replay buffer action when stopped."
+        },
+        {
+          "id": "1",
+          "label": "Prepare local still / preview",
+          "owner": "conversion",
+          "kind": "wait",
+          "detail": "Stills and video share the existing single preview worker, three admitted jobs and shared conversion budget; originals are never changed."
+        },
+        {
+          "id": "2",
+          "label": "Check library revision",
+          "owner": "instant_replay",
+          "kind": "gate",
+          "detail": "Validate every selected path and decision before one atomic mutation; conflicts preserve the pending draft."
+        },
+        {
+          "id": "3",
+          "label": "Keep, set aside or change purpose",
+          "owner": "instant_replay",
+          "kind": "action",
+          "detail": "Set aside preserves the file and can be restored. Keep preserves purpose. Replay-ready promotion is explicit; labels and unknown fields survive."
+        },
+        {
+          "id": "4",
+          "label": "Save a trimmed copy",
+          "owner": "conversion",
+          "kind": "action",
+          "detail": "Optional trim preserves full resolution, every audio track, source purpose and personal metadata. Original retained."
+        },
+        {
+          "id": "5",
+          "label": "Publish the complete catalogue",
+          "owner": "instant_replay",
+          "kind": "end",
+          "detail": "The UI advances its own revision, keeps unsaved notes stable and offers the saved copy when ready."
+        }
+      ],
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        },
+        {
+          "from": "2",
+          "to": "3"
+        },
+        {
+          "from": "3",
+          "to": "4"
+        },
+        {
+          "from": "4",
+          "to": "5"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/instant_replay/library.py",
+          "symbol": "mutate",
+          "hash": "21b8f4c4ec09c934e7004e6e611e381e7c0a948a5723739803c93b4e1a4fe9cd"
+        },
+        {
+          "path": "mini projects/instant_replay/library.py",
+          "symbol": "replay_candidate",
+          "hash": "47addbebcf2656b545f049112140c14da8e5a9ad5068e6454c54ae912cabab6a"
+        },
+        {
+          "path": "mini projects/instant_replay/editing.py",
+          "symbol": "start_trim",
+          "hash": "995f2ea91536eeb87323d98c75092a4de0881ad81f520706c5769a5f7983d57d"
+        },
+        {
+          "path": "hub_ui/replay_media.py",
+          "symbol": "poster",
+          "hash": "9dcaec8a5530ef30b7c58b25ee0d172cad789fdfadf7c6933fcc4c61e5d2d2b8"
+        },
+        {
+          "path": "mini projects/instant_replay/api.py",
+          "symbol": "mutate_library",
+          "hash": "710ac278e87d142c157ebbf770f0ca36419f6298322d1b807b8fd03855915f1c"
+        }
+      ],
+      "effects": [
+        {
+          "resource": "clips",
+          "intent": "Record a reversible review decision or save a shorter copy",
+          "role": "write",
+          "protection": "The atomic library revision protects edits; no review decision deletes or overwrites media."
+        },
+        {
+          "resource": "jobs",
+          "intent": "Prepare visible stills and the selected preview",
+          "role": "write",
+          "protection": "Existing preview worker admits at most three jobs across stills and video and shares the conversion budget."
+        }
+      ],
+      "owner_hashes": {
+        "instant_replay": "1067a8f9ab3dfc22ac30675c89073576bd403c559800328cfe9e7c5a87a06101",
+        "conversion": "b714ec8a6641880ed03bdde834c87c760b5b902d357ffd74361bc6101d768e07"
+      }
     }
   ]
 }

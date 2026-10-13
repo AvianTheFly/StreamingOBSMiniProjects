@@ -4,15 +4,13 @@ import {W,H,readConfig,palettes} from './config.js';
 import {Room} from './room.js';
 import {Lighting} from './lighting.js';
 import {Props} from './props.js';
-import {Projection} from './projection.js';
 import {Celebration} from './celebration.js';
 import {Penguin} from './penguin.js';
 import {ScreenContent} from './screen-content.js';
 import {ActionLink} from './action-link.js';
 import {PartyDirector} from './party-director.js';
-import {drawDisplayFrame} from '../lobby-motion/shared/display-frame.js';
 
-let holes=[[60,180,896,504],[1000,378,444,420],[1460,480,360,225]];
+let holes=[[60,180,896,504],[738,268,444,400],[1460,480,360,225]];
 try{
  const saved=JSON.parse(new URLSearchParams(location.search).get('holes'));
  if(Array.isArray(saved)&&saved.length===3&&saved.every(r=>Array.isArray(r)&&r.length===4&&r.every(Number.isFinite)&&r[0]>=0&&r[1]>=0&&r[2]>=32&&r[3]>=32&&r[0]+r[2]<=W&&r[1]+r[3]<=H))holes=saved;
@@ -20,7 +18,7 @@ try{
 
 const canvas=document.querySelector('#stage'),c=canvas.getContext('2d',{alpha:true});
 let config=readConfig(),frame=0,last=0,time=config.at,ready=false,disposed=false;
-const screens=new ScreenContent(()=>{if(ready&&config.paused)draw();}),room=new Room(),lights=new Lighting(),props=new Props(screens),projection=new Projection(screens),confetti=new Celebration();
+const screens=new ScreenContent(()=>{if(ready&&config.paused)draw();}),room=new Room(),lights=new Lighting(),props=new Props(screens),confetti=new Celebration();
 const penguin=new Penguin();
 const party=new PartyDirector(confetti);
 const actionLink=new ActionLink(cue=>action(cue.action,cue.id));
@@ -32,7 +30,7 @@ function draw(){
   const began=performance.now(),colors=palettes[config.palette],display=screens.effective(config);screens.tick(display);c.setTransform(canvas.width/W,0,0,canvas.height/H,0,0);
   c.clearRect(0,0,W,H);
   if(config.layer!=='foreground'){
-  room.draw(c);projection.render(c,time,display,colors);lights.room(c,time,config.energy,colors);
+  room.draw(c);lights.room(c,time,config.energy,colors);
   props.signs(c,time,display,colors);
   confetti.draw(c,time,colors,'back');
   lights.ball(c,495,143,84,time,colors);lights.ball(c,1428,144,77,time+3,colors);
@@ -55,16 +53,14 @@ function draw(){
     // Accents surround the live camera without passing over the user's face.
     c.save();c.beginPath();c.rect(0,0,W,H);c.rect(...holes[1]);c.clip('evenodd');confetti.draw(c,time,colors);c.restore();
   }
-  // Native layers leave every live desktop/chat pixel clear; full studio keeps
-  // the selected media programs visible inside the authored main display.
-  if(config.layer!=='full'){
-   if(config.layer==='foreground')drawDisplayFrame(c,holes[0],{accent:'#86e5de'});
-   for(const rect of config.layer==='foreground'?holes:[holes[1],holes[2]])c.clearRect(...rect);
-  }
+  // Keyed Parsec video and transparent chat need painted scenery underneath.
+  // Only the upper layer clears their apertures so accents cannot cover them.
+  if(config.layer==='foreground')for(const rect of [holes[1],holes[2]])c.clearRect(...rect);
   canvas.dataset.ready='true';canvas.dataset.time=time.toFixed(3);canvas.dataset.paused=String(config.paused);
   canvas.dataset.paintMs=((Number(canvas.dataset.paintMs)||0)*.9+(performance.now()-began)*.1).toFixed(2);
-  canvas.dataset.screen=screens.choice('main',display);
-  canvas.dataset.screenReady=String(screens.slots.get('main')?.ready||['cosmos','liquid','spirit'].includes(canvas.dataset.screen));
+  canvas.dataset.screen='removed';
+  canvas.dataset.screenReady='false';
+  canvas.dataset.screenMedia=JSON.stringify(Object.fromEntries([...screens.slots].map(([target,slot])=>[target,{id:slot.id,ready:slot.ready}])));
   canvas.dataset.effectCount=String(confetti.instances.length);
   canvas.dataset.effects=JSON.stringify(confetti.instances.map(e=>({id:e.id,kind:e.kind,started:e.started,ends:e.ends})));
   canvas.dataset.party=config.party;

@@ -5,14 +5,13 @@
  'use strict';
  const Motion=typeof module!=='undefined'&&module.exports?require('./music_motion.js'):root.MusicMotion;
  const Space=typeof module!=='undefined'&&module.exports?require('./music_space.js'):root.MusicSpace;
- const names=['Prism drive','Interference silk','Orbit engine','Crystal assembly','Copper dunes','Petal chamber','Signal architecture','Flow choreography',
-  'Resonance lattice','Waveform loom','Phase helix','Morphic shell',
-  'Faerie constellation','Cinder phoenix','Stormclaw bear','Verdant turtle','Sundering ram'];
- const affinity=[.9,.4,.65,.75,.1,.55,.85,.25,.8,.3,.7,.45,.2,.8,.9,.35,.65];
+ const names=['Prism drive','Silk vortex','Orbit engine','Folded light','Aurora falls','Petal chamber','Infinity current','Sonic medusa',
+  'Resonance lattice','Phase mandala','Phase helix','Morphic shell'];
+ const affinity=[.9,.4,.65,.75,.1,.55,.85,.25,.8,.3,.7,.45];
  // Favor comparable silhouettes during transport; less-visited families can
- // still win. This prevents arbitrary tunnel-to-animal tangles dominating a song.
- const neighbours=[[2,5,11],[9,4,7],[0,11,5],[6,8,16],[9,1,8],[11,0,12],[3,8,9],[1,9,12],
-  [6,3,4],[1,10,4],[9,11,13],[5,2,15],[5,7,13],[12,10,14],[16,15,13],[11,14,16],[14,15,3]];
+ // still win. Related contours make handoffs easier to follow during a song.
+ const neighbours=[[2,5,11],[6,4,10],[0,11,5],[4,8,9],[1,3,8],[11,0,7],[1,10,2],[5,11,4],
+  [4,3,9],[5,2,11],[6,1,11],[5,2,7]];
  const clamp=x=>Math.max(0,Math.min(1,Number.isFinite(x)?x:0));
  class Journey{
   constructor(){

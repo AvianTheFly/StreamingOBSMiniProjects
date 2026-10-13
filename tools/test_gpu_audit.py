@@ -11,6 +11,7 @@ from unittest.mock import Mock, patch
 import numpy as np
 
 from lib.performance_monitor import Collector, parse_gpu_csv
+from lib.process_inventory import ProcessEntry
 from shared import VoicePTT
 from voice import listener
 from voice.service import VoiceService
@@ -26,10 +27,11 @@ class AuditTests(unittest.TestCase):
         process.num_threads.return_value = 12
         process.cmdline.side_effect = AssertionError('Never inspect auth-bearing command lines')
         unrelated = Mock(pid=456, info={'pid': 456, 'name': 'unrelated.exe'})
-        module = SimpleNamespace(process_iter=Mock(return_value=[process, unrelated]),
+        module = SimpleNamespace(Process=Mock(return_value=process),
                                  NoSuchProcess=psutil.NoSuchProcess, AccessDenied=psutil.AccessDenied)
         collector = Collector()
-        with patch('lib.performance_monitor.time.monotonic', side_effect=[100, 101, 106]):
+        collector._process_rows = {123: ProcessEntry(123,'League of Legends.exe',0,12),456: ProcessEntry(456,'unrelated.exe',0,1)}
+        with patch('lib.performance_monitor.time.monotonic', side_effect=[100, 100, 101, 106, 106]):
             first = collector._sample_league(module)
             second = collector._sample_league(module)
             third = collector._sample_league(module)
@@ -37,8 +39,10 @@ class AuditTests(unittest.TestCase):
         self.assertEqual(second[0]['cpu_percent'], 240)
         self.assertEqual(third[0]['cpu_percent'], 125)
         self.assertEqual(second[0]['rss_mb'], 20)
-        self.assertEqual(module.process_iter.call_count, 2)
-        module.process_iter.assert_called_with(['pid', 'name'])
+        self.assertEqual(module.Process.call_count, 2)
+        module.Process.assert_called_with(123)
+        self.assertEqual(second[0]['threads'],12)
+        process.num_threads.assert_not_called()
         unrelated.cpu_percent.assert_not_called()
         process.cmdline.assert_not_called()
 
@@ -47,9 +51,10 @@ class AuditTests(unittest.TestCase):
         process = Mock(pid=123, info={'pid': 123, 'name': 'League of Legends.exe'})
         process.oneshot.side_effect = lambda: nullcontext()
         process.memory_info.side_effect = psutil.NoSuchProcess(123)
-        module = SimpleNamespace(process_iter=Mock(return_value=[process]),
+        module = SimpleNamespace(Process=Mock(return_value=process),
                                  NoSuchProcess=psutil.NoSuchProcess, AccessDenied=psutil.AccessDenied)
         collector = Collector()
+        collector._process_rows = {123: ProcessEntry(123,'League of Legends.exe',0,12)}
         with patch('lib.performance_monitor.time.monotonic', return_value=100):
             self.assertEqual(collector._sample_league(module), [])
         self.assertEqual(collector._league_processes, {})

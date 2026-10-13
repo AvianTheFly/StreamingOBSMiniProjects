@@ -17,7 +17,7 @@
         "event": "twitch.chat.message",
         "kind": "browser"
       },
-      "detail": "The overlay renders in its browser. Hub history observes the Hub chat transport, not the rendered browser pixels.",
+      "detail": "The overlay renders in its browser. Hub history observes the Hub chat transport, not the rendered browser pixels. Desktop host discovery shares the one-second process inventory. Pointer polling uses the shared visible transport: one cancellable request, a two-second deadline, no hidden/page-exit requests, and immediate refresh on return. Preview follows local pointer events without OS polling; saved hover and fade behavior remains unchanged. Local 6–7 discoveries use a visibility-scoped Hub SSE subscription. Cards contain a short emoji title and up to three plain-text lines, sharing normal fade/trim settings. Duplicate, expired, malformed and hidden-page deliveries are discarded; previews stay disconnected and teardown releases the subscription. Broadcaster-authored [COMMAND GUIDE] messages receive a static keyboard/COMMAND GUIDE label, reduced content and background opacity, and literal text without animated sticker substitution. Viewer copies and foreign shared-chat messages stay ordinary chat. Guide styling differs from game/joke notices and preserves normal moderation, aging and trim without another timer or transport. Broadcaster-authored 🃏 messages use a separate JOKE label, literal text, 55 percent of normal content opacity and 40 percent of normal card opacity, with no arrival animation. Viewer copies and foreign shared-chat messages stay ordinary chat. The existing message lifetime still controls expiration.",
       "steps": [
         {
           "id": "0",
@@ -31,19 +31,19 @@
           "label": "Match saved sticker phrase",
           "owner": "chat",
           "kind": "gate",
-          "detail": ""
+          "detail": "Apply saved whole-word text substitutions (any casing) before stickers. Saved literal words and phrases stay as text even when a provider code shares the word; expressive aliases and explicit codes remain available without deleting the library. Preserve Twitch-tagged native emote offsets, links and mentions. Replacement text may include saved sticker codes; all substitutions stay overlay-only."
         },
         {
           "id": "2",
           "label": "Render chat / sticker",
           "owner": "obs",
           "kind": "output",
-          "detail": "Browser applies saved font, message/line spacing and content opacity; trims to the saved message limit. Cards stay translucent during pointer readability changes."
+          "detail": "Browser holds each message at its chosen readability, then smoothly fades the whole message over the saved fade duration. Original arrival time survives settings polls; removal cancels its animation. The saved message limit may replace old messages sooner; lobby chat stays persistent."
         }
       ],
       "owner_hashes": {
-        "chat": "a76ca02c6bcf8fa1af177bc783060c1fc8365bf75218708debba02c6e118349b",
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f"
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "chat": "93cf5e5eed46a24f648f33b2e09a52025af5895d41637caadec2db38d8cc7025"
       },
       "edges": [
         {

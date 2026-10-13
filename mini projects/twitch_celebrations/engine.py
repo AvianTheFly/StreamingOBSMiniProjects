@@ -1,5 +1,7 @@
 """Pure scheduling: bounded queue, deduplication, raid priority and shuffled shows."""
 from collections import deque
+import json
+from pathlib import Path
 import random
 import time
 import uuid
@@ -10,7 +12,8 @@ THEMES = {
     'cat': {'title': 'Cosmic Cat Club', 'color': '#70e6de', 'bpm': 120},
     'frog': {'title': 'Frog Fiesta', 'color': '#c5f379', 'bpm': 140},
 }
-KINDS = {'raid': 8, 'follow': 2.2, 'subscribe': 3.8, 'gift': 3.8, 'cheer': 7}
+# Raid duration comes from the feature's measured music score.
+KINDS = {'raid': None, 'follow': 2.2, 'subscribe': 4.8, 'gift': 3.8, 'cheer': 7}
 
 
 def personal_details(kind, details):
@@ -35,6 +38,7 @@ def personal_details(kind, details):
 class Engine:
     def __init__(self, clock=time.monotonic, rng=None):
         self.clock = clock
+        self.raid_scores = json.loads(Path(__file__).with_name('raid_score.json').read_text(encoding='utf-8'))
         self.rng = rng or random.Random()
         self.queue = []
         self.seen = {}
@@ -79,6 +83,8 @@ class Engine:
         item = dict(id=uuid.uuid4().hex, kind=kind, name=str(name).strip()[:48] or 'A lovely human',
                     count=count, theme=theme or self.theme(), duration=KINDS[kind], queued=now,
                     details=personal_details(kind, details))
+        if kind == 'raid':
+            item['duration'] = self.raid_scores[item['theme']]['duration']
         if kind in ('raid', 'subscribe', 'gift'):
             index = next((i for i,x in enumerate(self.queue) if priority[x['kind']] > priority[kind]), len(self.queue))
             self.queue.insert(index, item)

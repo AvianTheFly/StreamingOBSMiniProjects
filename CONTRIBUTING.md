@@ -87,6 +87,10 @@ py -3.11 tools/check_architecture.py
 py -3.11 -X utf8 tools/run_offline_tests.py
 # A focused run accepts unittest module names:
 py -3.11 -X utf8 tools/run_offline_tests.py tools.test_coordination tools.test_shared_state
+# Standalone film/storyboard exports are optional for ordinary Hub changes:
+py -3.11 -X utf8 tools/run_offline_tests.py --include-artifacts
+# Inspect selection without importing tests:
+py -3.11 -X utf8 tools/run_offline_tests.py --list
 ```
 
 The architecture check scans supported runtime modules without importing them.
@@ -105,6 +109,35 @@ Concurrency regressions use events/barriers and disposable settings/media, not
 personal assets or a live OBS connection. Tests for ownership changes should
 cover replacement during cleanup, cancellation before admission, overlapping
 claims, newer intent, and shutdown where relevant.
+
+Tests are evidence about behavior, not an independent source of product
+requirements. Before preserving or adding an assertion, identify the streamer
+or viewer problem it detects. Protect saved data, control feedback, playback,
+scene intent, media integrity and resource cleanup. Use disposable profiles;
+do not require the streamer's real keys, sound lists or sticker choices to match
+a historical setup. Catalog checks should validate supported entries and unique
+identities without freezing the number of effects. Performance comparisons that
+promise unchanged output should compare both current paths on the same input;
+an old pixel or DSP snapshot is not a permanent artistic requirement.
+For a deliberate unchanged-art comparison, `test_supporter_rendering.cjs`
+supports `--capture-followers` and `--compare-followers`. Normal runs do not
+silently enforce a fingerprint left by an earlier review.
+
+The default Python suite covers Hub runtime, installers and Footage Desk.
+The ten standalone `stream_brand` export suites are listed in `ARTIFACT_MODULES`
+in `tools/run_offline_tests.py`; run them explicitly when working on those exports,
+or use `--include-artifacts` for the complete Python suite. Their story-specific
+checks describe those versions and must be reconsidered when the creative brief
+changes. `probe_3d_block_filter.py` and `probe_spotify_isolation.py` are manual
+live-device diagnostics, not offline regression tests. The former edits live OBS
+filters; the latter plays audible tones. Neither is run by the offline runner.
+
+JavaScript `.cjs` tests are separate from the Python runner. Prefer disposable
+browser fixtures for normal changes. Some artwork reviews depend on the live
+Hub or generated local media; inspect their entry points before running them.
+Passing automated checks cannot judge whether an animation is entertaining or
+whether the controls feel convenient during a stream; those need visual and
+workflow review.
 
 With the Hub running, `GET /api/coordination` reports current scene ownership,
 revision, deferred intent, recent decisions, active playback gates, and pause
@@ -127,3 +160,13 @@ subscription cleanup and desktop/mobile layouts without live commands or persona
 settings writes. `--live` captures the running Hub's views and rejects non-GET
 requests. Keep feature control and persistence in their existing public owners;
 the shell catalog contains presentation labels and links only.
+
+## Live diagnostic captures
+
+A finite live OBS check owns every recording, replay-buffer save and derived cut
+it creates. Move these files out of `REPLAY_DIR` into that check's diagnostic
+output folder as soon as the writer closes, including failure cleanup. Never
+leave test footage in the personal replay inventory or invoke a Hub save action
+for a synthetic test without collecting its original and derived files afterward.
+Directory discovery cannot distinguish a diagnostic OBS filename from a real
+user capture. Offline tests must continue to use disposable media.

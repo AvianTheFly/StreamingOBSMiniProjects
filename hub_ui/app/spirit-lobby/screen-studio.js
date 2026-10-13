@@ -1,5 +1,5 @@
 // Asset authoring UI calls the shared library; OBS follows saved display choices.
-const fields={main:'background',left:'leftScreen',right:'rightScreen',booth:'boothScreen'};
+const fields={left:'leftScreen',right:'rightScreen',booth:'boothScreen'};
 const textKeys=['title','subtitle','leftTitle','leftSubtitle','rightTitle','rightSubtitle'];
 export class ScreenStudio {
   constructor(form,update){

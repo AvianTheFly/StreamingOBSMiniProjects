@@ -87,15 +87,15 @@ class ReplayIntentTests(unittest.TestCase):
         self.assertEqual(presentation.transition_for('move'),('Move',320))
         self.assertEqual(presentation.transition_for('wipe'),('Luma Wipe',320))
 
-    def test_small_capture_never_requests_twitch_and_preserves_mark(self):
-        state=ReplayState();state._manual_mark_wall[0]=80
+    def test_small_capture_never_requests_twitch(self):
+        state=ReplayState()
         recorder=capture.ReplayCapture(state,SimpleNamespace(first_kill_wall_time=None,last_death_wall_time=None))
         cut=self.root/'replay-only'/'small_ir_trimmed.mkv';cut.parent.mkdir();cut.write_bytes(b'cut')
         def saved(**kwargs):kwargs['on_save_requested'](100);return str(self.small)
         with patch.object(capture,'save_replay_buffer_and_wait',side_effect=saved),patch.object(capture,'request_clip') as twitch,patch.object(capture,'_trim_from_end',return_value=str(cut)) as trim:
             self.assertTrue(recorder._on_save(purpose='replay_only',clip_seconds=10,pressed_at=99))
             self.assertTrue(state._save_done_event[0].wait(2));twitch.assert_not_called()
-        self.assertEqual(state._manual_mark_wall[0],80)
+        self.assertEqual(trim.call_args.args[1],10)
         self.assertEqual(state._save_result[0]['path'],str(cut))
         self.assertEqual(trim.call_args.kwargs['tail_seconds'],1)
         self.assertTrue(trim.call_args.kwargs['fast'])
@@ -105,6 +105,64 @@ class ReplayIntentTests(unittest.TestCase):
             files=inventory._replay_files_on_disk()
             self.assertIn(cut,files);self.assertNotIn(self.small,files)
             self.assertNotIn(cut,inventory._replay_files_on_disk(highlights_only=True))
+
+    def test_mark_saves_sixty_seconds_without_replay_or_twitch(self):
+        state=ReplayState()
+        recorder=capture.ReplayCapture(state,SimpleNamespace(first_kill_wall_time=80,last_death_wall_time=90))
+        cut=self.root/'review-later'/'marked_ir_trimmed.mkv';cut.parent.mkdir();cut.write_bytes(b'interesting')
+        def saved(**kwargs):kwargs['on_save_requested'](103);return str(self.small)
+        with patch.object(capture,'save_replay_buffer_and_wait',side_effect=saved),patch.object(capture,'request_clip') as twitch,patch.object(capture,'_trim_from_end',return_value=str(cut)) as trim:
+            self.assertTrue(recorder._on_mark(pressed_at=100))
+            self.assertTrue(state._save_done_event[0].wait(2));twitch.assert_not_called()
+        self.assertEqual(trim.call_args.args,(str(self.small),60))
+        self.assertEqual(trim.call_args.kwargs['tail_seconds'],3)
+        self.assertTrue(trim.call_args.kwargs['fast'])
+        self.assertEqual(state._clip_registry,[])
+        self.assertEqual(library.highlight_paths([self.small,cut]),[])
+        self.assertEqual(library.replay_paths([self.small,cut]),[])
+        self.assertNotIn(str(cut),excluded_paths(self.file),'Marked moments remain available for future footage review')
+        row=library.decorate([dict(path=str(cut),name=cut.name)])['clips'][0]
+        self.assertEqual((row['purpose'],row['review_state']),('review_later','pending'))
+        with patch.object(inventory,'REPLAY_DIR',str(self.root)):
+            self.assertIn(cut,inventory.replay_files(self.root))
+            self.assertEqual(inventory.ReplayInventory(state)._get_most_recent_clip(),[str(self.keeper)])
+
+    def test_highlight_anchor_keeps_thirty_seconds_of_lead_in(self):
+        for kill,death,expected in [(100,None,40),(None,100,40)]:
+            state=ReplayState()
+            recorder=capture.ReplayCapture(state,SimpleNamespace(first_kill_wall_time=kill,last_death_wall_time=death))
+            with patch.object(capture,'save_replay_buffer_and_wait',return_value=str(self.small)),patch.object(capture,'request_clip'),patch.object(capture,'_saved_clip',return_value=str(self.small)) as trim:
+                self.assertTrue(recorder._on_save(pressed_at=110));self.assertTrue(state._save_done_event[0].wait(2))
+            self.assertEqual(trim.call_args.args,(str(self.small),expected))
+
+    def test_mark_full_retains_the_entire_buffer_without_a_cut(self):
+        state=ReplayState();recorder=capture.ReplayCapture(state,SimpleNamespace(first_kill_wall_time=None,last_death_wall_time=None))
+        with patch.object(capture,'save_replay_buffer_and_wait',return_value=str(self.small)),patch.object(capture,'_trim_from_end') as trim,patch.object(capture,'request_clip') as twitch:
+            self.assertTrue(recorder._on_mark(full_save=True));self.assertTrue(state._save_done_event[0].wait(2))
+        trim.assert_not_called();twitch.assert_not_called()
+        self.assertEqual(state._save_result[0]['path'],str(self.small))
+        self.assertEqual(library.replay_paths([self.small]),[])
+
+    def test_keep_dismiss_and_restore_preserve_purpose_labels_and_media(self):
+        library.remember_capture(self.small,purpose='review_later')
+        data=library.read();key=library.clip_id(self.small);data['clips'][key]['custom']={'personal':True};library._write(data)
+        def decide(path,state):return library.mutate(dict(action='review',revision=library.read()['revision'],paths=[str(path)],decision=state),self.root)
+        decide(self.small,'kept')
+        self.assertEqual(library.replay_paths([self.small]),[],'Keeping never promotes a review capture')
+        self.assertTrue(library.read()['clips'][key]['kept'])
+        decide(self.keeper,'dismissed')
+        self.assertEqual(library.highlight_paths([self.keeper]),[])
+        decide(self.keeper,'pending')
+        self.assertEqual(library.highlight_paths([self.keeper]),[str(self.keeper)])
+        self.assertEqual(library.read()['clips'][key]['custom'],{'personal':True})
+        self.assertEqual(self.small.read_bytes(),b'small')
+        library.mutate(dict(action='purpose',revision=library.read()['revision'],paths=[str(self.small)],purpose='highlight'),self.root)
+        self.assertEqual(library.highlight_paths([self.small]),[str(self.small)])
+
+    def test_dismissed_registry_tag_falls_back_without_index_error(self):
+        library.mutate(dict(action='review',revision=library.read()['revision'],paths=[str(self.keeper)],decision='dismissed'),self.root)
+        state=ReplayState();state._clip_registry.append(dict(path=str(self.keeper),tag='win',saved_at=1))
+        self.assertEqual(inventory.ReplayInventory(state)._resolve_play_spec('win'),[])
 
     def test_api_rejects_invalid_duration_and_busy_capture_before_work(self):
         for value in [0,2,121,float('nan'),float('inf'),'bad',None]:

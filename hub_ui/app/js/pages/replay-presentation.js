@@ -10,13 +10,12 @@ export function mountPresentation(host,{canCapture=()=>true}={}) {
   function card(mode) {
     const replay=mode==='replay';
     return `<article class="ir-mode-card"><div class="ir-mode-heading"><span class="ir-mode-icon">${replay?'↺':'▷'}</span><div><span class="ir-mode-kicker">${replay?'IN THE GAME':'BETWEEN GAMES'}</span><h2>${replay?'Quick Replay':'Clip Showcase'}</h2></div><span class="ir-mode-tag">| → ${replay?'quick replay':'highlights'}</span></div>
-      <p>${replay?'Replay a moment while the live screen stays visible.':'Saved clips and collections.'}</p>
-      <iframe title="${replay?'Quick replay':'Clip showcase'} layout preview, off stream" src="/replay-stage.html?preview=${mode}" tabindex="-1"></iframe>
-      <div class="ir-mode-options"><label>Screen<select data-mode="${mode}" data-pref="companion"><option value="${replay?'live':'off'}">${replay?'Live screen':'Off'}</option><option value="${replay?'off':'live'}">${replay?'Off':'Live screen'}</option><option value="desktop">Desktop (show/hide)</option></select></label><label>Scene transition<select data-mode="${mode}" data-pref="transition">${sceneOptions}</select></label><label>Between clips<select data-mode="${mode}" data-pref="clip_transition">${clipOptions}</select></label><div class="ir-camera-choice"><label><input type="checkbox" data-mode="${mode}" data-pref="camera" checked> Face cam</label><button class="btn btn-secondary btn-sm" type="button" data-preview-transition="${mode}">Preview transition</button></div></div>
-      ${replay?`<div class="ir-quick-capture"><label>Last<select id="irQuickSeconds" aria-label="Quick replay duration"><option value="5">5 seconds</option><option value="10">10 seconds</option><option value="15" selected>15 seconds</option><option value="30">30 seconds</option><option value="60">60 seconds</option></select></label><button class="btn btn-primary" id="irQuickReplay">Replay this moment</button></div><p class="ir-capture-note">Replay only · no Twitch clip · excluded from highlight review.</p><div class="ir-mode-buttons"><button class="btn btn-secondary" id="irReplay">Replay latest</button><button class="btn btn-secondary" id="irSaveReplay">Save highlight + replay</button></div>`:`<div class="ir-mode-buttons"><button class="btn btn-primary" id="irHighlights">Game highlights</button><button class="btn btn-secondary" id="irLatest">Latest clip</button><button class="btn btn-secondary" id="irRandom">Shuffle</button></div>`}</article>`;
+      ${replay?`<div class="ir-quick-capture"><label>Last<select id="irQuickSeconds" aria-label="Quick replay duration"><option value="5">5 seconds</option><option value="10">10 seconds</option><option value="15" selected>15 seconds</option><option value="30">30 seconds</option><option value="60">60 seconds</option></select></label><button class="btn btn-primary" id="irQuickReplay">Replay now</button><button class="btn btn-secondary" id="irSaveBuffer">Save highlight</button></div><div class="ir-mode-buttons"><button class="btn btn-secondary btn-sm" id="irReplay">Replay latest</button><button class="btn btn-secondary btn-sm" id="irSaveReplay">Save + replay</button><span class="ir-muted">Quick replay stays replay-only</span></div>`:`<div class="ir-mode-buttons ir-showcase-actions"><button class="btn btn-primary" id="irHighlights">Game highlights</button><button class="btn btn-secondary" id="irLatest">Latest clip</button><button class="btn btn-secondary" id="irRandom">Shuffle</button></div><p>Choose a saved clip below to preview, trim or play it.</p>`}
+      <details class="ir-layout-settings" data-layout-mode="${mode}"><summary>Layout &amp; transitions <span>off-stream preview</span></summary><div class="ir-layout-body"><iframe title="${replay?'Quick replay':'Clip showcase'} layout preview, off stream" data-layout-preview="${mode}" data-preview-src="/replay-stage.html?preview=${mode}" tabindex="-1"></iframe>
+      <div class="ir-mode-options"><label>Screen<select data-mode="${mode}" data-pref="companion"><option value="${replay?'live':'off'}">${replay?'Live screen':'Off'}</option><option value="${replay?'off':'live'}">${replay?'Off':'Live screen'}</option><option value="desktop">Desktop (show/hide)</option></select></label><label>Scene transition<select data-mode="${mode}" data-pref="transition">${sceneOptions}</select></label><label>Between clips<select data-mode="${mode}" data-pref="clip_transition">${clipOptions}</select></label><div class="ir-camera-choice"><label><input type="checkbox" data-mode="${mode}" data-pref="camera" checked> Face cam</label><button class="btn btn-secondary btn-sm" type="button" data-preview-transition="${mode}">Preview transition</button></div></div></div></details></article>`;
   }
   host.innerHTML=`<div class="ir-studio-modes">${card('replay')}${card('showcase')}</div>
-    <div class="ir-studio-note"><span>Previews stay off stream.</span><label><input type="checkbox" id="irMotion" checked> Motion</label></div><p id="irCaptureStatus" class="ir-muted" role="status"></p>
+    <div class="ir-studio-note"><span>Browsing and previews stay off stream. Playback buttons show in OBS.</span><label><input type="checkbox" id="irMotion" checked> Motion</label></div><p id="irCaptureStatus" class="ir-muted" role="status"></p>
     <div class="ir-program card"><div class="ir-program-top"><span class="ir-mode-kicker" id="irOnAirLabel">READY</span><span id="irStageTime"></span></div><strong id="irStageClip">Nothing playing</strong><div class="ir-program-progress"><span id="irStageProgress"></span></div><div class="ir-program-bottom"><span id="irStageNext"></span><button class="btn btn-secondary btn-sm" id="irKeepCurrent" hidden>Keep this clip</button><label>Screen<select id="irCompanion"><option value="off">Off</option><option value="live">Live screen</option><option value="desktop">Desktop (show/hide)</option></select></label><label><input id="irCamera" type="checkbox"> Face cam</label></div></div>`;
   function paint(s) {
     if(disposed)return;
@@ -29,6 +28,7 @@ export function mountPresentation(host,{canCapture=()=>true}={}) {
       $('#irMotion').checked=s.motion!==false;$('#irCompanion').value=s.view||'off';$('#irCamera').checked=s.camera!==false;
     }
     currentMode=s.mode||'showcase';
+    $('.ir-program').hidden=!s.active&&!s.pending;
     $('#irCaptureStatus').textContent=s.capture?.message||'';
     $('#irCaptureStatus').classList.toggle('is-error',s.capture?.status==='error');
     $('#irQuickReplay').disabled=!canCapture()||!!s.active||!!s.pending||s.capture?.status==='saving';
@@ -43,7 +43,7 @@ export function mountPresentation(host,{canCapture=()=>true}={}) {
     $('#irStageProgress').style.width=`${duration?Math.min(100,cursor/duration*100):0}%`;
     const clock=ms=>{const n=Math.floor(ms/1000);return `${Math.floor(n/60)}:${String(n%60).padStart(2,'0')}`;};
     $('#irStageTime').textContent=duration?`${clock(cursor)} / ${clock(duration)}`:'';host.classList.toggle('is-on-air',!!s.active);
-    for(const mode of ['replay','showcase'])$(`iframe[src*="preview=${mode}"]`).contentWindow?.postMessage({type:'replay-layout',state:{view:s.settings?.[mode]?.companion||(mode==='replay'?'live':'off'),camera:s.settings?.[mode]?.camera!==false,clip_transition:s.settings?.[mode]?.clip_transition||(mode==='replay'?'sweep':'iris'),motion:s.motion}},location.origin);
+    for(const mode of ['replay','showcase'])$(`[data-layout-preview="${mode}"][src]`)?.contentWindow?.postMessage({type:'replay-layout',state:{view:s.settings?.[mode]?.companion||(mode==='replay'?'live':'off'),camera:s.settings?.[mode]?.camera!==false,clip_transition:s.settings?.[mode]?.clip_transition||(mode==='replay'?'sweep':'iris'),motion:s.motion}},location.origin);
   }
   async function save(fn){
     if(pending)return;
@@ -66,7 +66,12 @@ export function mountPresentation(host,{canCapture=()=>true}={}) {
   });
   host.querySelectorAll('[data-preview-transition]').forEach(el=>el.addEventListener('click',()=>{
     const mode=el.dataset.previewTransition,style=$(`[data-mode="${mode}"][data-pref="clip_transition"]`).value;
-    $(`iframe[src*="preview=${mode}"]`).contentWindow?.postMessage({type:'replay-transition-preview',style},location.origin);
+    $(`[data-layout-preview="${mode}"]`).contentWindow?.postMessage({type:'replay-transition-preview',style},location.origin);
+  }));
+  host.querySelectorAll('[data-layout-mode]').forEach(details=>details.addEventListener('toggle',()=>{
+    const frame=details.querySelector('iframe');
+    if(details.open)frame.src=frame.dataset.previewSrc;
+    else frame.removeAttribute('src');
   }));
   host.querySelectorAll('iframe').forEach(el=>el.addEventListener('load',()=>refresh()));
   async function refresh(){

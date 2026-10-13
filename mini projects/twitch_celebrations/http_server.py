@@ -42,7 +42,7 @@ def handler(service, root, port):
                 return self.send((root.parents[1]/'lib/browser_effects/web/subtle.js').read_bytes(),content_type='text/javascript')
             if path == '/optics.js':
                 return self.send((root.parents[1]/'lib/browser_effects/web/production.js').read_bytes(),content_type='text/javascript')
-            if path in ('/raid_art.js', '/cheer_show.js'):
+            if path in ('/subscriber_story.js', '/subscriber_party.js', '/subscriber_acts.js', '/raid_music.js', '/raid_art.js', '/raid_cast.js', '/raid_penguins.js', '/raid_story.js', '/raid_effects.js', '/raid_acts.js', '/raid_guests.js', '/raid_crossovers.js', '/cheer_show.js'):
                 return self.send((root/path[1:]).read_bytes(),content_type='text/javascript')
             if path in ('/supporter_show.js', '/supporter_show.css'):
                 p = root/path[1:]
@@ -52,9 +52,11 @@ def handler(service, root, port):
                 allowed = {'bear-attack.png','turtle.png','ram-charge.png','phoenix-hero.png'}
                 if name in allowed:
                     return self.send((root/'spirit_assets'/name).read_bytes(),content_type='image/png')
-            files = {'/':'control.html','/overlay':'overlay.html','/overlay.js':'overlay.js','/overlay.css':'overlay.css','/control.js':'control.js','/characters.js':'characters.js','/raid_sequence.js':'raid_sequence.js','/raid_sequence.css':'raid_sequence.css'}
+            files = {'/raid_score.json':'raid_score.json','/':'control.html','/overlay':'overlay.html','/overlay.js':'overlay.js','/overlay.css':'overlay.css','/control.js':'control.js','/characters.js':'characters.js','/raid_sequence.js':'raid_sequence.js','/raid_sequence.css':'raid_sequence.css','/raid_party.js':'raid_party.js','/raid-dancers.json':'media/raid-dancers.json','/raid-penguin-frames.json':'media/raid-penguin-frames.json'}
             if path in files:
                 p = root/files[path]
+                if p.suffix == '.json':
+                    return serve_file(self,p,headers={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'})
                 data = p.read_bytes().replace(b'__CSRF__',service.csrf.encode()) if path == '/' else p.read_bytes()
                 return self.send(data,content_type=mimetypes.guess_type(p.name)[0] or 'application/octet-stream')
             if path.startswith('/media/'):

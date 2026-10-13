@@ -1,0 +1,8 @@
+file 'F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/easter_eggs/v1/review/kirby.mp4'
+file 'F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/easter_eggs/v1/review/boo.mp4'
+file 'F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/easter_eggs/v1/review/crewmate.mp4'
+file 'F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/easter_eggs/v1/review/creeper.mp4'
+file 'F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/easter_eggs/v1/review/goose.mp4'
+file 'F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/easter_eggs/v1/review/climber.mp4'
+file 'F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/easter_eggs/v1/review/hornet.mp4'
+file 'F:/EVERYTHING STREAM RELATED/Streaming Scripts v2/stream_brand/easter_eggs/v1/review/salvager.mp4'

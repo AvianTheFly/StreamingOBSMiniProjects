@@ -1,5 +1,4 @@
-"""Preserve pre-cache visualizer output and verify disposable cache lifetimes."""
-import json
+"""Cached/live signal agreement and disposable cache lifetimes."""
 import tempfile
 import unittest
 from pathlib import Path
@@ -23,21 +22,42 @@ def frames():
 
 
 class AnalysisTests(unittest.TestCase):
-    def test_cached_and_uncached_match_pre_change_signals(self):
-        expected = json.loads((Path(__file__).parent/'fixtures/music_analysis_signals.json').read_text())
-        for cached in (False, True):
-            detector = BassDetector()
-            detector._last_peak_t = 100
-            actual = []
-            for i, frame in enumerate(frames()):
-                if cached:
-                    detector._process_features(detector.frame_features(frame), 100+i*1024/44100)
-                else:
-                    detector._process_frame(frame, 100+i*1024/44100)
-                actual.append([detector.get_level(), detector.get_motion(), detector.get_intensity(),
-                               detector.get_melody(), detector.get_presence(), detector.get_transient(),
-                               detector.consume_beat(), detector.consume_oomph()])
-            np.testing.assert_allclose(actual, expected, rtol=0, atol=1e-12)
+    def test_saved_analysis_matches_live_signals_and_still_reacts_to_music(self):
+        def signals(detector):
+            return [detector.get_level(), detector.get_motion(), detector.get_intensity(),
+                    detector.get_melody(), detector.get_presence(), detector.get_transient(),
+                    detector.consume_beat(), detector.consume_oomph()]
+
+        live, cached = BassDetector(), BassDetector()
+        live._last_peak_t = cached._last_peak_t = 100
+        audio = [*frames(), *[np.zeros(1024, dtype=np.float32) for _ in range(60)]]
+        expected, measurements = [], []
+        for i, frame in enumerate(audio):
+            measurements.append(live._process_frame(frame, 100+i*1024/44100))
+            expected.append(signals(live))
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / 'song.wav'
+            source.write_bytes(b'disposable identity for generated PCM')
+            cache = AnalysisCache(source, 44100, 1024, 60., 180., root=root/'cache')
+            self.assertTrue(cache.save(measurements))
+            rows = cache.load()
+            self.assertIsNotNone(rows)
+            try:
+                actual = []
+                for i, row in enumerate(rows):
+                    cached._process_features(row, 100+i*1024/44100)
+                    actual.append(signals(cached))
+            finally:
+                close_analysis(rows)
+        np.testing.assert_allclose(actual, expected, rtol=1e-7, atol=1e-10)
+        # Agreement alone would let two silent/broken paths pass. Check an
+        # audible response and decay, without freezing the visualizer's tuning.
+        values = np.asarray(actual)
+        self.assertTrue(np.isfinite(values).all())
+        self.assertGreater(values[:, 0].max(), 0)
+        self.assertGreater(np.ptp(values[:, 0]), 0)
+        self.assertLess(values[-1, 0], values[:, 0].max() * .1)
 
     def test_cache_roundtrip_invalidation_and_corruption(self):
         with tempfile.TemporaryDirectory() as directory:

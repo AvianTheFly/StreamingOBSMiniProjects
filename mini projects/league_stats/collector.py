@@ -8,6 +8,7 @@ from lib.league_live_client import fetch_snapshot, LiveClientUnavailable
 from .riot import RiotClient
 from .enrichment import Enrichment
 from .normalize import same_player
+from .client_enrichment import ClientEnrichment
 
 
 class Collector:
@@ -24,6 +25,8 @@ class Collector:
         self.riot = RiotClient(self.http)
         self.enrichment = Enrichment(tracker,self.riot)
         self.next_rank = 0
+        self.client_enrichment = ClientEnrichment(tracker, self.client)
+        self.next_local_enrichment = 0
 
     def context(self):
         self.phase = self.client.get('/lol-gameflow/v1/gameflow-phase')
@@ -110,6 +113,8 @@ class Collector:
                 self.account = None
         if self.stop.is_set():
             return
+        with self.tracker.lock:
+            self.tracker.client_phase = self.phase
         if self.phase in ('InProgress','Reconnect') and self.account:
             game = self.session.get('gameData',{})
             game_id = game.get('gameId')
@@ -149,6 +154,9 @@ class Collector:
             with self.tracker.lock:self.tracker.enrichment_status=self.enrichment.snapshot()
         if not self.account or self.stop.is_set():
             return
+        if now >= self.next_local_enrichment:
+            self.next_local_enrichment = now + 5
+            self.client_enrichment.tick(self.phase, self.account['puuid'])
         if now>=self.next_rank:
             self.next_rank=now+60
             try:self.tracker.observe_rank(self.account['puuid'],self.client.get('/lol-ranked/v1/current-ranked-stats'))

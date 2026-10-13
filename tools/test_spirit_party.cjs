@@ -27,6 +27,19 @@ async function main(){
     for(const [kind,count] of Object.entries(unit.pixels))assert(count>100,kind+' artwork failed to paint');
     await page.goto(base+'studio.html?party=off');await page.locator('[data-action]').last().waitFor();const preview=page.frames().find(f=>f.url().includes('index.html'));await preview.locator('canvas[data-ready=true]').waitFor();
     const background=await browser.newPage(),foreground=await browser.newPage();for(const [p,layer] of [[background,'background'],[foreground,'foreground']]){p.on('pageerror',e=>errors.push(e.message));p.on('console',m=>{if(m.type()==='error')errors.push(layer+': '+m.text());});p.on('response',r=>{if(r.status()>=400)errors.push(layer+': '+r.status()+' '+r.url());});await p.goto(base+'index.html?party=off&layer='+layer);try{await p.locator('canvas[data-ready=true]').waitFor();}catch(e){throw new Error(layer+': '+errors.join('\n')+' '+await p.locator('#loading').textContent()+' '+e.message);}}
+    assert(await page.locator('[name=background]').count()===0&&await page.locator('#screen-target option[value=main]').count()===0,'Removed desktop still appears in studio controls');
+    const painted=await background.evaluate(async()=>{
+      const c=document.querySelector('canvas').getContext('2d');
+      const samples=[[1050,400],[1200,650],[1500,500],[1700,650]].map(([x,y])=>Array.from(c.getImageData(x,y,1,1).data));
+      const {ScreenContent}=await import('./screen-content.js'),{readConfig}=await import('./config.js');
+      const owner=await new ScreenContent().load();owner.state.selected.main='saved-personal-main';owner.tick(readConfig('?layer=background'));
+      const noMain=!owner.slots.has('main')&&owner.state.selected.main==='saved-personal-main';owner.dispose();
+      return {samples,noMain};
+    });
+    assert(painted.samples.every(p=>p[3]===255)&&new Set(painted.samples.map(p=>p.slice(0,3).join(','))).size===painted.samples.length,'Camera/chat must have painted scenery instead of black browser rectangles: '+JSON.stringify(painted.samples));
+    assert(painted.noMain,'Removed main display allocated media or overwrote the saved choice');
+    const upperAlpha=await foreground.evaluate(()=>[[1050,400],[1500,500]].map(([x,y])=>document.querySelector('canvas').getContext('2d').getImageData(x,y,1,1).data[3]));
+    assert(upperAlpha.every(a=>a===0),'Foreground must leave the keyed camera and chat visible');
     await page.locator('[data-action=confetti]').click();await preview.waitForFunction(()=>JSON.parse(document.querySelector('canvas').dataset.effects).filter(x=>x.kind==='confetti').length===1);
     const first=await preview.evaluate(()=>JSON.parse(document.querySelector('canvas').dataset.effects)[0]);
     await page.waitForTimeout(300);await page.locator('[data-action=confetti]').click();await page.locator('[data-action=bubbles]').click();

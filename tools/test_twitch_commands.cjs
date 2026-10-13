@@ -29,7 +29,7 @@ async function main(){
    if(req.method==='POST'){
     let body='';for await(const chunk of req)body+=chunk;const data=JSON.parse(body);writes.push({pathname,data});
     if(pathname.endsWith('/preview'))value={response:'Fixture preview only'};
-    else{assert.equal(data.revision,current.revision);if('enabled'in data)current.enabled=data.enabled;if(data.command){const i=current.commands.findIndex(c=>c.command===data.original);if(i>=0)current.commands[i]={...current.commands[i],...data.command};else current.commands.push(data.command);}current.revision+='x';value=current;}
+    else{assert.equal(data.revision,current.revision);if('enabled'in data)current.enabled=data.enabled;if('announcements_enabled'in data)current.announcements_enabled=data.announcements_enabled;if(data.command){const i=current.commands.findIndex(c=>c.command===data.original);if(i>=0)current.commands[i]={...current.commands[i],...data.command};else current.commands.push(data.command);}current.revision+='x';value=current;}
    }
    res.setHeader('Content-Type','application/json');res.end(JSON.stringify(value));return;
   }
@@ -49,6 +49,7 @@ async function main(){
   await page.locator('#tcSearch').fill('when');assert.equal(await page.locator('[data-command]').count(),1);
   await page.locator('#tcSearch').fill('');await page.locator('#tcEnabled').uncheck();await page.getByText('Chat replies disabled.',{exact:true}).waitFor();assert.equal(current.enabled,false);
   await page.getByRole('button',{name:'New command',exact:true}).click();await page.locator('#tcName').fill('!hello');await page.locator('#tcResponse').fill('<img src=x onerror=alert(1)>');await page.getByRole('button',{name:'Save command',exact:true}).click();await page.getByText('Saved. Aliases now use this same reply.').waitFor();assert.equal(current.commands.length,3);
+  await page.locator('#tcAnnouncements').check();await page.getByText('Waiting for live streaming and the Twitch chat connection.',{exact:true}).waitFor();assert.equal(current.announcements_enabled,true);assert.equal(current.commands.length,3);
   await page.screenshot({path:path.join(output,'custom-command-editor-desktop.png'),fullPage:true});
   await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);await page.screenshot({path:path.join(output,'custom-command-editor-mobile.png'),fullPage:true});
   assert.deepEqual(errors,[]);console.log('Command UI: search, save, aliases, private preview, disabled switch, escaped text and mobile layout passed.');

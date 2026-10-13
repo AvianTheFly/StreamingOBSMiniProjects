@@ -1,5 +1,6 @@
 """Post-game checkpoints and explicit purchase events from Match-v5 timelines."""
 from .normalize import number
+from .recap_events import official_events
 
 
 def extract(data,record,item_catalog=None):
@@ -69,5 +70,7 @@ def extract(data,record,item_catalog=None):
         metrics.update(kills_before_10=kills_10,deaths_before_10=deaths_10)
     for key,values in [('first_kill_seconds',first_kill),('first_death_seconds',first_death),('level_6_seconds',first_six)]:
         if values:metrics[key]=min(values)
+    series = [dict(time=f['timestamp']/1000, **stats(f, own)) for f in frames if stats(f, own)]
     return dict(timeline_version=1,timeline_checkpoints=checkpoints,purchase_events=items,
+                official_events=official_events(events, record, catalog), official_samples=series,
                 metrics=metrics,raw_timeline=data)

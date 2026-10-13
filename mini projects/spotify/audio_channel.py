@@ -5,7 +5,8 @@ import json
 from .audio_analysis import quiet_features
 
 SCALARS = ('bass', 'treble', 'energy', 'beat', 'pitch', 'tonality', 'width', 'balance', 'flux',
-           'roughness', 'noisiness', 'texture_rate', 'loudness')
+           'roughness', 'noisiness', 'texture_rate', 'loudness',
+           'lead_level', 'lead_pitch', 'attack_level', 'air_level')
 SIZE = 48 + 128 + 8 + 8 + 8 + len(SCALARS) + 4
 
 

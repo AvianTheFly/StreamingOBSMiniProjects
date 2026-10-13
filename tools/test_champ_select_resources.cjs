@@ -5,12 +5,14 @@ const root=path.resolve(__dirname,'..'),feature=path.join(root,'mini projects/le
  const browser=await chromium.launch({headless:true,channel:'chrome'});
  try {
   const page=await browser.newPage(),errors=[];let requests=0;
-  const state={visible:true,theme:'astral',draft:{seconds:25,allies:[{championId:103,name:'Ahri',locked:false}],localSlot:0},chat:[]};
+  const state={visible:true,theme:'bear',draft:{seconds:25,allies:[{championId:103,name:'Ahri',locked:false}],localSlot:0},chat:[]};
   page.on('pageerror',e=>errors.push(e.message));
   await page.route('http://draft.test/**',route=>{
    const url=new URL(route.request().url());
    if(url.pathname==='/champ-select/state'){requests++;return route.fulfill({json:state});}
-   let file=url.pathname==='/shared/visible-poll.js'?path.join(root,'lib/browser_effects/web/visible-poll.js'):
+   let file=url.pathname.startsWith('/shared/')?path.join(root,'lib/browser_effects/web',path.basename(url.pathname)):
+    url.pathname.includes('/vfx/')?path.join(feature,'media/champ-select/vfx',path.basename(url.pathname)):
+    url.pathname.includes('/guests/')?path.join(feature,'media/draft-guests',path.basename(url.pathname)):
     url.pathname.includes('/backgrounds/')?path.join(feature,'media/champ-select',path.basename(url.pathname)):
     path.join(feature,'champ_select_web',url.pathname==='/champ-select'?'index.html':url.pathname.replace('/champ-select/',''));
    return route.fulfill({body:fs.readFileSync(file),contentType:file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':file.endsWith('.jpg')?'image/jpeg':file.endsWith('.svg')?'image/svg+xml':'text/html'});

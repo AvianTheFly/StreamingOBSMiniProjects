@@ -1,17 +1,18 @@
 // Decoded painted cast and continuous room business, owned by one presentation.
 import {smooth,ellipse,TAU} from './shared/world-motion.js';
-import {tag,ring} from './chaos-ink.js';
+import {preparedResidents} from './resident-parts.js';
 const habitats={
- arcade:[[433,839,136],[832,842,105],[1660,842,100]],
- tavern:[[571,992,135],[1450,988,120],[1080,1057,98]],
- forge:[[427,858,131],[1476,854,116],[712,859,107]],
- future:[[508,834,124],[1360,772,130],[1795,1034,104]],
- 'sky-harbor':[[404,976,145],[1236,298,120],[1455,1007,114]]
+ arcade:[[1410,548,49],[1430,696,48],[901,159,32]],
+ tavern:[[734,831,52],[910,837,48],[823,797,38]],
+ forge:[[672,793,52],[835,790,45],[900,793,49]],
+ future:[[1390,714,47],[1180,284,46],[1450,758,48]],
+ 'sky-harbor':[[870,789,51],[1240,288,45],[941,787,43]]
 };
 const colors={arcade:['#f396d7','#8ff3e0'],tavern:['#ffcb75','#b8e9b1'],forge:['#ffb264','#88e5f0'],future:['#8deef0','#cb9fee'],'sky-harbor':['#ffcc8b','#a2e1dd']};
 export class LobbyResidents{
  constructor(id){this.id=id;this.sprites=[];this.bounds=[];this.disposed=false;}
- async load(){
+ async load({prepared=true}={}){
+  if(prepared&&await this.loadPrepared())return;
   const image=new Image();image.src=new URL(`./art/${this.id}-cast-v1.png`,import.meta.url).href;await image.decode();
   if(this.disposed)return;
   // Isolate connected silhouettes once, including tails that extend past a third.
@@ -34,9 +35,37 @@ export class LobbyResidents{
   }
   scratch.width=scratch.height=1;
  }
+ async loadPrepared(){
+  const entry=preparedResidents[this.id];
+  if(!entry||!globalThis.crypto?.subtle)return false;
+  const surfaces=[];
+  try{
+   // Never reuse extraction from an edited original sheet. Browser SHA-256 is
+   // much cheaper than repeating connected-component scans over every pixel.
+   const response=await fetch(new URL(`./art/${this.id}-cast-v1.png`,import.meta.url),{cache:'no-store'});
+   if(!response.ok)return false;
+   const digest=await crypto.subtle.digest('SHA-256',await response.arrayBuffer());
+   const hash=Array.from(new Uint8Array(digest),v=>v.toString(16).padStart(2,'0')).join('');
+   if(hash!==entry.sha256)return false;
+   let bytes=0;
+   for(const part of entry.parts){
+    const image=new Image();image.src=new URL(part.url,import.meta.url).href;await image.decode();
+    const [,,w,h]=part.bounds;bytes+=w*h*4;
+    if(image.width!==w||image.height!==h||bytes>64*1024*1024)throw Error('Invalid prepared cast');
+    const sprite=document.createElement('canvas');sprite.width=w;sprite.height=h;
+    sprite.getContext('2d').drawImage(image,0,0);surfaces.push(sprite);
+   }
+   if(this.disposed||surfaces.length!==3)throw Error('Prepared cast no longer owned');
+   this.sprites=surfaces;this.bounds=entry.parts.map(p=>p.bounds.slice());
+   return true;
+  }catch{
+   for(const sprite of surfaces)sprite.width=sprite.height=1;
+   return false; // Missing/stale derived art retains the original extraction.
+  }
+ }
  sprite(c,slot,x,y,h,tilt=0,flip=false,alpha=1,breath=1){
   if(!this.sprites[slot]||this.disposed)return;const sprite=this.sprites[slot],w=h*sprite.width/sprite.height;
-  c.save();c.globalAlpha*=alpha;c.translate(x,y);c.rotate(tilt);c.scale(flip?-1:1,breath);c.drawImage(sprite,-w/2,-h,w,h);c.restore();
+  c.save();c.globalAlpha*=alpha;c.translate(x,y);c.rotate(tilt);c.scale(flip?-1:1,breath);c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';c.drawImage(sprite,-w/2,-h,w,h);c.restore();
  }
  draw(c,t,events){
   const busy=events.reduce((sum,e)=>sum+(e.impact||.5),0),alpha=.96-Math.min(.3,busy*.065),[warm,cool]=colors[this.id];
@@ -44,16 +73,15 @@ export class LobbyResidents{
    // A resident leaves its perch while taking part in a finite performance.
    const away=events.filter(e=>e.residentSlots?.includes(slot)).reduce((n,e)=>Math.max(n,smooth((t-e.started)/.6)*smooth((e.started+e.life-t)/.75)),0);
    const presence=alpha*(1-away);if(presence<.005)return;
-   const a=t*(.42+slot*.06)+slot*2.1,x=home+Math.sin(a*.55)*(slot===1?30:18),flying=slot===1&&(this.id==='future'||this.id==='sky-harbor');
-   const hop=flying?Math.sin(a*1.2)*12:Math.abs(Math.sin(a*1.8))*4;
-   if(!flying){c.save();c.globalAlpha*=presence;ellipse(c,x,y+3,h*.24,4,'#08121b55');c.restore();}
+   const a=t*(.28+slot*.04)+slot*2.1,x=home+Math.sin(a*.55)*(slot===1?5:3),flying=slot===1&&(this.id==='future'||this.id==='sky-harbor');
+   const hop=flying?Math.sin(a*1.2)*4:Math.abs(Math.sin(a*1.8))*.7;
+   if(!flying){c.save();c.globalAlpha*=presence;ellipse(c,x,y+1,h*.24,1.5,'#08121b55');c.restore();}
    this.sprite(c,slot,x,y-hop,h,Math.sin(a*1.8)*.035,false,presence,1+Math.sin(a*1.3)*.018);
-   // Little recurring actions are offset from the larger automatic entrances.
-   const phase=(t+slot*11)%37;
-   if(phase>25&&phase<31){const fade=smooth((phase-25)/.6)*smooth((31-phase)/.8);c.save();c.globalAlpha*=fade*presence;
-    if(slot===0){for(let i=0;i<3;i++)ellipse(c,x-18+i*18,y-h-15-Math.sin(phase*3+i)*4,3,3,warm);}
-    if(slot===1)ring(c,x,y+4,phase,cool);
-    if(slot===2)tag(c,x,y-h-12,this.id==='future'?'zzz':this.id==='forge'?'BONK?':'GG',warm,.7);
+   // Small contact gestures stay on the perch, never above a resident's head.
+   const phase=(t+slot*11)%43;
+   if(phase>29&&phase<34&&!flying){const fade=smooth((phase-29)/.6)*smooth((34-phase)/.8);c.save();c.globalAlpha*=fade*presence;
+    const roll=(phase-29)/5;
+    ellipse(c,x+8+roll*16,y-2-Math.sin(roll*Math.PI)*3,2,2,slot===2?cool:warm);
     c.restore();}
   });
   this.setting(c,t);

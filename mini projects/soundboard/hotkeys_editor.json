@@ -84,7 +84,13 @@
         "C": "epic newt newt",
         "J": "who is she",
         ",": "goofy running",
-        "a": "metal-gear-alert-sound-effect_XKoHReZ"
+        "a": "metal-gear-alert-sound-effect_XKoHReZ",
+        "4": [
+          "iphone-charge-sound",
+          "apple-pay-sound",
+          "ding-sound-effect_2",
+          "kaching-sound-fx"
+        ]
       },
       "group_names": {
         "1": "wow",
@@ -111,24 +117,14 @@
         "j": "realization",
         "C": "A few moments later",
         "J": "game recogznies game",
-        ",": "running"
+        ",": "running",
+        "4": "we're so back"
       },
       "empty_groups": [
         "7",
         "A"
       ],
-      "unbound_groups": [
-        {
-          "id": "u0",
-          "name": "we're so back",
-          "stems": [
-            "iphone-charge-sound",
-            "apple-pay-sound",
-            "ding-sound-effect_2",
-            "kaching-sound-fx"
-          ]
-        }
-      ],
+      "unbound_groups": [],
       "display_names": {},
       "categories": [
         "SFX Audio Only",

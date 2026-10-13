@@ -141,6 +141,8 @@ def postgame(data, puuid, catalog=None, item_catalog=None):
     win = win if isinstance(win, bool) else None
     opponent=[p for p in players if p.get('teamId')!=own.get('teamId') and position(own) and position(p)==position(own)]
     return dict(id=f'{puuid}:{info["gameId"]}', account=puuid, game_id=str(info['gameId']), schema_version=2,
+                team_id=own.get('teamId'), champion_id=own.get('championId'),
+                participants={str(p.get('participantId')):dict(champion=champion(p,catalog),team=p.get('teamId')) for p in players},
                 participant_id=own.get('participantId'), opponent_id=opponent[0].get('participantId') if len(opponent)==1 else None,
                 started_at=(number(info.get('gameCreation') or info.get('gameStartTimestamp')) or 0)/1000,
                 duration=duration, queue=info.get('queueId'), map=info.get('mapId'),

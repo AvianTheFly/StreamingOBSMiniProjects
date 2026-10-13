@@ -89,7 +89,7 @@ class _InstantReplayInterface(ProjectInterface):
             {"key": "play_random", "label": "Shuffle Clips", "description": "Keep playing saved clips at random until stopped."},
             {"key": "play_highlights", "label": "Play Highlights", "description": "Play clips from the current or previous game."},
             {"key": "save", "label": "Save Replay", "description": "Save the OBS replay buffer and request a Twitch clip."},
-            {"key": "mark", "label": "Mark Start", "description": "Mark the start point for the next saved clip."},
+            {"key": "mark", "label": "Mark for Review", "description": "Save the last 60 seconds for later review. No automatic replay or Twitch clip."},
             {"key": "pause", "label": "Pause", "description": "Pause the current replay."},
             {"key": "resume", "label": "Resume", "description": "Resume the current replay."},
             {"key": "revert", "label": "Stop Replay", "description": "Stop replay and return to the normal scene."},
@@ -101,8 +101,9 @@ class _InstantReplayInterface(ProjectInterface):
         if action == "mark":
             handler = _live.get("mark")
             if handler:
-                handler()
-                return {"ok": True, "action": action}
+                accepted = handler()
+                return {"ok": bool(accepted), "action": action,
+                        **({} if accepted else {'error': 'A capture is already saving.'})}
         elif action in ('save_replay', 'quick_replay'):
             handler = _live.get(action)
             if handler:

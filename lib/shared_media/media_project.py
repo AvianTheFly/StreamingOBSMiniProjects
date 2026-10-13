@@ -398,13 +398,18 @@ def run_media_project(
         f"then speak or press [{manual_keys}] for a direct asset."
     )
 
+    from .asset_controls import AssetControls
+    asset_controls = AssetControls(name_index, playback, stop_event, stop_random_mode)
     try:
+        live_state['asset_controls'] = asset_controls
         while not stop_event.is_set():
             try:
                 input_queue.get(timeout=0.5)
             except queue.Empty:
                 continue
     finally:
+        if live_state.get('asset_controls') is asset_controls:
+            live_state.pop('asset_controls', None)
         run_cleanup(cfg.project_name, manual_window.close,
                     lambda: hub_events.unsubscribe(cfg.event_name, on_event) if cfg.event_name else None,
                     lambda: ptt.cancel("shutdown") if ptt is not None else None,

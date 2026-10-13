@@ -3,8 +3,7 @@
 # Pattern A (hotkey-only) with a background watcher thread.
 #
 # The LeagueAPIWatcher runs in a daemon thread (it has a blocking poll loop).
-# The pynput keyboard listener runs here so it can hand B-key presses to the
-# watcher without any shared mutable state other than the watcher object itself.
+# The Hub's shared keyboard bus delivers recall and stance intent to the watcher.
 
 from __future__ import annotations
 
@@ -12,7 +11,7 @@ import atexit
 import queue
 import threading
 
-from lib.global_hotkeys import key_char, subscribe_global_hotkeys, unsubscribe_global_hotkeys
+from lib.global_hotkeys import key_char, key_token, subscribe_global_hotkeys, unsubscribe_global_hotkeys
 from .core.league_api import LeagueAPIWatcher
 
 
@@ -44,24 +43,29 @@ def run(
         name="league-watcher",
         daemon=True,
     )
-    watcher_thread.start()
 
     # Keyboard listener — fires on every key press
     def on_press(key) -> None:
         char = key_char(key)
-        if char and char.lower() == _RECALL_KEY:
+        if key_token(key) in ('enter', '\r', '\n'):
+            watcher.on_chat_key()
+        elif char and char.lower() == _RECALL_KEY:
             watcher.on_recall_key()
+        elif char and char.lower() in 'qwer':
+            watcher.on_stance_key(char)
 
-    kb_token = subscribe_global_hotkeys(on_press)
-    print(f"[league] Keyboard listener armed (recall key: '{_RECALL_KEY}').")
-    if startup_event is not None:
-        startup_event.set()
-
-    # Block until the hub sets stop_event
-    stop_event.wait()
-
-    unsubscribe_global_hotkeys(kb_token)
-    watcher_thread.join(timeout=3)
-    watcher.shutdown()
-    atexit.unregister(watcher.shutdown)
-    print("[league] Stopped.")
+    kb_token = None
+    try:
+        kb_token = subscribe_global_hotkeys(on_press)
+        watcher_thread.start()
+        print(f"[league] Keyboard listener armed (recall: B; Udyr stances: Q/W/E/R).")
+        if startup_event is not None:
+            startup_event.set()
+        stop_event.wait()
+    finally:
+        unsubscribe_global_hotkeys(kb_token)
+        if watcher_thread.ident is not None:
+            watcher_thread.join(timeout=3)
+        watcher.shutdown()
+        atexit.unregister(watcher.shutdown)
+        print("[league] Stopped.")

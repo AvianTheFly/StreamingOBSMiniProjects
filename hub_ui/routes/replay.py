@@ -13,6 +13,9 @@ class ReplayRoutes:
                 self._json(200, data)
             except Exception as exc:
                 self._err(500, str(exc))
+        elif action == 'queue':
+            from instant_replay.api import queue_state
+            self._json(200, queue_state())
         elif action == "stage":
             from instant_replay.stage import state
             self._json(200, state())
@@ -23,6 +26,20 @@ class ReplayRoutes:
                 self._json(200, trim_status(query.get("job", [""])[0]))
             except ValueError as exc:
                 self._err(400, str(exc))
+        elif action in {'poster', 'poster-media'}:
+            try:
+                from instant_replay.library import resolve
+                from instant_replay.config import REPLAY_DIR
+                from hub_ui.replay_media import poster
+                from lib.http_files import serve_file
+                query = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+                status, media = poster(resolve(query.get('path',[''])[0],REPLAY_DIR))
+                if action == 'poster-media' and media:
+                    serve_file(self,media,content_type='image/jpeg')
+                else:
+                    self._json(200,status)
+            except (ValueError,OSError) as exc:
+                self._err(400,str(exc))
         elif action in {"preview", "preview-media"}:
             try:
                 from instant_replay.library import resolve
@@ -56,6 +73,12 @@ class ReplayRoutes:
                 self._err(400, 'Invalid replay cue')
             else:
                 self._json(200, {'accepted': acknowledge_cue(revision, body['event'])})
+        elif action == 'queue':
+            from instant_replay.api import edit_queue, NotReady
+            try:
+                self._json(200, edit_queue(body))
+            except (NotReady, ValueError) as exc:
+                self._err(409, str(exc))
         elif action == "library":
             from instant_replay import library
             from instant_replay.api import mutate_library
@@ -63,7 +86,7 @@ class ReplayRoutes:
                 self._json(200, mutate_library(body))
             except library.Conflict as exc:
                 self._err(409, str(exc))
-            except (ValueError, OSError) as exc:
+            except (ValueError, OSError, RuntimeError) as exc:
                 self._err(400, str(exc))
         elif action == "trim":
             from hub_ui.replay_trim import start_trim

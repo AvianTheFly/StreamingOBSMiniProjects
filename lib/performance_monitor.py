@@ -16,6 +16,7 @@ from pathlib import Path
 import threading
 import time
 from lib.process_metrics import ProcessMetrics
+from lib.process_inventory import process_snapshot
 from lib.gpu_metrics import GpuMetrics, GPU_FIELDS, parse_gpu_csv
 
 OBS_FIELDS = ("cpu_usage", "memory_usage", "active_fps", "average_frame_render_time",
@@ -83,6 +84,7 @@ class Collector:
         self._league_processes = {}
         self._league_scan_at = 0.0
         self._work_processes = ProcessMetrics()
+        self._process_rows = {}
 
     def _sample_league(self, psutil):
         # Discover infrequently, then reuse Process objects so CPU percentages
@@ -91,9 +93,13 @@ class Collector:
         now = time.monotonic()
         if now >= self._league_scan_at:
             found = {}
-            for process in psutil.process_iter(['pid', 'name']):
-                name = (process.info['name'] or '').lower()
+            for entry in self._process_rows.values():
+                name = entry.name.lower()
                 if name not in LEAGUE_PROCESS_NAMES:
+                    continue
+                try:
+                    process = psutil.Process(entry.pid)
+                except (psutil.NoSuchProcess, psutil.AccessDenied):
                     continue
                 previous = self._league_processes.get(process.pid)
                 if previous is not None and previous['process'].is_running():
@@ -105,7 +111,7 @@ class Collector:
                     except (psutil.NoSuchProcess, psutil.AccessDenied):
                         pass
             self._league_processes = found
-            self._league_scan_at = now + 5
+            self._league_scan_at = time.monotonic() + 5
         rows = []
         for pid, tracked in list(self._league_processes.items()):
             process = tracked['process']
@@ -114,11 +120,15 @@ class Collector:
                     rows.append(dict(pid=pid, name=tracked['name'],
                         cpu_percent=process.cpu_percent() if tracked['primed'] else None,
                         rss_mb=round(process.memory_info().rss / 1048576, 1),
-                        threads=process.num_threads()))
+                        threads=self._thread_count(pid)))
                 tracked['primed'] = True
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 self._league_processes.pop(pid, None)
         return sorted(rows, key=lambda row: (row['name'], row['pid']))
+
+    def _thread_count(self, pid):
+        entry = self._process_rows.get(pid)
+        return entry.threads if entry is not None else None
 
     def close(self):
         self.gpu.close()
@@ -137,18 +147,20 @@ class Collector:
         data.update(self.gpu.sample())
         try:
             import psutil
+            self._process_rows = {}
+            self._process_rows = {entry.pid: entry for entry in process_snapshot()}
             if self.process is None:
                 self.process = psutil.Process()
                 self.process.cpu_percent()
                 psutil.cpu_percent()
             p = self.process
             data["hub"] = {"rss_mb": round(p.memory_info().rss / 1048576, 1),
-                           "threads": p.num_threads(), "cpu_percent": p.cpu_percent(),
+                           "threads": self._thread_count(p.pid), "cpu_percent": p.cpu_percent(),
                            "system_cpu_percent": psutil.cpu_percent(),
                            "logical_cpus": psutil.cpu_count(),
                            "system_memory_percent": psutil.virtual_memory().percent}
             if (self.obs_process is None or not self.obs_process.is_running()
-                    or self.obs_process.num_threads() <= 1):
+                    or self._thread_count(self.obs_process.pid) == 1):
                 from obs.obs_config import OBS_PORT
                 self.obs_process = find_obs_process(psutil, int(OBS_PORT))
                 if self.obs_process is not None:
@@ -157,7 +169,7 @@ class Collector:
                 data['obs_process'] = dict(pid=self.obs_process.pid,
                     cpu_percent=self.obs_process.cpu_percent(),
                     rss_mb=round(self.obs_process.memory_info().rss / 1048576, 1),
-                    threads=self.obs_process.num_threads())
+                    threads=self._thread_count(self.obs_process.pid))
         except Exception as exc:
             data["hub_error"] = type(exc).__name__
         try:

@@ -7,6 +7,7 @@ from unittest.mock import Mock, patch
 
 import psutil
 from lib.process_metrics import ProcessMetrics
+from lib.process_inventory import ProcessEntry
 from lib import performance_monitor
 
 
@@ -14,6 +15,7 @@ class ProcessMetricsTests(unittest.TestCase):
     def process(self, pid, name='python.exe', created=10):
         process = Mock(pid=pid, info=dict(name=name, ppid=7, create_time=created))
         process.oneshot.side_effect = nullcontext
+        process.create_time.return_value = created
         process.memory_info.return_value.rss = 20 * 1048576
         process.num_threads.return_value = 3
         process.cpu_percent.side_effect = [0, 160, 80]
@@ -21,14 +23,15 @@ class ProcessMetricsTests(unittest.TestCase):
         return process
 
     def module(self, processes):
-        return SimpleNamespace(process_iter=Mock(return_value=processes),
+        return SimpleNamespace(snapshot=Mock(return_value=[ProcessEntry(p.pid,p.info['name'],p.info['ppid'],3) for p in processes]),
+            Process=Mock(side_effect=lambda pid: next(p for p in processes if p.pid==pid)),
             cpu_count=lambda: 16, NoSuchProcess=psutil.NoSuchProcess, AccessDenied=psutil.AccessDenied)
 
     def test_counts_other_python_and_ffmpeg_with_machine_percentage(self):
         now = [0]
         python, ffmpeg, unrelated = self.process(101), self.process(102, 'ffmpeg.exe'), self.process(103, 'riot.exe')
         module = self.module([python, ffmpeg, unrelated])
-        sampler = ProcessMetrics(clock=lambda: now[0])
+        sampler = ProcessMetrics(clock=lambda: now[0], snapshot=module.snapshot)
         first = sampler.sample(module)
         self.assertTrue(all(row['cpu_percent'] is None for row in first))
         now[0] = 1
@@ -36,7 +39,8 @@ class ProcessMetricsTests(unittest.TestCase):
         self.assertEqual({row['pid'] for row in second}, {101, 102})
         self.assertTrue(all(row['machine_cpu_percent'] == 10 for row in second))
         self.assertTrue(all(row['cpu_percent'] == 160 for row in second))
-        module.process_iter.assert_called_once_with(['pid', 'name', 'ppid', 'create_time'])
+        module.snapshot.assert_called_once_with()
+        self.assertNotIn(103, [call.args[0] for call in module.Process.call_args_list])
         python.cmdline.assert_not_called()
         ffmpeg.cmdline.assert_not_called()
         unrelated.cpu_percent.assert_not_called()
@@ -45,11 +49,12 @@ class ProcessMetricsTests(unittest.TestCase):
         now = [0]
         old, new = self.process(101), self.process(101, created=20)
         module = self.module([old])
-        sampler = ProcessMetrics(clock=lambda: now[0])
+        sampler = ProcessMetrics(clock=lambda: now[0], snapshot=module.snapshot)
         sampler.sample(module)
         now[0] = 5
         self.assertEqual(sampler.sample(module)[0]['cpu_percent'], 160)
-        module.process_iter.return_value = [new]
+        module.Process.side_effect = lambda pid: new
+        module.snapshot.return_value = [ProcessEntry(new.pid,new.info['name'],7,3)]
         now[0] = 10
         row = sampler.sample(module)[0]
         self.assertIsNone(row['cpu_percent'])
@@ -57,8 +62,8 @@ class ProcessMetricsTests(unittest.TestCase):
 
     def test_obs_browser_and_mux_costs_are_visible_without_command_line_access(self):
         processes = [self.process(201, 'obs-browser-page.exe'), self.process(202, 'obs-ffmpeg-mux.exe')]
-        sampler = ProcessMetrics()
         module = self.module(processes)
+        sampler = ProcessMetrics(snapshot=module.snapshot)
         sampler.sample(module)
         rows = sampler.sample(module)
         self.assertEqual({row['name'] for row in rows}, {'obs-browser-page.exe', 'obs-ffmpeg-mux.exe'})
@@ -70,8 +75,9 @@ class ProcessMetricsTests(unittest.TestCase):
         denied, exited, good = self.process(101), self.process(102), self.process(103)
         denied.cpu_percent.side_effect = psutil.AccessDenied(101)
         exited.memory_info.side_effect = psutil.NoSuchProcess(102)
-        sampler = ProcessMetrics()
-        rows = sampler.sample(self.module([denied, exited, good]))
+        module = self.module([denied, exited, good])
+        sampler = ProcessMetrics(snapshot=module.snapshot)
+        rows = sampler.sample(module)
         self.assertEqual([row['pid'] for row in rows], [103])
         self.assertEqual(len(sampler._tracked), 1)
 

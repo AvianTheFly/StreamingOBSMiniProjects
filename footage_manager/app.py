@@ -20,16 +20,17 @@ from pathlib import Path
 
 # Standalone launchers must still resolve the repository's shared persistence API.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from media import EXTENSIONS, JOB_CONTEXT, Cancelled, check_cancelled, deletion_check, export_clip, probe, run, unchanged
+from footage_manager.media import EXTENSIONS, JOB_CONTEXT, Cancelled, check_cancelled, deletion_check, export_clip, probe, run, unchanged
 from store import Store
 import analysis_api
+from footage_manager import cleanup
 from footage_manager.jobs import JobRunner
 
 HERE = Path(__file__).resolve().parent
 DATA = Path(os.environ.get('LOCALAPPDATA', str(Path.home()))) / 'FootageDesk'
 DEFAULT_OUTPUT = Path('C:/StreamingMedia/SelectedClips')
 TOKEN = secrets.token_urlsafe(32)
-UI_VERSION = hashlib.sha256(b''.join((HERE/'web'/name).read_bytes() for name in ('index.html', 'app.js', 'analysis.js', 'voice_markers.js', 'between_games.js', 'workflow.js', 'clip_editor.js', 'clip_drag.js', 'clip_history.js', 'clip_editor.css', 'recording_timeline.js', 'timeline_review.css', 'workflow.css', 'style.css'))).hexdigest()[:16]
+UI_VERSION = hashlib.sha256(b''.join((HERE/'web'/name).read_bytes() for name in ('index.html', 'app.js', 'analysis.js', 'find_moments.js', 'voice_markers.js', 'between_games.js', 'workflow.js', 'clip_editor.js', 'clip_drag.js', 'clip_history.js', 'clip_editor.css', 'recording_timeline.js', 'timeline_review.css', 'workflow.css', 'style.css'))).hexdigest()[:16]
 STOP = threading.Event()
 STORE = None
 
@@ -301,7 +302,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self.response({'app': 'Footage Desk', 'source': str(HERE), 'port': self.server.server_port})
             if path == '/':
                 return self.response((HERE/'web/index.html').read_text(encoding='utf-8').replace('__TOKEN__', TOKEN).replace('__UI_VERSION__', UI_VERSION).encode(), content_type='text/html; charset=utf-8')
-            if path in ('/app.js', '/analysis.js', '/voice_markers.js', '/between_games.js', '/workflow.js', '/clip_editor.js', '/clip_drag.js', '/clip_history.js', '/clip_editor.css', '/recording_timeline.js', '/timeline_review.css', '/workflow.css', '/style.css'):
+            if path in ('/app.js', '/analysis.js', '/find_moments.js', '/voice_markers.js', '/between_games.js', '/workflow.js', '/clip_editor.js', '/clip_drag.js', '/clip_history.js', '/clip_editor.css', '/recording_timeline.js', '/timeline_review.css', '/workflow.css', '/style.css'):
                 return self.response((HERE/'web'/path[1:]).read_bytes(), content_type='text/javascript' if path.endswith('.js') else 'text/css')
             if path == '/api/library':
                 jobs = RUNNER.snapshot()
@@ -311,6 +312,10 @@ class Handler(BaseHTTPRequestHandler):
                 output = STORE.setting('output', str(DEFAULT_OUTPUT))
                 free = shutil.disk_usage(Path(output).anchor).free if Path(output).anchor else 0
                 return self.response({'videos': videos, 'roots': STORE.setting('roots', []), 'output': output, 'data': str(STORE.directory), 'jobs': jobs, 'free': free, 'session': TOKEN, 'ui_version': UI_VERSION})
+            if path == '/api/analysis-plan':
+                return self.response(analysis_api.plan(STORE))
+            if path == '/api/cleanup-plan':
+                return self.response(cleanup.preview(STORE))
             if path == '/api/analysis':
                 weights = json.loads(query['weights'][0]) if 'weights' in query else None
                 return self.response(analysis_api.summary(STORE, weights))
@@ -376,12 +381,23 @@ class Handler(BaseHTTPRequestHandler):
                 raise ValueError('Invalid request size')
             payload = json.loads(self.rfile.read(length))
             path = urllib.parse.urlparse(self.path).path
+            if path == '/api/cleanup':
+                with JOB_LOCK:
+                    if any(j['label']==cleanup.LABEL and j['state'] in ('queued','running') for j in JOBS.values()):
+                        raise ValueError('Storage cleanup is already queued or running')
+                    work = cleanup.prepare(STORE,payload)
+                    ident = enqueue(cleanup.LABEL,work)
+                return self.response({'job':ident,'ledger':str(work.path),
+                                      'recordings':len(work.plan['sources']),
+                                      'retained_clips':len(work.plan.get('retained',[])),
+                                      'estimated_saved_bytes':work.plan['estimated_saved_bytes']})
             if path == '/api/analyze':
                 with JOB_LOCK:
                     if any(j['label']=='Analyze games and moments' and j['state'] in ('queued','running') for j in JOBS.values()):
                         raise ValueError('An analysis is already queued or running. Cancel it or wait for completion.')
-                work = analysis_api.prepare(STORE, payload)
-                return self.response({'job': enqueue('Analyze games and moments', work, background=True)})
+                    work = analysis_api.prepare(STORE, payload)
+                    ident = enqueue('Analyze games and moments', work, background=True)
+                return self.response({'job': ident})
             if path == '/api/analysis-keep':
                 return self.response({'id': analysis_api.keep(STORE,payload)})
             if path == '/api/analysis-replay':
@@ -507,6 +523,8 @@ def main():
     parser.add_argument('--port', type=int, default=8791)
     parser.add_argument('--data', default=str(DATA))
     parser.add_argument('--no-browser', action='store_true')
+    parser.add_argument('--no-startup-backup', action='store_true',
+                        help='Skip the catalogue startup snapshot for explicitly requested no-backup maintenance')
     args = parser.parse_args()
     if not shutil.which('ffmpeg') or not shutil.which('ffprobe'):
         raise SystemExit('FFmpeg and FFprobe must be on PATH')
@@ -535,7 +553,8 @@ def main():
     for video in STORE.rows("SELECT * FROM videos WHERE trash_path!='' AND availability!='deleted'"):
         if Path(video['trash_path']).exists() and not Path(video['path']).exists():
             STORE.execute("UPDATE videos SET availability='trash' WHERE id=?", (video['id'],))
-    STORE.backup()
+    if not args.no_startup_backup:
+        STORE.backup()
     STOP.clear()
     jobs_thread=threading.Thread(target=worker,name='Footage media jobs',daemon=True)
     scan_thread=threading.Thread(target=automatic_scans,name='Footage scan schedule',daemon=True)

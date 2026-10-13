@@ -47,7 +47,7 @@ const {chromium}=require('playwright');
   if(process.env.SPOTIFY_STILL_OUTPUT){
    const out=process.env.SPOTIFY_STILL_OUTPUT;fs.mkdirSync(out,{recursive:true});
    await page.addStyleTag({content:'body{background:#080d17}'});
-   for(const stage of [6,9,13,16])for(const [pose,angles] of [['front',[0,0,0]],['spatial',[.6,.32,.12]]]){
+   for(const stage of [1,4,6,7,9,11])for(const [pose,angles] of [['front',[0,0,0]],['spatial',[.6,.32,.12]]]){
     const pixels=await page.evaluate(({stage,angles})=>{
      journey.stage=stage;[journey.space.yaw,journey.space.tilt,journey.space.roll]=angles;
      widget.hidden=false;clear();present();
@@ -61,7 +61,7 @@ const {chromium}=require('playwright');
    }
    fs.writeFileSync(path.join(out,'camera-gpu.json'),JSON.stringify(results,null,2));
   }
-  console.log(JSON.stringify({passed:true,scenes:17,views:results.rows.length,minimumCoverage:Math.min(...results.rows.map(r=>r.coverage)),
+  console.log(JSON.stringify({passed:true,scenes:results.rows.length/5,views:results.rows.length,minimumCoverage:Math.min(...results.rows.map(r=>r.coverage)),
    minimumVisiblePixels:Math.min(...results.rows.map(r=>r.visible)),resources:results.resources}));
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

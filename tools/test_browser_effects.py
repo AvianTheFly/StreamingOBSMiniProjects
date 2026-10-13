@@ -14,48 +14,26 @@ from lib.browser_effects.http_server import handler
 
 
 class SessionTests(unittest.TestCase):
-    def test_extended_sound_catalog_resolves_authored_scenes_and_exceptions(self):
-        import re
-        from lib.browser_effects.catalog import effect_for, load_catalog
-        folder = Path('mini projects/soundboard')
-        catalog = load_catalog(folder)
-        source = Path('lib/browser_effects/art/library-scenes.js').read_text(encoding='utf-8')
-        authored = re.findall(r"case '([^']+)'", source)
-        scenes = [effect['scene'] for effect in catalog.values() if effect.get('scene')]
-        self.assertCountEqual(scenes, authored)
-        self.assertEqual(len(scenes), len(set(scenes)))
-        for stem in catalog:
-            self.assertIsNotNone(effect_for(folder, stem), stem)
-        self.assertEqual(effect_for(folder, 'hooray')['renderer'], 'hooray')
-        self.assertEqual(effect_for(folder, 'mom frog')['scene'], 'mom-frog')
-
-    def test_requested_border_groups_have_distinct_supported_shows(self):
+    def test_effect_lookup_allows_shared_art_and_keeps_personal_bindings(self):
         from lib.browser_effects.catalog import effect_for
-        folder=Path('mini projects/soundboard')
-        profile=json.loads((folder/'hotkeys_editor.json').read_text())['profiles']['default']
-        for key, count in [('Z',7),('1',3),('!',13)]:
-            stems=profile['hotkeys'][key]
-            self.assertEqual(len(stems), count)
-            effects=[effect_for(folder, stem) for stem in stems]
-            self.assertTrue(all(effects), key)
-            self.assertTrue(all(e.get('rave') for e in effects), key)
-            self.assertEqual(len({(e['renderer'],e.get('style')) for e in effects}),count)
+        with tempfile.TemporaryDirectory() as directory:
+            folder = Path(directory)
+            profile = folder / 'hotkeys_editor.json'
+            original = b'{"profiles":{"default":{"hotkeys":{"@":"hooray","Z":["my sound"]},"personal":42}}}'
+            profile.write_bytes(original)
+            effect = {'renderer': 'borders', 'style': 'confetti'}
+            (folder / 'browser_effects.json').write_text(json.dumps({
+                'my sound': effect, 'another sound': effect,
+                'hooray': {'renderer': 'hooray'}}))
+            self.assertEqual(effect_for(folder, 'MY SOUND'), effect)
+            self.assertEqual(effect_for(folder, 'another sound'), effect)
+            self.assertEqual(effect_for(folder, 'hooray'), {'renderer': 'hooray'})
+            self.assertIsNone(effect_for(folder, 'audio without an animation'))
+            self.assertEqual(profile.read_bytes(), original)
 
     def setUp(self):
         self.now=10
         self.channel=Channel(lambda:self.now)
-
-    def test_random_character_queue_keeps_existing_asset_identities(self):
-        from lib.browser_effects.catalog import effect_for
-        folder = Path('mini projects/soundboard')
-        profile = json.loads((folder/'hotkeys_editor.json').read_text())['profiles']['default']
-        stems = ['lizzard-1', 'gary_meow', 'mac-quack', 'bonk_7zPAD7C', 'piuw']
-        self.assertEqual(profile['hotkeys']['2'], stems)
-        effects = [effect_for(folder, stem) for stem in stems]
-        self.assertTrue(all(effects))
-        self.assertTrue(all(effect['renderer'] == 'borders' for effect in effects))
-        self.assertEqual([effect.get('scene') or effect['style'] for effect in effects],
-                         ['lizard', 'gary', 'quack', 'bonk', 'piuw'])
 
     def test_replacement_ignores_stale_end_and_stop(self):
         old=self.channel.begin('old',Path('old.wav'),{})
@@ -79,16 +57,6 @@ class SessionTests(unittest.TestCase):
         self.channel.stop()
         self.assertTrue(self.channel.matches('DIE DIE DIE'))
         self.assertFalse(self.channel.matches('hooray'))
-
-    def test_celebrations_are_mapped_and_hooray_uses_transparent_confetti(self):
-        from lib.browser_effects.catalog import effect_for
-        folder=Path('mini projects/soundboard')
-        profile=json.loads((folder/'hotkeys_editor.json').read_text())['profiles']['default']
-        self.assertEqual(profile['hotkeys']['@'], 'hooray')
-        self.assertEqual(effect_for(folder, 'hooray')['renderer'], 'hooray')
-        effects=[effect_for(folder, stem) for stem in profile['hotkeys']['!']]
-        self.assertTrue(all(effects))
-        self.assertEqual(len({(e['renderer'],e.get('style')) for e in effects}),len(effects))
 
     def test_catalog_selects_border_renderer_without_changing_profiles(self):
         from lib.browser_effects.catalog import effect_for

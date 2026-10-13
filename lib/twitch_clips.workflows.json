@@ -10,35 +10,35 @@
   "flows": [
     {
       "id": "twitch_clips.capture",
-      "label": "OBS saves a replay",
+      "label": "A replay save or moderator requests a clip",
       "topic": "Save a replay",
       "trigger": {
         "label": "OBS saves a replay",
         "event": "twitch.clip",
         "kind": "event"
       },
-      "detail": "",
+      "detail": "Highlight saves and moderator !clip share one 60-second Twitch request and a 90-second global cooldown, including uncertain failures. Chat attaches to the pending result or reuses its confirmed link without another POST; observers are bounded. Labels or current stream title/category plus local date/time form readable titles. Confirmation verifies the published duration; shorter clips retain their link and report an error without creating a duplicate. Local OBS saving is independent. Shutdown uses the published stop signal and joins the worker.",
       "steps": [
         {
           "id": "0",
           "label": "Twitch session available?",
           "owner": "twitch_clips",
           "kind": "gate",
-          "detail": ""
+          "detail": "Reject a second creation inside the 90-second window; at most 32 chat callbacks may observe pending work, and completed results can be reused."
         },
         {
           "id": "1",
           "label": "Request a 60-second Twitch clip",
           "owner": "twitch_clips",
           "kind": "action",
-          "detail": ""
+          "detail": "Request duration=60 with a clean descriptive title. Optional channel metadata has a five-second bound and a title fallback."
         },
         {
           "id": "2",
           "label": "Wait for confirmation",
           "owner": "twitch_clips",
           "kind": "wait",
-          "detail": ""
+          "detail": "Poll only the created ID; accept a published duration within 0.1 seconds of 60. Report shorter clips honestly with their link, without retrying creation."
         },
         {
           "id": "3",
@@ -49,7 +49,7 @@
         }
       ],
       "owner_hashes": {
-        "twitch_clips": "6cb4d1a0bfd46acfcee2107dc15ef18af573b5c472fa2821ac55c09974be6e37"
+        "twitch_clips": "2fde67d62597cc39d8a19e01fc620734354b4fc9b4f2a12c1d71c0d3bc75d287"
       },
       "edges": [
         {
@@ -69,7 +69,12 @@
         {
           "path": "lib/twitch_clips.py",
           "symbol": "_worker",
-          "hash": "5a92b3669431f0f4bc129e77afc7ce88620aad6fba2a19670f5b6faa0e091d09"
+          "hash": "933ef2072e4fdf2ab99679bc3eead9bdaea59d310ae03b11e8cfd5996c90d8ec"
+        },
+        {
+          "path": "lib/twitch_clips.py",
+          "symbol": "request_clip",
+          "hash": "99e2b6d88fa72ee63614b7fb8365d56ca973f6c2bfd55a73f62368b01e35fa53"
         }
       ]
     }

@@ -31,6 +31,11 @@ def reply(channel, text, parent, *, allowed):
     return bool(_sender and _sender.enqueue(channel,text,parent,allowed=allowed))
 
 
+def announce(channel, text, *, allowed):
+    """Queue an unthreaded message through the same authorized delivery owner."""
+    return bool(_sender and _sender.enqueue(channel,text,None,allowed=allowed))
+
+
 def parse_message(line, channel):
     match = re.fullmatch(r'@([^ ]+) :([A-Za-z0-9_]+)![^ ]+ PRIVMSG #([A-Za-z0-9_]+) :(.*)',line)
     if not match or match[3].lower()!=channel:

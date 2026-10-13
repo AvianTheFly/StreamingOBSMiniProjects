@@ -17,7 +17,7 @@
         "event": "hub.started",
         "kind": "event"
       },
-      "detail": "OBS-independent features start immediately based on public REQUIRES_OBS=False metadata. Undeclared/invalid dependencies remain deferred; voice and remaining playback workers start once after OBS connects. The CLI keeps its explicit fail-fast option. Native BLAS/OpenMP pools default to two threads after loading the environment and before feature imports; explicit thread settings are preserved and inherited by children. The launcher checks availability without initializing the native dependencies. Before starting features, hydrate the bounded derived metadata cache from LOCALAPPDATA; unchanged files avoid repeat ffprobe launches. Missing/invalid cache data falls back to ordinary probing. The existing preparation worker flushes trailing cache changes and never writes source assets. The existing diagnostics worker lazily owns one read-only NVML handle, closes it on shutdown and retains it across OBS reconnects. Unsupported counters remain unknown. Driver failures release the handle and retry after 60 seconds; the CLI fallback is limited to one launch per five seconds even during media bursts, with cached sample age reported.",
+      "detail": "OBS-independent features start immediately based on public REQUIRES_OBS=False metadata. Undeclared/invalid dependencies remain deferred; voice and remaining playback workers start once after OBS connects. The CLI keeps its explicit fail-fast option. Native BLAS/OpenMP pools default to two threads after loading the environment and before feature imports; explicit thread settings are preserved and inherited by children. The launcher checks availability without initializing the native dependencies. Before starting features, hydrate the bounded derived metadata cache from LOCALAPPDATA; unchanged files avoid repeat ffprobe launches. Missing/invalid cache data falls back to ordinary probing. The existing preparation worker flushes trailing cache changes and never writes source assets. The existing diagnostics worker lazily owns one read-only NVML handle, closes it on shutdown and retains it across OBS reconnects. Unsupported counters remain unknown. Driver failures release the handle and retry after 60 seconds; the CLI fallback is limited to one launch per five seconds even during media bursts, with cached sample age reported. Once OBS is available, Hub startup enables the replay buffer through the shared idempotent output API before voice and dependent playback start. This also applies to deferred OBS startup. Shutdown cancels this action; failure warns without blocking modules. Later manual buffer stops remain stopped until an explicit start or the next Hub launch. Twitch VOD/Stream Rewind checks are manual: startup registers the service without opening Chrome or creating a check worker. Check settings explicitly opens the signed-in dashboard; the extension closes only the acknowledged setup tab after successful verification. Busy checks reject duplicate requests; the Hub stop signal cancels the bounded wait. Read-only process discovery uses one shared immutable one-second Windows Toolhelp inventory. It retains no OS handle or worker; diagnostic CPU counters retain PID/creation-time identity, and thread counts come from the inventory at discovery cadence. Failed inventories back off for one second and never publish partial or stale success.",
       "steps": [
         {
           "id": "0",
@@ -52,11 +52,11 @@
           "label": "Start remaining workers once",
           "owner": "hub",
           "kind": "end",
-          "detail": "Independent workers are excluded from the deferred batch."
+          "detail": "Independent workers are excluded from the deferred batch. Start replay capture first, leaving an already-running buffer intact."
         }
       ],
       "owner_hashes": {
-        "hub": "40bd807609f763027d6a9c5ba598e6d523b408028fbb059df52f91098d54ba4a"
+        "hub": "490de150321b31966efff034dda8fa6b6b69d0d57bfc40cc0da3527c3a3b74b6"
       },
       "edges": [
         {
@@ -96,7 +96,7 @@
         {
           "path": "main.py",
           "symbol": "_run_hub",
-          "hash": "4c0b26f4cf3c9dd448c1ce17dd84fb8d6fae319ec69a8c385b94c66d82bbfb7a"
+          "hash": "2d196ac62428b7a1479c844e6c7ea91d18afebaa71b105d01213a873511372ec"
         },
         {
           "path": "lib/hub_runtime/projects.py",
@@ -122,6 +122,11 @@
           "path": "lib/gpu_metrics.py",
           "symbol": "GpuMetrics.sample",
           "hash": "ed48886e963406106b481eefada56b0752c1d2024fefba7fc7f810bd49a58916"
+        },
+        {
+          "path": "lib/hub_runtime/outputs.py",
+          "symbol": "start_capture",
+          "hash": "a3e4a72587014b6ed1cc48147cf728654c30bdd576d23edc6e78d090eea19a05"
         }
       ]
     },
@@ -304,7 +309,7 @@
         "kind": "event",
         "label": "Presentation subscribes"
       },
-      "detail": "The existing bounded SSE transport filters optional event types before serialization and queueing. Lobby artwork subscribes only to its cues. Unfiltered Hub clients retain initial and periodic status; workflow history still samples with no status subscriber. Disconnect releases the queue.",
+      "detail": "The existing bounded SSE transport filters optional event types before serialization and queueing. Lobby artwork subscribes only to its cues. Unfiltered Hub clients retain initial and periodic status; workflow history still samples with no status subscriber. Disconnect releases the queue. Local game chat notices are forwarded as chat.overlay.notice within hub_event during the same server lifetime. The feature supplies discovery policy and copy; the adapter adds no replay buffer, producer worker or Twitch delivery.",
       "steps": [
         {
           "id": "subscribe",
@@ -355,10 +360,15 @@
           "path": "hub_ui/updates.py",
           "symbol": "stream",
           "hash": "82d2e04787b28d894b1c63db9419547fb2f52d6a55c60fa7caee26b2313f9262"
+        },
+        {
+          "path": "hub_ui/updates.py",
+          "symbol": "forward_domain_events",
+          "hash": "2b29a63cfd015b3d62398e2c25e5f649a345f04dc4a798c0ae6f6b8b512038cf"
         }
       ],
       "owner_hashes": {
-        "hub": "b9b788f67f36e3e61acf7e7b14cf3d96728f674c610c9e1dde9d60046175fa6c"
+        "hub": "be6aa47d26c0675c53db953c937f80c08ce731d988c62500bd7e46a15ce8c033"
       }
     }
   ]

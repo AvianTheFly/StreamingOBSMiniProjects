@@ -60,7 +60,7 @@ class ReplaySelection:
                 if self._deferred_cancel.is_set() or scene_director.snapshot()['manual_revision'] != revision:
                     return
                 path = result.get('path')
-                if path:
+                if path and result.get('purpose') != 'review_later':
                     stage.waiting(False)
                     self.playback._play_all_clips_sequential([path],
                         presentation='replay' if force_replay else None, mode=mode)
@@ -116,7 +116,8 @@ class ReplaySelection:
             token = game_match.group(1)
             _WORD_NUMS = {'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10}
             from . import library
-            reels = list_edited_reels()
+            eligible = set(library.highlight_paths([str(p) for _, p in list_edited_reels()]))
+            reels = [(n, p) for n, p in list_edited_reels() if str(p.resolve()) in eligible]
             archived_numbers = library.game_numbers()
             if token in ('last', 'latest'):
                 available_numbers = archived_numbers + [n for n, _ in reels]
@@ -157,7 +158,8 @@ class ReplaySelection:
                 clips = prev_clips
                 label = f'previous game ({len(clips)} clip(s))'
             else:
-                reels = list_edited_reels()
+                eligible = set(library.highlight_paths([str(p) for _, p in list_edited_reels()]))
+                reels = [(n, p) for n, p in list_edited_reels() if str(p.resolve()) in eligible]
                 if reels:
                     _, reel_path = reels[-1]
                     print(f'[instant_replay] No live clips — playing latest reel: {reel_path.name}')
@@ -182,9 +184,10 @@ class ReplaySelection:
             save_time = self.state._last_save_cmd_time[0]
             in_progress = self.state._save_in_progress[0]
             done_event = self.state._save_done_event[0]
+            saving_for_review = self.state._save_result[0].get('purpose') == 'review_later'
         now = time.time()
         within_window = save_time is not None and now - save_time <= PLAY_AFTER_SAVE_WINDOW
-        if in_progress and within_window:
+        if in_progress and within_window and not saving_for_review:
             print(f'[instant_replay] ⏳ Save in progress — will play automatically once the clip is ready.')
 
             self.queue_saved_replay(force_replay=force_replay, mode='replay' if force_replay else 'showcase' if force_showcase else None)

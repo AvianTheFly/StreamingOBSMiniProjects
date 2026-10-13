@@ -33,7 +33,7 @@ if(process.argv[2]){
   maximumJump=Math.max(maximumJump,Math.abs(j.motion.pacing.speed-previous));previous=j.motion.pacing.speed;
   if(i%30===0)timeline.push({seconds:i/30,energy:j.energy,voices:j.motion.presenceVoices.slice(),
    ...j.motion.pacing.snapshot(),evolution:{...j.evolution},stage:j.stage,transitioning:j.transitioning});
-  if(i%150===0&&w.active)for(let stage=0;stage<17;stage++)Stages.render(stage,{line(a,b){assert(a.every(Number.isFinite)&&b.every(Number.isFinite));},face(p){assert(p.flat().every(Number.isFinite));}},w,j);
+  if(i%150===0&&w.active)for(let stage=0;stage<Journey.names.length;stage++)Stages.render(stage,{line(a,b){assert(a.every(Number.isFinite)&&b.every(Number.isFinite));},face(p){assert(p.flat().every(Number.isFinite));}},w,j);
  }
  assert(frames.length>4800,'reference audit must cover the whole 163-second recording');
  const mean=(a,b,key)=>timeline.filter(f=>a<=f.seconds&&f.seconds<b).reduce((s,f)=>s+f[key]/(b-a),0);

@@ -10,7 +10,7 @@ from lib.settings_backups import SettingsBackups
 PATH = Path(__file__).with_name('commands.json')
 RESERVED = {'!stats','!count','!melee','!range','!ranged','!caster','!cannon','!siege',
             '!nexus','!statundo','!command','!cmd','!addcom','!editcom','!delcom'}
-KINDS = {'text','index','time','8ball'}
+KINDS = {'text','index','time','8ball','clip'}
 
 
 class Conflict(ValueError):
@@ -20,6 +20,8 @@ class Conflict(ValueError):
 def validate(data):
     if not isinstance(data,dict) or type(data.get('enabled')) is not bool:
         raise ValueError('Commands need an enabled switch.')
+    if type(data.get('announcements_enabled', False)) is not bool:
+        raise ValueError('Command reminders need an enabled switch.')
     if not isinstance(data.get('channel'),str) or not re.fullmatch(r'[a-z0-9_]{1,25}',data['channel']):
         raise ValueError('Enter a valid Twitch channel.')
     rows = data.get('commands')
@@ -39,6 +41,10 @@ def validate(data):
                 raise ValueError('Duplicate or reserved command: '+name)
             names.add(name)
         kind = row.get('kind','text')
+        if kind == 'clip' and (row['command'] != '!clip' or aliases
+                               or row.get('permission') != 'moderator'
+                               or row.get('cooldown') != 90):
+            raise ValueError('Twitch clipping uses !clip, moderator permission, no aliases and a shared 90-second cooldown.')
         if kind not in KINDS:
             raise ValueError('Choose a supported response type.')
         response = row.get('response','')
@@ -67,7 +73,7 @@ def read(path=PATH):
 
 
 def save(body,path=PATH,*,snapshot=None):
-    if not isinstance(body,dict) or set(body)-{'revision','enabled','command','original'}:
+    if not isinstance(body,dict) or set(body)-{'revision','enabled','command','original','announcements_enabled'}:
         raise ValueError('Unknown command edit.')
     def edit(current):
         validate(current)
@@ -76,6 +82,8 @@ def save(body,path=PATH,*,snapshot=None):
         result = deepcopy(current)
         if 'enabled' in body:
             result['enabled'] = body['enabled']
+        if 'announcements_enabled' in body:
+            result['announcements_enabled'] = body['announcements_enabled']
         if 'command' in body:
             row = body['command']
             if not isinstance(row,dict) or set(row)-{'command','aliases','response','kind','enabled','cooldown','permission','category'}:

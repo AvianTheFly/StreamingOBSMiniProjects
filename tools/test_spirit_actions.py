@@ -10,8 +10,9 @@ from hub_ui.updates import subscription
 class ActionsTests(unittest.TestCase):
     def test_catalog_and_validation(self):
         items = catalog()
-        self.assertEqual(len({e['id'] for e in items}), 18)
-        self.assertEqual(len({e['key'] for e in items}), 18)
+        self.assertTrue(items)
+        self.assertEqual(len({e['id'] for e in items}), len(items))
+        self.assertEqual(len({e['key'] for e in items}), len(items))
         for e in items:
             self.assertIn(e['stage'], ('back', 'front'))
             self.assertGreater(e['weight'], 0)

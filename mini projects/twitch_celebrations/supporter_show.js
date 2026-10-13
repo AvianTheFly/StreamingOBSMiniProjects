@@ -1,6 +1,7 @@
 // Dynamic supporter copy/layout and the preserved follower cameo.
 import {smooth,trace,EdgeFinish} from './subtle.js';
 import {celebrationWorld,celebrationArtReady} from './raid_art.js';
+import {SubscriberParty} from './subscriber_party.js';
 const TAU=Math.PI*2,clamp=x=>Math.max(0,Math.min(1,x)),lerp=(a,b,p)=>a+(b-a)*p;
 export const SPIRITS={
  crab:{id:'bear',name:'STORMCLAW',color:'#85dcff',secondary:'#bbb5ff'},
@@ -62,6 +63,8 @@ export function detailFor(item){const d=item.details||{},tier={'1000':'TIER I','
 export class SupporterShow{
  constructor(stage){this.stage=stage;this.ready=celebrationArtReady;this.reduced=matchMedia('(prefers-reduced-motion:reduce)');}
  start(item,settings){
+  this.stop();
+  if(item.kind==='subscribe'){this.subscription=new SubscriberParty(this.stage);this.subscription.start(item);return;}
   document.getElementById('cast').replaceChildren();
   this.item=item;this.spirit=SPIRITS[item.theme]||SPIRITS.crab;this.seed=hash(item.name);this.follow=item.kind==='follow';this.custom=!!settings.custom?.[item.theme]?.visual;
   if(!this.follow){this.edgeCanvas??=document.createElement('canvas');this.edgeCanvas.width=1920;this.edgeCanvas.height=1080;this.edgeContext=this.edgeCanvas.getContext('2d');borderFinish??=new EdgeFinish();}
@@ -87,6 +90,7 @@ export class SupporterShow{
   if(node.scrollWidth>node.clientWidth){node.classList.add('wrapped-name');node.style.whiteSpace='normal';node.style.overflowWrap='anywhere';}
  }
  update(elapsed){
+  if(this.subscription){this.subscription.update(elapsed);return;}
   const duration=this.item.duration||3.8,t=this.reduced.matches?(this.follow?1:1.7):elapsed;
   this.stage.dataset.supportPhase=elapsed<.55?'arrival':elapsed<1.3?'impact':elapsed<duration-.55?'honor':'exit';
   if(!this.follow){const reveal=this.reduced.matches?1:smooth((elapsed-.42)/.48);this.panel.querySelector('#supporterName').style.clipPath=`inset(0 ${(1-reveal)*100}% 0 0)`;const message=this.panel.querySelector('#supporterMessage');message.style.opacity=this.reduced.matches?1:smooth((elapsed-.68)/.35);}
@@ -109,5 +113,5 @@ export class SupporterShow{
   if(!this.reduced.matches)trace(c,u=>[220+u*490,894+Math.sin(u*Math.PI)*10],t,{color:this.spirit.color,speed:.35,tail:.2,width:1.5});
   for(let j=0;j<5;j++)star(c,210+j*24,778+Math.sin(t*2+j)*8,2,this.spirit.secondary,.45);
  }
- stop(){this.resizeObserver?.disconnect();this.c?.clearRect(0,0,1920,1080);this.layer?.remove();this.layer=null;this.stage.classList.remove('supporter','follower','subscriber');delete this.stage.dataset.spirit;delete this.stage.dataset.supportPhase;this.item=null;}
+ stop(){this.subscription?.stop();this.subscription=null;this.resizeObserver?.disconnect();this.c?.clearRect(0,0,1920,1080);this.layer?.remove();this.layer=null;this.stage.classList.remove('supporter','follower','subscriber');delete this.stage.dataset.spirit;delete this.stage.dataset.supportPhase;this.item=null;}
 }

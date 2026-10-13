@@ -51,3 +51,33 @@ class MotionTests(unittest.TestCase):
         for name,item in json.loads((target/'build.json').read_text(encoding='utf-8')).items():
             self.assertEqual(hashlib.sha256((target/name).read_bytes()).hexdigest(),item['sha256'])
             self.assertEqual((target/name).read_bytes(),(root/item['source']).read_bytes())
+
+    def test_redesigned_backing_and_foreground_keep_media_and_personal_placement(self):
+        from scene_voice_switcher.layouts import SPIRIT_ART, foreground, artwork
+        for name in SPIRIT_ART:
+            data={'locations':{name:{'camera':[1000,350,300,420],'extra_personal':'kept'}}}
+            layers=plan(name,data)['layers']
+            self.assertEqual(layers[0]['settings']['file'],str(artwork(name)))
+            self.assertTrue(layers[0]['configure'])
+            self.assertTrue(artwork(name).is_file())
+            if name != 'AuroraCampLobby':
+                self.assertTrue(foreground(name).is_file())
+                self.assertEqual(next(p for p in layers if p['source']==name+' Foreground')['settings']['file'],str(foreground(name)))
+            self.assertEqual(data['locations'][name]['extra_personal'],'kept')
+
+    def test_distinct_foregrounds_match_authored_camera_and_current_plate(self):
+        from PIL import Image
+        import hashlib
+        from scene_voice_switcher.layouts import SPIRIT_ART, foreground, artwork, ART, defaults
+        for name in SPIRIT_ART:
+            if name == 'AuroraCampLobby':
+                continue
+            with Image.open(foreground(name)) as new, Image.open(artwork(name)) as plate:
+                expected=Image.new('L',new.size,255)
+                x,y,w,h=defaults(name)['camera']
+                expected.paste(0,(x,y,x+w,y+h))
+                self.assertEqual(expected.tobytes(),new.getchannel('A').tobytes())
+                records=json.loads((foreground(name).parent/'distinct-layer-provenance.json').read_text())
+                record=next(r for r in records if Path(r['output']).name==foreground(name).name)
+                self.assertEqual(hashlib.sha256(artwork(name).read_bytes()).hexdigest(),record['plateSha256'])
+                self.assertEqual(hashlib.sha256(new.convert('RGB').tobytes()).hexdigest(),record['rgbSha256'])

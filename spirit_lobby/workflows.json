@@ -89,7 +89,7 @@
           "owner": "lobby_screens",
           "label": "Active browser displays refresh the saved selection",
           "kind": "end",
-          "detail": "The existing document loop owns bounded catalog refresh and four media slots; hidden documents pause media, abort refresh and release animation. No program-scene or audio changes."
+          "detail": "The existing document loop owns bounded catalog refresh and three active sign/booth media slots; hidden documents pause media, abort refresh and release animation. No program-scene or audio changes."
         }
       ],
       "edges": [
@@ -115,8 +115,9 @@
         }
       ],
       "owner_hashes": {
-        "lobby_screens": "a36a0a9fab1c0312b4e1d6640e25a6d3cc5f4b6b5288b139145556ee3629a95c"
-      }
+        "lobby_screens": "6836cc647724e3e4efe84f71e93478a6d8d7777ba0b1f2ddef54b250664b2c1b"
+      },
+      "detail": "The main desktop display is removed from Afterparty artwork and studio controls. The three wall/booth slots retain saved media and messages; the old main selection is preserved without allocating playback. Original scenery remains beneath the shared keyed Parsec camera and transparent chat; only foreground apertures are cleared. Afterparty uses the aligned room plate with both original wall plaques. The booth is centered at x960, with the default camera centered above its deck; saved per-location overrides still win. Text retains the painted sign material, and media projects inside the same fitted plaques."
     },
     {
       "id": "lobby_screens.party",
@@ -188,8 +189,9 @@
         }
       ],
       "owner_hashes": {
-        "lobby_screens": "9975c5f53cc86c7d630649c438b0c60e985a30e1e3d8fe8263de6b561021f21d"
-      }
+        "lobby_screens": "48579e05c8482bc3b9a70315092624c001d17c466cb3a26625ce8acfb10713d4"
+      },
+      "detail": "The main desktop display is removed from Afterparty artwork and studio controls. The three wall/booth slots retain saved media and messages; the old main selection is preserved without allocating playback. Original scenery remains beneath the shared keyed Parsec camera and transparent chat; only foreground apertures are cleared. Feature-local party-staging.js scales whole visitor acts at side steps, windows and the rear floor. Robot, duck and balloon visits render behind the booth; automatic front effects have lower selection weight. Visitors have no floating captions. The same document owns drawing and cleanup."
     },
     {
       "id": "lobby_screens.ambient",
@@ -251,8 +253,9 @@
         }
       ],
       "owner_hashes": {
-        "lobby_screens": "a36a0a9fab1c0312b4e1d6640e25a6d3cc5f4b6b5288b139145556ee3629a95c"
-      }
+        "lobby_screens": "48579e05c8482bc3b9a70315092624c001d17c466cb3a26625ce8acfb10713d4"
+      },
+      "detail": "The main desktop display is removed from Afterparty artwork and studio controls. The three wall/booth slots retain saved media and messages; the old main selection is preserved without allocating playback. Original scenery remains beneath the shared keyed Parsec camera and transparent chat; only foreground apertures are cleared. Feature-local party-staging.js scales whole visitor acts at side steps, windows and the rear floor. Robot, duck and balloon visits render behind the booth; automatic front effects have lower selection weight. Visitors have no floating captions. The same document owns drawing and cleanup."
     }
   ]
 }

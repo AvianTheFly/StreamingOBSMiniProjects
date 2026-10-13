@@ -133,7 +133,17 @@ class MatchScreenTests(unittest.TestCase):
         from .main import Service
         service = Service.__new__(Service)
         service.match_screens = self.screens
+        service.client_scenes = SimpleNamespace(replay_viewing=SimpleNamespace(active=False))
         service.engine = Mock(config={'paused': True})
+        self.assertEqual(service.match_scene_hold(disconnected=True), 0)
+
+    def test_replay_viewing_holds_fallback_lobby_without_live_match_art(self):
+        from .main import Service
+        service = Service.__new__(Service)
+        service.client_scenes = SimpleNamespace(replay_viewing=SimpleNamespace(active=True))
+        service.engine = Mock(config={'paused': True})
+        self.assertGreater(service.match_scene_hold(disconnected=True), 0)
+        service.client_scenes.replay_viewing.active = False
         self.assertEqual(service.match_scene_hold(disconnected=True), 0)
 
     def test_game_api_loss_keeps_art_until_its_original_deadline(self):
@@ -189,6 +199,36 @@ class MatchScreenTests(unittest.TestCase):
                 callbacks['game.disconnected']({})
                 self.assertFalse(returned.wait(.15))
                 remaining[0] = 0
+                self.assertTrue(returned.wait(1))
+            finally:
+                stop.set(); worker.join(2)
+            self.assertFalse(worker.is_alive())
+
+
+    def test_client_failure_after_game_end_releases_waiting_fallback(self):
+        from scene_voice_switcher import main as switcher
+        callbacks = {}; delegated = [True]
+        stop = threading.Event(); startup = threading.Event(); checked = threading.Event(); returned = threading.Event()
+        def client_routes():
+            checked.set()
+            return delegated[0]
+        with patch.object(switcher, '_discover_lobbies', return_value={'TavernLobby': []}), \
+             patch.object(switcher, 'show_lobby', side_effect=lambda *a, **k: (returned.set() or True, 'TavernLobby')), \
+             patch.object(switcher, 'VoicePTT'), \
+             patch.object(switcher, 'subscribe_global_hotkeys'), \
+             patch.object(switcher, 'unsubscribe_global_hotkeys'), \
+             patch.object(switcher.hub_events, 'subscribe', side_effect=lambda name, cb: callbacks.update({name: cb})), \
+             patch.object(switcher.hub_events, 'unsubscribe'), \
+             patch.object(switcher.game_scene_policy, 'automatic_lobbies', side_effect=client_routes), \
+             patch.object(switcher.game_scene_policy, 'hold', return_value=0):
+            worker = threading.Thread(target=switcher.run, args=(queue.Queue(), stop), kwargs={'startup_event': startup})
+            worker.start()
+            try:
+                self.assertTrue(startup.wait(2))
+                callbacks['game.disconnected']({})
+                self.assertTrue(checked.wait(1))
+                self.assertFalse(returned.is_set())
+                delegated[0] = False
                 self.assertTrue(returned.wait(1))
             finally:
                 stop.set(); worker.join(2)

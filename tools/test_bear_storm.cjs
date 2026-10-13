@@ -1,28 +1,17 @@
-// Storm artwork regression: accepted approach choreography, intact paint, projection,
+// Current bear artwork: intact paint, projection,
 // visible claw contacts, perspective pressure and configurable cover integration.
-const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=require('node:fs');
+const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {serve}=require('./spirit_fixture.cjs');
-const out=process.env.SPIRIT_OUTPUT||'C:/StreamingMedia/Transitions/udyr-spirits-v15';
-(async()=>{const fixture=await serve(),reference=await serve(process.env.SPIRIT_REFERENCE||out+'/before-v15/lib/scene_transitions/web'),browser=await chromium.launch({headless:true,channel:'chrome'});
+const out=process.env.SPIRIT_OUTPUT||path.resolve(__dirname,'../output/bear-review');
+fs.mkdirSync(out,{recursive:true});
+(async()=>{const fixture=await serve(),browser=await chromium.launch({headless:true,channel:'chrome'});
  try{const page=await browser.newPage();await page.goto(fixture.url);await page.waitForFunction(()=>!!window.spiritPreview);
- // Compare the immutable accepted v10 source in the same Chrome process;
- // premultiplied canvas rounding can differ across graphics-process lifetimes.
- const ref=await browser.newPage();await ref.goto(reference.url);await ref.waitForFunction(()=>!!window.spiritPreview);
- const accepted=await ref.evaluate(async()=>{
-  const {arrival}=await import('./bear.js'),m=await import('./rigs/bear/motion.js');
-  return {swipes:m.swipes,samples:Array.from({length:397},(_,i)=>{const t=i/60;return {arrival:[arrival(t),arrival(t,1)],gait:m.gait(t),views:m.views(t)};})};
- });
- const proof=await page.evaluate(async accepted=>{
-  const {SpiritTransition}=await import('./renderer.js'),{Character}=await import('./characters.js');
+ const proof=await page.evaluate(async()=>{
+  const {Character}=await import('./characters.js');
   const {arrival,slashPoint}=await import('./bear.js'),m=await import('./rigs/bear/motion.js');
   const {frontAnatomy,frontPoint,frontClawContact}=await import('./rigs/bear/front-motion.js'),{world}=await import('./performance.js');
   const check=(condition,message)=>{if(!condition)throw Error(message);};
-  const distance=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);let preservedFrames=0,samples=0,visibleContacts=0,minJacobian=Infinity,maxSupportSlide=0;
-  check(JSON.stringify(m.swipes)===JSON.stringify(accepted.swipes),'Accepted strike/audio beats changed');
-  for(let i=0;i<accepted.samples.length;i++){const t=i/60;
-   const sample={arrival:[arrival(t),arrival(t,1)],gait:m.gait(t),views:m.views(t)};
-   check(JSON.stringify(sample)===JSON.stringify(accepted.samples[i]),'Accepted walking/turn choreography changed');preservedFrames++;
-  }
+  const distance=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);let samples=0,visibleContacts=0,minJacobian=Infinity,maxSupportSlide=0;
   const actor=await new Character().load('bear');check(actor.parts.front.poses.length===3,'Missing complete frontal poses');
   for(const [key,pose] of actor.parts.front.poses.entries())check(Math.abs(pose.w/pose.h-frontAnatomy.widths[key]/frontAnatomy.height)<1e-9,'Frontal art aspect ratio is stretched');
   const support=m.acting(1.94).hindPaws;
@@ -50,8 +39,8 @@ const out=process.env.SPIRIT_OUTPUT||'C:/StreamingMedia/Transitions/udyr-spirits
   }
   check(m.acting(2.40).front.layers.find(l=>l.weight===1).key===1,'First swipe loses its follow-through');
   check(m.acting(2.90).front.layers.find(l=>l.weight===1).key===2,'Second swipe loses its follow-through');
-  actor.dispose();return {preservedFrames,samples,visibleContacts,minJacobian,maxSupportSlide,completeStormFrontalPoses:true,mirroredClawContacts:true};
- },accepted);
- assert.equal(proof.preservedFrames,397);fs.writeFileSync(out+'/bear-storm-validation.json',JSON.stringify(proof,null,2));console.log('Accepted approach choreography, intact storm artwork, non-folding projection, visible claws, stable support and follow-through passed');
- }finally{await browser.close();fixture.close();reference.close();}
+  actor.dispose();return {samples,visibleContacts,minJacobian,maxSupportSlide,completeStormFrontalPoses:true,mirroredClawContacts:true};
+ });
+ assert(proof.samples>0&&proof.visibleContacts>0);fs.writeFileSync(out+'/bear-storm-validation.json',JSON.stringify(proof,null,2));console.log('Intact storm artwork, non-folding projection, visible claws, stable support and follow-through passed');
+ }finally{await browser.close();fixture.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

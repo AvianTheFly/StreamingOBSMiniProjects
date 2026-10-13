@@ -82,4 +82,7 @@ def apply_layout(client, scene, plan):
     if [name for name in ordered if name in expected] != expected:
         for index, source in enumerate(expected):
             before_write(); client.set_scene_item_index(scene, indexed[source]['sceneItemId'], index)
+    if plan.get('display_content'):
+        from lib.display_capture import apply_content
+        apply_content(plan['display_content'], client=client)
     return saved

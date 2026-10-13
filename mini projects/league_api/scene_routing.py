@@ -8,6 +8,8 @@ def idle_uses_lobby(settings):
 
 
 def destination(settings, target):
+    if target == 'loading' and settings.get('loading_scene'):
+        return settings['loading_scene']
     if target == 'champions' and settings.get('champion_scene'):
         return settings['champion_scene']
     if target == 'idle' and not idle_uses_lobby(settings):
@@ -18,8 +20,8 @@ def destination(settings, target):
 def _prepare_scene(client, settings, target):
     """Resolve every required item before writing visibility or switching scenes."""
     scenes = {s['sceneName'] for s in client.get_scene_list().scenes}
-    if target == 'champions' and settings.get('champion_scene'):
-        scene = settings['champion_scene']
+    if target in {'champions', 'loading'} and settings.get('champion_scene' if target == 'champions' else 'loading_scene'):
+        scene = destination(settings, target)
         if scene not in scenes:
             raise ValueError(f'OBS champion scene is missing: {scene}')
         return

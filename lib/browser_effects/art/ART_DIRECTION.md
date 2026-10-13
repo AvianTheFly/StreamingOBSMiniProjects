@@ -1,5 +1,38 @@
 # Original border artwork / 2026-10-02
 
+## Thematic performances / 2026-10-08
+
+The current requested scope is `Z T t 1 ! 2 @ 3 # 4 $ %` in Soundboard's
+`default` profile: 40 distinct sounds. `4` is unbound and remains untouched.
+`sound-shorts.js` owns anime Wow, Roblox Win, checklist approval, the original
+anxious-creature Oh No and the return intro. `sound-romance.js` owns six distinct
+romance acts, including Super Idol's ice-cream/flower concert, the local moonlit
+spinning cat and the Cena/Cupid self-hit joke. `sound-encores.js` supplies one
+small relevant second-act prop per established cast without replacing its primary
+performance. The oven-mitt conductor reacts to the same 6.24-second final Muffin
+lyric and the bakery stays closed. The full-perimeter accelerating car remains.
+Hooray uses smiling poppers and a reduced paper shower at the edge, with a clear
+gameplay opening and slowly breathing stars. Original-media PCM envelopes are
+merged into `culture-timing.json`; unselected timing remains intact.
+
+All 57 non-Hextech League events use new flat storybook performers in their own
+feature's `story-*.js`. Structures grow into crooked silhouettes, then crush and
+remain rubble; restored inhibitors assemble in the opposite direction. Respawn
+wakes turtle, phoenix, ram and bear in four fixed sections with leaves, feathers,
+horn curls, paws and a rising sun. Death puts those same spirits to sleep.
+Dragon habitats have element-specific motion, quiet sustained counterparts and
+their existing release envelope. Combat, harvest, ward, progression, match-end
+and optional signals use literal small props. Inferred signals retain explicit
+questions and remain opt-in. Hextech's original drawing and caption are preserved.
+
+The standalone `tools/review_thematic_borders.cjs` reviews the exact 40-member
+hotkey expansion and the full League catalog with nine story samples, original
+audio playback, deterministic seeking, cleanup, alpha/brightness budgets,
+structural phase ordering, four-spirit waking, ambient continuation and exact
+before/after Hextech pixels. Its browser routes only read local files and cannot
+open OBS or reach the live Hub. Review evidence is in `output/thematic-borders/`.
+See `docs/THEMATIC-BORDERS-20261008.md` for the artistic scope and preservation.
+
 ## Cultural-context sound pass / 2026-10-04
 
 The current 30 sounds behind `! 2 # Z T t h H` use `culture-cues.js` and its
@@ -238,3 +271,42 @@ Riot context used for artistic interpretation:
 and [Void ecosystem](https://www.leagueoflegends.com/en-us/news/game-updates/patch-14-1-notes/).
 These historical descriptions inform materials and motifs, not current buff
 numbers, event detection, spawn schedules or timing claims.
+
+The October 8 League `story-rim.js` layers open elemental currents and small
+traveling motif phrases around the existing safe perimeter. Avoid opaque scenic
+rectangles. `tools/build_thematic_preview.py` packages the real renderers for
+local play/pause/seek review with original audio and no application connections.
+
+The individual audit adds `sound-signatures.js` for cue-specific native rim icons
+and one-time contour phrases. `sound-choreography.js` owns reconstructible rose,
+arrow, hat, fish and planted-turn geometry, shared with contact regressions.
+Secondary props appear after their related action. Finite decorative motion
+settles near the end; musical dance cadence remains tied to the original clip.
+Use native transparent paths for crescents, tears and ticket edges, never a
+background-colored disk or rectangle to imitate missing alpha.
+
+League `story-combos.js` gives double/triple/quadra/penta/ace five different
+performances. `story-motifs.js` supplies semantic edge silhouettes and explicit
+single particle-birth windows. `story-ink.js` clamps finite decorative time after
+the payoff while keeping persistent death and dragon ambience alive. A stolen
+objective travels around the edge into an actual hand; growing masonry crushes,
+energy empties, item gems fit their slots and stair-climbers land on platforms.
+See `docs/BORDER-AUDIT-20261008.md` for every individual design decision.
+
+The second joke-quality pass uses small consequences and reactions instead of
+adding large scenes. `sound-encore-motion.js` reconstructs thrown paper, a pressed
+boot, a level teacup, landed toast and a muted ping. Props make contact before
+their consequence appears. Longer cues may overlap a distinct tiny rim act.
+Half-second sounds use picture-sized echoes and keep their main reaction clear.
+`story-payoffs.js` owns finite League reactions and physical encore blocking;
+it does not infer events or create a clock. Sensitive and uncertain events keep
+their calm or tentative character. Four thin spirit contours add visual richness
+to respawn without filled halos. See `docs/BORDER-JOKE-QUALITY-20261008.md` for
+all 99 editorial decisions and the enlarged reaction review.
+
+`sound-lineups.js` owns measured contacts in original clip seconds: stamp/paper,
+button press, first Bonk impact, quack/cursor, Gary's meow and the completed mute
+phrase. PCM energy witnesses cover first attacks at FFT boundaries. Six dance
+grids refine existing pulse families from independent bass and spectral attacks;
+neither settings nor profile BPM changes. Reactions precede their held payoff,
+and quiet tails do not replay the act. See `docs/BORDER-LINEUP-AUDIT-20261009.md`.

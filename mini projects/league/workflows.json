@@ -17,7 +17,7 @@
         "event": "league:game_start",
         "kind": "event"
       },
-      "detail": "",
+      "detail": "League reads the complete image-clock match state from game_scene_policy. It starts HUD, session accounting and local overlays on observed GameStart, including clock zero. The image owner publishes the Hub event once; local handlers emit it only in standalone mode. Missing player identity does not end a match. Short API outages preserve the published boundary. The existing watcher samples at 250 ms during gameplay through the unchanged shared cache. HUD requires known player identity; its Udyr player starts blue, accepts Q/W/E/R immediately outside the five-second Enter guard, and requires mana evidence within that guard.",
       "steps": [
         {
           "id": "0",
@@ -42,8 +42,8 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "league": "e5c1c40d153f1aa5c9723f700c99c25e772bdaa7ab2a43a29e8c39c7b1b8a83a"
+        "league": "8aafb226c31fb7ad049dc8ef793bf872c0b0bc918c9c6930309f0f6aa2f9e0fd",
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c"
       },
       "edges": [
         {
@@ -59,7 +59,12 @@
         {
           "path": "mini projects/league/handlers/lifecycle.py",
           "symbol": "make_game_start_handler",
-          "hash": "500c0685206ae8dd05559d8f7f6386eda680bd61b046f7fc04b26c66d863ad20"
+          "hash": "204c877bef9f17b978689e7e3cef40395440807c32e49620410886cac31eccae"
+        },
+        {
+          "path": "mini projects/league/core/league_api.py",
+          "symbol": "LeagueAPIWatcher.run",
+          "hash": "b458a4733f23435c5d1b8e5e3f55c1c5e421f2e00fe0f511dd0a70bd8248dc23"
         }
       ]
     },
@@ -72,7 +77,7 @@
         "event": "league:game_end",
         "kind": "event"
       },
-      "detail": "",
+      "detail": "League cleanup, kill-audio parking and session accounting follow the published result-image start, including its saved delay. A cumulative GameEnd cannot restart the completed match. Local cleanup does not publish duplicate Hub events while the image provider exists; standalone mode uses the shared pure interpreter. HUD deactivation clears candidate casts and cancels stance playback before future source reuse.",
       "steps": [
         {
           "id": "0",
@@ -90,7 +95,7 @@
         }
       ],
       "owner_hashes": {
-        "league": "e5c1c40d153f1aa5c9723f700c99c25e772bdaa7ab2a43a29e8c39c7b1b8a83a"
+        "league": "8aafb226c31fb7ad049dc8ef793bf872c0b0bc918c9c6930309f0f6aa2f9e0fd"
       },
       "edges": [
         {
@@ -102,7 +107,12 @@
         {
           "path": "mini projects/league/handlers/lifecycle.py",
           "symbol": "make_game_end_handler",
-          "hash": "86194c0464cbc8c055bbec1a492613e2695c1fda4bc364b2afbad759e6c34813"
+          "hash": "c2f5bea624435c927460ab9fdaa49e8280ff1748eb797ed210ddcfa8bf34f9a0"
+        },
+        {
+          "path": "mini projects/league/core/league_api.py",
+          "symbol": "LeagueAPIWatcher.run",
+          "hash": "b458a4733f23435c5d1b8e5e3f55c1c5e421f2e00fe0f511dd0a70bd8248dc23"
         }
       ],
       "effects": [
@@ -201,7 +211,7 @@
         "event": "league:death",
         "kind": "event"
       },
-      "detail": "",
+      "detail": "Existing player handlers retain death, respawn and recall overlays. HudPresentation alone applies alive-only Udyr visibility; death clears pending cast evidence and pauses the stance worker, while respawn retains the last selected stance.",
       "steps": [
         {
           "id": "0",
@@ -226,8 +236,8 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "league": "e5c1c40d153f1aa5c9723f700c99c25e772bdaa7ab2a43a29e8c39c7b1b8a83a"
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "league": "8aafb226c31fb7ad049dc8ef793bf872c0b0bc918c9c6930309f0f6aa2f9e0fd"
       },
       "edges": [
         {
@@ -334,7 +344,7 @@
         "event": "league:*",
         "kind": "event"
       },
-      "detail": "",
+      "detail": "LeagueAPIWatcher assembles local event handlers, kill audio, HUD visibility and the Udyr stance and chat-guard owner. Objective event handlers retain their existing dispatch.",
       "steps": [
         {
           "id": "0",
@@ -359,8 +369,8 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "league": "e5c1c40d153f1aa5c9723f700c99c25e772bdaa7ab2a43a29e8c39c7b1b8a83a"
+        "league": "8aafb226c31fb7ad049dc8ef793bf872c0b0bc918c9c6930309f0f6aa2f9e0fd",
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c"
       },
       "edges": [
         {
@@ -376,9 +386,74 @@
         {
           "path": "mini projects/league/core/league_api.py",
           "symbol": "LeagueAPIWatcher.__init__",
-          "hash": "5acda42c0d7b4e2d7f80e890050a170600e6a078036182d77f9cd32ad98b43b0"
+          "hash": "596f7c850af53de7ba78dbaccae2b61aeb75ff015bf7bfbc4251a8b0dd7b9ca5"
         }
       ]
+    },
+    {
+      "id": "league.udyr_stances",
+      "label": "Udyr stances and chat guard",
+      "topic": "Gameplay HUD",
+      "trigger": {
+        "label": "Q / W / E / R with Enter guard",
+        "event": "keyboard.press",
+        "kind": "event"
+      },
+      "detail": "The existing shared keyboard subscription accepts Q/W/E/R only during known alive gameplay. Keys switch immediately even without clear mana evidence, except during the five seconds after each Enter press. Enter clears previous candidates and extends the guard; it does not toggle chat state. During that guard, a fresh MANA sample showing at least one mana spent within 0.8 seconds accepts the latest candidate key. Ignored chat presses never replay when the guard expires. Three stable observed regeneration intervals allow conservative correction when regeneration masks spending; changed regeneration, mana cap, resource maximum changes, stale or invalid snapshots disable correction. This is mana evidence, not an authoritative ability-cast feed. The existing watcher observes every 250 ms during gameplay through the shared four-per-second HTTP cache, without per-key requests. Q=blue bear, W=green turtle, E=gold ram and R=red phoenix; the current stance never restarts. One PlaybackWorker owns source replacement through cleanup, follows the League permission gate, and releases on death/end/shutdown. Respawn retains the stance; a new game starts blue. Personal filters, transforms, audio controls and other Udyr/lobby sources remain unchanged.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Apply Enter guard and mana evidence",
+          "owner": "league",
+          "kind": "gate",
+          "detail": "Bounded rolling history and expiring candidates"
+        },
+        {
+          "id": "1",
+          "label": "Replace accepted stance",
+          "owner": "league",
+          "kind": "action",
+          "detail": "Serialized playback and League permission gate"
+        },
+        {
+          "id": "2",
+          "label": "Loop original animation segment",
+          "owner": "obs",
+          "kind": "output",
+          "detail": "Existing masked gameplay media input"
+        }
+      ],
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/league/udyr_casts.py",
+          "symbol": "ManaCasts",
+          "hash": "a953b722501292cc1ae80a98e05487f5dabe83a347ac5468800deb766dd35c27"
+        },
+        {
+          "path": "mini projects/league/udyr_stances.py",
+          "symbol": "UdyrStances",
+          "hash": "f66335394b32045a2d5308509b987e9170d780744f4dd02360c81c022c2ceb5c"
+        },
+        {
+          "path": "mini projects/league/main.py",
+          "symbol": "run",
+          "hash": "30b4bb3f76eab8b4f3678def518522408531baa48cf5d9864d6c6d23c4cbff32"
+        }
+      ],
+      "owner_hashes": {
+        "league": "8aafb226c31fb7ad049dc8ef793bf872c0b0bc918c9c6930309f0f6aa2f9e0fd",
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c"
+      }
     }
   ]
 }

@@ -66,6 +66,7 @@ class LifecycleTests(unittest.TestCase):
         watcher.stop_event.is_set.side_effect = [False] * 6 + [True]
         watcher.match_lifecycle = MatchLifecycle()
         watcher.hud = Mock()
+        watcher.stances = Mock()
         watcher.detector = Mock()
         watcher._on_connected = Mock()
         watcher._on_disconnected = Mock()

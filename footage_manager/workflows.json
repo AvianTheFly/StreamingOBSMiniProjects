@@ -31,7 +31,7 @@
           "label": "Queue bounded analysis",
           "owner": "footage_desk",
           "kind": "wait",
-          "detail": ""
+          "detail": "Find moments or the standalone HTTP client submits fast estimates to the existing single worker. New-only mode skips completed unchanged sources, including older detector generations, and excludes recordings under ten minutes. A folder scan completes before command-line analysis selection. HTTP admission rejects concurrent analysis jobs atomically. Cancel and foreground yields use existing checkpoints. Detection creates proposed markers, never personal keeps, exports or deletions."
         },
         {
           "id": "2",
@@ -70,7 +70,7 @@
         }
       ],
       "owner_hashes": {
-        "footage_desk": "cb6cab45f002800d9e7fac7d5f6377232a5f14852eff13910acbfacf37f66d7f"
+        "footage_desk": "a686cf07c9f6c378618c11c4faea4205b34ece8bbbcd5738d7732ab092cfd281"
       },
       "edges": [
         {
@@ -130,6 +130,70 @@
           "hash": "5f31ecdd95bfe447f448221a2e3b057abbd8794e83e002006710da13983c9deb"
         }
       ]
+    },
+    {
+      "id": "footage_desk.cleanup",
+      "label": "Authorized storage cleanup",
+      "topic": "Footage review",
+      "trigger": {
+        "label": "Explicit batch original-deletion authorization",
+        "event": "footage.cleanup",
+        "kind": "separate"
+      },
+      "detail": "Explicit outcome-specific vocal thresholds (defaults: wins zero, losses four, unknowns zero). Current authorization keeps wins at twenty, losses at thirty and unknowns at twenty-five; remove measured segments below each threshold. Unmeasured audio, personal keepers, 30-second game buffers and ambiguous desktop gaps remain protected. The existing single media worker first revises generated retained exports using original-time coordinates and verified all-track replacements, then processes unchanged analyzed online sources of at least ten minutes. Permanently delete superseded files and originals only after replacement verification. No backups. Cancellation preserves unfinished inputs. Metadata ledgers record completed originals and revised exports separately.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Prepare retention plan",
+          "owner": "footage_desk",
+          "kind": "action",
+          "detail": "Preview current analysis; skip unanalysed/changed/no-game sources and unresolved review decisions."
+        },
+        {
+          "id": "1",
+          "label": "Verify retained footage",
+          "owner": "footage_desk",
+          "kind": "wait",
+          "detail": "Existing media owner stream-copies bounded exports and validates all streams before deletion."
+        },
+        {
+          "id": "2",
+          "label": "Remove verified original",
+          "owner": "footage_desk",
+          "kind": "action",
+          "detail": "Revalidate source, personal decisions and exports. Persist deletion intent and completion ledger; permanently unlink only the exact source."
+        }
+      ],
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "footage_manager/cleanup_plan.py",
+          "symbol": "<module>",
+          "hash": "21565eb66a360a5a18ac72ca0624469a1c71c232e9b76f7bea221dd63752cdb9"
+        },
+        {
+          "path": "footage_manager/cleanup.py",
+          "symbol": "<module>",
+          "hash": "5e340eea0b4992ed8d8033dc99503818607603881cbb90b8e18c74d2dd4c0e61"
+        },
+        {
+          "path": "footage_manager/retained_cleanup.py",
+          "symbol": "<module>",
+          "hash": "abae1d6cf889795f2e9f6f2944296969233037af1beb4c3f06ffd846eabaab08"
+        }
+      ],
+      "owner_hashes": {
+        "footage_desk": "a686cf07c9f6c378618c11c4faea4205b34ece8bbbcd5738d7732ab092cfd281"
+      }
     }
   ]
 }

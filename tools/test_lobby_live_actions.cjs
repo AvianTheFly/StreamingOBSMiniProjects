@@ -31,7 +31,7 @@ async function main(){
     await send(cue);await send(cue);
     assert.equal((await events()).filter(e=>e.manual).length,1,'Echoes do not repeat the effect');
     assert.equal((await events())[0].kind,action,'The live cue reaches the actual artist');
-    const holes=await page.evaluate(()=>{const c=document.querySelector('canvas').getContext('2d');return [[125,304,575,280],[830,450,460,460],[1463,203,317,470]].map(rect=>{const data=c.getImageData(...rect).data;for(let i=3;i<data.length;i+=4)if(data[i])return false;return true;});});
+    const holes=await page.evaluate(async()=>{const {scene}=await import('./forge-world.js');const c=document.querySelector('canvas').getContext('2d');return scene.holes.map(rect=>{const data=c.getImageData(...rect).data;for(let i=3;i<data.length;i+=4)if(data[i])return false;return true;});});
     assert(holes.every(Boolean),'Camera, desktop and chat stay clear');
     await page.evaluate(()=>{window.retainedLink=window.links[0];window.dispatchEvent(new Event('pagehide'));});
     assert(await page.evaluate(()=>window.retainedLink.closed),'Teardown closes the channel');

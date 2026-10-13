@@ -18,7 +18,7 @@
     "stage": "front",
     "weight": 96,
     "description": "A fresh rainbow burst with every press.",
-    "autoWeight": 0.55,
+    "autoWeight": 0.24750000000000003,
     "impact": 1
   },
   {
@@ -29,7 +29,7 @@
     "stage": "front",
     "weight": 32,
     "description": "Iridescent bubbles float up and pop into little stars.",
-    "autoWeight": 1,
+    "autoWeight": 0.45,
     "impact": 0.5
   },
   {
@@ -81,9 +81,9 @@
     "label": "Duck parade",
     "key": "d",
     "life": 9,
-    "stage": "front",
+    "stage": "back",
     "weight": 36,
-    "description": "A procession of bouncing ducks in colorful party hats.",
+    "description": "Small ducks shuffle across the rear dance floor behind the booth.",
     "autoWeight": 0.9,
     "impact": 0.65
   },
@@ -125,9 +125,9 @@
     "label": "Roller robot",
     "key": "r",
     "life": 9,
-    "stage": "front",
+    "stage": "back",
     "weight": 28,
-    "description": "A tiny robot rolls through with a glowing drink.",
+    "description": "A miniature drinks robot rolls along the side steps by the sofas.",
     "autoWeight": 0.85,
     "impact": 0.4
   },
@@ -147,7 +147,7 @@
     "label": "Party balloons",
     "key": "a",
     "life": 10,
-    "stage": "front",
+    "stage": "back",
     "weight": 40,
     "description": "Iridescent balloons sway up from the edges.",
     "autoWeight": 1,
@@ -161,7 +161,7 @@
     "stage": "front",
     "weight": 40,
     "description": "A glowing pinball ricochets between the floor bumpers.",
-    "autoWeight": 0.85,
+    "autoWeight": 0.3825,
     "impact": 0.3
   },
   {

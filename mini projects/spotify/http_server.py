@@ -5,6 +5,7 @@ import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
+from .morph_assets import PreparedMorphs
 
 WEB = Path(__file__).parent / 'web'
 
@@ -32,6 +33,7 @@ class SpotifyHTTPServer(ThreadingHTTPServer):
 
 
 def make_server(state, port=7447):
+    prepared_morphs = PreparedMorphs(WEB)
     class Handler(BaseHTTPRequestHandler):
         protocol_version = 'HTTP/1.1'
 
@@ -69,7 +71,13 @@ def make_server(state, port=7447):
                     state.snapshot() if after is None else state.wait_snapshot(after))
                 payload = json.dumps(data, separators=(',', ':')).encode()
                 kind = 'application/json'
-            elif route in ('/overlay', '/', '/overlay.js', '/overlay.css', '/surface.js', '/filament.js', '/reactive.js', '/forms.js', '/performance.js', '/radiance.js', '/music_strings.js', '/music_pacing.js', '/music_motion.js', '/music_space.js', '/journey.js', '/music_feed.js', '/stage_palette.js', '/stage_spirits.js', '/stage_geometry.js', '/stage_morph.js', '/stage_depth.js', '/stage_renderer.js'):
+            elif route == '/prepared-morphs.json':
+                payload = prepared_morphs.read()
+                if payload is None:
+                    self.send_error(404, 'Prepared morphs unavailable')
+                    return
+                kind = 'application/json'
+            elif route in ('/overlay', '/', '/overlay.js', '/overlay.css', '/surface.js', '/filament.js', '/reactive.js', '/forms.js', '/performance.js', '/radiance.js', '/music_strings.js', '/music_pacing.js', '/music_motion.js', '/music_articulation.js', '/music_dance.js', '/stage_articulation.js', '/music_space.js', '/journey.js', '/music_feed.js', '/stage_palette.js', '/stage_designs.js', '/stage_geometry.js', '/stage_morph.js', '/morph_cache.js', '/stage_depth.js', '/stage_renderer.js'):
                 name = 'overlay.html' if route in ('/overlay', '/') else route[1:]
                 payload = (WEB / name).read_bytes()
                 kind = {'html':'text/html', 'js':'application/javascript', 'css':'text/css'}[name.rsplit('.',1)[1]]
@@ -86,7 +94,7 @@ def make_server(state, port=7447):
             self.end_headers()
             try:
                 self.wfile.write(payload)
-            except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError, TimeoutError):
                 pass  # Browser reloads and timed-out polls can close an in-flight request.
     return SpotifyHTTPServer(('127.0.0.1', port), Handler)
 

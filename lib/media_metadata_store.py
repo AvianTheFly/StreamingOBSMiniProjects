@@ -25,7 +25,9 @@ def valid_row(row):
     if any(type(row[k]) is not int or row[k] < 0 for k in ('mtime_ns','size')):
         return False
     value = row['metadata']
-    return (isinstance(value,dict) and set(value) == {'codec','width','height','fps'}
+    return (isinstance(value,dict) and set(value) in
+            ({'codec','width','height','fps'}, {'codec','width','height','fps','has_audio'})
+            and (value.get('has_audio') is None or type(value.get('has_audio')) is bool)
             and isinstance(value['codec'],str) and len(value['codec']) <= 64
             and all(type(value[k]) is int and 0 <= value[k] <= 65536 for k in ('width','height'))
             and type(value['fps']) in (int,float) and math.isfinite(value['fps'])

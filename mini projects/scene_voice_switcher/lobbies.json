@@ -3,14 +3,110 @@
     "ForgeLobby": {
       "rotation": true,
       "chat": [
-        1463,
-        203,
-        317,
-        470
+        80,
+        180,
+        215,
+        450
+      ],
+      "screen": [
+        420,
+        110,
+        816,
+        459
+      ],
+      "camera": [
+        1390,
+        240,
+        420,
+        450
       ]
     },
     "SanctuaryLobby": {
+      "rotation": true,
+      "screen": [
+        540,
+        70,
+        800,
+        450
+      ],
+      "camera": [
+        1370,
+        350,
+        420,
+        470
+      ],
+      "chat": [
+        75,
+        340,
+        240,
+        470
+      ]
+    },
+    "SpiritArcadeLobby": {
       "rotation": false
+    },
+    "SpiritRailLobby": {
+      "rotation": false
+    },
+    "ReefLobby": {
+      "rotation": false
+    },
+    "FutureWorldLobby": {
+      "rotation": false
+    },
+    "TavernWorldLobby": {
+      "rotation": false
+    },
+    "StormCoastLobby": {
+      "rotation": false
+    },
+    "SkyHarborLobby": {
+      "rotation": false
+    },
+    "AuroraCampLobby": {
+      "screen": [
+        620,
+        325,
+        832,
+        468
+      ],
+      "camera": [
+        100,
+        410,
+        430,
+        555
+      ],
+      "chat": [
+        1605,
+        110,
+        245,
+        405
+      ]
+    },
+    "PhoenixObservatoryLobby": {
+      "screen": [
+        1130,
+        160,
+        768,
+        432
+      ],
+      "camera": [
+        745,
+        475,
+        355,
+        530
+      ],
+      "chat": [
+        88,
+        115,
+        190,
+        465
+      ]
     }
+  },
+  "screen_content": "udyr",
+  "selection": {
+    "mode": "shuffle",
+    "source": null
   }
 }

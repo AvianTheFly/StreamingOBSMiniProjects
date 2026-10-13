@@ -45,7 +45,7 @@ def catalog():
         {'source': name, 'label': row[1], 'rotation': settings.location(name, data)['rotation'],
          'effects': effects_catalog(name),
          'art_url': '/api/projects/scene_voice_switcher/artwork?source=' + name
-                    if row[0] else '/spirit-lobby/art/clubhouse-clean.webp'}
+                    if row[0] else '/spirit-lobby/art/clubhouse-aligned.png'}
         for name, row in LAYOUTS.items()]}
 
 
@@ -67,7 +67,9 @@ def locations():
     visible=[r['sourceName'] for r in client.get_scene_item_list(LOBBIES_SCENE).scene_items
              if r['sourceName'] in lobbies and r['sceneItemEnabled']]
     installed = set(obs.list_scenes())
+    from .screen_content import catalog as display_catalog
     return {'game_scene': GAME_SCENE, 'lobbies_scene': LOBBIES_SCENE, 'selection': settings.selection(),
+            'display': display_catalog(client),
             'lobbies': list(lobbies), 'locations':[presentation.describe(client,n) for n in lobbies],
             'current_lobby':program if program in lobbies else visible[0] if program==LOBBIES_SCENE and visible else None,
             'program_scene':program,'screen':screen_snapshot(client=client),

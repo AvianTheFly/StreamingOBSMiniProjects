@@ -1,0 +1,170 @@
+[
+  {
+    "id": "kirby-hello",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 814590
+  },
+  {
+    "id": "kirby-dance",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 2102752
+  },
+  {
+    "id": "kirby-inhale",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 740683
+  },
+  {
+    "id": "boo-peekaboo",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 2294855
+  },
+  {
+    "id": "boo-dance",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 3104371
+  },
+  {
+    "id": "boo-scare",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 2362728
+  },
+  {
+    "id": "crewmate-salute",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 653076
+  },
+  {
+    "id": "crewmate-dance",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 1012077
+  },
+  {
+    "id": "crewmate-task",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 667397
+  },
+  {
+    "id": "creeper-hello",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 696832
+  },
+  {
+    "id": "creeper-dance",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 1970172
+  },
+  {
+    "id": "creeper-fakeout",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 661920
+  },
+  {
+    "id": "goose-honk",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 613343
+  },
+  {
+    "id": "goose-march",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 984833
+  },
+  {
+    "id": "goose-theft",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 786262
+  },
+  {
+    "id": "climber-salute",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 831063
+  },
+  {
+    "id": "climber-dance",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 2372811
+  },
+  {
+    "id": "climber-slip",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 776490
+  },
+  {
+    "id": "hornet-bow",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 758974
+  },
+  {
+    "id": "hornet-flourish",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 1215784
+  },
+  {
+    "id": "hornet-silk",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 772269
+  },
+  {
+    "id": "salvager-hello",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 966785
+  },
+  {
+    "id": "salvager-dance",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 1284849
+  },
+  {
+    "id": "salvager-trophy",
+    "decoded_frames": 120,
+    "transparent_endpoints": true,
+    "alpha_content": true,
+    "bytes": 1036474
+  }
+]

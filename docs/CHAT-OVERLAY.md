@@ -25,7 +25,7 @@ Your saved shortcuts are **Ctrl+Alt+F9** (borders), **Ctrl+Alt+F7**
 the overlay and its resize grip to change the window dimensions. New host
 shortcuts set in its settings take precedence over these documented values.
 Windowed/borderless games support desktop overlays; exclusive fullscreen
-can cover them. Empty chat is transparent; live messages fade after 60 seconds.
+can cover them. Empty chat is transparent; the current preset expires messages after 60 seconds total.
 
 Chat Studio provides Glass, Minimal and Neon styles, font/size, emote size, message/line spacing,
 card opacity, message limit, fading, accent, motion, badge visibility, header,
@@ -45,14 +45,14 @@ including animated GIF/WebP, or existing `/viewer_assets/` images. Channel
 7TV aliases load automatically. Extension-only effects and 7TV cosmetics are
 separate features and aren't replicated.
 
-Your gameplay preset shows six messages, 17px semibold text, 28px emotes and 22% card
-opacity inside a 420 × 467 host window, fading after 35 seconds. Message spacing
-is 4px and line spacing 130%; both have sliders in Chat Studio. Resting text is
-78% opaque, and older messages retain at least 85% of that strength for scanning.
-Cards fit their message width, older messages dim, and the newest has a small
-accent marker. Animation is limited to a 3px arrival; there is no continuous
-background animation. Real chat contains no
-sample messages. The Studio preview contains local sample messages.
+Your saved font, message limit, emote size, card opacity and host geometry are
+independent preferences. Message and line spacing have sliders in Chat Studio.
+The current timing preset keeps text fully readable for 30 seconds, then fades
+text, stickers and cards together over another 30 seconds. New messages do not
+dim earlier rows by position. Cards keep their saved translucent appearance,
+and the newest message has a small accent marker. Arrival movement is only 3px;
+there is no continuous background animation. Real chat contains no samples;
+Studio previews use local sample messages.
 
 ## Sticker rules
 
@@ -74,7 +74,7 @@ Unsaved preview settings stay in place until you save or reload the Studio.
 
 ## Pointer readability
 
-In gameplay, text, badges and emotes rest at 78% opacity and rise to 94%
+In gameplay, text, badges and emotes use the saved resting and pointer opacity levels
 under the pointer. Card opacity, borders, dimensions and animations do not
 change on hover. Pointer detection reads Windows cursor coordinates; it does
 not install a mouse hook or disable click-through behavior. Only the card under
@@ -143,3 +143,29 @@ Finite reinstall from public metadata:
 `py -3.11 -X utf8 tools/build_chat_chaos_pack.py --kesha tmp_obs_debug/kesha-7tv-source.json --discovery tmp_obs_debug/chaos-search-sources.json`.
 Personal entries and unknown metadata are preserved on reinstall. Real-CDN
 animation and live-library verification: `node tools/verify_chat_chaos.cjs`.
+
+## Delayed gradual fade
+
+The desktop preset holds messages at full text readability for 30 seconds, then
+fades the whole message smoothly over 30 seconds before removal (60 seconds total).
+Cards retain their saved translucency. New messages no longer dim earlier rows
+by position; the message limit can still replace old entries during busy chat.
+Chat Studio exposes **Stay readable for** and **Fade duration** separately.
+A zero fade duration disables age-based expiry; lobby chat remains persistent.
+Existing preferences without a hold setting keep their original immediate fade.
+
+## 6–7 finder
+
+While League Stats tracks a live match, the OBS chat overlay can spot any
+player at **6 kills / 7 deaths**, **exactly 67 CS**, or a **6–7 team kill score**
+in either direction. A small local chat card says **🔎 6–7 found!**, followed by
+one emoji-led line per kind of discovery, naming the champions or the teams.
+It follows your existing chat size, theme and fade settings. Nothing is posted
+to Twitch chat and no sound or scene switch is added.
+
+Each discovery appears once per match, with at least 12 seconds between cards.
+Finds during that spacing period appear only if still true on a later live poll.
+Starting the Hub mid-match quietly establishes a baseline, so it does not replay
+old scoreboard values. Hidden overlays do not replay missed notices on return.
+The game clock, historical matches and post-game results do not trigger finds.
+

@@ -11,7 +11,7 @@ const fs=require('node:fs'),path=require('node:path'),{chromium}=require('playwr
   await page.route('http://127.0.0.1:7447/**',route=>{
    const u=new URL(route.request().url());if(u.pathname==='/api/state')return route.continue();
    const name=u.pathname==='/overlay'?'overlay.html':u.pathname.slice(1);
-   if(!/^[a-z_]+\.(html|css|js)$/.test(name))return route.abort();
+   if(!/^[a-z_-]+\.(html|css|js|json)$/.test(name))return route.abort();
    return route.fulfill({body:fs.readFileSync(path.join(web,name)),contentType:name.endsWith('.js')?'application/javascript':name.endsWith('.css')?'text/css':'text/html'});
   });
   await page.goto('http://127.0.0.1:7447/overlay');await page.addStyleTag({content:'body{background:#080d17}'});
@@ -28,7 +28,7 @@ const fs=require('node:fs'),path=require('node:path'),{chromium}=require('playwr
   const sampleCount=Math.ceil(Number(process.env.SPOTIFY_LIVE_SECONDS||20)/2);
   if(!Number.isSafeInteger(sampleCount)||sampleCount<1||sampleCount>30)throw Error('Live preview is limited to 60 seconds');
   for(let i=0;i<sampleCount;i++){
-   if(stages.length)await page.evaluate(stage=>{if(!VisualJourney.names[stage])throw Error('Unknown live QA stage');journey.stage=stage;journey.transitioning=false;journey.age=0;journey.exposure=0;},stages[Math.floor(i*stages.length/10)]);
+   if(stages.length)await page.evaluate(stage=>{if(!VisualJourney.names[stage])throw Error('Unknown live QA stage');journey.stage=stage;journey.transitioning=false;journey.age=0;journey.exposure=0;},stages[Math.floor(i*stages.length/sampleCount)]);
    await page.waitForTimeout(2000);
    samples.push(await page.evaluate(()=>({title:data.title,playing:data.playing,energy:data.energy,bass:data.bass,beat:data.beat,motion:journey.motion.snapshot(),scene:journey.name,blend:journey.blend,palettePhase:journey.palettePhase,shapePhase:journey.shapePhase,evolution:{...journey.evolution},graphics:radiance.status()})));
   }

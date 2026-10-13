@@ -1,0 +1,126 @@
+{
+  "description": "Unmodified feature-local copies of the user-generated lobby character poses.",
+  "source_provenance": "mini projects/scene_voice_switcher/web/art/game-guests-provenance.json",
+  "assets": [
+    {
+      "file": "raid-game-kirby-0.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-kirby-0.png",
+      "sha256": "c1d51c7ae68f15d7c90b7f16ccd2201fc7242821b22fa38880bb1ea0ddf5894c"
+    },
+    {
+      "file": "raid-game-kirby-1.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-kirby-1.png",
+      "sha256": "c72081bade7fa545d662e91ba73b9b66d8396b0d77069dc2066d1e48b1dd49ff"
+    },
+    {
+      "file": "raid-game-kirby-2.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-kirby-2.png",
+      "sha256": "031f814bd6d20191137471ca887182f768eac106c852b1e7d83ac901831d7d8e"
+    },
+    {
+      "file": "raid-game-goose-0.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-goose-0.png",
+      "sha256": "2dd31b02d92820e1cbf1f3f8f48dbb0109859988e0d8a5b1659986ec556d657c"
+    },
+    {
+      "file": "raid-game-goose-1.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-goose-1.png",
+      "sha256": "69fbdac6b97c6ca713fa0eb69ebe53c58bf00900f704b3527947fddfa0c48b5c"
+    },
+    {
+      "file": "raid-game-goose-2.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-goose-2.png",
+      "sha256": "75c23c7f2e8faabed07d36fcd8bd2d2d93543d4416b3e33d25fbd3ba15ed4631"
+    },
+    {
+      "file": "raid-game-crewmate-0.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-crewmate-0.png",
+      "sha256": "4de15c112e7137279117992e3bc9287c92aad0858816bbdc6dcda8e79e9c18e3"
+    },
+    {
+      "file": "raid-game-crewmate-1.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-crewmate-1.png",
+      "sha256": "cf2853e982ac1346c8cbfb8b02112290a7a0dafcfd5d0c285ec19dc87e28c264"
+    },
+    {
+      "file": "raid-game-crewmate-2.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-crewmate-2.png",
+      "sha256": "a2f21331aedce5c78b89f01ac439b59c5a09b49e245550e06123189bfc03124f"
+    },
+    {
+      "file": "raid-game-climber-0.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-climber-0.png",
+      "sha256": "28ccb8c5fe12783d3ce27c5b5bf8293e1a16ec27ab88668fa5b0de27c4ffecdb"
+    },
+    {
+      "file": "raid-game-climber-1.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-climber-1.png",
+      "sha256": "84471a57298805995ef57683be9ba126a2e466795775aa5e709daf6d9f69e185"
+    },
+    {
+      "file": "raid-game-climber-2.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-climber-2.png",
+      "sha256": "fb65e0861cb27e3d4293aa9e69ce47a25c02ad79497ec9e8e992c49ec77441ff"
+    },
+    {
+      "file": "raid-game-hornet-0.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-hornet-0.png",
+      "sha256": "30770fa9868e4f14733fc79d5bd51ad57b445de21ad88353fda7d36f9a85765c"
+    },
+    {
+      "file": "raid-game-hornet-1.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-hornet-1.png",
+      "sha256": "d4af8cd4e61d5cbbc1965c18e778e5927cebd3686875db052d3c104230fd6c0e"
+    },
+    {
+      "file": "raid-game-hornet-2.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-hornet-2.png",
+      "sha256": "471e144e02200b4b10d37197ae6233cfbf93192df7140cafb22ef761ce8f1ea1"
+    },
+    {
+      "file": "raid-game-boo-0.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-boo-0.png",
+      "sha256": "5f5d596fcb8913877a32446af732d6b823066ce5767e3fabe6596a1b60043d70"
+    },
+    {
+      "file": "raid-game-boo-1.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-boo-1.png",
+      "sha256": "fcf2cd8f451ee99936a89490a46f039a646ef6e68f5936fbab6804ef08b8ab4c"
+    },
+    {
+      "file": "raid-game-boo-2.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-boo-2.png",
+      "sha256": "c11ca60513ce7247bd2979deb0b38ed509602b72dd9ecc7d4fa01dbe818d1874"
+    },
+    {
+      "file": "raid-game-creeper-0.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-creeper-0.png",
+      "sha256": "9072143161e348f6254ff6ce61cead6cf6e0c660c5271dc2556723c02d91592a"
+    },
+    {
+      "file": "raid-game-creeper-1.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-creeper-1.png",
+      "sha256": "38cd5c0718f642e307def18703a14fccd3f7b696834c7184b763132a4bcf1717"
+    },
+    {
+      "file": "raid-game-creeper-2.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-creeper-2.png",
+      "sha256": "66e225a1af406f48df6d319fccf2792a5a38cb47627f46aba127ebc281ba4fe3"
+    },
+    {
+      "file": "raid-game-salvager-0.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-salvager-0.png",
+      "sha256": "e3d7a30c290aba6ceb049bacc131782583c463e16a77722b80d73243b53b77fd"
+    },
+    {
+      "file": "raid-game-salvager-1.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-salvager-1.png",
+      "sha256": "fc6bcd0f908c7b8e4c6f044d371cbcd221a8dc60248bda0749be1cb05b06bcad"
+    },
+    {
+      "file": "raid-game-salvager-2.png",
+      "source": "mini projects/scene_voice_switcher/web/art/prepared/game-salvager-2.png",
+      "sha256": "b19cb340a253a75aad81e6778af3aaf3ca177d655cc78055c6345e50ccc99b54"
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-"""One startup check in the user's normal Chrome session via a local extension."""
+"""Manual settings check in the user's normal Chrome session via a local extension."""
 import os
 from pathlib import Path
 import secrets
@@ -17,7 +17,7 @@ class StreamSettingsService:
         self.port = 7420
         self.nonce = None
         self.done = threading.Event()
-        self.state = dict(state='idle', message='Twitch startup check has not run.', busy=False)
+        self.state = dict(state='idle', message='Twitch settings check is manual. Use Check settings to verify VOD and Stream Rewind settings.', busy=False)
 
     def snapshot(self):
         with self.lock:
@@ -26,7 +26,8 @@ class StreamSettingsService:
     def start(self, stop, *, port=7420):
         with self.lock:
             self.stop, self.port = stop, port
-        self.retry()
+        # Twitch retains these preferences. Register the Hub lifetime without
+        # opening Chrome; only an explicit dashboard action starts a check.
 
     def retry(self, *, login=False):
         with self.lock:

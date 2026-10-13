@@ -59,7 +59,6 @@ def run(
     _is_multi_clip_active = state._is_multi_clip_active
     _last_save_cmd_time = state._last_save_cmd_time
     _lock = state._lock
-    _manual_mark_wall = state._manual_mark_wall
     _previous_game_clips = state._previous_game_clips
     _random_playback_active = state._random_playback_active
     _replay_active = state._replay_active
@@ -101,6 +100,8 @@ def run(
         'pause_replay': _pause_replay, 'resume_replay': _resume_replay,
         'play_clip': _play_clip_path, 'play_sequence': _play_all_clips_sequential,
         'playback_busy': _playback_gate.locked, 'skip_clip': _skip_clip.set,
+        'queue_state': playback.queue.snapshot, 'queue_edit': playback.edit_queue,
+        'queue_remove_paths': playback.queue.remove_paths,
         'play_spec': _on_play, 'save_clip': _on_save, 'mark': _on_mark,
         'stage_state': stage.state, 'set_companion': stage.set_companion,
         'in_game': lambda: tracker.game_connected,
@@ -123,7 +124,7 @@ def run(
         elif cmd == "play":
             _on_play(spec)
         elif cmd == "mark":
-            _on_mark()
+            _on_mark(tag=spec, clip_seconds=clip_seconds, full_save=full_save, pressed_at=pressed_at)
         elif cmd == "stop":
             print("[instant_replay] ⏹ Leaving replay.")
             _cancel_watcher.set()

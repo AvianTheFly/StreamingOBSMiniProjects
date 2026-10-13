@@ -1,0 +1,50 @@
+[
+  {
+    "source": "SanctuaryLobby",
+    "plate": "F:\\EVERYTHING STREAM RELATED\\Streaming Scripts v2\\mini projects\\scene_voice_switcher\\web\\art\\ionian-distinct-v4b.png",
+    "output": "F:\\EVERYTHING STREAM RELATED\\Streaming Scripts v2\\mini projects\\scene_voice_switcher\\web\\art\\ionian-distinct-v4b-foreground.png",
+    "camera": [
+      1370,
+      350,
+      420,
+      470
+    ],
+    "width": 1920,
+    "height": 1080,
+    "plateSha256": "a56af62cbf7844dd0c854f619281c2592e06d4326757786e27bb8b3eb57b010e",
+    "rgbSha256": "a5e6b4dc3a9332240062b32f9b74463c3f9b26a0fd26760a33c8e889c0c390a9",
+    "alphaSha256": "c1cb3bdded92105b66e0e25f86e9a8d11f8bf99c23c5e441d0649c772c71847a"
+  },
+  {
+    "source": "ForgeLobby",
+    "plate": "F:\\EVERYTHING STREAM RELATED\\Streaming Scripts v2\\mini projects\\scene_voice_switcher\\web\\art\\forge-distinct-v4.png",
+    "output": "F:\\EVERYTHING STREAM RELATED\\Streaming Scripts v2\\mini projects\\scene_voice_switcher\\web\\art\\forge-distinct-v4-foreground.png",
+    "camera": [
+      1390,
+      240,
+      420,
+      450
+    ],
+    "width": 1920,
+    "height": 1080,
+    "plateSha256": "1a85e79ef3e52f39f87b55b540b1e8a50c5ed9660a5ce37c3f39114398cf86f8",
+    "rgbSha256": "055eba076e30943f559005c2fc414cfb74284619c6a5f06990b5047fb5c85487",
+    "alphaSha256": "342ff8a26cdabc5772143f420731daefe063a8c6f031cb6e10526288867a4e69"
+  },
+  {
+    "source": "PhoenixObservatoryLobby",
+    "plate": "F:\\EVERYTHING STREAM RELATED\\Streaming Scripts v2\\mini projects\\scene_voice_switcher\\web\\art\\cryophoenix-distinct-v4b.png",
+    "output": "F:\\EVERYTHING STREAM RELATED\\Streaming Scripts v2\\mini projects\\scene_voice_switcher\\web\\art\\cryophoenix-distinct-v4b-foreground.png",
+    "camera": [
+      745,
+      475,
+      355,
+      530
+    ],
+    "width": 1920,
+    "height": 1080,
+    "plateSha256": "8d34b64520eca46ae2fa53a088ebc91e704fa3715dce3baabc014810308aa310",
+    "rgbSha256": "dc62304bcb8dde10ff49de96f61c99eb5e8636bb0342e8639aabfd3115ecadf2",
+    "alphaSha256": "f043be1c25a444132710cbf7426976b83260f9d5889e0143424aa02968faf01b"
+  }
+]

@@ -36,7 +36,7 @@ class ReplySender:
             return False
         if not re.fullmatch(r'[a-z0-9_]{1,25}',channel) or channel != self.channel_provider():
             return False
-        if not isinstance(parent,str) or not re.fullmatch(r'[A-Za-z0-9-]{1,100}',parent):
+        if parent is not None and (not isinstance(parent,str) or not re.fullmatch(r'[A-Za-z0-9-]{1,100}',parent)):
             return False
         text = clean(text)
         if not text or not session.status(channel).get('ready'):
@@ -62,10 +62,12 @@ class ReplySender:
             # Refresh can block; recheck lifecycle/channel/permission before any write.
             if not self._valid(item):
                 return
+            payload = {'broadcaster_id':auth['broadcaster_id'], 'sender_id':auth['sender_id'], 'message':text}
+            if parent is not None:
+                payload['reply_parent_message_id'] = parent
             response = self.post('https://api.twitch.tv/helix/chat/messages',
                 headers={'Authorization':'Bearer '+auth['token'], 'Client-Id':auth['client_id']},
-                json={'broadcaster_id':auth['broadcaster_id'], 'sender_id':auth['sender_id'],
-                      'message':text, 'reply_parent_message_id':parent}, timeout=3)
+                json=payload, timeout=3)
             if response.status_code == 429:
                 self.next_send = max(self.next_send, self.clock()+30)
                 result = dict(sent=False, message='Twitch rate limit; this reply was skipped')

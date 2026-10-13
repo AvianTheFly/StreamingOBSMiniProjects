@@ -1,5 +1,38 @@
 # League production borders
 
+## Authored performances (2026-10-13)
+
+Every built-in event owns a separate composition in `art/border-{combat,dragons,
+objectives,structures,vitals,progression,lifecycle,signals}.js`. `border-scenery.js`
+and `border-signal-scenery.js` stage different materials on different margins.
+`border-ink.js` and `border-materials.js` supply pure geometry and optics;
+`border-contacts.js` supplies the actual sword, hand, Herald, stair and circuit
+contact coordinates. `border-scores.js` dispatches; `border-stories.js` supplies
+preview-only descriptions. [The complete review](art/BORDER-DESIGN.md) connects
+all 58 triggers to researched context and their distinct visual processes.
+
+Repeated corner crests, common four-sided rails and punchline captions are
+retired from finite shows. Only main titles and the functional return timer
+appear on stream. Waves, flames, rubble, petals, circuits, light and illustrated
+props have event-specific staging. The 1440 × 670 gameplay center stays clear.
+The existing clock reconstructs every pose. Finite action occupies the first
+74% of personal duration and holds through the original exit fade. Saved opacity
+applies once. Sustained drake ambience stays with earlier owners; death follows
+its real elapsed clock until respawn. No new runtime resource or detection owner.
+
+Build: `py -3.11 tools/build_border_art.py --league-only`.
+Review: `node tools/test_league_authored_borders.cjs` checks every entry, occupied
+margins, clear center, title-only output, physical contacts, deterministic seeking
+at 2/3/5 seconds, cleanup, opacity, sustained state and draw cost. It exports
+contact sheets with three temporal samples and source fingerprints.
+`test_league_production.cjs`, `test_league_visibility.cjs` and
+`test_match_screens.cjs` retain controls, transport, visibility and handoff checks.
+Older choreography tests cover historical helpers, not the current visual design.
+
+`py -3.11 tools/build_league_event_preview.py` exports the exact renderer in a
+self-contained selector/replay/pause/scrub preview. It has no live connection or
+settings-write path. The art-direction notes below are historical.
+
 The Hub's League API page now opens **Production borders**. Direct controls:
 http://127.0.0.1:7431/production. The **Clip alerts & media** link opens the existing
 editor. Borders have their own `production.json`; `alerts.json` and its personalized

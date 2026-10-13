@@ -22,7 +22,7 @@ const subjects=[
   for(let p=.77;p<1;p+=.01){const m=R.cultureToastMotion(p);fail(near(m.toast.x,m.hand.x)&&near(m.toast.y+23*.8,m.hand.y),'Toast floats through/above catch');}
   const trip=R.cultureDetectiveMotion(.4);fail(near(trip.foot.x,trip.peel.x)&&near(trip.foot.y,trip.peel.y),'Trip has no shoe/peel contact');
   for(let p=0;p<1;p+=.005){const m=R.cultureSpillMotion(p),bottom=m.y+1.05*(Math.abs(Math.sin(m.a))*29+Math.abs(Math.cos(m.a))*31);fail(bottom<=m.surface+.001,'Mug penetrates surface');if(m.landed)fail(near(bottom,m.surface),'Mug hovers after impact');}
-  const click=R.cultureMuteMotion(.7);fail(near(click.cursor.x,click.target.x)&&near(click.cursor.y,click.target.y),'Mute click misses control');fail(!R.cultureMuteMotion(.699).clicked&&R.cultureMuteMotion(.699).release===0,'Gamer relaxes before click');
+  const click=R.cultureMuteMotion(R.SOUND_LINEUPS.mute/5.04);fail(near(click.cursor.x,click.target.x)&&near(click.cursor.y,click.target.y),'Mute click misses control');const before=R.cultureMuteMotion((R.SOUND_LINEUPS.mute-.001)/5.04);fail(!before.clicked&&before.release===0,'Gamer relaxes before click');
   const hit=R.cultureRescueBlockMotion(.72);fail(near(hit.bolt.x,hit.fist.x)&&near(hit.bolt.y,hit.fist.y),'Hero deflects before contact');
   const canvas=document.createElement('canvas');canvas.width=1920;canvas.height=1080;const c=canvas.getContext('2d',{willReadFrequently:true}),frames=[];
   for(const row of subjects){const show=makeRenderer(canvas,row.effect);await show.ready;const shots=[];

@@ -17,7 +17,7 @@
         "event": "game.connected",
         "kind": "event"
       },
-      "detail": "Game connection queues a manual-revision-scoped intent. The bounded feature loop cancels its older return and asks SceneDirector for gameplay. Newer deliberate choices reject stale work; a temporary owner defers accepted automatic intent. Streamer automatic holds also defer the gameplay request. The feature lifetime owns one SessionControls hold and releases it without applying deferred work on shutdown.",
+      "detail": "The image owner publishes observed GameStart once, including clock zero. Game connection queues a manual-revision-scoped intent. The bounded feature loop cancels its older return and asks SceneDirector for gameplay. Newer deliberate choices reject stale work; a temporary owner defers accepted automatic intent. Streamer automatic holds also defer the gameplay request. The feature lifetime owns one SessionControls hold and releases it without applying deferred work on shutdown. Before gameplay is queued, the shared game policy notifies its loading owner to withdraw obsolete loading intent. The manual revision is captured before this notification. The bounded feature loop reconciles Break/Wrap up holds against the manual scene revision. A later deliberate scene choice ends their scope without resuming stale intent; temporary replay entry and return preserve it. Explicit Hold view remains until Auto scenes.",
       "steps": [
         {
           "id": "0",
@@ -49,9 +49,9 @@
         }
       ],
       "owner_hashes": {
+        "coordination": "07d408729e7fba7515af4c909e35a6ea2ccc98738908d0a3549c82d23487b85c",
         "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
-        "scene_voice_switcher": "4cc07122c6040ee4330ee2faf5a3e286289aa44035e6c406be30d1f9a48e9fea",
-        "coordination": "c4fc5a67e5e47be4bc18ef0c9359201377f1dcd8de6671d557968aab81c68b17"
+        "scene_voice_switcher": "59ffc06eb06005b03b4093b9d46fbeb5f97b461825f46686e2130eedb3a331d6"
       },
       "edges": [
         {
@@ -71,12 +71,17 @@
         {
           "path": "mini projects/scene_voice_switcher/main.py",
           "symbol": "run",
-          "hash": "b575a2b5ae3fb6b8d759739b7214bf623cb1306a8fbe0e0a75c66a30030a360f"
+          "hash": "b65b827bc49d01ac272b30a5ce7f5f77f8124996717b7ef0b9dafd109274eae2"
         },
         {
           "path": "mini projects/scene_voice_switcher/routing.py",
           "symbol": "show_game",
           "hash": "a6d0f2d814e8a24875195d32f74e2be1c35c7e9fb9d138026239c5e7cff20236"
+        },
+        {
+          "path": "mini projects/scene_voice_switcher/session_controls.py",
+          "symbol": "SessionControls.reconcile",
+          "hash": "1a58806402bcc180b514ea2f602e28b917c848ad43ead8d60e1b9a937348ec38"
         }
       ],
       "effects": [
@@ -115,7 +120,7 @@
         "event": "game.disconnected",
         "kind": "event"
       },
-      "detail": "Game disconnect records the shared hold and queues a manual-revision-scoped intent. A registered enabled client provider owns automatic lobbies; otherwise the switcher waits for the hold, chooses a rotation location inside SceneDirector preparation and hides the shared desktop. Deferred requests retain the revision guard. Shutdown withdraws only this ownerÃ¢â‚¬â„¢s pending intent. The accepted lobby is repaired from the complete published layer snapshot before it appears. Each chat browser has its own board dimensions; the existing camera and desktop resources are reused. Break and Wrap up retain their automatic hold through newer game events; Auto scenes can resume the latest valid request. The feature releases only its own hold without switching scenes during shutdown.",
+      "detail": "The image owner publishes the ending boundary on the automatic result picture start and supplies its original manual revision. Game disconnect retains a manual-revision-scoped return intent. An enabled client provider owns automatic lobbies only while its HTTP observations are available. If that owner later becomes unavailable, the retained switcher return waits for the shared result hold, chooses a rotation location inside SceneDirector preparation and hides the shared desktop. Reconnect or newer deliberate intent rejects the obsolete return. The accepted lobby is repaired from the complete published layer snapshot before it appears. Break and Wrap up hold automation while their presentation remains current; a later deliberate scene choice releases that scope without replaying deferred work. Temporary replay preserves it. Explicit Hold view remains until Auto scenes. Shutdown releases only the feature hold and pending intent.",
       "steps": [
         {
           "id": "0",
@@ -161,9 +166,9 @@
         }
       ],
       "owner_hashes": {
+        "coordination": "07d408729e7fba7515af4c909e35a6ea2ccc98738908d0a3549c82d23487b85c",
         "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
-        "scene_voice_switcher": "4cc07122c6040ee4330ee2faf5a3e286289aa44035e6c406be30d1f9a48e9fea",
-        "coordination": "c4fc5a67e5e47be4bc18ef0c9359201377f1dcd8de6671d557968aab81c68b17"
+        "scene_voice_switcher": "59ffc06eb06005b03b4093b9d46fbeb5f97b461825f46686e2130eedb3a331d6"
       },
       "edges": [
         {
@@ -191,12 +196,17 @@
         {
           "path": "mini projects/scene_voice_switcher/main.py",
           "symbol": "run",
-          "hash": "b575a2b5ae3fb6b8d759739b7214bf623cb1306a8fbe0e0a75c66a30030a360f"
+          "hash": "b65b827bc49d01ac272b30a5ce7f5f77f8124996717b7ef0b9dafd109274eae2"
         },
         {
           "path": "mini projects/scene_voice_switcher/routing.py",
           "symbol": "show_lobby",
           "hash": "9fb481785f97a7b90111db82eacc2e20a8cf9f593f9823a21e108301e59ff402"
+        },
+        {
+          "path": "mini projects/scene_voice_switcher/session_controls.py",
+          "symbol": "SessionControls.reconcile",
+          "hash": "1a58806402bcc180b514ea2f602e28b917c848ad43ead8d60e1b9a937348ec38"
         }
       ],
       "effects": [
@@ -242,7 +252,7 @@
         "event": "hub_action",
         "kind": "control"
       },
-      "detail": "Gallery, desk and voice choices prepare the selected world before SceneDirector shows it. SessionControls owns Break/Wrap up intent under an identity-scoped automatic hold. Failed selection rolls back only a newly acquired hold; successful Lobby/Game selection or shutdown releases without resuming deferred intent. Auto scenes releases with resume. Desk lobby entry hides desktop capture. Other entries retain their visibility policy. Worlds outside rotation remain selectable. Newer choices during inventory reads reject stale selection before repair. Native entries use the shared observer; saved group choices resolve to their parent. The offline catalog exposes authored previews without OBS. Saved shuffle/fixed selection belongs to this feature; fixed selection preserves rotation membership and layouts, while shuffle excludes the currently visible candidate when alternatives exist. Inventory publishes the choice and layouts from one settings snapshot. Explicit manual selections can override the current view without replacing future rotation preferences. Next lobby excludes the current world when alternatives exist without changing saved fixed/shuffle preferences. The public opening handoff checks the supplied manual revision before preparation. Other scenes exposes only installed named presentation destinations.",
+      "detail": "Gallery, desk and voice choices prepare the selected world before SceneDirector shows it. SessionControls owns Break/Wrap up intent under an identity-scoped automatic hold. Failed selection rolls back only a newly acquired hold; successful Lobby/Game selection or shutdown releases without resuming deferred intent. Auto scenes releases with resume. Desk lobby entry hides desktop capture. Other entries retain their visibility policy. Worlds outside rotation remain selectable. Newer choices during inventory reads reject stale selection before repair. Native entries use the shared observer; saved group choices resolve to their parent. The offline catalog exposes authored previews without OBS. Saved shuffle/fixed selection belongs to this feature; fixed selection preserves rotation membership and layouts, while shuffle excludes the currently visible candidate when alternatives exist. Inventory publishes the choice and layouts from one settings snapshot. Explicit manual selections can override the current view without replacing future rotation preferences. Next lobby excludes the current world when alternatives exist without changing saved fixed/shuffle preferences. The public opening handoff checks the supplied manual revision before preparation. Other scenes exposes only installed named presentation destinations. The bounded feature loop reconciles Break/Wrap up holds against the manual scene revision. A later deliberate scene choice ends their scope without resuming stale intent; temporary replay entry and return preserve it. Explicit Hold view remains until Auto scenes.",
       "steps": [
         {
           "id": "0",
@@ -274,9 +284,9 @@
         }
       ],
       "owner_hashes": {
-        "scene_voice_switcher": "d22677dc856ffd2f18ebc165dbb5a6d6dd8be248e85508bb1ef5ba04b6f9ad86",
+        "scene_voice_switcher": "0a60854b6f9812cb55ebc62b221f1f69352712c7e56da6a93a547f37c3e96ffd",
         "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
-        "coordination": "c4fc5a67e5e47be4bc18ef0c9359201377f1dcd8de6671d557968aab81c68b17"
+        "coordination": "adbef1aa441fcdee05337d67c4c8444234f9fec2c63a23e4d8bdb28d02dfadd3"
       },
       "edges": [
         {
@@ -301,7 +311,7 @@
         {
           "path": "mini projects/scene_voice_switcher/session_controls.py",
           "symbol": "SessionControls",
-          "hash": "2cb2adaaf6f0cbfa572230152ecdcd5c85a8b37bd97c71a03c9fd51bbb678fe4"
+          "hash": "dc3a35138726e0831b272be38c06567c7c78a8256f5e0285425994761dde7eef"
         },
         {
           "path": "mini projects/scene_voice_switcher/api.py",
@@ -332,6 +342,11 @@
           "path": "mini projects/scene_voice_switcher/interface.py",
           "symbol": "_SceneVoiceSwitcherInterface.present_lobby",
           "hash": "833e3e10c70fd10a35c70a67af1be4774baf5b09e3b014b1f3956c030ad9ec3f"
+        },
+        {
+          "path": "mini projects/scene_voice_switcher/session_controls.py",
+          "symbol": "SessionControls.reconcile",
+          "hash": "1a58806402bcc180b514ea2f602e28b917c848ad43ead8d60e1b9a937348ec38"
         }
       ],
       "effects": [
@@ -370,7 +385,7 @@
         "event": "scene.decision",
         "kind": "event"
       },
-      "detail": "The finite off-air installer adds only the featureÃ¢â‚¬â„¢s OBS script entry. OBS owns one frontend subscription, native show/hide transitions and style/duration controls, with no timer, socket or Hub worker. Show/hide pairs use the same mask and duration. Existing personal item transitions take priority. Unload releases its callback and removes only its own named item transitions. No camera, chat, filters, transforms, global transition or output path is changed.",
+      "detail": "The finite off-air installer adds only the featureÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s OBS script entry. OBS owns one frontend subscription, native show/hide transitions and style/duration controls, with no timer, socket or Hub worker. Show/hide pairs use the same mask and duration. Existing personal item transitions take priority. Unload releases its callback and removes only its own named item transitions. No camera, chat, filters, transforms, global transition or output path is changed.",
       "steps": [
         {
           "id": "0",
@@ -430,7 +445,7 @@
         "event": "scene.decision",
         "kind": "event"
       },
-      "detail": "The feature publishes complete per-world source and placement data. Shared mechanics resolve required resources, snapshot before the first repair, and update only named layers when their settings, visibility, placement or relative stacking differ. The publication/presentation lock keeps a saved edit from racing an older layout. Image settings, nested camera filters, personal CSS and unowned overlays survive; only active chat browsers remain loaded. Deferred and stale scene intents do not repair anything until accepted. Ready worlds optionally publish a transparent living-world layer after its original foreground (or camera for a flat painting) and before dedicated chat, with all three saved live apertures passed explicitly. Other worlds retain their authored layers. Locations may be groups in the single Lobbies scene. Enumeration uses the group transport; missing group children reject before mutation and require offline structural repair.",
+      "detail": "The feature publishes complete per-world source and placement data. Shared mechanics resolve required resources, snapshot before the first repair, and update only named layers when their settings, visibility, placement or relative stacking differ. The publication/presentation lock keeps a saved edit from racing an older layout. Unowned image settings, nested camera filters, personal CSS and unowned overlays survive; only active chat browsers remain loaded. Deferred and stale scene intents do not repair anything until accepted. Ready worlds optionally publish a transparent living-world layer after its original foreground (or camera for a flat painting) and before dedicated chat, with all three saved live apertures passed explicitly. Other worlds retain their authored layers. Locations may be groups in the single Lobbies scene. Enumeration uses the group transport; missing group children reject before mutation and require offline structural repair. Spirit Afterparty uses the original clubhouse plate without a desktop display. Its layout hides only its Hub Display Capture link, while all camera layers reuse FaceCamWithProps and its existing Parsec capture and filters. Painted background remains underneath keyed video and chat; the foreground alone clears their saved apertures. Afterparty uses the aligned room plate with both original wall plaques. The booth is centered at x960, with the default camera centered above its deck; saved per-location overrides still win. Text retains the painted sign material, and media projects inside the same fitted plaques. Each layout publishes the explicit shared display selection as complete data. Udyr animation is the installed default. Nested client, desktop and Chrome references remain selectable; the private legacy desktop gate cannot undo an explicit choice. Parent per-world placement and every original input/filter/volume remain untouched. Four curated full-scenery worlds explicitly configure versioned Base and Foreground file references through this same plan. Versioned native masks open the authored camera rectangles; all earlier source files are retained; browser and native backings match even through a keyed camera. Scenery only publishes a null display selection, hiding allowed nested media without touching unknown overlays. Media visibility is observed independently by the browser; hiding a display also removes its frame and reveals the new background. The October 13 distinct habitat revision authors four independent camera/chat/media placements in habitat-designs.js, exported to habitat-layouts.json. User-requested installation saves these four placements through configure_lobby, after snapshotting. Unknown settings, rotation and all other worlds remain preserved. Native foreground masks open the rectangular camera area; browser camera-occlusion restores the physical prop below its measured contour. Custom camera bounds disable that contour. Explicit per-location overrides continue to win.",
       "steps": [
         {
           "id": "0",
@@ -501,29 +516,29 @@
         {
           "path": "mini projects/scene_voice_switcher/presentation.py",
           "symbol": "plan",
-          "hash": "fb79d895bf515f5cf41fa9fcc39865e6b976eaefe361784934c21fe92ed3d3ed"
+          "hash": "fdc87a7646644cb8f2ed71b3bfd7c1253a072fa00a22a799f1d356201fac5b6f"
         },
         {
           "path": "mini projects/scene_voice_switcher/inventory.py",
           "symbol": "publish_inventory",
-          "hash": "fd5130c8d6cbc01d7fa2ee082f8e29ab812b7d211e0ca7c63d275e91120808f8"
+          "hash": "a83a2c89ad8eba55801d862e709bc81f2271241fe395a7a5da6c28f2cc97c310"
         },
         {
           "path": "lib/coordination/lobby_layout.py",
           "symbol": "apply_layout",
-          "hash": "2eace3434dc3a53c884078d27098948a1264f84db349ceb276d18a8b45ffc39b"
+          "hash": "53631cf346cf0acfce2653bda004d97455be089dfc596e869964e1cce8af20a6"
         },
         {
           "path": "lib/coordination/lobbies.py",
           "symbol": "_prepare_lobby",
-          "hash": "63fdd8ddf01545119cac09c714cc6a3527355950efcf64edcb81146860efa8e9"
+          "hash": "138dbdedf366dd26782c8c62c1e8074b806562dc78bd22f81db112c3cd5cf7d3"
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "settings_history": "c0de7909c62939f1fd4a5e9801a1e697f7ce5ce1ec4dd05940d65e2224805cd6",
-        "scene_voice_switcher": "9c85fd051d688c8c1b8f05ef663abaaeaa83b216ce78f0a979ffda2ebf15c810",
-        "coordination": "1bf723a6b7eb5bb30c91ed682b26757815ed275e05f71b3c9938ba24205a6910"
+        "coordination": "75830bfb9b0c501c3bde2e42d470c914410b3e8310d04af7c61f48505744b6d5",
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "scene_voice_switcher": "215cdfef2f651abb9ae0abc790205400be614d103ad7a711190619d2d638d185",
+        "settings_history": "c0de7909c62939f1fd4a5e9801a1e697f7ce5ce1ec4dd05940d65e2224805cd6"
       },
       "effects": [
         {
@@ -542,7 +557,7 @@
         "label": "A ready living lobby is visible",
         "kind": "browser"
       },
-      "detail": "The original OBS painting stays beneath a world layer. Five selected worlds can paint versioned replacement artwork through that existing layer; saved live apertures are still cleared after the complete painting and every accent. The other worlds retain their original painted overlays. Feature-local chaos-cast assembles finite setup/payoff jokes, chaos-ink owns illustrated game props, and lobby-cameos adds painted-character performances through the public PaintedWorld.drawVisitor contract. LobbyResidents owns three decoded connected-alpha sprite caches per redesigned world, continuous room routines and perch handoff during cameos; late decode and teardown release the same presentation resources. Afterparty is independent and unchanged. Eleven ready worlds (Reef, Forge, Sanctuary, Sky Harbor, Storm Coast, Phoenix Observatory, Spirit Railway, Tavern, Future Lounge, Spirit Arcade and Aurora Camp) each supply their own painted landmark motion, ambience and finite themed guests. New invitations retain existing instances, automatic entrances use novelty and soft pressure, and switching the studio world replaces its single document while rejecting stale selections. Complete saved desktop, camera and chat rectangles are cleared after all accents. Hidden documents pause; native OBS unloads inactive sources; teardown releases clocks, instances and cached canvases. Finite off-air installation preserves original inputs, filters, transforms and the program scene. No audio, new Hub worker, socket or program-scene writer is introduced. Maintenance reruns enumerate installed groups and reject missing group children before any installation writes. Manual cues use the existing Hub SSE channel only in a visible native world document; private previews never subscribe. Cue age, world identity and bounded deduplication guard dispatch; hide/page exit closes the subscription. Living-world browser sources explicitly enable OBS custom FPS so the authored 24 FPS source limit is honored independently of the 60 FPS stream. The finite frame-cap repair changes only the missing flag on matching existing sources, with rollback settings snapshots and off-air checks. Feature-owned saved apertures are passed as optional destination occlusions. PaintedPatch skips only triangles whose current deformed bounds lie fully within a later-cleared aperture, including a conservative antialias/seam margin. Each frame rechecks geometry, preserving re-entry, pixel output, mesh density and custom placement.",
+      "detail": "The original OBS painting stays beneath a world layer. Eight selected worlds can paint versioned replacement artwork through that existing layer; saved live apertures are still cleared after the complete painting and every accent. The other worlds retain their original painted overlays. Feature-local chaos-cast assembles finite setup/payoff jokes, chaos-ink owns illustrated game props, and lobby-cameos adds painted-character performances through the public PaintedWorld.drawVisitor contract. LobbyResidents owns three decoded connected-alpha sprite caches per redesigned world, continuous room routines and perch handoff during cameos; late decode and teardown release the same presentation resources. Afterparty has its own renderer and shared Parsec camera presentation. Eleven ready worlds (Reef, Forge, Sanctuary, Sky Harbor, Storm Coast, Phoenix Observatory, Spirit Railway, Tavern, Future Lounge, Spirit Arcade and Aurora Camp) each supply their own painted landmark motion, ambience and finite themed guests. New invitations retain existing instances, automatic entrances use novelty and soft pressure, and switching the studio world replaces its single document while rejecting stale selections. Complete active desktop, camera and chat rectangles are cleared after all accents. Hidden documents pause; native OBS unloads inactive sources; teardown releases clocks, instances and cached canvases. Finite off-air installation preserves original inputs, filters, transforms and the program scene. No audio, new Hub worker, socket or program-scene writer is introduced. Maintenance reruns enumerate installed groups and reject missing group children before any installation writes. Manual cues use the existing Hub SSE channel only in a visible native world document; private previews never subscribe. Cue age, world identity and bounded deduplication guard dispatch; hide/page exit closes the subscription. Living-world browser sources explicitly enable OBS custom FPS so the authored 24 FPS source limit is honored independently of the 60 FPS stream. The finite frame-cap repair changes only the missing flag on matching existing sources, with rollback settings snapshots and off-air checks. Feature-owned saved apertures are passed as optional destination occlusions. PaintedPatch skips only triangles whose current deformed bounds lie fully within a later-cleared aperture, including a conservative antialias/seam margin. Each frame rechecks geometry, preserving re-entry, pixel output, mesh density and custom placement. Lossless resident parts are prepared offline by tools/prepare_lobby_cast.cjs from the original browser extraction; source SHA-256 validation gates reuse and stale or missing parts fall back to the original algorithm. Each presentation owns its decoded surfaces and releases late or closed loads. Shared furniture retains up to 128 MiB of exact material/geometry recipes, with direct painting for transformed or translucent contexts and page-exit cleanup. Spirit Afterparty uses the original clubhouse plate without a desktop display. Its layout hides only its Hub Display Capture link, while all camera layers reuse FaceCamWithProps and its existing Parsec capture and filters. Painted background remains underneath keyed video and chat; the foreground alone clears their saved apertures. Visitor staging belongs to web/visitor-staging.js: all eleven worlds publish explicit shelf, path, window or counter placements with smaller whole-act scales. Background cues receive higher automatic selection weight; foreground acts retain physical prop interactions. Dynamic visitor captions are absent, while studio invitation names remain available. Resident perches use small silhouettes and quiet contact gestures. Complete saved apertures still win after drawing. Feature-local game-guests.js adds eight familiar game-character casts with 35 world-specific contacts and finite twelve-second performances. game-guest-sprites.js loads only that world's required three-pose sets and releases decoded images, including interrupted loads. game-guest-acts.js owns small background reactions; game-guest-stunts.js owns goose cup mischief, planted fixed-length hammer pivots, silk leaps and salvage slapstick. Labels stay in the studio, not over characters. Most new visits are small background acts; the occasional pot-climber foreground stunt has lower invitation weight. These artists share the existing clock, novelty and pressure gates, and complete active saved live apertures remain clear. Four curated worlds now use complete scenery behind the optional media display. Native Base and Foreground use matching versioned artwork; the original foreground alpha, inputs and placements are retained. LeagueGuest composition owns per-world Udyr, poro, scuttler and Teemo poses through the existing disposable sprite mechanism. Finite stance tasks, scene-wide weather/spirits/lanterns and frame-aware goose, poro and pot-climber performances share the same automatic clock. Screen-visible artists use the actual saved rectangle; screen-hidden acts move to physical room shelves. Stage order draws behind-frame acts, the conditional frame, then front-edge acts, before clearing active apertures. Camera and chat always remain clear. No labels are painted above visitors. Shared visible polling reads actual supported nested media and parent visibility, including manual OBS changes; hidden/page-exit cancels polling and stale responses are rejected. Four rooms are recommended for rotation; other authored worlds remain manually available. The October 13 habitat revision uses four detailed versioned paintings and their preserved generated casts. habitat-blocking owns measured contact planes, exclusive automatic surfaces and a two-story admission cap. habitat-acts owns physical prop choreography and material reactions; habitat-scenes selects game/League/frame visitors and three distinct finite environment events per room. Manual visits claim their surface. The old forge shelf resident cache is disabled after that shelf became a mountain opening. Caption theatre survives only as a private opt-in preview. Native scenes have no visitor captions or plaque. The private gallery owns one replaceable iframe, origin/source/world-checked readiness and local next-visit, pause and media-space controls. It cannot dispatch live actions or change settings. Exact prompts and original/intermediate artwork remain retained. No added clock, worker, socket, audio or scene writer. The distinct composition contract now supplies each painting and three rectangles independently. camera-occlusion restores only the authored foreground prop below the torso after clearing; custom camera bounds disable it. habitat-media-frame draws roots, bamboo, iron or ice outside the media bounds and only while media is visible. Private broadcast-preview stand-ins never access live sources. No new timers or connections are introduced.",
       "steps": [
         {
           "id": "0",
@@ -607,12 +622,12 @@
         {
           "path": "mini projects/scene_voice_switcher/presentation.py",
           "symbol": "plan",
-          "hash": "4fa11df958ce87d9dd9733af03407ca818e9deaf453f6cbfb6b7d2abd73e36bc"
+          "hash": "fdc87a7646644cb8f2ed71b3bfd7c1253a072fa00a22a799f1d356201fac5b6f"
         },
         {
           "path": "tools/build_lobby_motion.py",
           "symbol": "build",
-          "hash": "4dee774b3167bc01e69cf09adb08894a5c8ddc8c4f3855c2b615982efb44c298"
+          "hash": "df306119c72b5f328feb922359f3f210359e75750b35bd78db2241c645f2a26c"
         },
         {
           "path": "tools/install_lobby_motion.py",
@@ -621,8 +636,8 @@
         }
       ],
       "owner_hashes": {
-        "browser_effects": "84cc95ab85b277890a7bb2f688932b3aa04b9b08eac8a43c35eeb7af8086e666",
-        "scene_voice_switcher": "81c25b4cfb038a045bad0f8aad8702cf6391f58432c8d1c7846cef866302af13"
+        "browser_effects": "646313d93b5c9e0e2ee60afb214945dc23975389c178cf8bfedefc21914bf933",
+        "scene_voice_switcher": "215cdfef2f651abb9ae0abc790205400be614d103ad7a711190619d2d638d185"
       }
     },
     {
@@ -694,6 +709,82 @@
       "owner_hashes": {
         "hub": "b9b788f67f36e3e61acf7e7b14cf3d96728f674c610c9e1dde9d60046175fa6c",
         "scene_voice_switcher": "dd247b23af4a5f2fd5db9354c8c493b3518ecf73520babe87886eb93641ed049"
+      }
+    },
+    {
+      "id": "scene_voice_switcher.display",
+      "label": "Lobby display choice",
+      "topic": "Lobby display choice",
+      "trigger": {
+        "label": "Lobby display choice",
+        "kind": "control",
+        "event": "hub_action"
+      },
+      "detail": "The Hub offers Scenery only, Udyr animation, League client, Desktop and Google Chrome for the existing lobby display. The feature validates installed references, snapshots settings and atomically saves only screen_content while preserving unknown personal fields. Inventory republishes complete layout data; shared mechanics select exactly one owned reference or hide all allowed references for Scenery only and preserve unknown overlays. No program scene, media file, original input setting, volume, filter or saved per-world screen placement changes. The installer creates an independent unfiltered Hub Lobby Udyr media input using the original media settings and current gain/mute, fits its new nested display item, and hides only the old tilted input reference inside Hub Display Capture. It retains the original input, filters, and all other scene placements; repeated installation preserves the dedicated input settings and placement. The off-stream installer adds missing references inside the existing shared nested scene and chooses Udyr; ordinary Hub choices do not require a restart. The feature visibility API reads the real parent reference and active supported nested sources. It never infers media visibility from the saved choice or desktop alone. A visible browser document reads this through the shared cancellable poller and only displays the media frame when a source is actually shown; hidden documents cancel requests. Existing unknown overlays are not treated as selected media and remain intact.",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Choose lobby display",
+          "owner": "scene_voice_switcher",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "1",
+          "label": "Save and publish choice",
+          "owner": "scene_voice_switcher",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Show existing input reference",
+          "owner": "obs",
+          "kind": "action",
+          "detail": ""
+        }
+      ],
+      "edges": [
+        {
+          "from": "0",
+          "to": "1"
+        },
+        {
+          "from": "1",
+          "to": "2"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/scene_voice_switcher/screen_content.py",
+          "symbol": "select",
+          "hash": "5a7e56dbf87b2130cc923e64d9cd6511f6dd013f83c02e394ce66bf89b553f00"
+        },
+        {
+          "path": "mini projects/scene_voice_switcher/screen_content.py",
+          "symbol": "install",
+          "hash": "1141a1dc96e2642ae24ee28c75963d72cc4a0331f2fae550e045a53fd7bb85c2"
+        },
+        {
+          "path": "mini projects/scene_voice_switcher/screen_content.py",
+          "symbol": "blueprint",
+          "hash": "24ead42bf51ac293613de98f2d42a45a8df6e9eaca685e056048ef846dc0164d"
+        },
+        {
+          "path": "lib/display_capture.py",
+          "symbol": "apply_content",
+          "hash": "f7e2778f3f0866de76cdf58638cb7d9fd162b3d65d4fa4830701bd6252668d36"
+        },
+        {
+          "path": "mini projects/scene_voice_switcher/screen_content.py",
+          "symbol": "visibility",
+          "hash": "cbea668ab755c1eb74289420f9095654652c263d7b53bbc30397d2d7f38f0bd9"
+        }
+      ],
+      "effects": [],
+      "owner_hashes": {
+        "scene_voice_switcher": "e83cbc6f69cec3b2baa8842dd67cb30f8def236c75297477ffb091498a484fcb",
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c"
       }
     }
   ]

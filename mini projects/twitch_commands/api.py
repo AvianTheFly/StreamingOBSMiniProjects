@@ -5,11 +5,12 @@ from .policy import match,render
 
 _lock = threading.Lock()
 _provider = None
+_jokes = None
 
 
-def register(provider):
-    global _provider
-    with _lock: _provider = provider
+def register(provider,jokes=None):
+    global _provider, _jokes
+    with _lock: _provider, _jokes = provider, jokes
 
 
 def provider():
@@ -19,7 +20,17 @@ def provider():
 
 
 def state():
-    return provider().snapshot()
+    result = provider().snapshot()
+    with _lock: jokes = _jokes
+    if jokes is not None:
+        result['jokes'] = jokes.snapshot()
+    return result
+
+
+def save_jokes(body):
+    with _lock: jokes = _jokes
+    if jokes is None: raise ValueError('Joke rotation is not running.')
+    return jokes.save(body)
 
 
 def save(body):

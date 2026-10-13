@@ -1,0 +1,5 @@
+Tool: built-in image_gen (edit).
+Input: original-room.webp recovered from commit 51eb0f4.
+Output: clubhouse-aligned.png
+
+Use case: precise-object-edit. This image is the edit target for an existing animated streaming room. Make ONLY ONE local change: remove the large central black widescreen television including its neon/brass frame (central area approximately x=34% through 65%, y=18% through 45%). Fill ONLY that central region naturally with matching woodland conservatory architecture: tall arched glass windows showing the blue forest at night. Keep the moon crest above and small plants below. CRITICAL preserve exact framing, zoom, perspective, dimensions and every existing object OUTSIDE that central TV area. In particular keep BOTH SMALL blank black brass-framed side-wall signs EXACTLY unchanged in their existing places: left sign x2%-12% y33%-42%, right x89%-98% y33%-42%. Preserve left bookshelves, teapots, couches and windows; do not replace or remove the left plaque. Keep foreground dancefloor and stage unchanged, no desk, no people, no text. Do not zoom, crop, rearrange, or redesign room. Return full single landscape image.

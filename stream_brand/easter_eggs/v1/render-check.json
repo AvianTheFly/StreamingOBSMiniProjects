@@ -1,0 +1,202 @@
+{
+  "checks": [
+    {
+      "clip": "kirby-hello",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 37529,
+      "distinctAlphaFrames": 44
+    },
+    {
+      "clip": "kirby-dance",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 39655,
+      "distinctAlphaFrames": 97
+    },
+    {
+      "clip": "kirby-inhale",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 34951,
+      "distinctAlphaFrames": 44
+    },
+    {
+      "clip": "boo-peekaboo",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 41871,
+      "distinctAlphaFrames": 106
+    },
+    {
+      "clip": "boo-dance",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 42172,
+      "distinctAlphaFrames": 109
+    },
+    {
+      "clip": "boo-scare",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 41861,
+      "distinctAlphaFrames": 109
+    },
+    {
+      "clip": "crewmate-salute",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 32595,
+      "distinctAlphaFrames": 43
+    },
+    {
+      "clip": "crewmate-dance",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 33554,
+      "distinctAlphaFrames": 43
+    },
+    {
+      "clip": "crewmate-task",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 33000,
+      "distinctAlphaFrames": 43
+    },
+    {
+      "clip": "creeper-hello",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 24917,
+      "distinctAlphaFrames": 39
+    },
+    {
+      "clip": "creeper-dance",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 26521,
+      "distinctAlphaFrames": 93
+    },
+    {
+      "clip": "creeper-fakeout",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 33604,
+      "distinctAlphaFrames": 39
+    },
+    {
+      "clip": "goose-honk",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 27448,
+      "distinctAlphaFrames": 39
+    },
+    {
+      "clip": "goose-march",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 28834,
+      "distinctAlphaFrames": 44
+    },
+    {
+      "clip": "goose-theft",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 20893,
+      "distinctAlphaFrames": 44
+    },
+    {
+      "clip": "climber-salute",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 29830,
+      "distinctAlphaFrames": 41
+    },
+    {
+      "clip": "climber-dance",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 33664,
+      "distinctAlphaFrames": 102
+    },
+    {
+      "clip": "climber-slip",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 28858,
+      "distinctAlphaFrames": 41
+    },
+    {
+      "clip": "hornet-bow",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 23071,
+      "distinctAlphaFrames": 42
+    },
+    {
+      "clip": "hornet-flourish",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 23876,
+      "distinctAlphaFrames": 61
+    },
+    {
+      "clip": "hornet-silk",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 27165,
+      "distinctAlphaFrames": 39
+    },
+    {
+      "clip": "salvager-hello",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 29757,
+      "distinctAlphaFrames": 42
+    },
+    {
+      "clip": "salvager-dance",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 31029,
+      "distinctAlphaFrames": 42
+    },
+    {
+      "clip": "salvager-trophy",
+      "count": 120,
+      "first": 0,
+      "last": 0,
+      "max": 34934,
+      "distinctAlphaFrames": 44
+    }
+  ],
+  "staleSelection": {
+    "clip": "boo",
+    "images": "boo"
+  },
+  "oneShotClears": true,
+  "errors": []
+}

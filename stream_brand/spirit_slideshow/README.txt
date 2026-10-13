@@ -1,5 +1,11 @@
 SANCTUARY / IMAGE SLIDESHOW MVP 01
 
+Latest revision: v4/timeline.json repairs the ram charge and fall with four longer
+first-person holds selected from six new paintings. Ram horns physically break the wall; the breach
+reveals an already collapsed bridge, and momentum carries Udyr through its gap.
+Delivery: C:/StreamingMedia/ChannelPresentation/2026-10-10/spirit-slideshow-v4-ram-impact/
+Earlier versions remain available. See v4/README.txt for rebuilding and provenance.
+
 34 newly generated cinematic paintings tell the complete sanctuary escape story
 over the first 40 seconds of the supplied Fortunate Son / MOONLGHT Remix.
 The images hold still and cut at the authored action moments. There are no

@@ -1,0 +1,15 @@
+{
+  "sources": {
+    "kirby": "C:\\Users\\Michael\\.codex\\generated_images\\01a1335b-d5ba-75a2-9ed0-b0d4c9db06a7\\exec-55fd6327-edec-4abf-a50f-60fddd534aec.png",
+    "crewmate": "C:\\Users\\Michael\\.codex\\generated_images\\01a1335b-d5ba-75a2-9ed0-b0d4c9db06a7\\exec-f7c99730-bfb1-424a-b367-fb6606e42c56.png",
+    "creeper": "C:\\Users\\Michael\\.codex\\generated_images\\01a1335b-d5ba-75a2-9ed0-b0d4c9db06a7\\exec-a071d3c2-ddcf-4cc1-8c85-6c206b7d4dcd.png",
+    "goose": "C:\\Users\\Michael\\.codex\\generated_images\\01a1335b-d5ba-75a2-9ed0-b0d4c9db06a7\\exec-82020cea-6e38-4cf1-adb5-9241fc037934.png",
+    "climber": "C:\\Users\\Michael\\.codex\\generated_images\\01a1335b-d5ba-75a2-9ed0-b0d4c9db06a7\\exec-acb8a5b5-6779-4dd2-a2d0-3a4bb13c0908.png",
+    "hornet": "C:\\Users\\Michael\\.codex\\generated_images\\01a1335b-d5ba-75a2-9ed0-b0d4c9db06a7\\exec-0a111b66-f20f-42ce-952e-2ee0780339fd.png",
+    "salvager": "C:\\Users\\Michael\\.codex\\generated_images\\01a1335b-d5ba-75a2-9ed0-b0d4c9db06a7\\exec-bd5d12cf-637a-4aca-b266-7604163545a1.png"
+  },
+  "boo": {
+    "status": "New generation blocked twice by image tool safety review; existing three poses reused with new choreography",
+    "retryPrompt": "Create a transparent animation sprite sheet of Nintendo's friendly white Boo ghost, matching the white ghost on row 2 in the reference. Exactly 8 columns and 3 rows, 24 isolated full-body drawings, equal square cells, 2048x768 wide canvas. No backgrounds, no text, no ground shadows, no grid lines. Same character size, camera and feet/tail baseline in every cell. Plenty of empty transparent padding. Soft dimensional cartoon toy style. Row 1 eight frames of a shy friendly greeting: covers face, peeks, lowers hands, raises hand, waves, blushes, covers face, peeks again. Row 2 eight frames of a playful dance: neutral, lean left arm up, dip, lean right arm up, twirl, back three-quarter, front happy, settle. Row 3 eight frames of a funny surprised reaction: curious, puff cheeks, arms wide, playful open-mouth expression, startled at its own antics, arms up surprised, hides face, bashful smile. Keep all 24 figures fully inside their own cells on real alpha transparency."
+  }
+}

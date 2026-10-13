@@ -2,6 +2,7 @@ import { burst } from './bursts.js';
 import { hextechAtmosphere } from './elements.js';
 import { clipEdges } from './materials.js';
 import { deathAtmosphere,EdgeFinish,eventArt,artReady } from './event-art.js';
+import { StanceAccent } from './stance-accent.js';
 export class ProductionScene {
   constructor(canvas) {
     this.canvas = canvas;
@@ -11,6 +12,10 @@ export class ProductionScene {
     this.art.width = 1920; this.art.height = 1080;
     this.artContext = this.art.getContext('2d');
     this.finish = new EdgeFinish();
+    this.stanceAccent = new StanceAccent();
+    // Upload the tiny surfaces during setup, never at the first ability cast.
+    for(const tile of this.stanceAccent.tiles.values())this.artContext.drawImage(tile,0,0);
+    this.artContext.clearRect(0,0,1920,1080);
   }
   clear() {
     this.c.clearRect(0, 0, 1920, 1080);
@@ -44,6 +49,7 @@ export class ProductionScene {
       deathAtmosphere(c,state.death);c.restore();
     }
     this.finish.apply(c,10);
+    this.stanceAccent.draw(c,state.stance);
     // The user's strength control applies once to the composed show. Solid
     // engraving stays solid relative to glass even where several layers overlap.
     this.c.save(); this.c.globalAlpha = Math.max(0,Math.min(1,state.opacity ?? 1));

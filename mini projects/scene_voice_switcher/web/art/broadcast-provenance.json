@@ -1,0 +1,24 @@
+{
+  "tool": "Built-in image_gen",
+  "mode": "precise-object-edit",
+  "images": [
+    {
+      "file": "aurora-distinct-v4b.png",
+      "input": "aurora-distinct-v4.png",
+      "generated": "exec-34a03d89-1672-4152-a4ff-f28fa081b6ea.png",
+      "prompt": "Precise foreground-only edit of this completed thunderbear forest streaming painting. Keep the whole image and every small story, tree, bear, bridge, goose boot, squirrels, cooking fire, turtle, spoon shrine and blank right parchment unchanged. Add ONE low, thick, naturally curved fallen tree root/log across the FRONT edge of the broad empty lower-left mossy stone platform. This creates a natural waist-high foreground barrier so a chest-up live webcam person can sit BEHIND it without the torso cutting off in empty space. The log/root occupies only normalized x.045-.31, its mossy irregular upper edge runs around y.77-.80, and its dark gnarled root face reaches y.90. It must look organic, not a straight counter, desk, chair or fence. One tiny bioluminescent mushroom and soft fern on the edge, subtle material integration. Clear space above it stays open for the host; do not add any person, creature or text there. Preserve all existing mini stories and the open forest atmosphere. Only add this local natural foreground occluder on the lower-left ledge."
+    },
+    {
+      "file": "ionian-distinct-v4b.png",
+      "input": "ionian-distinct-v4.png",
+      "generated": "exec-55be069d-4299-4811-a06d-a2ef03e4426a.png",
+      "prompt": "Precise foreground-only edit of this finished turtle-island streaming painting. Preserve absolutely all composition, turtle islands, lighting, fine jokes, blank left chat parchment, poro queue, fish fishing for a poro, snail race, and all scenery. Add ONE graceful curved bamboo-and-jade balustrade across the FRONT of the existing lower-right circular tea landing. It is an elegant waist-high arc for a seated live host to appear BEHIND, not a bar counter or desk. Its upper edge should run from image normalized x.70 y.80 through x.79 y.825 to x.935 y.805; the small upright bamboo posts and jade/turtle-knot details extend down to the existing stone floor at y.94. Keep plenty of uncluttered scenic space above that rail for the person's shoulders and head. Make the rail convincingly occupy the foreground, with a little blossom vine draping on one post. Do not add any person or chair. Do not obscure the stone tea table to the left, existing tabletop jokes, or any of the other discoveries. Exact same image, only this small functional foreground railing on the lower-right landing. The image will be used with a live chest-up facecam so the railing must hide the bottom edge of the torso naturally. No text, no UI, no new panels."
+    },
+    {
+      "file": "cryophoenix-distinct-v4b.png",
+      "input": "cryophoenix-distinct-v4.png",
+      "generated": "exec-33ddb06e-28e5-4aab-bfe5-de9b7ab7a37d.png",
+      "prompt": "Make a very precise local foreground edit of this finished shattered cryophoenix observatory. Keep every other pixel/content as unchanged as possible: the phoenix, spiraling sky, floating platforms, left constellation parchment, telescope poros, chess goose, egg guard, tiny icebirds and log, mittens and skating crab. On the large EMPTY circular central foreground platform, add a compact waist-high crescent-shaped frozen astronomical lectern/armillary plinth. It sits on the NEAR edge of the circle and runs only from normalized x.35 to x.59, with its upper uneven frosted edge at y.785-.81 and solid icy carved front extending to y.90. It is an organically curved asymmetrical sculptural ice console with subtle star-carved stone and three tiny protruding ice crystal tips, not a rectangular bar, counter or chair. There must be unobstructed space directly above its center for a chest-up LIVE HOST who will later be composited behind it. Do NOT depict a person. The small solid foreground plinth is intended to naturally cover the bottom edge of a webcam torso. It must look like it belongs to this broken observatory and should not cover the left or right platform Easter eggs. Preserve the elegant broken-platform composition and the striking giant phoenix. Only add this little functional sculptural foreground piece; no UI, no text, no screen."
+    }
+  ]
+}

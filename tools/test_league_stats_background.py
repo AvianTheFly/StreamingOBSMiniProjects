@@ -11,7 +11,7 @@ from league_stats.collector import Collector
 class BackgroundTests(unittest.TestCase):
     def make_collector(self):
         tracker = Mock(lock=threading.RLock(), enrichment_requested=True, import_requested=True,
-                       catalog={}, item_catalog={})
+                       catalog={}, item_catalog={}, records={})
         collector = Collector(tracker, threading.Event(), client=Mock(), fetch=Mock(return_value={}))
         self.addCleanup(collector.http.close)
         collector.next_client = float('inf')

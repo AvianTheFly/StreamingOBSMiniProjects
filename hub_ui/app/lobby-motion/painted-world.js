@@ -3,7 +3,7 @@ import {PaintedPatch} from './shared/world-motion.js';
 import {LobbyResidents} from './lobby-residents.js';
 export const edge=(u,v)=>Math.sin(u*Math.PI)**2*Math.sin(v*Math.PI)**2;
 export class PaintedWorld {
- constructor(scene,ambience){this.scene=scene;this.ambience=ambience;this.patches=[];this.residents=scene.artUrl?new LobbyResidents(scene.id):null;}
+ constructor(scene,ambience){this.scene=scene;this.ambience=ambience;this.patches=[];this.residents=(scene.residents??!!scene.artUrl)?new LobbyResidents(scene.id):null;}
  async load(){
   const image=new Image();image.src=this.scene.artUrl?new URL(this.scene.artUrl,import.meta.url).href:'/api/projects/scene_voice_switcher/artwork?source='+encodeURIComponent(this.scene.source);await image.decode();
   this.base=document.createElement('canvas');this.base.width=1920;this.base.height=1080;this.base.getContext('2d').drawImage(image,0,0,1920,1080);

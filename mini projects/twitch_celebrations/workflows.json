@@ -17,7 +17,7 @@
         "event": "twitch:raid",
         "kind": "event"
       },
-      "detail": "Eight-second native crab flotilla, lantern dragons, occupied cat train or frog musicians. Existing cue clock, audio and server expiry; transparent gameplay center.",
+      "detail": "Single-pass 6.4–6.6-second raid production: large top-center raider name and exact viewer count; ten original border acts plus five connected comic scenes with eight familiar lobby characters. Repairs power the crab cannon, stolen snacks hit Bongo, Hornet saves a failed climb, Pedro gives Boo a record hat, and Creeper sends a trophy to the salvage robot. The gameplay center stays transparent; no Mob or video panels.",
       "steps": [
         {
           "id": "0",
@@ -49,19 +49,19 @@
           "label": "Run the selected show",
           "owner": "obs",
           "kind": "output",
-          "detail": ""
+          "detail": "One existing overlay clock advances the announcement and clipped canvas. Story owns finite act windows; acts and crossovers own character gags with shared prop/contact trajectories; effects owns bounded stagecraft. The page caches local penguin poses and 24 unchanged lobby poses. Each scene runs once per raid, with at most four principal performers and four support characters; reduced motion freezes the composition. Current saved audio and volume apply. Custom visual choices remain stored but do not appear in raids. The shared raid score supplies exact queue and private-preview durations. The owned audio position drives smooth story retiming: cannon, sneeze, Kirby hit, rescue, record hat, confetti and trophy catch land on measured beats. Drums, speakers and border bursts follow the musical grid; no strobing or repeated music."
         },
         {
           "id": "4",
           "label": "Release for the next show",
           "owner": "twitch_celebrations",
           "kind": "end",
-          "detail": ""
+          "detail": "Expiry, stop, pause, replacement, server loss and page exit remove the canvas and announcement and stop owned audio. Audio ending also clears the raid; its completed event ID rejects stale replay. Blocked audio uses the bounded event clock; delayed playback seeks to the current event position."
         }
       ],
       "owner_hashes": {
-        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
-        "twitch_celebrations": "2962f448cfc1bbbef8dcfb4f40051fafcb5606ab6fec617aac715897c034ec7a"
+        "twitch_celebrations": "050f98e85a42fd89d52e5b1970eb2213f45232b5c3e22831a4fb830166afc786",
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c"
       },
       "edges": [
         {
@@ -85,7 +85,7 @@
         {
           "path": "mini projects/twitch_celebrations/engine.py",
           "symbol": "Engine.submit",
-          "hash": "a1796f8919ebd803d2c9de27483d6008fd836eeb8671afcf1705853642850d4e"
+          "hash": "a76af9627057cc07ae4554cccecc853e71e99a5b7f11d820721dad363e1964ab"
         },
         {
           "path": "mini projects/twitch_celebrations/engine.py",
@@ -108,7 +108,7 @@
         "event": "twitch:subscribe",
         "kind": "event"
       },
-      "detail": "Runtime names/facts at the top with native den, grove, workshop or phoenix scenes. Gifts have separately staged delivery acts. Approved follower renderer and its feature-owned original sprites are preserved.",
+      "detail": "A 4.8-second subscription thank-you: a goose or salvage robot sends a coin to a crewmate machine, which returns a heart for Kirby to turn into a balloon. Observed cumulative months unlock bounded extras at 3, 6 and 12 months. One top-center thank-you shows the actual name and known month count; no additional captions, tier labels or subscriber-message block. Gifts and approved followers retain their existing presentations.",
       "steps": [
         {
           "id": "0",
@@ -140,19 +140,19 @@
           "label": "Run the selected show",
           "owner": "obs",
           "kind": "output",
-          "detail": ""
+          "detail": "SupporterShow delegates subscriptions to SubscriberParty. Subscriber story owns pure milestone policy and shared coin/heart endpoints; subscriber acts own wordless props and character gags. Existing feature-local lobby pose cache is reused. The existing audio element and RAF drive the original single-pass 120 BPM sting; event expiry is always bounded. At most six characters and thirty particles per burst; the center x=240..1680, y=170..840 remains clear. Reduced motion freezes the complete composition. Saved custom audio and current volume apply; saved custom visuals remain stored for other events."
         },
         {
           "id": "4",
           "label": "Release for the next show",
           "owner": "twitch_celebrations",
           "kind": "end",
-          "detail": ""
+          "detail": "Stop, expiry, replacement, pause, disconnect, page exit and music end clear the presentation and owned audio. SubscriberParty disconnects its resize observer; deferred font fitting rejects obsolete layers. Completed event IDs prevent replay before server expiry."
         }
       ],
       "owner_hashes": {
         "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
-        "twitch_celebrations": "2962f448cfc1bbbef8dcfb4f40051fafcb5606ab6fec617aac715897c034ec7a"
+        "twitch_celebrations": "0eb2e5669a196bfbdafb544f9033bfd6b4266177cf1421369a0fdaf4e15bee63"
       },
       "edges": [
         {
@@ -176,7 +176,7 @@
         {
           "path": "mini projects/twitch_celebrations/engine.py",
           "symbol": "Engine.submit",
-          "hash": "a1796f8919ebd803d2c9de27483d6008fd836eeb8671afcf1705853642850d4e"
+          "hash": "a76af9627057cc07ae4554cccecc853e71e99a5b7f11d820721dad363e1964ab"
         },
         {
           "path": "mini projects/twitch_celebrations/engine.py",
@@ -471,7 +471,7 @@
         "label": "Chat writing is requested",
         "kind": "control"
       },
-      "detail": "Existing celebration tokens remain valid without chat writing; no provider starts at import.",
+      "detail": "Existing celebration tokens remain valid without chat writing; no provider starts at import. Shutdown joins the bounded shared Twitch clip worker before unregistering its authorization session.",
       "steps": [
         {
           "id": "0",
@@ -552,11 +552,11 @@
         {
           "path": "mini projects/twitch_celebrations/main.py",
           "symbol": "run",
-          "hash": "2985d2981aba78d489612932f152868e6a6346eb32a6ddc72aa03defc20a5eaa"
+          "hash": "123e2b1a27e857e7acdcc12258a346aa1dd02c2763579e3608bc727458f6f688"
         }
       ],
       "owner_hashes": {
-        "twitch_celebrations": "2962f448cfc1bbbef8dcfb4f40051fafcb5606ab6fec617aac715897c034ec7a"
+        "twitch_celebrations": "659adca0f8aad397ccc5f27b1c89bf7f128cfcbf4b80d7ebfa0ddcf5006df8a6"
       }
     }
   ]

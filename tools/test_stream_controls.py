@@ -62,6 +62,31 @@ class StreamControlTests(unittest.TestCase):
         self.controls.follow()
         self.assertEqual(self.writes, ['Other'])
 
+    def test_ending_hold_expires_when_another_manual_scene_is_chosen(self):
+        self.controls.present('ending', lambda: self.choose('Afterparty'))
+        self.director.request('Old queue', owner='client')
+        self.choose('Game')
+        self.controls.reconcile()
+        self.assertFalse(self.controls.snapshot()['held'])
+        self.assertIsNone(self.director.snapshot()['pending_scene'])
+        self.director.request('Lobby', owner='client')
+        self.assertEqual(self.writes, ['Afterparty', 'Game', 'Lobby'])
+
+    def test_break_scope_survives_replay_and_explicit_hold_remains_deliberate(self):
+        self.controls.present('break', lambda: self.choose('Tavern'))
+        lease = self.director.reserve('instant_replay', 'Replay', 'Game')
+        self.director.activate(lease); self.controls.reconcile()
+        self.assertTrue(self.controls.snapshot()['held'])
+        self.director.finish(lease); self.controls.reconcile()
+        self.assertTrue(self.controls.snapshot()['held'])
+        self.controls.hold(); self.choose('Other'); self.controls.reconcile()
+        self.assertTrue(self.controls.snapshot()['held'])
+
+    def test_external_obs_scene_change_expires_the_ending_hold(self):
+        self.controls.present('ending', lambda: self.choose('Afterparty'))
+        self.scene = 'Game'; self.director.observe('Game'); self.controls.reconcile()
+        self.assertFalse(self.controls.snapshot()['held'])
+
     def test_unobserved_external_choice_invalidates_pending_on_release(self):
         self.controls.hold()
         self.director.request('Draft', owner='client')

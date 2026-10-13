@@ -49,6 +49,18 @@ class PersistentMetadataTests(unittest.TestCase):
             metadata.probe_media(self.file)
             self.assertEqual(probe.call_count,3)
 
+    def test_old_video_only_cache_is_reprobed_once_for_audio_presence(self):
+        stat = self.file.stat()
+        row = dict(path=str(self.file), mtime_ns=stat.st_mtime_ns, size=stat.st_size,
+                   metadata=dict(codec='h264', width=640, height=360, fps=30))
+        self.cache.write_text(json.dumps(dict(version=1, entries=[row])))
+        self.restart()
+        complete = metadata.MediaMetadata('h264', 640, 360, 30, has_audio=True)
+        with patch.object(metadata, '_read_metadata', return_value=complete) as probe:
+            self.assertEqual(metadata.probe_media(self.file), complete)
+            self.assertEqual(metadata.probe_media(self.file), complete)
+            probe.assert_called_once()
+
     def test_invalid_or_oversized_cache_falls_back_without_resetting_media(self):
         for content in ('broken json', '{"version":2,"entries":[]}', ' '* (MAX_BYTES+1),
                         json.dumps({'version':1,'entries':[{'path':str(self.file),'mtime_ns':0,'size':13,'metadata':None}]})):

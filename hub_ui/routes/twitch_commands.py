@@ -26,6 +26,7 @@ class TwitchCommandRoutes:
                 raise ValueError('Command edit is too large.')
             body = self._body()
             if path=='/api/twitch-commands/preview': result = api.preview(body)
+            elif path=='/api/twitch-commands/jokes': result = api.save_jokes(body)
             elif path=='/api/twitch-commands/settings': result = api.save(body)
             else: return self._err(404,'Unknown chat command endpoint.')
             self._json(200,result)

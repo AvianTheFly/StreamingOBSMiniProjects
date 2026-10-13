@@ -91,7 +91,8 @@ def export_clip(store, clip, output, padding=15, mode='copy'):
     source_streams = json.loads(video['streams'])
     mp4 = all(s['type'] in ('video', 'audio') and s['codec'] in ('h264', 'hevc', 'av1', 'aac', 'mp3') for s in source_streams)
     extension = '.mp4' if mp4 else '.mkv'
-    destination = output / f'{source.stem}__r{clip["id"]}__{title}__{stamp}{extension}'
+    stem = video.get('export_stem', source.stem)
+    destination = output / f'{stem}__r{clip["id"]}__{title}__{stamp}{extension}'
     temporary = destination.with_name(destination.stem + '.partial' + extension)
     args = ['ffmpeg', '-nostdin', '-v', 'error', '-n', '-ss', str(start), '-i', str(source), '-t', str(end-start), '-map', '0', '-map_metadata', '0']
     if mode == 'exact':

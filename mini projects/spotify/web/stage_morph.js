@@ -1,12 +1,13 @@
 /* Live geometric transport between distinct compositions. Curves and facets
  * keep receiving current audio throughout the handoff. Only correspondence is
- * cached, in one bounded plan per scene pair; no frame history or GPU resources. */
+ * cached/prepared, in one bounded plan per scene pair; no frame history or GPU resources. */
 (function(root){
  'use strict';
  const Stages=typeof module!=='undefined'&&module.exports?require('./stage_geometry.js'):root.VisualStages;
+ const Cache=typeof module!=='undefined'&&module.exports?require('./morph_cache.js'):root.MorphPlanCache;
  const mix=(a,b,t)=>a+(b-a)*t,clamp=v=>Math.max(0,Math.min(1,v));
  const smooth=v=>{v=clamp(v);return v*v*(3-2*v);};
- const plans=new Map();
+ const plans=new Cache(),references=new Map();
  function capture(stage,w,j,decorate=s=>s){
   const groups={stroke:[],line:[],face:[]};
   const add=(kind,points,colors,widths,alphas,key)=>groups[kind].push({points,colors,widths,alphas,key:key??groups[kind].length});
@@ -161,13 +162,29 @@
    .map(pair=>({...pair,a:group[pair.a].i,b:bb[k][pair.b].i})));
  }
  function plan(from,to){
-  const key=from+':'+to;if(plans.has(key))return plans.get(key);
-  const {w,j}=reference(),a=capture(from,w,j),b=capture(to,w,j),result={};
+  const key=from+':'+to,cached=plans.get(key);if(cached)return cached;
+  const a=referenceStage(from),b=referenceStage(to),result={};
   for(const kind of ['face','line','stroke']){
-   const aa=a[kind].map(prepare),bb=b[kind].map(prepare);
+   const aa=a[kind],bb=b[kind];
    result[kind]=kind==='stroke'?pairContours(aa,bb):pairGroup(aa,bb,kind);
   }
   plans.set(key,result);return result;
+ }
+ function referenceStage(stage){
+  if(!Number.isInteger(stage)||stage<0||stage>=64)throw Error('Invalid morph stage');
+  if(!references.has(stage)){
+   const {w,j}=reference(),groups=capture(stage,w,j);
+   for(const kind of ['face','line','stroke'])groups[kind]=groups[kind].map(prepare);
+   references.set(stage,groups);
+  }return references.get(stage);
+ }
+ function exportPrepared(count){
+  if(!Number.isInteger(count)||count<2||count>64)throw Error('Invalid prepared stage count');
+  const data={schema:1,stages:count,plans:{},sizes:{},counts:[]};
+  for(let stage=0;stage<count;stage++){const groups=referenceStage(stage);data.counts.push(Object.fromEntries(['face','line','stroke'].map(kind=>[kind,groups[kind].length])));}
+  for(let from=0;from<count;from++)for(let to=0;to<count;to++)if(from!==to){
+   const key=from+':'+to;data.plans[key]=plan(from,to);data.sizes[key]=JSON.stringify(data.plans[key]).length;
+  }return data;
  }
  function render(sink,w,j,decorate=s=>s){
   if(!j.transitioning||j.blend<=0||j.blend>=1){
@@ -244,6 +261,8 @@
   }
  }
  function emit(sink,p,c,w,a,copies=1){if(sink.stroke)sink.stroke(p,c,w,a,undefined,copies);else for(let i=1;i<p.length;i++)sink.line(p[i-1],p[i],c[i],w[i],a[i]);}
- const api={render,capture,planCount:()=>plans.size};root.VisualMorph=api;
+ const api={render,capture,exportPrepared,planCount:()=>plans.status().entries,
+  installPrepared:(data,count)=>plans.install(data,count),loadPrepared:count=>plans.load(count),
+  clear(){plans.clear();references.clear();},status:()=>({plans:plans.status(),references:references.size})};root.VisualMorph=api;
  if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

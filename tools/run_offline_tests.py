@@ -2,7 +2,9 @@
 
 Optional arguments are unittest module names. Background-thread exceptions fail
 the run rather than getting lost beneath a successful main-thread test result.
+Standalone film/artifact checks are opt-in with --include-artifacts or by name.
 """
+import argparse
 import sys
 from pathlib import Path
 import threading
@@ -17,13 +19,27 @@ ensure_import_paths()
 load_project_env()
 
 
-def _run_tests():
-    names = sys.argv[1:] or ['tools.' + path.stem for path in sorted((ROOT / 'tools').glob('test_*.py'))]
-    if not sys.argv[1:]:
-        names.extend('league_api.' + path.stem for path in sorted(
-            (ROOT / 'mini projects' / 'league_api').glob('test_*.py')))
-        names.extend('footage_manager.' + path.stem for path in sorted(
-            (ROOT / 'footage_manager').glob('test_*.py')))
+# These exercise standalone exports in stream_brand, not the running Hub.
+# Keep their public module paths for the artifact exporters/review archives.
+ARTIFACT_MODULES = frozenset('tools.test_' + name for name in (
+    'channel_trailer', 'cinematic_art', 'cinematic_sketch', 'illustrated_sketch',
+    'intro_renderer', 'motion_audio', 'motion_sketch', 'sanctuary_sketch',
+    'sketch_journey', 'spirit_slideshow',
+))
+
+
+def selected_modules(names=(), *, include_artifacts=False, root=ROOT):
+    if names:
+        return list(names)
+    discovered = ['tools.' + path.stem for path in sorted((root / 'tools').glob('test_*.py'))]
+    discovered.extend('league_api.' + path.stem for path in sorted(
+        (root / 'mini projects' / 'league_api').glob('test_*.py')))
+    discovered.extend('footage_manager.' + path.stem for path in sorted(
+        (root / 'footage_manager').glob('test_*.py')))
+    return [name for name in discovered if include_artifacts or name not in ARTIFACT_MODULES]
+
+
+def _run_tests(names):
     failures = []
     original = threading.excepthook
     def thread_failed(args):
@@ -43,9 +59,19 @@ def _run_tests():
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('modules', nargs='*', help='unittest module, class or method names')
+    parser.add_argument('--include-artifacts', action='store_true',
+                        help='also run standalone film/storyboard export checks')
+    parser.add_argument('--list', action='store_true', help='list selected modules without importing them')
+    args = parser.parse_args()
+    names = selected_modules(args.modules, include_artifacts=args.include_artifacts)
+    if args.list:
+        print('\n'.join(names))
+        return 0
     configure_test_process()
     with test_run_slot(ROOT):
-        return _run_tests()
+        return _run_tests(names)
 
 
 if __name__ == '__main__':

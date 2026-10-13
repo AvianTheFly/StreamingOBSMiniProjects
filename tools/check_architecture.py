@@ -23,6 +23,7 @@ CONNECTION_OWNERS = {
 
 # Explicit composition adapters may import only the feature they expose.
 FEATURE_ADAPTERS = {
+    'hub_ui/routes/league_stage.py': 'league_api',  # Stage authoring composition; League owns image validation, selection and persistence.
     'hub_ui/routes/effect_soundboard.py': 'soundboard',  # Read-only gallery of feature-owned mappings and media; no playback.
     'hub_ui/routes/effect_league.py': 'league_api',  # Read-only gallery of public production definitions and saved presentation controls.
     'hub_ui/routes/spirit_lobby.py': 'spirit_lobby',  # Public lobby display library; feature owns assets/persistence.

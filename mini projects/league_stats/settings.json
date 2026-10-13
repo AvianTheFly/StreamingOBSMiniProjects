@@ -1,0 +1,15 @@
+{
+  "allow_moderators": true,
+  "helpers": [],
+  "cooldown_seconds": 15,
+  "helper_enabled": true,
+  "include_custom": false,
+  "region": "na1",
+  "custom_counters": {},
+  "blocked_helpers": [],
+  "viewer_requests": true,
+  "request_cooldown_seconds": 10,
+  "cs_goal": 7,
+  "chat_replies": true,
+  "postgame_auto": true
+}

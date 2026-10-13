@@ -1,5 +1,5 @@
 {
-  "revision": 133,
+  "revision": 144,
   "clips": {
     "b4599b300815a05841074ac3": {
       "path": "C:\\StreamingMedia\\Replays\\clips\\Game 1023 2026-09-14\\Replay 2026-09-14 15-32-21_ir_trimmed.mkv",
@@ -408,7 +408,8 @@
       "tag": "untagged",
       "saved_at": 1790917837.7994967,
       "kept": true,
-      "game": ""
+      "game": "",
+      "review_state": "dismissed"
     },
     "f2bb5517752e4745e8026e8c": {
       "path": "C:\\StreamingMedia\\Replays\\Replay 2026-10-03 01-26-12.mp4",
@@ -499,6 +500,101 @@
       "kept": true,
       "purpose": "replay_only",
       "capture_source": "C:\\StreamingMedia\\Replays\\Replay 2026-10-03 02-32-40.mp4"
+    },
+    "f21322bc04d6082d00732a9e": {
+      "path": "C:\\StreamingMedia\\Replays\\clips\\Ungrouped\\Replay 2026-10-09 11-35-03_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1791560124.4038324,
+      "kept": true,
+      "purpose": "highlight",
+      "archived_from": [
+        "C:\\StreamingMedia\\Replays\\Replay 2026-10-09 11-35-03_ir_trimmed.mkv"
+      ],
+      "game": ""
+    },
+    "62f9e6d069d246eb1230c84c": {
+      "path": "C:\\StreamingMedia\\Replays\\2026-10-02 01-18-56.mp4",
+      "review_state": "dismissed"
+    },
+    "2bfb8740fed203c51900f37b": {
+      "path": "C:\\StreamingMedia\\Replays\\2026-10-02 01-20-03.mp4",
+      "review_state": "dismissed"
+    },
+    "93ef7d546bb94e840057001a": {
+      "path": "C:\\StreamingMedia\\Replays\\2026-10-02 01-21-12.mp4",
+      "review_state": "dismissed"
+    },
+    "613868c811973abb285927d3": {
+      "path": "C:\\StreamingMedia\\Replays\\2026-10-02 01-23-35.mp4",
+      "review_state": "dismissed"
+    },
+    "13f09e683e8d5b14d38e390e": {
+      "path": "C:\\StreamingMedia\\Replays\\Replay 2026-10-02 01-10-14.mp4",
+      "review_state": "dismissed"
+    },
+    "611ab0c9563843ffd79ec818": {
+      "path": "C:\\StreamingMedia\\Replays\\Replay 2026-10-02 01-22-40.mp4",
+      "review_state": "dismissed"
+    },
+    "aeb5bb2fcc0c5381822ad59c": {
+      "path": "C:\\StreamingMedia\\Replays\\Replay 2026-10-02 01-23-44.mp4",
+      "review_state": "dismissed"
+    },
+    "bfbeac994d2fa9d6119091d0": {
+      "path": "C:\\StreamingMedia\\Replays\\Replay 2026-10-02 01-51-18.mp4",
+      "review_state": "dismissed"
+    },
+    "843a14728a9ba3551ce631c2": {
+      "path": "C:\\StreamingMedia\\Replays\\Replay 2026-10-02 02-19-03.mp4",
+      "review_state": "dismissed"
+    },
+    "d19ef65b8c58a4e6b123cd47": {
+      "path": "C:\\StreamingMedia\\Replays\\clips\\Ungrouped\\Replay 2026-10-11 01-52-24_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1791698034.0364416,
+      "kept": true,
+      "purpose": "highlight",
+      "review_state": "kept",
+      "archived_from": [
+        "C:\\StreamingMedia\\Replays\\Replay 2026-10-11 01-52-24_ir_trimmed.mkv"
+      ],
+      "game": ""
+    },
+    "b4067d7f66a14cbf3cf36342": {
+      "path": "C:\\StreamingMedia\\Replays\\clips\\Game 1172 2026-10-11\\Replay 2026-10-11 02-03-10_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1791698655.3716278,
+      "kept": true,
+      "purpose": "highlight",
+      "review_state": "kept",
+      "archived_from": [
+        "C:\\StreamingMedia\\Replays\\Replay 2026-10-11 02-03-10_ir_trimmed.mkv"
+      ],
+      "game": "Game 1172 2026-10-11"
+    },
+    "0f43aa674eba849f587faed8": {
+      "path": "C:\\StreamingMedia\\Replays\\clips\\Ungrouped\\Replay 2026-10-11 02-10-45_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1791699135.8972025,
+      "kept": true,
+      "purpose": "highlight",
+      "review_state": "kept",
+      "archived_from": [
+        "C:\\StreamingMedia\\Replays\\Replay 2026-10-11 02-10-45_ir_trimmed.mkv"
+      ],
+      "game": ""
+    },
+    "b68a5b2f379016f3b17a94e9": {
+      "path": "C:\\StreamingMedia\\Replays\\clips\\Ungrouped\\Replay 2026-10-12 22-24-51_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1791858300.7804515,
+      "kept": true,
+      "purpose": "highlight",
+      "review_state": "kept",
+      "archived_from": [
+        "C:\\StreamingMedia\\Replays\\Replay 2026-10-12 22-24-51_ir_trimmed.mkv"
+      ],
+      "game": ""
     }
   },
   "groups": []

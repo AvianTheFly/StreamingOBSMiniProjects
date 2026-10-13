@@ -1,5 +1,6 @@
 // Twitch IRC tags and emote offsets are data. Never interpret chat as HTML.
 import {compileStickers,stickerFragments} from './stickers.js';
+import {textFragments} from './text_replacements.js';
 export function parseLine(line){
  const result={tags:{},prefix:'',command:'',params:[],text:''};
  if(line.startsWith('@')){const end=line.indexOf(' ');for(const tag of line.slice(1,end).split(';')){const eq=tag.indexOf('=');const key=eq<0?tag:tag.slice(0,eq);result.tags[key]=(eq<0?'':tag.slice(eq+1)).replace(/\\([s:rn\\])/g,(_,c)=>({s:' ',':':';',r:'\r',n:'\n','\\':'\\'}[c]));}line=line.slice(end+1);}
@@ -15,7 +16,7 @@ export function fragments(text,tags,emotes,replacements,options={}){
  for(const gif of (tags.gifs||'').split(',')){const [position,,url]=gif.split('|');const [start,end]=(position||'').split('-').map(Number);if(safeImage(url)&&Number.isInteger(start)&&Number.isInteger(end)&&start>=0&&end>=start&&end<chars.length)ranges.push({start,end,url,alt:chars.slice(start,end+1).join('')});}
  ranges.sort((a,b)=>a.start-b.start);let at=0;const out=[];
  const rules=compileStickers(replacements,options);
- const plain=value=>out.push(...stickerFragments(value,emotes,rules,safeImage));
+ const plain=value=>{for(const part of textFragments(value,options.textReplacements||{},emotes))out.push(...stickerFragments(part.text,emotes,rules,safeImage));};
  for(const range of ranges){if(range.start<at)continue;plain(chars.slice(at,range.start).join(''));out.push(range);at=range.end+1;}plain(chars.slice(at).join(''));return out;
 }
 export function readableColor(value){

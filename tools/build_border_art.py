@@ -4,6 +4,7 @@ PNG originals remain untouched. Embedding allows existing static module routes
 to deliver artwork atomically without a new service or runtime HTTP route.
 """
 import base64
+import argparse
 import json
 import os
 import tempfile
@@ -21,8 +22,8 @@ JOBS = [
      {}),
 ]
 
-def build():
-    for directory, source, output, files in JOBS:
+def build(*, sound_only=False, league_only=False):
+    for directory, source, output, files in (JOBS[:1] if sound_only else JOBS[1:2] if league_only else JOBS):
         base = ROOT / directory
         code = (base / source).read_text(encoding='utf-8')
         if '/* @CULTURE_TIMING@ */' in code:
@@ -32,6 +33,18 @@ def build():
             marker = '/* @CULTURE_' + name.upper() + '@ */'
             if marker in code:
                 code = code.replace(marker, (base/('culture-' + name + '.js')).read_text(encoding='utf-8'))
+        for name in ('ink', 'structures', 'spirits', 'combos', 'combat', 'objectives', 'progression', 'signals', 'payoffs', 'motifs', 'rim', 'events', 'cues', 'energy', 'theater'):
+            marker = '/* @STORY_' + name.upper() + '@ */'
+            if marker in code:
+                code = code.replace(marker, (base/('story-' + name + '.js')).read_text(encoding='utf-8'))
+        for name in ('ink', 'materials', 'scenery', 'signal-scenery', 'contacts', 'combat', 'dragons', 'objectives', 'structures', 'vitals', 'progression', 'lifecycle', 'signals', 'stories', 'scores'):
+            marker = '/* @BORDER_' + name.upper().replace('-', '_') + '@ */'
+            if marker in code:
+                code = code.replace(marker, (base/('border-' + name + '.js')).read_text(encoding='utf-8'))
+        for name in ('energy', 'lineups', 'choreography', 'encore-motion', 'signatures', 'shorts', 'romance', 'encores'):
+            marker = '/* @SOUND_' + name.upper().replace('-', '_') + '@ */'
+            if marker in code:
+                code = code.replace(marker, (base/('sound-' + name + '.js')).read_text(encoding='utf-8'))
         if '/* @PLAYFUL_INK@ */' in code:
             code = code.replace('/* @PLAYFUL_INK@ */', (ROOT/'lib/browser_effects/art/playful-ink.js').read_text(encoding='utf-8'))
         for marker, filename in [('PLAYFUL_EVENTS', 'playful-events.js'), ('PLAYFUL_SOUNDS', 'playful-sounds.js'), ('PLAYFUL_SETS', 'playful-sets.js'), ('PLAYFUL_SOUND_SETS', 'playful-sound-sets.js'), ('PLAYFUL_SOUND_ACTS', 'playful-sound-acts.js')]:
@@ -96,4 +109,9 @@ def build():
         print(f'Built {output}: {len(result):,} bytes')
 
 if __name__ == '__main__':
-    build()
+    parser = argparse.ArgumentParser(description=__doc__)
+    selection = parser.add_mutually_exclusive_group()
+    selection.add_argument('--sound-only', action='store_true', help='Build only soundboard art; leave other feature bundles untouched')
+    selection.add_argument('--league-only', action='store_true', help='Build only League art; leave other feature bundles untouched')
+    args = parser.parse_args()
+    build(sound_only=args.sound_only, league_only=args.league_only)

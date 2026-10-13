@@ -37,25 +37,72 @@ def make_handler(service, *, root: Path, port: int, load_config):
             if self.headers.get('Host') not in self.local_origins():
                 self.send_error(403); return
             path=unquote(urlparse(self.path).path)
+            if path.startswith('/purchase-assets/'):
+                name=path.removeprefix('/purchase-assets/')
+                if not re.fullmatch(r'(?:[1-9][0-9]{0,6}\.png|ka-ching\.wav)',name):
+                    self.send_error(404); return
+                target=root/'media'/'purchases'/name
+                if not target.is_file(): self.send_error(404); return
+                from lib.http_files import serve_file
+                serve_file(self,target,content_type=mimetypes.guess_type(target.name)[0]); return
+            if path=='/production/purchases.js':
+                self.send_bytes((root/'production'/'web'/'purchases.js').read_bytes(),'text/javascript'); return
+            if path == '/stage/state':
+                self.send_bytes(json.dumps({**service.client_scenes.stage_snapshot(), 'appearance':service.stage_appearance.snapshot()}).encode()); return
+            if path.startswith('/stage/art/'):
+                try:
+                    target=service.stage_appearance.asset(path.removeprefix('/stage/art/'))
+                    from lib.http_files import serve_file
+                    serve_file(self,target,content_type=mimetypes.guess_type(target.name)[0])
+                except (ValueError,FileNotFoundError): self.send_error(404)
+                return
+            if path in {'/stage/loading', '/stage/queue', '/stage/stage.js', '/stage/stage.css',
+                        '/stage/queue.js', '/stage/queue.css', '/stage/queue-art.js',
+                        '/stage/queue-theme.js', '/stage/queue-background.js', '/stage/queue-effects.js',
+                        '/stage/queue-performances.js',
+                        '/stage/queue-bear.webp', '/stage/queue-turtle.webp',
+                        '/stage/queue-ram.webp', '/stage/queue-phoenix.webp'}:
+                name = path.rsplit('/', 1)[-1]
+                file = root/'stage_web'/(name if '.' in name else 'queue.html' if name == 'queue' else 'index.html')
+                self.send_bytes(file.read_bytes(), 'text/css' if file.suffix == '.css' else 'text/javascript' if file.suffix == '.js' else 'image/webp' if file.suffix == '.webp' else 'text/html; charset=utf-8'); return
             if path == '/shared/visible-poll.js':
                 self.send_bytes((root.parents[1]/'lib'/'browser_effects'/'web'/'visible-poll.js').read_bytes(), 'text/javascript'); return
+            if path == '/shared/world-motion.js':
+                self.send_bytes((root.parents[1]/'lib'/'browser_effects'/'web'/'world-motion.js').read_bytes(), 'text/javascript'); return
             if path == '/champ-select/state':
                 self.send_bytes(json.dumps(service.client_scenes.overlay_snapshot()).encode()); return
             if path == '/champ-select':
                 self.send_bytes((root/'champ_select_web'/'index.html').read_bytes(), 'text/html; charset=utf-8'); return
-            if path in {'/champ-select/app.js', '/champ-select/style.css'}:
+            if path in {'/champ-select/app.js', '/champ-select/layout.js', '/champ-select/style.css',
+                        '/champ-select/world-motion.js', '/champ-select/world-art.js',
+                        '/champ-select/world-events.js', '/champ-select/world-assets.js',
+                        '/champ-select/vfx-texture.js', '/champ-select/vfx-ink.js', '/champ-select/vfx-timing.js', '/champ-select/spirit-locks.js',
+                        '/champ-select/world-guests.js', '/champ-select/spirit-secrets.js', '/champ-select/scene-map.js',
+                        '/champ-select/draft-cues.js', '/champ-select/draft-demo.js'}:
                 file = root/'champ_select_web'/path.rsplit('/', 1)[-1]
                 self.send_bytes(file.read_bytes(), 'text/css' if file.suffix == '.css' else 'text/javascript'); return
+            if path in {'/champ-select/fonts/barlow.ttf', '/champ-select/fonts/cinzel.ttf'}:
+                self.send_bytes((root/'champ_select_web'/'fonts'/path.rsplit('/', 1)[-1]).read_bytes(), 'font/ttf'); return
+            if path.startswith('/champ-select/vfx/'):
+                name = path.removeprefix('/champ-select/vfx/')
+                if not re.fullmatch(r'(bear|turtle|ram|phoenix)\.png', name):
+                    self.send_error(404); return
+                self.send_bytes((root/'media'/'champ-select'/'vfx'/name).read_bytes(), 'image/png'); return
+            if path.startswith('/champ-select/guests/'):
+                name = path.removeprefix('/champ-select/guests/')
+                if not re.fullmatch(r'game-(kirby|boo|crewmate|goose)-[0-2]\.png', name):
+                    self.send_error(404); return
+                self.send_bytes((root/'media'/'draft-guests'/name).read_bytes(), 'image/png'); return
             if path.startswith('/champ-select/backgrounds/'):
                 name = path.removeprefix('/champ-select/backgrounds/')
-                if not re.fullmatch(r'(astral|tidal|neon|frost|verdant)\.jpg', name):
+                if not re.fullmatch(r'(bear|turtle|ram|phoenix|astral|tidal|neon|frost|verdant)\.jpg', name):
                     self.send_error(404); return
                 file = root/'media'/'champ-select'/name
                 if not file.is_file(): self.send_error(404); return
                 self.send_bytes(file.read_bytes(), 'image/jpeg'); return
             if path.startswith('/champ-select/masks/'):
                 name = path.removeprefix('/champ-select/masks/')
-                if not re.fullmatch(r'(astral|tidal|neon|frost|verdant)\.svg', name):
+                if not re.fullmatch(r'(bear|turtle|ram|phoenix|astral|tidal|neon|frost|verdant)\.svg', name):
                     self.send_error(404); return
                 file = root/'champ_select_web'/'masks'/name
                 self.send_bytes(file.read_bytes(), 'image/svg+xml'); return
@@ -86,7 +133,7 @@ def make_handler(service, *, root: Path, port: int, load_config):
                 self.send_bytes((root/'production'/'web'/'control.html').read_bytes(),'text/html; charset=utf-8'); return
             if path=='/production/subtle.js':
                 self.send_bytes((root.parents[1]/'lib'/'browser_effects'/'web'/'subtle.js').read_bytes(),'application/javascript'); return
-            if path.startswith('/production/') and path.removeprefix('/production/') in {'overlay.js','scene.js','materials.js','terrain.js','bursts.js','control.js','control.css','palette.js','primitives.js','combat.js','elements.js','objectives.js','progression.js','event-art.js','event-relics.js','match-screens.js'}:
+            if path.startswith('/production/') and path.removeprefix('/production/') in {'overlay.js','scene.js','materials.js','terrain.js','bursts.js','control.js','control.css','palette.js','primitives.js','combat.js','elements.js','objectives.js','progression.js','event-art.js','event-relics.js','match-screens.js','stance-accent.js'}:
                 file=root/'production'/'web'/path.removeprefix('/production/')
                 self.send_bytes(file.read_bytes(),'text/css' if file.suffix=='.css' else 'text/javascript'); return
             if path=='/sprite.png':
@@ -200,6 +247,8 @@ def make_handler(service, *, root: Path, port: int, load_config):
                 if not 0<size<=65536: raise ValueError('Invalid body size')
                 body=json.loads(self.rfile.read(size))
                 if not isinstance(body,dict): raise ValueError('Expected an object')
+                if path=='/purchases/preview':
+                    self.send_bytes(json.dumps(service.preview_purchase(body.get('item_id',3078))).encode()); return
                 if path=='/client-scenes':
                     self.send_bytes(json.dumps(service.client_scenes.configure(body)).encode()); return
                 if path=='/client-scenes/hide-now':

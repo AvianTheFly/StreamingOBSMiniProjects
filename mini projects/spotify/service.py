@@ -1,4 +1,4 @@
-"""Read Spotify's Windows media session; never control or duplicate its audio."""
+"""Observe Spotify and host scoped playback control on one Windows media loop."""
 from __future__ import annotations
 
 import asyncio
@@ -8,6 +8,8 @@ import time
 from .audio_worker import relay_audio
 from .audio_analysis import AudioAnalysis, quiet_features, spectrum
 from .media_notifications import MediaNotifications
+from .playback_control import PlaybackControl
+from lib import audio_focus
 
 
 
@@ -113,6 +115,8 @@ async def watch_media(state, stop):
     )
     manager = None
     notifications = MediaNotifications(asyncio.get_running_loop())
+    control = PlaybackControl(notifications._notify)
+    registration = audio_focus.register(control)
     metadata_revision, metadata_at, metadata = -1, -1000., None
     try:
         while not stop.is_set():
@@ -121,7 +125,9 @@ async def watch_media(state, stop):
                 if manager is None:
                     manager = await asyncio.wait_for(Manager.request_async(), 2)
                     notifications.bind_manager(manager)
-                session = select_spotify(manager.get_sessions(), Status.PLAYING)
+                sessions = list(manager.get_sessions())
+                session = select_spotify(sessions, Status.PLAYING)
+                await control.reconcile(sessions, session, Status.PLAYING, getattr(Status, 'PAUSED', None))
                 notifications.bind_session(session)
                 if session is None:
                     metadata = None
@@ -145,6 +151,13 @@ async def watch_media(state, stop):
                 notifications.reset()
             await notifications.wait()
     finally:
+        audio_focus.unregister(registration)
+        control.close()
+        try:
+            sessions = list(manager.get_sessions()) if manager else []
+            await control.reconcile(sessions, None, Status.PLAYING, getattr(Status, 'PAUSED', None))
+        except Exception:
+            pass
         notifications.close()
     state.set_media(playing=False, title='', artist='', error='Hub stopped')
 

@@ -5,7 +5,6 @@ class ReplayState:
 
     def __init__(self):
         self._lock = threading.Lock()
-        self._manual_mark_wall: list[float | None] = [None]
         self._clip_registry: list[dict] = []
         self._tag_counters: dict[str, int] = {}
         self._save_in_progress = [False]

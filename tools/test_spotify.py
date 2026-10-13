@@ -141,7 +141,7 @@ class SpotifyTests(unittest.TestCase):
             with urlopen(root+'/overlay') as response:
                 overlay = response.read()
                 self.assertIn(b'visualizer', overlay)
-                for name in ('surface.js', 'filament.js', 'reactive.js', 'forms.js', 'performance.js', 'radiance.js', 'music_strings.js', 'music_pacing.js', 'music_motion.js', 'journey.js', 'stage_palette.js', 'stage_spirits.js', 'stage_geometry.js', 'stage_morph.js', 'stage_renderer.js'):
+                for name in ('surface.js', 'filament.js', 'reactive.js', 'forms.js', 'performance.js', 'radiance.js', 'music_strings.js', 'music_pacing.js', 'music_dance.js', 'music_motion.js', 'journey.js', 'stage_palette.js', 'stage_designs.js', 'stage_geometry.js', 'stage_morph.js', 'stage_renderer.js'):
                     self.assertIn(name.encode(), overlay)
                     with urlopen(root+'/'+name) as script:
                         self.assertIn('application/javascript', script.headers['Content-Type'])

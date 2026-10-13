@@ -8,7 +8,8 @@ import time
 from pathlib import Path
 
 
-THEMES = ('astral', 'tidal', 'neon', 'frost', 'verdant')
+THEMES = ('bear', 'turtle', 'ram', 'phoenix')
+LEGACY_THEMES = {'astral': 'ram', 'tidal': 'turtle', 'neon': 'bear', 'frost': 'phoenix', 'verdant': 'turtle'}
 
 
 def _id(value):
@@ -87,6 +88,13 @@ def project(session, catalog):
             slot['name'] = item.get('name', '')
             slot['image'] = f"/champ-select/icons/{slot['championId']}.png" if item else ''
             slot['portrait'] = f"/champ-select/portraits/{slot['championId']}.jpg" if item else ''
+    for side, players in [('allies', allies), ('enemies', enemies)]:
+        for index, slot in enumerate(result[side]):
+            player = players[index] if index < len(players) and isinstance(players[index], dict) else {}
+            slot['label'] = str(player.get('obfuscatedSummonerName') or player.get('gameName')
+                                or player.get('summonerName')
+                                or f"{'Teammate' if side == 'allies' else 'Opponent'} {index + 1}")[:64]
+            slot['role'] = str(player.get('assignedPosition') or '')[:24]
     return result
 
 
@@ -96,7 +104,8 @@ class ChampSelectState:
         file = self.root / 'champion_catalog.json'
         self.catalog = json.loads(file.read_text(encoding='utf-8')) if file.exists() else {}
         self.session_id = None
-        self.theme = 'astral'
+        self.generation = 0
+        self.theme = 'bear'
         self.data = project(None, self.catalog)
         self.chat = []
         self.timer_started = None
@@ -120,8 +129,10 @@ class ChampSelectState:
         identifier = session.get('gameId') or session.get('chatDetails', {}).get('chatRoomName') or 'active'
         if identifier != self.session_id:
             self.session_id = identifier
+            self.generation += 1
             self.theme = random.choice(THEMES)
             self.chat = []
+        theme_setting = LEGACY_THEMES.get(theme_setting, theme_setting)
         if theme_setting in THEMES:
             self.theme = theme_setting
         self.data = project(session, self.catalog)
@@ -157,6 +168,6 @@ class ChampSelectState:
         draft = dict(self.data) if visible else project(None, self.catalog)
         if visible and self.timer_started is not None:
             draft['seconds'] = math.ceil(max(0, self.timer_seconds - (time.monotonic() - self.timer_started)))
-        return {'visible': visible, 'theme': self.theme,
+        return {'visible': visible, 'theme': self.theme, 'generation': self.generation,
                 'draft': draft,
                 'chat': self.chat if visible else []}

@@ -46,6 +46,49 @@ class CommandTests(unittest.TestCase):
         self.assertFalse(self.service.receive(message('!dc','m3','other')))
         self.assertEqual(len(self.sent),2)
 
+    def test_clip_only_admits_owner_or_real_mod_and_rejects_stale_duplicates(self):
+        with patch('twitch_commands.clipping.request_clip', return_value=True) as request:
+            self.assertFalse(self.service.receive(message('!clip')))
+            self.assertFalse(self.service.receive(message('!clip', moderator='true')))
+            stale = message('!clip', moderator=True); stale['sent_at'] = '1'
+            self.assertFalse(self.service.receive(stale))
+            foreign = message('!clip', moderator=True); foreign['channel'] = 'other'
+            self.assertFalse(self.service.receive(foreign))
+            self.assertTrue(self.service.receive(message('!CLIP', moderator=True)))
+            self.assertFalse(self.service.receive(message('!clip', moderator=True)))
+            self.assertTrue(self.service.receive(message('!clip', 'owner', 'test_channel')))
+            self.assertEqual(request.call_count, 2)
+            self.assertTrue(request.call_args.kwargs['reuse'])
+
+    def test_clip_replies_only_after_confirmation_and_revokes_on_edit_or_stop(self):
+        with patch('twitch_commands.clipping.request_clip', return_value=True) as request:
+            self.service.receive(message('!clip', moderator=True))
+        self.assertEqual(self.sent, [])
+        completed = request.call_args.kwargs['on_complete']
+        completed(dict(status='ready', message='Twitch clip ready (60s).', url='https://clips.twitch.tv/test'))
+        self.assertEqual(self.sent[0][0][1], 'Clip saved! Twitch clip ready (60s). https://clips.twitch.tv/test')
+        self.service.close()
+        self.assertFalse(self.sent[0][1]['allowed']())
+        completed(dict(status='ready', url='https://clips.twitch.tv/test'))
+        self.assertEqual(len(self.sent), 1)
+
+    def test_clip_failure_never_claims_success(self):
+        with patch('twitch_commands.clipping.request_clip', return_value=True) as request:
+            self.service.receive(message('!clip', moderator=True))
+        request.call_args.kwargs['on_complete'](dict(status='error', url=''))
+        self.assertIn('could not be confirmed', self.sent[0][0][1])
+        self.assertNotIn('Clip saved!', self.sent[0][0][1])
+
+    def test_short_clip_reply_explains_duration_and_links_the_single_clip(self):
+        with patch('twitch_commands.clipping.request_clip', return_value=True) as request:
+            self.service.receive(message('!clip', moderator=True))
+        request.call_args.kwargs['on_complete'](dict(status='error',
+            message='Twitch published only 30s of the requested 60s. No duplicate was created.',
+            url='https://clips.twitch.tv/short'))
+        self.assertIn('only 30s', self.sent[0][0][1])
+        self.assertIn('https://clips.twitch.tv/short', self.sent[0][0][1])
+        self.assertNotIn('Clip saved!', self.sent[0][0][1])
+
     def test_user_cooldown_is_longer(self):
         self.assertTrue(self.service.receive(message()))
         self.clock[0]+=31
@@ -101,6 +144,23 @@ class CommandTests(unittest.TestCase):
         self.assertFalse(allowed())
         self.assertFalse(self.service.receive(message('!dc','m2')))
         self.service.close();self.assertFalse(allowed())
+
+    def test_reminder_settings_preserve_catalog_and_revoke_pending_message(self):
+        original = self.service.snapshot()['commands']
+        with patch.object(settings.SettingsBackups,'snapshot'):
+            self.service.save(dict(revision=self.service.snapshot()['revision'],announcements_enabled=True))
+        self.assertEqual(self.service.snapshot()['commands'], original)
+        self.service.announcements.send = Mock(return_value=True)
+        with patch('twitch_commands.service.runtime_ready',return_value=True), patch('twitch_commands.service.clips_available',return_value=False):
+            self.service.tick()
+            self.clock[0] = self.service.announcements.due
+            self.assertTrue(self.service.tick())
+            guard = self.service.announcements.send.call_args.kwargs['allowed']
+            self.assertTrue(guard())
+            with patch.object(settings.SettingsBackups,'snapshot'):
+                self.service.save(dict(revision=self.service.snapshot()['revision'],announcements_enabled=False))
+            self.assertFalse(guard())
+        self.assertIsNone(self.service.snapshot()['announcements']['next_in_seconds'])
 
     def test_failed_admission_does_not_consume_cooldown(self):
         self.service.reply=lambda *a,**k:False

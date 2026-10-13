@@ -18,7 +18,7 @@ export class ScreenContent {
   tick(config){
     if(performance.now()>=this.nextRefresh&&!this.suspended)this.refresh();
     for(const target of Object.keys(defaults)){
-      const active=config.layer==='foreground'?target==='booth':config.layer==='background'?target!=='booth':true;
+      const active=target!=='main'&&(config.layer==='foreground'?target==='booth':config.layer==='background'?target!=='booth':true);
       if(!active){const slot=this.slots.get(target);if(slot)this.release(slot);this.slots.delete(target);continue;}
       const id=this.choice(target,config),asset=this.state.assets.find(a=>a.id===id),old=this.slots.get(target);
       if(old?.id!==id){if(old)this.release(old);this.slots.delete(target);if(asset?.kind==='image'||asset?.kind==='video')this.open(target,asset);}

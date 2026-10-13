@@ -4,7 +4,7 @@
     "label": "Chat commands",
     "group": "Inputs",
     "icon": "chat",
-    "description": "Personalized viewer replies through the shared Hub sender.",
+    "description": "Personalized replies and rotating command reminders through the shared Hub sender.",
     "separate": false
   },
   "flows": [
@@ -17,7 +17,7 @@
         "event": "twitch.chat.message",
         "kind": "event"
       },
-      "detail": "One subscriber matches enabled commands and trusted roles. Aliases share cooldowns; duplicate/stale messages are rejected. The bounded Hub reply queue rechecks settings generation, channel and lifetime before sending. Private previews never enqueue messages.",
+      "detail": "One subscriber matches enabled commands and trusted roles. Aliases share cooldowns; duplicate/stale messages are rejected. The bounded Hub reply queue rechecks settings generation, channel and lifetime before sending. Private previews never enqueue messages. Built-in !clip accepts only the broadcaster or Twitch-tagged moderators in the configured channel while commands are enabled; stale/repeated IDs are rejected. It creates a titled 60-second clip through the shared service, or observes an existing pending/completed clip within its 90-second window without another creation. Replies include the confirmed duration and link; short clips and uncertain failures are reported honestly. Edits and shutdown revoke pending replies. The existing module lifetime also samples the separately documented reminder scheduler; no additional thread is started.",
       "steps": [
         {
           "id": "match",
@@ -66,17 +66,150 @@
         {
           "path": "mini projects/twitch_commands/service.py",
           "symbol": "Commands.receive",
-          "hash": "2abfe64baa0299c36113d260a49bf63d64ef8756f4201b4ddfed3807a1c8fe69"
+          "hash": "ccae9193605e03124806bf8819cbb835a8ffda6b042efa6d1720a597c60da111"
         },
         {
           "path": "mini projects/twitch_commands/main.py",
           "symbol": "run",
-          "hash": "63a883ac4fe960ab93856c0f3d24e82237a134b498fd923fd81de8db68b475da"
+          "hash": "84e34cd0457992f0894b2f95a3d5716d0a42c6025c5ec192f08a06058e12634c"
+        },
+        {
+          "path": "mini projects/twitch_commands/clipping.py",
+          "symbol": "ClipCommand.receive",
+          "hash": "61b03661deb1581583ac40134f0891e45edb4192657795689d162c7a80d2b313"
         }
       ],
       "owner_hashes": {
-        "chat_transport": "0935a6133944e3e1e86d0907df4ab370f44fc52849f30badeccb42826fcda23d",
-        "twitch_commands": "507386cdeb467edccd2c8d9cab79f20da90d4cbfb0fdc29d13bd95cfe6173c5c"
+        "twitch_commands": "121f152e5f4d28cca0ac2dc7007668ae361ac85fdb89a62dbd70427665b40b12",
+        "chat_transport": "20a8cca880d0e430f475a1d231b8178e828ad3cf30b5b0afd7ba1a867712979a"
+      }
+    },
+    {
+      "id": "twitch_commands.announcements",
+      "label": "Share five available commands",
+      "topic": "Chat & stats",
+      "trigger": {
+        "label": "Random 30–60 minute live-stream interval",
+        "kind": "poll"
+      },
+      "detail": "The existing module thread samples shared OBS stream status and authorized chat readiness. Offline, unavailable, disabled, edited or stopped intent resets the deadline. Each deadline draws another independent 30–60 minute delay with no catch-up or uncertain-write retries. Five least-recently shown enabled commands are proven through the real matcher and renderer; owner-only and unavailable clip commands are excluded. Everyone and Mods labels disclose permissions. The first set favors profile, build, Discord, 8-ball and command help. The [COMMAND GUIDE] prefix selects a distinct subdued overlay treatment. Settings generation, channel, live state and shutdown are rechecked by the shared sender before delivery.",
+      "steps": [
+        {
+          "id": "gate",
+          "label": "Streaming and chat ready?",
+          "owner": "twitch_commands",
+          "kind": "gate",
+          "detail": "Both the command and reminder switches must be enabled."
+        },
+        {
+          "id": "select",
+          "label": "Rotate five working command handlers",
+          "owner": "twitch_commands",
+          "kind": "action",
+          "detail": "Match enabled names and roles; render real response copy; check clip session availability."
+        },
+        {
+          "id": "send",
+          "label": "Queue one labeled command guide",
+          "owner": "chat_transport",
+          "kind": "end",
+          "detail": "Existing authorized sender; one plain chat message, bounded queue and expiry, no replay of missed intervals."
+        }
+      ],
+      "edges": [
+        {
+          "from": "gate",
+          "to": "select"
+        },
+        {
+          "from": "select",
+          "to": "send"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/twitch_commands/announcements.py",
+          "symbol": "Announcements",
+          "hash": "6b23095b2a15860e608f6f7adde9b1d1301cfe8bde94586fa238ba634cdbd556"
+        },
+        {
+          "path": "mini projects/twitch_commands/announcements.py",
+          "symbol": "candidates",
+          "hash": "afad009513fb15172cbccf7b7729c8c47c34f32c0562f4b746c58678084f2436"
+        },
+        {
+          "path": "mini projects/twitch_commands/service.py",
+          "symbol": "Commands.tick",
+          "hash": "2e79e6c9d20d2567d2dce47bf0708c678ddd2fe6888ae1a006ac948afbf16963"
+        }
+      ],
+      "owner_hashes": {
+        "twitch_commands": "121f152e5f4d28cca0ac2dc7007668ae361ac85fdb89a62dbd70427665b40b12",
+        "chat_transport": "20a8cca880d0e430f475a1d231b8178e828ad3cf30b5b0afd7ba1a867712979a"
+      }
+    },
+    {
+      "id": "twitch_commands.jokes",
+      "label": "A quiet joke appears in live Twitch chat",
+      "topic": "Chat & stats",
+      "trigger": {
+        "label": "Streaming with jokes enabled",
+        "kind": "control"
+      },
+      "detail": "The existing module loop waits a fresh random 20–40 minutes while OBS streams and this channel has authorized connected chat. The personal catalog uses durable no-repeat reservations across restarts, including uncertain delivery. Offline, disabled, edited, stopped or long-suspended intent resets; no catch-up burst. The shared sender rechecks permission before its single attempt. Broadcaster messages start with 🃏; overlay jokes use literal text, softer ink/background, no entrance animation and normal expiration. The Hub list preview never sends.",
+      "steps": [
+        {
+          "id": "wait",
+          "label": "Wait a random 20–40 minutes while live",
+          "owner": "twitch_commands",
+          "kind": "gate",
+          "detail": "No immediate startup post; loss of readiness resets the timer."
+        },
+        {
+          "id": "reserve",
+          "label": "Reserve an unused joke durably",
+          "owner": "twitch_commands",
+          "kind": "action",
+          "detail": "Malformed data is preserved and disables posting; unknown fields survive."
+        },
+        {
+          "id": "send",
+          "label": "Queue one marked ordinary message",
+          "owner": "chat_transport",
+          "kind": "end",
+          "detail": "Same bounded sender, channel authorization, stale guards and no uncertain retries."
+        }
+      ],
+      "edges": [
+        {
+          "from": "wait",
+          "to": "reserve"
+        },
+        {
+          "from": "reserve",
+          "to": "send"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "mini projects/twitch_commands/jokes.py",
+          "symbol": "Jokes",
+          "hash": "1bb2c727df33ac87301ec2f82d4ac669acf673e95e480d4d386b3fc5155352de"
+        },
+        {
+          "path": "mini projects/twitch_commands/joke_catalog.py",
+          "symbol": "reserve",
+          "hash": "4e6d5cf566a39c843859e4341f5a7b7d99d9284258c0fd4bda79fe87ce986636"
+        },
+        {
+          "path": "mini projects/twitch_commands/main.py",
+          "symbol": "run",
+          "hash": "84e34cd0457992f0894b2f95a3d5716d0a42c6025c5ec192f08a06058e12634c"
+        }
+      ],
+      "owner_hashes": {
+        "twitch_commands": "121f152e5f4d28cca0ac2dc7007668ae361ac85fdb89a62dbd70427665b40b12",
+        "chat_transport": "20a8cca880d0e430f475a1d231b8178e828ad3cf30b5b0afd7ba1a867712979a"
       }
     }
   ]

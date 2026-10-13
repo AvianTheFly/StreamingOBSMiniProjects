@@ -15,6 +15,74 @@
     "source": "mini projects/scene_voice_switcher/web/art/arcade-chaos-v1.png",
     "sha256": "424ac926b6980d6bd63f5c602fb5dcf109eb3f7b3df184abdf89fb99b0b4b660"
   },
+  "art/aurora-distinct-v4.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/aurora-distinct-v4.png",
+    "sha256": "0778786977b6522118856354032ad9f30a83c14e2d5f368c8bfe2103f5456a33"
+  },
+  "art/aurora-distinct-v4b.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/aurora-distinct-v4b.png",
+    "sha256": "3acfeb14b073e8b9532ce3728d9642ea934120e92bb295a57e070be8a994fc61"
+  },
+  "art/aurora-festival-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/aurora-festival-v1.png",
+    "sha256": "52ccd337f38ef980a9ef86083b9d989fe39561a04f1f47143193517bbae3c5e0"
+  },
+  "art/aurora-habitat-v2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/aurora-habitat-v2.png",
+    "sha256": "cbaa8c90c45a180ea046ec78626b15e0ade4c5a5e2accb87e72e81c2ad53876a"
+  },
+  "art/aurora-habitat-v3.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/aurora-habitat-v3.png",
+    "sha256": "6278b3dda7283a0503dc334916043221175c789830b9f7c78c9b908285204cd6"
+  },
+  "art/aurora-open-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/aurora-open-v1.png",
+    "sha256": "a5e7375b7152790dd1c57abb7a1a1915d9aa316700cf2a42727dab2a272ee223"
+  },
+  "art/aurora-spirit-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/aurora-spirit-v1.png",
+    "sha256": "277032e428569dceb313b450fc18b3fedd0f30915ab2b846e34c19664af0c20d"
+  },
+  "art/cryophoenix-distinct-v4-foreground.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/cryophoenix-distinct-v4-foreground.png",
+    "sha256": "c2174568533b67a1be4720abab1ce2f6614ccac3ec4b8bbd458bcc6d6e81ea55"
+  },
+  "art/cryophoenix-distinct-v4.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/cryophoenix-distinct-v4.png",
+    "sha256": "e738e90859e573822141fda5b9888bba6f677bb73924a0616aba36174a0df35b"
+  },
+  "art/cryophoenix-distinct-v4b-foreground.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/cryophoenix-distinct-v4b-foreground.png",
+    "sha256": "3fb9ac2064434349bff8d11d28e8902f9867260b9041e48acbd34417c556c6e9"
+  },
+  "art/cryophoenix-distinct-v4b.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/cryophoenix-distinct-v4b.png",
+    "sha256": "8d34b64520eca46ae2fa53a088ebc91e704fa3715dce3baabc014810308aa310"
+  },
+  "art/cryophoenix-festival-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/cryophoenix-festival-v1.png",
+    "sha256": "7cf6141ba61f2469a5296222f636de18ef5d4e133a92a08f3a19a72d00d16082"
+  },
+  "art/cryophoenix-habitat-v2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/cryophoenix-habitat-v2.png",
+    "sha256": "19d095a5239a1a7ab7aac9c5fbd2535e480bfa41bd25bc9bd1f25ec39f125600"
+  },
+  "art/cryophoenix-habitat-v3-foreground.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/cryophoenix-habitat-v3-foreground.png",
+    "sha256": "8e33561a1ca51193a5951ebfd947a4053386d41d1fc86eabb84c652062c1f237"
+  },
+  "art/cryophoenix-habitat-v3.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/cryophoenix-habitat-v3.png",
+    "sha256": "0e058c836b8f56b8ebd604230185481dc79a4883c146ae1fdb6222fecbe1eb86"
+  },
+  "art/cryophoenix-open-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/cryophoenix-open-v1.png",
+    "sha256": "3cd0c5c05f0e606952a443a678e14839cfda9efb7abd3d61b141c6d7aed67ecd"
+  },
+  "art/cryophoenix-spirit-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/cryophoenix-spirit-v1.png",
+    "sha256": "90ded3d911822ff8481aa7f65f4d1fbf7d260aa043fff78c9a85d8ca12159d01"
+  },
   "art/forge-cast-v1.png": {
     "source": "mini projects/scene_voice_switcher/web/art/forge-cast-v1.png",
     "sha256": "b0b2bc1a3a849d102d1a32e2c99b35f68668556d0b4e71c0a68f1883742453e8"
@@ -23,6 +91,34 @@
     "source": "mini projects/scene_voice_switcher/web/art/forge-chaos-v1.png",
     "sha256": "951764e66dede44a97dd2b52827485735a2e768f496984da33a1d06c15d5c7c0"
   },
+  "art/forge-distinct-v4-foreground.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/forge-distinct-v4-foreground.png",
+    "sha256": "1e3e5bdee881905822d6906ab993e2b7af58dd4a447dfbb20453f9a3d6e4f649"
+  },
+  "art/forge-distinct-v4.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/forge-distinct-v4.png",
+    "sha256": "1a85e79ef3e52f39f87b55b540b1e8a50c5ed9660a5ce37c3f39114398cf86f8"
+  },
+  "art/forge-festival-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/forge-festival-v1.png",
+    "sha256": "f84ec8ac56ef6c8e8b53943b650e2d4b64074334cf784ce4c4e79a03126e1412"
+  },
+  "art/forge-habitat-v2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/forge-habitat-v2.png",
+    "sha256": "4555c441fa6844e3e5e92dfea9be5746ec3edde109ff602193ee4e4cf9741609"
+  },
+  "art/forge-habitat-v3-foreground.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/forge-habitat-v3-foreground.png",
+    "sha256": "832a28418791408c642bb8c3ad0ad20e5d5ea3442bb34c709cae24587c49bd4c"
+  },
+  "art/forge-habitat-v3.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/forge-habitat-v3.png",
+    "sha256": "859769eb3f93f457b00715e8882c6196048a48296d2917d35fc325634f0cba5e"
+  },
+  "art/forge-open-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/forge-open-v1.png",
+    "sha256": "e7c1b49a73c2d19bf228a2aa950b793e77063a9e7ec3b95a261cdaa4174383b0"
+  },
   "art/future-cast-v1.png": {
     "source": "mini projects/scene_voice_switcher/web/art/future-cast-v1.png",
     "sha256": "7705326abcc3e1798b20f4f2593f057138c9a0bf31413f3a0568e7173477cf4f"
@@ -30,6 +126,266 @@
   "art/future-chaos-v1.png": {
     "source": "mini projects/scene_voice_switcher/web/art/future-chaos-v1.png",
     "sha256": "d20b5d6bb4cd536b3ff72a1825e2b7176493e4adbc4d0f776dd2e0f5fa939d05"
+  },
+  "art/game-guests-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/game-guests-v1.png",
+    "sha256": "7ae31aa03a0f3d3af7f7515f7137af5978889844a4f1d0122e90ddf7e48adf5a"
+  },
+  "art/game-stunts-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/game-stunts-v1.png",
+    "sha256": "f7ce89ea1aa596ae63495f97852d12af94300a59de97d2eb43a6d225c56a8bf0"
+  },
+  "art/ionian-distinct-v4-foreground.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/ionian-distinct-v4-foreground.png",
+    "sha256": "71cbcc508c48d739003f57a6abde0b44a0937e15ae470c5e913876621b55f9c7"
+  },
+  "art/ionian-distinct-v4.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/ionian-distinct-v4.png",
+    "sha256": "b3cf1657569d1ebfda293c4ec6266c375e32330004614433cc1ceb6d0d2b9e56"
+  },
+  "art/ionian-distinct-v4b-foreground.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/ionian-distinct-v4b-foreground.png",
+    "sha256": "778d51d10c26e218b8b1bcbef35964010b3c3f4c1be0d3f9ea366ea86faf2c46"
+  },
+  "art/ionian-distinct-v4b.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/ionian-distinct-v4b.png",
+    "sha256": "a56af62cbf7844dd0c854f619281c2592e06d4326757786e27bb8b3eb57b010e"
+  },
+  "art/ionian-festival-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/ionian-festival-v1.png",
+    "sha256": "74a8ddb54635060630f84abe9d94c75aab932c27deeb27db407420f89d4b7d45"
+  },
+  "art/ionian-habitat-v2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/ionian-habitat-v2.png",
+    "sha256": "e01a4f7847d4384d4473b56c8cff7bdd84745202f83ce3ce559bb9c33ae992fd"
+  },
+  "art/ionian-habitat-v3-foreground.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/ionian-habitat-v3-foreground.png",
+    "sha256": "c36aadd707c3e1945df5006ebb1eefa0cd88f3587a9d8cf9da1d7ff0367c06bc"
+  },
+  "art/ionian-habitat-v3.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/ionian-habitat-v3.png",
+    "sha256": "40a18ff0bad12d779a49744e95497167ed6b8de539ecbede860863a09643d4db"
+  },
+  "art/ionian-open-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/ionian-open-v1.png",
+    "sha256": "7b0f867000ceffb110e85690878a378a918ec93553f9ff52026c59aaabb6191c"
+  },
+  "art/ionian-spirit-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/ionian-spirit-v1.png",
+    "sha256": "d7a990173ff93f66a1f9c2f6c161e71b1c32f8aa388d8a644f896eef9643391c"
+  },
+  "art/ionian-spirit-v2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/ionian-spirit-v2.png",
+    "sha256": "23960aedbf3467ff940274d38acf232b0f0f1e6d7d26cad469d7eb7476528952"
+  },
+  "art/league-guests-v1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/league-guests-v1.png",
+    "sha256": "6264be7a5a4689ff39c92142b3d0c2717d0958561fb0725f8591ef014c416b02"
+  },
+  "art/prepared/arcade-resident-0.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/arcade-resident-0.png",
+    "sha256": "4ba05cc456b2d2da844917491fb7ef9c1d19b995dc2e818a86b815d0c373c375"
+  },
+  "art/prepared/arcade-resident-1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/arcade-resident-1.png",
+    "sha256": "3331094e967eec311286c4cdfc0834eff8b0771b6be02e32766fb1c07565b56d"
+  },
+  "art/prepared/arcade-resident-2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/arcade-resident-2.png",
+    "sha256": "329a050ff3001a50fc6386177cd9fac62f46886845653785fb8908ccea817131"
+  },
+  "art/prepared/forge-resident-0.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/forge-resident-0.png",
+    "sha256": "bf9d03b05d78f5a4787293525ba12d066092ceddf9ebe2bc85d120c4386844ae"
+  },
+  "art/prepared/forge-resident-1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/forge-resident-1.png",
+    "sha256": "71a8b171b86198fa7b2de0b54013887af525114f2d7cff5ff0b183936e7bdc8b"
+  },
+  "art/prepared/forge-resident-2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/forge-resident-2.png",
+    "sha256": "d335bee04c66de1f6789bc641500bca25143c68b1e9bb10375761715345f2f0e"
+  },
+  "art/prepared/future-resident-0.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/future-resident-0.png",
+    "sha256": "046ee6bb3d8bdabac7412e09ab40b824fadee1ced4e231352fa0214b44be807a"
+  },
+  "art/prepared/future-resident-1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/future-resident-1.png",
+    "sha256": "31ba655045bc155cb37c4e3f84465b402dccb12c7c9a7b6723c34554c4131345"
+  },
+  "art/prepared/future-resident-2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/future-resident-2.png",
+    "sha256": "263ef43b162b3eca4e2736ce2ca7ba64cfdf1142a523a8e24efc443cfbf09345"
+  },
+  "art/prepared/game-boo-0.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-boo-0.png",
+    "sha256": "5f5d596fcb8913877a32446af732d6b823066ce5767e3fabe6596a1b60043d70"
+  },
+  "art/prepared/game-boo-1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-boo-1.png",
+    "sha256": "fcf2cd8f451ee99936a89490a46f039a646ef6e68f5936fbab6804ef08b8ab4c"
+  },
+  "art/prepared/game-boo-2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-boo-2.png",
+    "sha256": "c11ca60513ce7247bd2979deb0b38ed509602b72dd9ecc7d4fa01dbe818d1874"
+  },
+  "art/prepared/game-climber-0.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-climber-0.png",
+    "sha256": "28ccb8c5fe12783d3ce27c5b5bf8293e1a16ec27ab88668fa5b0de27c4ffecdb"
+  },
+  "art/prepared/game-climber-1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-climber-1.png",
+    "sha256": "84471a57298805995ef57683be9ba126a2e466795775aa5e709daf6d9f69e185"
+  },
+  "art/prepared/game-climber-2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-climber-2.png",
+    "sha256": "fb65e0861cb27e3d4293aa9e69ce47a25c02ad79497ec9e8e992c49ec77441ff"
+  },
+  "art/prepared/game-creeper-0.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-creeper-0.png",
+    "sha256": "9072143161e348f6254ff6ce61cead6cf6e0c660c5271dc2556723c02d91592a"
+  },
+  "art/prepared/game-creeper-1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-creeper-1.png",
+    "sha256": "38cd5c0718f642e307def18703a14fccd3f7b696834c7184b763132a4bcf1717"
+  },
+  "art/prepared/game-creeper-2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-creeper-2.png",
+    "sha256": "66e225a1af406f48df6d319fccf2792a5a38cb47627f46aba127ebc281ba4fe3"
+  },
+  "art/prepared/game-crewmate-0.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-crewmate-0.png",
+    "sha256": "4de15c112e7137279117992e3bc9287c92aad0858816bbdc6dcda8e79e9c18e3"
+  },
+  "art/prepared/game-crewmate-1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-crewmate-1.png",
+    "sha256": "cf2853e982ac1346c8cbfb8b02112290a7a0dafcfd5d0c285ec19dc87e28c264"
+  },
+  "art/prepared/game-crewmate-2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-crewmate-2.png",
+    "sha256": "a2f21331aedce5c78b89f01ac439b59c5a09b49e245550e06123189bfc03124f"
+  },
+  "art/prepared/game-goose-0.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-goose-0.png",
+    "sha256": "2dd31b02d92820e1cbf1f3f8f48dbb0109859988e0d8a5b1659986ec556d657c"
+  },
+  "art/prepared/game-goose-1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-goose-1.png",
+    "sha256": "69fbdac6b97c6ca713fa0eb69ebe53c58bf00900f704b3527947fddfa0c48b5c"
+  },
+  "art/prepared/game-goose-2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-goose-2.png",
+    "sha256": "75c23c7f2e8faabed07d36fcd8bd2d2d93543d4416b3e33d25fbd3ba15ed4631"
+  },
+  "art/prepared/game-hornet-0.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-hornet-0.png",
+    "sha256": "30770fa9868e4f14733fc79d5bd51ad57b445de21ad88353fda7d36f9a85765c"
+  },
+  "art/prepared/game-hornet-1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-hornet-1.png",
+    "sha256": "d4af8cd4e61d5cbbc1965c18e778e5927cebd3686875db052d3c104230fd6c0e"
+  },
+  "art/prepared/game-hornet-2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-hornet-2.png",
+    "sha256": "471e144e02200b4b10d37197ae6233cfbf93192df7140cafb22ef761ce8f1ea1"
+  },
+  "art/prepared/game-kirby-0.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-kirby-0.png",
+    "sha256": "c1d51c7ae68f15d7c90b7f16ccd2201fc7242821b22fa38880bb1ea0ddf5894c"
+  },
+  "art/prepared/game-kirby-1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-kirby-1.png",
+    "sha256": "c72081bade7fa545d662e91ba73b9b66d8396b0d77069dc2066d1e48b1dd49ff"
+  },
+  "art/prepared/game-kirby-2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-kirby-2.png",
+    "sha256": "031f814bd6d20191137471ca887182f768eac106c852b1e7d83ac901831d7d8e"
+  },
+  "art/prepared/game-salvager-0.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-salvager-0.png",
+    "sha256": "e3d7a30c290aba6ceb049bacc131782583c463e16a77722b80d73243b53b77fd"
+  },
+  "art/prepared/game-salvager-1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-salvager-1.png",
+    "sha256": "fc6bcd0f908c7b8e4c6f044d371cbcd221a8dc60248bda0749be1cb05b06bcad"
+  },
+  "art/prepared/game-salvager-2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/game-salvager-2.png",
+    "sha256": "b19cb340a253a75aad81e6778af3aaf3ca177d655cc78055c6345e50ccc99b54"
+  },
+  "art/prepared/league-poro-0.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/league-poro-0.png",
+    "sha256": "7861b33d7ecce5dc269ba9f059a174d942f5192c27465a8fd803eb0650a8cdd1"
+  },
+  "art/prepared/league-poro-1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/league-poro-1.png",
+    "sha256": "aee156fb4c62438e5ff9b575ba7905a5ce2a85ddde736bdf2f3bdf9c27d3100e"
+  },
+  "art/prepared/league-poro-2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/league-poro-2.png",
+    "sha256": "f896fc5d3c9122128947af31cead29ff3d6f72fd2f065958425195f3c9e2ea94"
+  },
+  "art/prepared/league-scuttle-0.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/league-scuttle-0.png",
+    "sha256": "c0aac2b8e5be38001d1cc13dbaa61f6738cb46747c70909797242d241ccd98c3"
+  },
+  "art/prepared/league-scuttle-1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/league-scuttle-1.png",
+    "sha256": "76532b5fcb38532eab34fe7d5c6d127c6fc6fe03679474b0a8be3dc32e63fe1e"
+  },
+  "art/prepared/league-scuttle-2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/league-scuttle-2.png",
+    "sha256": "8f724c738dac686da7c9d910acbdce429e4cf2caa161f26b17b3a4bad93fd50f"
+  },
+  "art/prepared/league-teemo-0.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/league-teemo-0.png",
+    "sha256": "69f256b760f7654f046a9b1840941a13d0e31a4aedf1e250c0a715aa79cebe6d"
+  },
+  "art/prepared/league-teemo-1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/league-teemo-1.png",
+    "sha256": "96c822bb59560dc0bce0dc7fc7186259d9aa6751e4c10b2f46612380bf6119ea"
+  },
+  "art/prepared/league-teemo-2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/league-teemo-2.png",
+    "sha256": "c3d4567447b531cb7c9822de96b2d35364629b87aa8856f7f3af24b0754e1967"
+  },
+  "art/prepared/league-udyr-0.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/league-udyr-0.png",
+    "sha256": "02abc128b2b11061b844bce9349d3436556d38623d1a48f8f48665c0fc207229"
+  },
+  "art/prepared/league-udyr-1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/league-udyr-1.png",
+    "sha256": "7779ff70bac791df01773359292dd9c8b81da20c28f6bb3051e6fa49548d82ad"
+  },
+  "art/prepared/league-udyr-2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/league-udyr-2.png",
+    "sha256": "479a64eb8f9a718e41adbf7a8fd37209296076f6a37e0480b495d2df9ca2c367"
+  },
+  "art/prepared/sky-harbor-resident-0.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/sky-harbor-resident-0.png",
+    "sha256": "1f3161ce068c8af93586cb27adf79ba51a3a987da4d239b379eac9ab7b48a792"
+  },
+  "art/prepared/sky-harbor-resident-1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/sky-harbor-resident-1.png",
+    "sha256": "f37550bfb26f637291fcb0b125263dd95c62ae687c4aa636efdeeb84b1a599fd"
+  },
+  "art/prepared/sky-harbor-resident-2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/sky-harbor-resident-2.png",
+    "sha256": "7d30a003ab5cda8d37a454c2bbbacdc4e035a5b6ce292518e39324669220f03a"
+  },
+  "art/prepared/tavern-resident-0.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/tavern-resident-0.png",
+    "sha256": "580882347ce3dc78b9550de3c53d540fe08192b359536ac49b07df16f23e3ae0"
+  },
+  "art/prepared/tavern-resident-1.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/tavern-resident-1.png",
+    "sha256": "c37911e490c7a0cd076b55ee779a6bb6afdf0028d31b90c526d328e9d5ab68a4"
+  },
+  "art/prepared/tavern-resident-2.png": {
+    "source": "mini projects/scene_voice_switcher/web/art/prepared/tavern-resident-2.png",
+    "sha256": "73bd66b495fef99ee0f89e36bc0e3e68a107765b3a692637f6eab42bb10c1b82"
   },
   "art/sky-harbor-cast-v1.png": {
     "source": "mini projects/scene_voice_switcher/web/art/sky-harbor-cast-v1.png",
@@ -53,19 +409,55 @@
   },
   "aurora-camp-world.js": {
     "source": "mini projects/scene_voice_switcher/web/aurora-camp-world.js",
-    "sha256": "5becd791cac1ee56d43796a88733e74c34622e874a35ad02e8f5723ef798fa7b"
+    "sha256": "b78f2b7fa58b20e1655a8fdefaa0832a71f5c7164c34c91adeab21ddacf4eb2d"
+  },
+  "broadcast-preview.js": {
+    "source": "mini projects/scene_voice_switcher/web/broadcast-preview.js",
+    "sha256": "9d2abc756fb0a12dd442cf0916f0f6b22c42524feea9b06a8de227e56a39f0e7"
+  },
+  "camera-occlusion.js": {
+    "source": "mini projects/scene_voice_switcher/web/camera-occlusion.js",
+    "sha256": "fa69ca9adf0e05f79ac5c2f11a2adb3f27e5962d1393942a2f735c36b1f8ed02"
   },
   "chaos-cast.js": {
     "source": "mini projects/scene_voice_switcher/web/chaos-cast.js",
-    "sha256": "8effe9570bc46756926240379ec4fb5a093d20d1d33ef879cbac55175a8e7029"
+    "sha256": "49f170b88dc8505d610f4811a901a5e8fc354c0699bbbfcba45cc684b7883f2c"
   },
   "chaos-ink.js": {
     "source": "mini projects/scene_voice_switcher/web/chaos-ink.js",
-    "sha256": "8eb5a2e02d2976de882b057d36251b314f99d6a3f5a0958a55ec5dd8ab52111a"
+    "sha256": "f5e013e8d4b71e12903e4fbe540301d065a96b91b25c86571a97d9a87f8fe5c1"
+  },
+  "display-state.js": {
+    "source": "mini projects/scene_voice_switcher/web/display-state.js",
+    "sha256": "5cdbd488bfa9a923dd467804b549a2fe1b3e1eb836cc093ce0e1155dc9a44f51"
+  },
+  "festival-copy.js": {
+    "source": "mini projects/scene_voice_switcher/web/festival-copy.js",
+    "sha256": "ae2c6c6f46a7e0de5252055cdfaa0798476e2a57838ab09695098722e4069ef1"
+  },
+  "festival-ink.js": {
+    "source": "mini projects/scene_voice_switcher/web/festival-ink.js",
+    "sha256": "dcd00ab86ddc4ecdb8891aa6baea0c123f03eaa87bf3102e13809c9c2a0c43cb"
+  },
+  "festival-review.html": {
+    "source": "mini projects/scene_voice_switcher/web/festival-review.html",
+    "sha256": "dfd130d1b4ebe1cda134515f824ccf4255003aa48c1b888fc4182b0d07de7d95"
+  },
+  "festival-review.js": {
+    "source": "mini projects/scene_voice_switcher/web/festival-review.js",
+    "sha256": "e30face20e86bb345e9f6fa27143eb5cb53c0c320db13bee03b3c92dd08814de"
+  },
+  "festival-theater.js": {
+    "source": "mini projects/scene_voice_switcher/web/festival-theater.js",
+    "sha256": "0dcbc1721846c464d27bd866e9d02916802db39b18d777226e31674e4758bfa2"
+  },
+  "festival-weather.js": {
+    "source": "mini projects/scene_voice_switcher/web/festival-weather.js",
+    "sha256": "6b4b14234a2950569bcf87a4c7f10887b81fecf18d854f098c85453b6fff9406"
   },
   "forge-atmosphere.js": {
     "source": "mini projects/scene_voice_switcher/web/forge-atmosphere.js",
-    "sha256": "eff1a5bbb882ea42565bdaa943a5ce7afcb13971348ef014de35cc02a5fc495e"
+    "sha256": "19cddaf5bd8f8a07f351b15232134e2191b110fb960456cb05d2327157967e99"
   },
   "forge-guests.js": {
     "source": "mini projects/scene_voice_switcher/web/forge-guests.js",
@@ -73,7 +465,7 @@
   },
   "forge-world.js": {
     "source": "mini projects/scene_voice_switcher/web/forge-world.js",
-    "sha256": "44ff05eb75c7dc04da180a0c2d1cd582336f0bb0fbd35c2853952a7f0500def0"
+    "sha256": "0a49baeb83b721342b1829b3de38c819ef5e095947f23eed02c26b1a5fece30a"
   },
   "future-guests.js": {
     "source": "mini projects/scene_voice_switcher/web/future-guests.js",
@@ -83,9 +475,77 @@
     "source": "mini projects/scene_voice_switcher/web/future-world.js",
     "sha256": "940d16a5190faa27fcd08474d5c3c2e56faed73cbeb5e490b684d82d36f340c5"
   },
+  "game-guest-acts.js": {
+    "source": "mini projects/scene_voice_switcher/web/game-guest-acts.js",
+    "sha256": "c78a00ee6d0c016671410f64e3128a5e16bd7f47cf6370e5756ca771407f05d0"
+  },
+  "game-guest-assets.js": {
+    "source": "mini projects/scene_voice_switcher/web/game-guest-assets.js",
+    "sha256": "f48e3bba837e736df2db02cfcf20bac35c4bf60b475f3b3b4f6365607b6e8acf"
+  },
+  "game-guest-sprites.js": {
+    "source": "mini projects/scene_voice_switcher/web/game-guest-sprites.js",
+    "sha256": "8f3f99f067c09a21057c578010b6e4f8337d5bb75aea9a115ae2485a4266610c"
+  },
+  "game-guest-stunts.js": {
+    "source": "mini projects/scene_voice_switcher/web/game-guest-stunts.js",
+    "sha256": "70ff48ba4d8189918e5ed5d3a1c0f6e6e5301f43f30af84d6e992df4fb003239"
+  },
+  "game-guests.js": {
+    "source": "mini projects/scene_voice_switcher/web/game-guests.js",
+    "sha256": "146eb6b7105b24d224ffc2b30ad21f6d8e15ded9ceace0bf343c5c7d47b5c18d"
+  },
+  "habitat-acts.js": {
+    "source": "mini projects/scene_voice_switcher/web/habitat-acts.js",
+    "sha256": "7ec2a69bb76245f03227cb8ea24932896e43d65c9cff86e85ad06b4cf7b3e176"
+  },
+  "habitat-atmosphere.js": {
+    "source": "mini projects/scene_voice_switcher/web/habitat-atmosphere.js",
+    "sha256": "55192acb401311f9319b968eef68d6d6739a64899c9c601771b4513d18423323"
+  },
+  "habitat-blocking.js": {
+    "source": "mini projects/scene_voice_switcher/web/habitat-blocking.js",
+    "sha256": "42979b06dc989f91c82c0820664fafedd848197ad9f4f027c912ce400a2fcfcd"
+  },
+  "habitat-designs.js": {
+    "source": "mini projects/scene_voice_switcher/web/habitat-designs.js",
+    "sha256": "6663493688b694071b2e6b2d8eedfd5dcf0db37da58eadb4b5671e7a7ca8e43c"
+  },
+  "habitat-environment.js": {
+    "source": "mini projects/scene_voice_switcher/web/habitat-environment.js",
+    "sha256": "c6f6cdc4a955304dbb2138afc498b0b7c8bae6843d7f436931b86f16105e594b"
+  },
+  "habitat-media-frame.js": {
+    "source": "mini projects/scene_voice_switcher/web/habitat-media-frame.js",
+    "sha256": "b2a55a8de7ee2775b81510e0fea4ffe7bd717b8956d8ff1b35ffe0ceb3383e53"
+  },
+  "habitat-scenes.js": {
+    "source": "mini projects/scene_voice_switcher/web/habitat-scenes.js",
+    "sha256": "d35f103b2b5747ce59d266f24416b79173350b5cf9402b41be00c40651298af4"
+  },
+  "habitat-world.js": {
+    "source": "mini projects/scene_voice_switcher/web/habitat-world.js",
+    "sha256": "1a12bcb70408dbef5e41e4975d3db05d430c6b38b26b158e6cc9fb80a2cd576f"
+  },
   "index.html": {
     "source": "mini projects/scene_voice_switcher/web/index.html",
     "sha256": "35b94cd5e7cc843132c035c89cc6431a710163f32387a6f5f99d3fd6dd7b6183"
+  },
+  "league-acts.js": {
+    "source": "mini projects/scene_voice_switcher/web/league-acts.js",
+    "sha256": "087e7f7f0f874371d21e58a1d903e28201fa55d6163a8f8f60e30eceee215b8f"
+  },
+  "league-guest-assets.js": {
+    "source": "mini projects/scene_voice_switcher/web/league-guest-assets.js",
+    "sha256": "c94be606bf3aafbe8e67cac261a5e840aa8763f3993079018340b76b01b14179"
+  },
+  "league-guests.js": {
+    "source": "mini projects/scene_voice_switcher/web/league-guests.js",
+    "sha256": "ae505c1f77e0533007be796efb54e2bc2270efd1b272a543525616b8ece03306"
+  },
+  "league-spirit-ink.js": {
+    "source": "mini projects/scene_voice_switcher/web/league-spirit-ink.js",
+    "sha256": "cb8fc4786f5aa2c531e9358e718fa716f659f99b61ff52387b06e05dde33047a"
   },
   "live-actions.js": {
     "source": "mini projects/scene_voice_switcher/web/live-actions.js",
@@ -93,15 +553,19 @@
   },
   "lobby-cameos.js": {
     "source": "mini projects/scene_voice_switcher/web/lobby-cameos.js",
-    "sha256": "486be93c152b1cc320153627705771c7313b32c48c18b77599b732d2f1c39956"
+    "sha256": "358567a4a4a0ab80a80dd41d144c1f60a5639910d0b351bb963ad9e73370708b"
+  },
+  "lobby-moments.js": {
+    "source": "mini projects/scene_voice_switcher/web/lobby-moments.js",
+    "sha256": "89ff87829930182cfbee5e682e2b0e70dd37669c1b10de47431458bee3ac1beb"
   },
   "lobby-residents.js": {
     "source": "mini projects/scene_voice_switcher/web/lobby-residents.js",
-    "sha256": "15b47244ad4f7f506f8727b048a0d081c448a8586f4b334f6da24edaeca9c509"
+    "sha256": "0a37002b1d473897973efffe3eecf2b0eb2b139a9680fb68e51481b5a71045a1"
   },
   "painted-world.js": {
     "source": "mini projects/scene_voice_switcher/web/painted-world.js",
-    "sha256": "00e01aa9a43f2a49eeb682414dac8d892513a9daf2dcf12e27da7a70f378be87"
+    "sha256": "836e132b5fd5978ac1bd06e6d916ccbfeb7e7cb794b3e2013cb735a58e042edd"
   },
   "phoenix-observatory-guests.js": {
     "source": "mini projects/scene_voice_switcher/web/phoenix-observatory-guests.js",
@@ -109,7 +573,7 @@
   },
   "phoenix-observatory-world.js": {
     "source": "mini projects/scene_voice_switcher/web/phoenix-observatory-world.js",
-    "sha256": "fa89a0201476ee2e2b4cae58e78a0086dcd3f820aaf7f68dd906cd8c41431d95"
+    "sha256": "716dbc4625e366045b810738a2ec442e907943cfdc1ea1fa8971e1e5b67e9c52"
   },
   "reef-cues.js": {
     "source": "mini projects/scene_voice_switcher/web/reef-cues.js",
@@ -129,11 +593,15 @@
   },
   "reef-visitors.js": {
     "source": "mini projects/scene_voice_switcher/web/reef-visitors.js",
-    "sha256": "c76c4d2c75baa5e034511d4a85d5a9f9446409a5c4e722ee0145fb9e9e6e13b1"
+    "sha256": "a3d0bfa71d9b20aa1dc7980b0806742fb7af0971692b8aac3b5d1b74433a0bc6"
   },
   "reef-world.js": {
     "source": "mini projects/scene_voice_switcher/web/reef-world.js",
     "sha256": "1950b0b4f4b771e2eec15e3769243dc2cf8d5dce38a9943431bf5cd8fb45cb11"
+  },
+  "resident-parts.js": {
+    "source": "mini projects/scene_voice_switcher/web/resident-parts.js",
+    "sha256": "c65fc4028555210f92c2d06bf1e3cf0268036b2aa406fe7c11ac4a2a891ee7a6"
   },
   "sanctuary-atmosphere.js": {
     "source": "mini projects/scene_voice_switcher/web/sanctuary-atmosphere.js",
@@ -145,11 +613,11 @@
   },
   "sanctuary-world.js": {
     "source": "mini projects/scene_voice_switcher/web/sanctuary-world.js",
-    "sha256": "6fd409a2f7ae7b0d9655936a52d08ad288e12f217b1daeea258d4807fe1705ee"
+    "sha256": "2ea5dd94fd3fe62657b22bc6031c998ff572d1c7cec822305f271842e8558279"
   },
   "screen-frame.js": {
     "source": "mini projects/scene_voice_switcher/web/screen-frame.js",
-    "sha256": "80c68ecdb7ccc8d35e915bccf03972f5e3af3654968f9aff864ea9b23c6f8f41"
+    "sha256": "5f008e07be591856b30c9dda75cd346f70255b436c38db8792bd9832a9192e11"
   },
   "sky-harbor-guests.js": {
     "source": "mini projects/scene_voice_switcher/web/sky-harbor-guests.js",
@@ -167,13 +635,17 @@
     "source": "mini projects/scene_voice_switcher/web/spirit-rail-world.js",
     "sha256": "f5e007f8d112ce1071da0ce41bb4ea463fd072fce662c443447f89222bb598bb"
   },
+  "spirit-weather.js": {
+    "source": "mini projects/scene_voice_switcher/web/spirit-weather.js",
+    "sha256": "7f2ed3934f3dfd237b40f3b3025643e31e61690ee93c6f58507ba71df298b607"
+  },
   "stage.js": {
     "source": "mini projects/scene_voice_switcher/web/stage.js",
-    "sha256": "f62827b21ea619f6352eec3ad2017a56f8eb03c3725dd0a9345310bde3736975"
+    "sha256": "74b47e54e51f95cea8ee6009e0d25af59a80deb8f885c463e4beb207d978e87a"
   },
   "storm-coast-guests.js": {
     "source": "mini projects/scene_voice_switcher/web/storm-coast-guests.js",
-    "sha256": "0fdd7ab8efd9bced2e34594a1188fe3eeddfff96b079b268ac56bf1be744d3b4"
+    "sha256": "fe8b111a8dd222c7ca703fa8b2626b3269de5c1dd5e1f257e2df0652e73123ba"
   },
   "storm-coast-world.js": {
     "source": "mini projects/scene_voice_switcher/web/storm-coast-world.js",
@@ -189,7 +661,7 @@
   },
   "studio.js": {
     "source": "mini projects/scene_voice_switcher/web/studio.js",
-    "sha256": "cc2009c3412f1164dec03f4db4865eb0bb4c51a30b3bff1a5145dd985b63cac8"
+    "sha256": "45ade533b3d11f5878f9b4c99f97034997c0e022ca76b5f4dc3b00910403a9d6"
   },
   "tavern-guests.js": {
     "source": "mini projects/scene_voice_switcher/web/tavern-guests.js",
@@ -203,13 +675,17 @@
     "source": "mini projects/scene_voice_switcher/web/travel-ink.js",
     "sha256": "5f0acfedf55326960186708bfb2b6fd7ee8e98be8cda941419cf61ea43336ff8"
   },
+  "visitor-staging.js": {
+    "source": "mini projects/scene_voice_switcher/web/visitor-staging.js",
+    "sha256": "ac2fc33451b3a98bd5b9d99ec2318ff6ef2840979a9d1df585bab6641fef60ea"
+  },
   "world-ink.js": {
     "source": "mini projects/scene_voice_switcher/web/world-ink.js",
     "sha256": "d32598bef9cde6fd2fe4defa7994f608c498d8c0d925787ad3093c5aa745f36f"
   },
   "worlds.js": {
     "source": "mini projects/scene_voice_switcher/web/worlds.js",
-    "sha256": "ec6329bbf8dd90c77c3e887ad029a46c0e8710e73a5582cf541e447da296a661"
+    "sha256": "39ba4c0f85282c9fee2fc6c34210215ae7dfb1f87077671cd2cbeff1e23cf870"
   },
   "shared/world-motion.js": {
     "source": "lib/browser_effects/web/world-motion.js",
@@ -217,6 +693,6 @@
   },
   "shared/display-frame.js": {
     "source": "lib/browser_effects/web/display-frame.js",
-    "sha256": "d6f4cc06683301a2218e955211161b0b3542b85de9ba3efa7a675ff7304b1e15"
+    "sha256": "f59e87f6798a1e4b41162c77b8b1bfb86c185863463e0ddad233805660b96523"
   }
 }

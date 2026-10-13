@@ -1,0 +1,2018 @@
+[
+  {
+    "character": "kirby",
+    "pose": 0,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      72,
+      123,
+      241,
+      198
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 1,
+    "components": 3,
+    "scale": 1.18,
+    "contentBounds": [
+      79,
+      63,
+      238,
+      258
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 2,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      72,
+      122,
+      242,
+      199
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 3,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      59,
+      121,
+      268,
+      201
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 4,
+    "components": 2,
+    "scale": 1.18,
+    "contentBounds": [
+      60,
+      122,
+      263,
+      199
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 5,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      67,
+      115,
+      251,
+      207
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 6,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      94,
+      132,
+      197,
+      189
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 7,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      72,
+      122,
+      241,
+      199
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 8,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      72,
+      123,
+      241,
+      198
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 9,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      66,
+      121,
+      253,
+      201
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 10,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      86,
+      152,
+      214,
+      169
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 11,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      73,
+      122,
+      240,
+      199
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 12,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      79,
+      147,
+      227,
+      175
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 13,
+    "components": 4,
+    "scale": 1.18,
+    "contentBounds": [
+      57,
+      91,
+      271,
+      249
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 14,
+    "components": 3,
+    "scale": 1.18,
+    "contentBounds": [
+      63,
+      150,
+      302,
+      171
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 15,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      73,
+      115,
+      238,
+      207
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 16,
+    "components": 3,
+    "scale": 1.18,
+    "contentBounds": [
+      92,
+      115,
+      260,
+      207
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 17,
+    "components": 5,
+    "scale": 1.18,
+    "contentBounds": [
+      37,
+      126,
+      317,
+      195
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 18,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      66,
+      132,
+      253,
+      189
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 19,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      65,
+      121,
+      255,
+      201
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 20,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      82,
+      131,
+      221,
+      190
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 21,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      81,
+      141,
+      223,
+      181
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 22,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      37,
+      144,
+      312,
+      177
+    ]
+  },
+  {
+    "character": "kirby",
+    "pose": 23,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      80,
+      137,
+      224,
+      184
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 0,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      101,
+      118,
+      184,
+      203
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 1,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      99,
+      117,
+      186,
+      204
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 2,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      78,
+      112,
+      229,
+      209
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 3,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      99,
+      112,
+      186,
+      209
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 4,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      87,
+      126,
+      211,
+      195
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 5,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      77,
+      115,
+      231,
+      207
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 6,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      97,
+      130,
+      191,
+      191
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 7,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      101,
+      118,
+      184,
+      203
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 8,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      93,
+      129,
+      199,
+      192
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 9,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      81,
+      83,
+      223,
+      238
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 10,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      80,
+      141,
+      224,
+      181
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 11,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      79,
+      78,
+      228,
+      243
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 12,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      64,
+      109,
+      257,
+      212
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 13,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      94,
+      110,
+      197,
+      211
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 14,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      73,
+      98,
+      238,
+      223
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 15,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      98,
+      114,
+      190,
+      208
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 16,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      69,
+      134,
+      247,
+      188
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 17,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      65,
+      136,
+      256,
+      185
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 18,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      70,
+      136,
+      245,
+      185
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 19,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      56,
+      111,
+      274,
+      210
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 20,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      69,
+      136,
+      247,
+      185
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 21,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      61,
+      114,
+      263,
+      208
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 22,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      76,
+      136,
+      234,
+      185
+    ]
+  },
+  {
+    "character": "crewmate",
+    "pose": 23,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      98,
+      132,
+      189,
+      189
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 0,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      131,
+      98,
+      124,
+      223
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 1,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      118,
+      90,
+      149,
+      231
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 2,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      114,
+      88,
+      157,
+      234
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 3,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      108,
+      112,
+      169,
+      209
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 4,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      110,
+      105,
+      165,
+      216
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 5,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      115,
+      106,
+      155,
+      215
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 6,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      109,
+      135,
+      168,
+      186
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 7,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      129,
+      96,
+      127,
+      225
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 8,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      129,
+      95,
+      127,
+      227
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 9,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      119,
+      90,
+      148,
+      231
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 10,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      109,
+      136,
+      168,
+      185
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 11,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      114,
+      101,
+      158,
+      221
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 12,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      112,
+      83,
+      160,
+      238
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 13,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      110,
+      90,
+      165,
+      231
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 14,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      123,
+      117,
+      139,
+      204
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 15,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      104,
+      109,
+      177,
+      212
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 16,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      129,
+      101,
+      126,
+      221
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 17,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      101,
+      139,
+      184,
+      182
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 18,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      116,
+      85,
+      152,
+      236
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 19,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      119,
+      79,
+      148,
+      242
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 20,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      113,
+      67,
+      159,
+      254
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 21,
+    "components": 12,
+    "scale": 1.18,
+    "contentBounds": [
+      81,
+      60,
+      210,
+      261
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 22,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      118,
+      95,
+      150,
+      227
+    ]
+  },
+  {
+    "character": "creeper",
+    "pose": 23,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      129,
+      101,
+      127,
+      221
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 0,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      105,
+      108,
+      175,
+      214
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 1,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      116,
+      69,
+      152,
+      253
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 2,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      114,
+      78,
+      158,
+      243
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 3,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      89,
+      56,
+      208,
+      266
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 4,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      101,
+      90,
+      184,
+      231
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 5,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      101,
+      180,
+      183,
+      142
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 6,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      80,
+      106,
+      225,
+      215
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 7,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      111,
+      104,
+      164,
+      217
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 8,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      79,
+      103,
+      228,
+      218
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 9,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      78,
+      104,
+      230,
+      217
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 10,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      37,
+      196,
+      310,
+      125
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 11,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      75,
+      106,
+      236,
+      215
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 12,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      57,
+      102,
+      270,
+      219
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 13,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      82,
+      99,
+      221,
+      222
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 14,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      40,
+      195,
+      304,
+      126
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 15,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      85,
+      104,
+      216,
+      217
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 16,
+    "components": 2,
+    "scale": 1.18,
+    "contentBounds": [
+      104,
+      139,
+      261,
+      183
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 17,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      53,
+      190,
+      278,
+      131
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 18,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      53,
+      187,
+      280,
+      135
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 19,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      62,
+      185,
+      262,
+      136
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 20,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      80,
+      104,
+      224,
+      217
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 21,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      94,
+      99,
+      197,
+      222
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 22,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      73,
+      119,
+      238,
+      202
+    ]
+  },
+  {
+    "character": "goose",
+    "pose": 23,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      61,
+      142,
+      263,
+      179
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 0,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      82,
+      88,
+      221,
+      234
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 1,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      96,
+      37,
+      194,
+      284
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 2,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      89,
+      90,
+      207,
+      231
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 3,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      105,
+      67,
+      176,
+      254
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 4,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      86,
+      45,
+      212,
+      276
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 5,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      85,
+      89,
+      216,
+      232
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 6,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      84,
+      86,
+      217,
+      235
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 7,
+    "components": 2,
+    "scale": 1.18,
+    "contentBounds": [
+      85,
+      89,
+      218,
+      232
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 8,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      82,
+      92,
+      222,
+      229
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 9,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      84,
+      99,
+      217,
+      222
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 10,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      80,
+      98,
+      224,
+      223
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 11,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      82,
+      98,
+      222,
+      223
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 12,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      83,
+      36,
+      218,
+      286
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 13,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      85,
+      101,
+      216,
+      221
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 14,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      83,
+      102,
+      219,
+      219
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 15,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      82,
+      90,
+      222,
+      231
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 16,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      90,
+      80,
+      205,
+      241
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 17,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      89,
+      83,
+      207,
+      238
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 18,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      102,
+      69,
+      181,
+      253
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 19,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      101,
+      45,
+      183,
+      276
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 20,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      93,
+      45,
+      198,
+      276
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 21,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      65,
+      75,
+      256,
+      247
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 22,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      45,
+      76,
+      296,
+      245
+    ]
+  },
+  {
+    "character": "climber",
+    "pose": 23,
+    "components": 2,
+    "scale": 1.18,
+    "contentBounds": [
+      98,
+      92,
+      190,
+      229
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 0,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      121,
+      39,
+      144,
+      282
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 1,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      108,
+      40,
+      169,
+      281
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 2,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      115,
+      60,
+      156,
+      261
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 3,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      92,
+      103,
+      201,
+      218
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 4,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      106,
+      53,
+      173,
+      268
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 5,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      119,
+      39,
+      148,
+      282
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 6,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      81,
+      45,
+      223,
+      276
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 7,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      60,
+      95,
+      264,
+      227
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 8,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      102,
+      46,
+      181,
+      275
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 9,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      106,
+      73,
+      173,
+      248
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 10,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      52,
+      82,
+      281,
+      240
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 11,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      101,
+      44,
+      184,
+      277
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 12,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      80,
+      62,
+      224,
+      260
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 13,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      55,
+      99,
+      275,
+      222
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 14,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      29,
+      89,
+      327,
+      232
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 15,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      128,
+      44,
+      129,
+      277
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 16,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      93,
+      58,
+      199,
+      263
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 17,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      90,
+      55,
+      205,
+      267
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 18,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      55,
+      64,
+      275,
+      257
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 19,
+    "components": 2,
+    "scale": 1.18,
+    "contentBounds": [
+      118,
+      69,
+      149,
+      253
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 20,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      125,
+      67,
+      135,
+      254
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 21,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      88,
+      59,
+      209,
+      262
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 22,
+    "components": 2,
+    "scale": 1.18,
+    "contentBounds": [
+      43,
+      72,
+      300,
+      249
+    ]
+  },
+  {
+    "character": "hornet",
+    "pose": 23,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      105,
+      57,
+      176,
+      264
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 0,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      108,
+      111,
+      169,
+      210
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 1,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      105,
+      111,
+      176,
+      210
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 2,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      106,
+      105,
+      172,
+      216
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 3,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      93,
+      108,
+      198,
+      214
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 4,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      80,
+      108,
+      225,
+      214
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 5,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      101,
+      111,
+      183,
+      210
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 6,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      80,
+      110,
+      225,
+      211
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 7,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      106,
+      112,
+      173,
+      209
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 8,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      104,
+      109,
+      177,
+      212
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 9,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      68,
+      109,
+      250,
+      212
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 10,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      103,
+      105,
+      179,
+      216
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 11,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      98,
+      147,
+      189,
+      175
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 12,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      73,
+      109,
+      240,
+      212
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 13,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      102,
+      102,
+      181,
+      219
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 14,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      80,
+      106,
+      224,
+      215
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 15,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      106,
+      110,
+      173,
+      211
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 16,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      111,
+      99,
+      164,
+      222
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 17,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      105,
+      56,
+      175,
+      266
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 18,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      88,
+      66,
+      209,
+      255
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 19,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      90,
+      64,
+      205,
+      257
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 20,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      82,
+      110,
+      222,
+      211
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 21,
+    "components": 2,
+    "scale": 1.18,
+    "contentBounds": [
+      85,
+      110,
+      215,
+      211
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 22,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      112,
+      109,
+      162,
+      212
+    ]
+  },
+  {
+    "character": "salvager",
+    "pose": 23,
+    "components": 1,
+    "scale": 1.18,
+    "contentBounds": [
+      93,
+      106,
+      198,
+      215
+    ]
+  }
+]

@@ -1,0 +1,35 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const vm=require('node:vm');
+const path=require('node:path');
+(async()=>{
+  const elements=new Map(), $=id=>{if(!elements.has(id))elements.set(id,{textContent:'',disabled:false,showModal(){this.open=true;},close(){this.open=false;},click(){this.clicked=true;}});return elements.get(id);};
+  let submit, requests=[], refreshes=0;
+  const plan={eligible_ids:[1,2],pending_ids:[2],missing_dependencies:[]};
+  const context=vm.createContext({$,selected:{id:1},notify(){},action:fn=>fn(),refresh:async()=>refreshes++,api:async(url,body)=>{
+    requests.push({url,body});if(url==='/api/analysis-plan')return plan;
+    return new Promise(resolve=>submit=resolve);
+  }});
+  vm.runInContext(fs.readFileSync(path.join(__dirname,'web/find_moments.js'),'utf8'),context);
+  await $('find-moments').onclick();
+  assert.equal($('find-current').disabled,true);
+  assert.equal($('find-new').disabled,false);
+  assert.match($('find-current-note').textContent,/already has estimates/);
+  context.selected={id:2};await $('find-moments').onclick();
+  assert.equal($('find-current').disabled,false);
+  const first=$('find-current').onclick();await $('find-current').onclick();
+  assert.equal(requests.filter(r=>r.url==='/api/analyze').length,1);
+  assert.equal($('find-new').disabled,true);
+  assert.deepEqual(JSON.parse(JSON.stringify(requests.at(-1).body)),{sample_seconds:60,audio:true,audio_track:'auto',only_new:true,ids:[2]});
+  submit({job:'x'});await first;assert.equal(refreshes,1);
+  assert.equal($('find-moments-dialog').open,false);
+  context.api=async url=>{if(url==='/api/analysis-plan')return plan;throw Error('An analysis is already queued or running.');};
+  await $('find-moments').onclick();await $('find-current').onclick();
+  assert.equal($('find-moments-dialog').open,true);
+  assert.match($('find-status').textContent,/already queued/);
+  assert.equal($('find-current').disabled,false);
+  plan.missing_dependencies=['cv2'];await $('find-moments').onclick();
+  assert.equal($('find-current').disabled,true);assert.equal($('find-new').disabled,true);
+  assert.match($('find-status').textContent,/pip install/);
+  console.log('Find moments: saved-result reuse, source choice, duplicate-click guard and dependency feedback passed.');
+})().catch(error=>{console.error(error);process.exitCode=1;});

@@ -33,7 +33,7 @@ class LoadingTests(unittest.TestCase):
 
     def test_editor_and_playback_share_media_metadata_cache(self):
         from lib.hotkey_editor import server
-        result = SimpleNamespace(returncode=0, stdout='{"streams":[{"width":1280,"height":720}]}')
+        result = SimpleNamespace(returncode=0, stdout='{"streams":[{"codec_type":"video","width":1280,"height":720}]}')
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / 'clip.mp4'
             path.write_bytes(b'original')
@@ -68,7 +68,7 @@ class LoadingTests(unittest.TestCase):
         self.assertEqual(transform['positionY'], 25)
 
     def test_dimensions_cached_until_file_changes(self):
-        result = SimpleNamespace(returncode=0, stdout='{"streams":[{"width":1280,"height":720}]}')
+        result = SimpleNamespace(returncode=0, stdout='{"streams":[{"codec_type":"video","width":1280,"height":720}]}')
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / 'clip.mp4'
             path.write_bytes(b'original')

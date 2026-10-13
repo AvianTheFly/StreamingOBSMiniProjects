@@ -12,6 +12,8 @@
     "DESKTOP 3D SCREEN",
     "league client"
   ],
-  "theme": "random",
-  "champion_scene": "League Champion Select World"
+  "theme": "astral",
+  "queue_theme": "bear",
+  "champion_scene": "League Champion Select World",
+  "loading_scene": "League Spirit Loading"
 }

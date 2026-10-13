@@ -1,0 +1,32 @@
+[
+  {
+    "plate": "F:\\EVERYTHING STREAM RELATED\\Streaming Scripts v2\\mini projects\\scene_voice_switcher\\web\\art\\forge-habitat-v3.png",
+    "mask": "F:\\EVERYTHING STREAM RELATED\\Streaming Scripts v2\\mini projects\\scene_voice_switcher\\art\\forge-foreground-cutout.png",
+    "output": "F:\\EVERYTHING STREAM RELATED\\Streaming Scripts v2\\mini projects\\scene_voice_switcher\\web\\art\\forge-habitat-v3-foreground.png",
+    "width": 1672,
+    "height": 941,
+    "alphaUnchanged": true,
+    "plateSha256": "859769eb3f93f457b00715e8882c6196048a48296d2917d35fc325634f0cba5e",
+    "rgbSha256": "43a983317ad82d91a3b12ffc8d434c3e676a4463cc5ede47a22887c6bb2b5817"
+  },
+  {
+    "plate": "F:\\EVERYTHING STREAM RELATED\\Streaming Scripts v2\\mini projects\\scene_voice_switcher\\web\\art\\ionian-habitat-v3.png",
+    "mask": "F:\\EVERYTHING STREAM RELATED\\Streaming Scripts v2\\mini projects\\scene_voice_switcher\\art\\sanctuary-foreground-cutout.png",
+    "output": "F:\\EVERYTHING STREAM RELATED\\Streaming Scripts v2\\mini projects\\scene_voice_switcher\\web\\art\\ionian-habitat-v3-foreground.png",
+    "width": 1672,
+    "height": 941,
+    "alphaUnchanged": true,
+    "plateSha256": "40a18ff0bad12d779a49744e95497167ed6b8de539ecbede860863a09643d4db",
+    "rgbSha256": "a31f9ac3231a9ae679b4a742e2173f6dd6fd22279e7eefa65437e01d4c577d8f"
+  },
+  {
+    "plate": "F:\\EVERYTHING STREAM RELATED\\Streaming Scripts v2\\mini projects\\scene_voice_switcher\\web\\art\\cryophoenix-habitat-v3.png",
+    "mask": "F:\\EVERYTHING STREAM RELATED\\Streaming Scripts v2\\mini projects\\scene_voice_switcher\\art\\phoenix-observatory-foreground-cutout.png",
+    "output": "F:\\EVERYTHING STREAM RELATED\\Streaming Scripts v2\\mini projects\\scene_voice_switcher\\web\\art\\cryophoenix-habitat-v3-foreground.png",
+    "width": 1672,
+    "height": 941,
+    "alphaUnchanged": true,
+    "plateSha256": "0e058c836b8f56b8ebd604230185481dc79a4883c146ae1fdb6222fecbe1eb86",
+    "rgbSha256": "ac7031aef40230ee092b5830d9a95601254ca3117bcec54a8a7fa1cc56415b82"
+  }
+]

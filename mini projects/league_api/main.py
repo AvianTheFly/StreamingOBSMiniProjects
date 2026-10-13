@@ -38,7 +38,11 @@ class Service:
     def __init__(self, stop_event):
         self.parent_stop=stop_event; self.stop_event=threading.Event(); self.lock=threading.RLock()
         self.production_store=ProductionSettings(ROOT/'production.json')
-        self.engine=Engine(load_config(),production_settings=self.production_store.load()); self.status='Waiting for a League game'
+        catalog_path=ROOT/'media'/'purchases'/'catalog.json'
+        item_catalog=json.loads(catalog_path.read_text(encoding='utf-8'))['data'] if catalog_path.is_file() else {}
+        self.engine=Engine(load_config(),production_settings=self.production_store.load(),item_catalog=item_catalog); self.status='Waiting for a League game'
+        from lib.coordination.playback import coordinator
+        self.purchase_permission=coordinator.permission('league_api')
         from .match_screens import MatchScreens
         self.match_screens=MatchScreens(ROOT/'media'/'match-screens', self.engine.production.settings)
         self.last_success=None; self.error=None; self.clients=0; self.media_errors=[]
@@ -46,12 +50,31 @@ class Service:
         self.last_overlay=-1000
         from .client_scenes import ClientScenes
         self.client_scenes=ClientScenes(ROOT/'client_scenes.json',scene_hold=self.match_scene_hold)
+        from .match_timing import MatchTiming
+        from .match_handoff import MatchHandoff
+        self.match_timing = MatchTiming()
+        self.match_handoff = MatchHandoff(self.match_screens)
+        from .stage_appearance import StageAppearance
+        self.stage_appearance=StageAppearance(ROOT)
+        from .production.stance_accent import StanceAccent
+        self.stance_accent = StanceAccent()
 
     def match_scene_hold(self, **context):
         # Do not take the service lock here: client routing has its own lock.
+        if self.client_scenes.replay_viewing.active:
+            return 1
         if self.engine.config.get('paused'):
             return 0
         return self.match_screens.scene_hold(**context)
+
+    def preview_purchase(self, identity=3078):
+        with self.lock:
+            if self.engine.config.get('paused') or not self.engine.production.settings.get('item_purchases',True) or not self.purchase_permission.is_set():
+                raise ValueError('Resume League alerts before previewing an item.')
+            item=self.engine.purchases.catalog.get(str(identity)) if type(identity) is int else None
+            if not item: raise ValueError('Choose an item from the installed item catalog.')
+            self.engine.purchases.enqueue(identity,item['name'])
+            return {'ok':True,'name':item['name']}
 
     def production_settings(self):
         from .production.catalog import manifest, GROUPS
@@ -157,6 +180,9 @@ class Service:
             if not presentation_active:
                 production['enabled']=False
             match_screen=self.match_screens.snapshot() if presentation_active else None
+            production['stance'] = self.stance_accent.snapshot(
+                presentation_active and not match_screen and not death and
+                self.match_timing.snapshot()['running'] and self.purchase_permission.is_set())
             if match_screen:
                 # The full-canvas art owns these lifecycle shows, without rewriting
                 # the user's saved event options, clip media, volumes or layout.
@@ -177,7 +203,11 @@ class Service:
                 else: alert['media']=''
                 audio=self.media_path(alert.get('audio',''))
                 alert['audio']='/asset?path='+quote(alert['audio']) if audio else ''
-            return {'production':production,'match_screen':match_screen,'overlay_enabled':self.engine.config.get('overlay_enabled',True),'layout':self.engine.config.get('layout',LAYOUT),'status':self.status,'alerts':alerts,'metrics':self.engine.metrics,
+            if (not self.purchase_permission.is_set() or match_screen or self.engine.config.get('paused')
+                    or not self.engine.production.settings.get('item_purchases',True)):
+                self.engine.purchases.clear()
+            purchase=self.engine.purchases.snapshot()
+            return {'purchase':purchase,'production':production,'match_screen':match_screen,'overlay_enabled':self.engine.config.get('overlay_enabled',True),'layout':self.engine.config.get('layout',LAYOUT),'status':self.status,'alerts':alerts,'metrics':self.engine.metrics,
                     'sprite':({**self.engine.sprite,'remaining':max(0,self.engine.sprite['expires']-self.engine.clock())} if self.engine.sprite and self.engine.sprite['expires']>self.engine.clock() and not self.engine.config.get('paused') and self.engine.config.get('overlay_enabled',True) else None),
                     'history':self.engine.history[-20:],'error':self.error,'media_errors':self.media_errors[-10:],
                     'paused':self.engine.config.get('paused',False),'revision':self.engine.config.get('revision',0)}
@@ -193,6 +223,7 @@ class Service:
         # Riot's local game endpoint uses a self-signed certificate. This context
         # and disabled proxies are scoped exclusively to the fixed loopback URL.
         while not self.stop_event.is_set() and not self.parent_stop.is_set():
+            boundaries = []
             try:
                 data=fetch_snapshot()
                 if not isinstance(data.get('gameData',{}).get('gameTime'),(float,int)):
@@ -201,14 +232,36 @@ class Service:
                 with self.lock:
                     gap=self.last_success is not None and now-self.last_success>3
                     candidates=self.engine.ingest(data,baseline=gap)
+                    if not self.purchase_permission.is_set(): self.engine.purchases.clear()
                     self.match_screens.ingest(data['gameData']['gameTime'],candidates)
+                    screen = self.match_screens.automatic_screen()
+                    if (screen and screen['key'] in {'victory', 'defeat'} and
+                            screen['id'] != self.match_handoff.screen_id):
+                        self.match_handoff.begin()
+                    boundaries = self.match_timing.observe(data, screen)
                     self.status='Connected to League'; self.error=None; self.last_success=now
+                self.client_scenes.observe_live(data, running=self.match_timing.snapshot()['running'])
             except Exception as exc:
                 with self.lock:
                     self.status='Waiting for a League game'
                     if self.last_success and time.monotonic()-self.last_success>3: self.engine.clear()
                     # Connection refusal is normal outside a game; don't flood logs.
                     self.error=str(exc) if isinstance(exc,(ValueError,KeyError,TypeError)) else None
+                boundaries = self.match_timing.disconnected()
+            # Dispatch outside the service lock. Feature observers only schedule;
+            # the scene owners and existing workers retain all resource writes.
+            for boundary in boundaries:
+                if boundary == 'game.connected':
+                    self.match_handoff.reset()
+                    self.client_scenes.game_started()
+                else:
+                    revision = self.match_handoff.origin[1] if self.match_handoff.origin is not None else None
+                    self.client_scenes.game_ended(expected_manual_revision=revision)
+                from events import emit
+                emit(boundary, owner='league_api',
+                     manual_revision=self.client_scenes.intent_revision if boundary == 'game.disconnected' else None)
+            self.client_scenes.apply_pending()
+            self.match_handoff.tick()
             self.stop_event.wait(max(.25,min(5,float(self.engine.config.get('poll_seconds',.5)))))
 
     def handler(self):
@@ -223,12 +276,14 @@ def run(input_queue,stop_event,*,startup_event=None):
         if startup_event: startup_event.set()
         return
     try:
+        service.stance_accent.start()
         try:
             from .interface import _live
             _live['service']=service
         except ImportError: pass
-        game_scene_policy.register(service, automatic_lobbies=lambda: service.client_scenes.enabled,
-                                   hold=service.match_scene_hold)
+        game_scene_policy.register(service, automatic_lobbies=service.client_scenes.routes_lobbies,
+                                   hold=service.match_scene_hold, game_started=service.client_scenes.game_started,
+                                   match_state=service.match_timing.snapshot)
         server.daemon_threads=True
         web=threading.Thread(target=server.serve_forever,daemon=True); web.start()
         threading.Thread(target=service.client_scenes.run,args=(service.stop_event,stop_event),daemon=True,name='league-client-scenes').start()
@@ -239,6 +294,7 @@ def run(input_queue,stop_event,*,startup_event=None):
         print(f'[league_api] Ready: http://127.0.0.1:{PORT}/production · borders and optional clip alerts',flush=True)
         service.poll()
     finally:
+        service.stance_accent.close()
         game_scene_policy.unregister(service)
         service.stop_event.set()
         service.engine.clear(); service.match_screens.clear(); server.shutdown(); server.server_close()

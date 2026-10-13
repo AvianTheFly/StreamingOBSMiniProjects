@@ -28,3 +28,7 @@
 @keyframes spirit-name{0%{transform:translateX(10px) scale(.98);opacity:.3}60%{transform:translateX(-2px) scale(1.012);opacity:1}100%{transform:translateX(0) scale(1);opacity:1}}
 @keyframes friend-enter{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
 @media(prefers-reduced-motion:reduce){.supporter *{animation:none!important;transition:none!important}}
+.subscription-party #supporterPanel{left:24%;top:1.5%;width:52%;height:13%;max-height:13%;box-sizing:border-box;gap:3px;align-items:center;text-align:center;overflow:hidden;transition:none;background:linear-gradient(100deg,#1c293beb,#34314aeb,#1c293beb);border:1px solid #ffd98080;border-radius:0 0 24px 24px;padding:8px 16px;box-shadow:none;transform-origin:center}
+.subscription-party #supporterKicker{font-size:clamp(7px,.8vw,16px);color:#ffe1a0;letter-spacing:.13em}
+.subscription-party #supporterName{width:100%;font-size:clamp(14px,2.5vw,48px);line-height:1.06;color:#fff1e0;text-overflow:clip;letter-spacing:-.035em}
+.subscription-party #supporterDetail{font-size:clamp(8px,.9vw,18px);color:#ffccdd;letter-spacing:.025em;text-transform:none}

@@ -40,6 +40,8 @@ class ProjectRoutes(SongRoutes, SceneRoutes, SoundEffectRoutes, ReplayRoutes):
                 self._ss_categories()
             else:
                 self._err(404, "Unknown action")
+        elif name == 'scene_voice_switcher' and action == 'display_state':
+            self._svs_display_state()
         elif name == "scene_voice_switcher" and action == "lobbies":
             self._svs_lobbies()
         elif name == 'scene_voice_switcher' and action == 'catalog':

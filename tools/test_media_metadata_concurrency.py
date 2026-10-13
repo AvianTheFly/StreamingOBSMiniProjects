@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 from lib import media_metadata as metadata
 
-RESULT = SimpleNamespace(returncode=0, stdout='{"streams":[{"codec_name":"h264","width":640,"height":360,"avg_frame_rate":"30/1"}]}')
+RESULT = SimpleNamespace(returncode=0, stdout='{"streams":[{"codec_type":"video","codec_name":"h264","width":640,"height":360,"avg_frame_rate":"30/1"}]}')
 
 
 class MediaMetadataConcurrencyTests(unittest.TestCase):

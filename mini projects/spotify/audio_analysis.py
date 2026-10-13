@@ -3,13 +3,15 @@ from functools import lru_cache
 
 import numpy as np
 from .audio_texture import spectral_roughness
+from .audio_articulation import AudioArticulation
 
 
 def quiet_features():
     return dict(waveform=[0.] * 128, bass=0., treble=0., energy=0., beat=0.,
                 pitch=0., tonality=0., width=0., balance=0., flux=0.,
                 voice_widths=[0.] * 8, voice_balances=[0.] * 8, voice_levels=[0.] * 8,
-                roughness=0., noisiness=0., texture_rate=0., loudness=0.)
+                roughness=0., noisiness=0., texture_rate=0., loudness=0.,
+                lead_level=0., lead_pitch=0., attack_level=0., air_level=0.)
 
 
 @lru_cache(maxsize=8)
@@ -78,8 +80,9 @@ class AudioAnalysis:
         self.bass_average = .02
         self.beat = 0.
         self.previous_spectrum = np.zeros(48)
+        self.articulation = AudioArticulation()
 
-    def analyze(self, samples, rate=44100, *, realtime=False):
+    def analyze(self, samples, rate=44100, *, realtime=False, hop_seconds=.01):
         if realtime:
             samples = samples[-2048:]
         mono = samples.mean(axis=1)
@@ -91,6 +94,7 @@ class AudioAnalysis:
         if float(np.sqrt(np.mean(mono * mono))) < rms*.15:
             mono = samples[:, int(np.argmax(np.mean(samples*samples, axis=0)))]
         if rms < .0001:
+            self.articulation.reset()
             self.beat *= .7
             self.previous_spectrum.fill(0)
             return [0.] * 48, quiet_features()
@@ -99,6 +103,7 @@ class AudioAnalysis:
         # bass is present. Averaging channels before the FFT erased those layers.
         transform = np.fft.rfft(samples * window[:, None], axis=0)
         magnitude = np.sqrt(np.mean(np.abs(transform)**2, axis=1))
+        articulation = self.articulation.measure(magnitude, hz, len(samples), rate, hop_seconds)
         bands = _bands(magnitude, mono, bounds)
         transforms = {len(samples): transform}
         if realtime and len(samples) >= 2048:
@@ -158,4 +163,4 @@ class AudioAnalysis:
                            roughness=roughness, noisiness=1-tonality, texture_rate=texture_rate,
                            # Fixed headroom, no short-term AGC or saturated
                            # exponential: mastered breaks can stay quieter.
-                           loudness=float(np.clip(full_rms*2, 0, 1)))
+                           loudness=float(np.clip(full_rms*2, 0, 1)), **articulation)

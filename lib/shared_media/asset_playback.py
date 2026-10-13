@@ -5,6 +5,7 @@ current project/profile values, while this component owns applying asset state,
 starting media, waiting, saving overrides and parking the physical source.
 """
 from lib.runtime_cleanup import run_cleanup
+from lib.audio_focus import interrupt_audio
 
 
 class AssetPlayback:
@@ -21,6 +22,7 @@ class AssetPlayback:
     def play(self, stem, path, source, *, cancelled, allowed=None):
         store = self.state_for(source)
         loaded = False
+        release_audio = lambda: None
         try:
             if cancelled():
                 return
@@ -39,6 +41,9 @@ class AssetPlayback:
                 return
             shared = bool(getattr(self.cfg, 'single_source_mode', False))
             settle = max(0, int(getattr(self.cfg, 'media_swap_settle_ms', 0) or 0)) if shared else 0
+            release_audio = interrupt_audio(path, cancelled=cancelled)
+            if cancelled():
+                return
             loaded = self.start_source(scene=self.cfg.scene, source_name=source,
                 filepath=path, start_timeout=self.cfg.media_start_timeout,
                 swap_settle_ms=settle, cancelled=cancelled)
@@ -57,4 +62,5 @@ class AssetPlayback:
             if loaded and store is not None:
                 actions.append(lambda: store.capture_override_for_stem(stem))
             actions.append(lambda: self.obs.park_media_source(self.cfg.scene, source))
+            actions.append(release_audio)
             run_cleanup(self.cfg.project_name, *actions)

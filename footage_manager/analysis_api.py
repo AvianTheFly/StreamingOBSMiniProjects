@@ -32,14 +32,28 @@ def summary(store, weights=None):
             'dependencies':{name:importlib.util.find_spec(name) is not None for name in ('cv2','rapidocr_onnxruntime','faster_whisper')}}
 
 
+def plan(store):
+    """Cheap queue preview; no decoding or personal marker writes."""
+    videos = candidates(store)
+    return {'eligible_ids': [video['id'] for video in videos],
+            'pending_ids': AnalysisStore(store).pending_ids(videos),
+            'missing_dependencies': [name for name in ('cv2','rapidocr_onnxruntime','faster_whisper')
+                                     if importlib.util.find_spec(name) is None]}
+
+
 def prepare(store,payload):
+    if payload.get('only_new') and payload.get('force'):
+        raise ValueError('Choose new recordings or reanalysis, not both')
     missing=[name for name in ('cv2','rapidocr_onnxruntime','faster_whisper') if importlib.util.find_spec(name) is None]
     if missing:
         raise ValueError('Install footage_manager/requirements-analysis.txt first. Missing: '+', '.join(missing))
     if payload.get('ids') is not None and not candidates(store,payload['ids']):
         raise ValueError('Choose an online video at least 10 minutes long')
+    work = AnalysisBatch(store,payload)
+    if not work.videos:
+        raise ValueError('No new or changed eligible recordings. Scan folders to find new footage.')
     store.backup()
-    return AnalysisBatch(store,payload)
+    return work
 
 
 def voice_marks(store, video_id):

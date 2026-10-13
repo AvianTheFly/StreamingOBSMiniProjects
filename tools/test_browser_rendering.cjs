@@ -17,6 +17,11 @@ function silence(seconds) {
  try{
   const page=await browser.newPage({viewport:{width:1920,height:1080}});
   const errors=[],acks=[],wave=silence(4);let active=null,offline=false;
+  async function waitForAck(id,status){
+   const deadline=Date.now()+8000;
+   while(!acks.some(x=>x.id===id&&x.status===status)&&Date.now()<deadline)await new Promise(resolve=>setTimeout(resolve,25));
+   assert(acks.some(x=>x.id===id&&x.status===status),`${id} must acknowledge ${status}: ${JSON.stringify(acks)}`);
+  }
   page.on('pageerror',e=>errors.push(e.message));
   await page.addInitScript(()=>{
    let release;
@@ -81,7 +86,7 @@ function silence(seconds) {
   assert.equal(await page.evaluate(()=>window.testFrames),paused.frames,'pause freezes visuals');
   active={...active,paused:false};await page.waitForFunction(()=>!window.testAudio.at(-1).paused);
   await page.waitForFunction(()=>window.testAudio.at(-1).getAttribute('src')===null,{},{timeout:8000});
-  assert(acks.some(x=>x.id==='first'&&x.status==='ended'),'natural completion must acknowledge ended');
+  await waitForAck('first','ended');
   active=null;await page.waitForTimeout(400);
   const idleClears=await page.evaluate(()=>window.testCanvasClears);
   await page.waitForTimeout(750);
@@ -159,10 +164,10 @@ function silence(seconds) {
   offline=false;active=null;await page.waitForTimeout(400);
   for(const [id,stem,effect]of [['border-audio','celebrate',{renderer:'borders',style:'party',label:'CELEBRATE!'}],['hooray-audio','hooray',{renderer:'hooray'}]]){
    active={id,stem,effect,elapsed:0,started:false,paused:false};
-   await page.waitForFunction(()=>!window.testAudio.at(-1).paused);
+   await page.waitForFunction(id=>window.testAudio.at(-1)?.getAttribute('src')?.endsWith('/'+encodeURIComponent(id))&&!window.testAudio.at(-1).paused,id);
    await page.waitForFunction(()=>window.testAudio.at(-1).getAttribute('src')===null,{},{timeout:8000});
    assert(acks.some(x=>x.id===id&&x.status==='playing'));
-   assert(acks.some(x=>x.id===id&&x.status==='ended'));
+   await waitForAck(id,'ended');
    active=null;await page.waitForTimeout(400);
   }
   assert.deepEqual(errors,[]);console.log('Browser audio, pause/resume, transparency, idle and offline cleanup passed. Preview: '+output);

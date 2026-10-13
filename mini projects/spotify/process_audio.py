@@ -98,8 +98,9 @@ def check(result):
 
 
 def spotify_pid():
-    processes = {p.info['pid']: p.info['ppid'] for p in psutil.process_iter(['pid', 'ppid', 'name'])
-                 if (p.info['name'] or '').lower() == 'spotify.exe'}
+    from lib.process_inventory import process_snapshot
+    processes = {p.pid: p.parent for p in process_snapshot()
+                 if p.name.lower() == 'spotify.exe'}
     roots = sorted(pid for pid, parent in processes.items() if parent not in processes)
     return roots[0] if roots else None
 
@@ -131,7 +132,8 @@ def capture_process(pid):
             raise completion.error
         check(completion.result.value)
         client = C.cast(completion.client, P(IAudioClient))
-        fmt = WaveFormat(1, 2, 44100, 176400, 4, 16, 0)
+        # Float capture retains quiet Spotify detail before visual-only gain.
+        fmt = WaveFormat(3, 2, 44100, 352800, 8, 32, 0)
         check(client.Initialize(0, 0x80060000, 0, 0, C.byref(fmt), None))
         event = kernel.CreateEventW(None, False, False, None)
         if not event:
@@ -154,8 +156,8 @@ def capture_process(pid):
                 check(capture.GetBuffer(C.byref(data), C.byref(frames), C.byref(flags), C.byref(position), C.byref(clock)))
                 try:
                     samples = np.zeros((frames.value, 2), dtype=np.float32) if flags.value & 2 else (
-                        np.frombuffer(C.string_at(data, frames.value * 4), dtype=np.int16)
-                        .reshape(-1, 2).astype(np.float32) / 32768.)
+                        np.frombuffer(C.string_at(data, frames.value * 8), dtype=np.float32)
+                        .reshape(-1, 2).copy())
                     chunks.append(samples)
                     # WASAPI QPC time is in 100-ns units and identifies the
                     # first frame. Track the newest packet end, not queued data.

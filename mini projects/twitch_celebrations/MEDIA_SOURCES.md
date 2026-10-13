@@ -25,3 +25,46 @@ same local videos, up to eight seconds, 24 fps. They loop in the border only.
 Default assignments and dance cadence live in `characters.js` (`partyTracks`).
 Saved per-theme `settings.custom` choices take precedence over these defaults.
 No internet connection is needed for playback after download.
+
+## Raid festival dancers / October 12, 2026
+
+`media/raid-dancers.json` records the original source pages and exact GIF
+downloads for Toothless, Mob's default dance, dancing cat and OIIA Ethel.
+These are silent local PNG atlases prepared by `tools/prepare_raid_party.py`;
+white/green backgrounds are keyed during preparation and OIIA plays at half speed.
+Crab Rave uses the existing local dance cut. Classic Club Penguin uses untouched
+copies of `hub_ui/app/spirit-lobby/art/penguin.png` and its frame map. No original
+asset is overwritten and no external media is fetched during an alert. The finale
+also uses the existing silent Minions, Tobey, Squidward and Pedro dance cuts.
+
+## Current border puppets / October 12 follow-up
+
+The current raid no longer loads the above meme atlases or dance videos.
+`raid_cast.js` supplies authored vector puppets, including a Pedro raccoon based
+on the existing border effect's mask, headphones, ringed tail and record gag.
+Only the classic penguin PNG and frame metadata are used for bitmap animation.
+The previously prepared media and personal custom choices remain on disk.
+Raids retain saved audio choices but do not display custom visual panels.
+
+
+## Familiar-character crossovers / October 13, 2026
+
+Twenty-four existing generated lobby poses (Kirby, knife goose, Among Us
+crewmate, Getting Over It climber, Hornet, Boo, Creeper and the original salvage
+robot) are copied without pixel edits to `media/raid-game-*.png`. The source PNGs
+and lobby configurations are untouched. `media/raid-game-provenance.json` records
+every original path and SHA-256 digest; `tools/prepare_raid_guests.py` verifies the
+copies. There is no feature-peer runtime import or alert-time external download.
+
+
+Current raid-only music uses `raid-{crab,dragon,cat,frog}-single.wav`, prepared
+locally by `tools/prepare_raid_music.py` from the existing party MP3s. These
+6.4–6.6-second cuts stop before repeated material and fade out once. Original
+16-second files and other event playback remain unchanged. `raid_score.json`
+records exact source hashes, measured musical timing and cut durations.
+
+
+`subscriber-thanks.wav` is an original 4.8-second 120 BPM synthesized musical
+sting, prepared by `tools/prepare_subscriber_music.py` with deterministic notes,
+bass and soft percussion. It plays once for subscriptions only; existing
+supporter audio remains for gifts and followers. No external music was added.

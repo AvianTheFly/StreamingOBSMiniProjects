@@ -101,6 +101,19 @@ async function main(){
 
     assert(alpha[0]===0&&alpha[1]>240,'Camera must remain visible above the opaque foreground booth');
 
+    const alignment=await page.evaluate(async()=>{
+      const {panels}=await import('./surfaces.js'),{TextScreens}=await import('./text-screens.js');
+      const canvas=document.createElement('canvas');canvas.width=1920;canvas.height=1080;
+      const text=new TextScreens();text.draw(canvas.getContext('2d'),'left','THE','AFTERPARTY','#ffffff');
+      const texture=text.cache.get('left').image;
+      const c=document.querySelector('canvas').getContext('2d');
+      return {left:panels.left,right:panels.right,corner:texture.getContext('2d').getImageData(0,0,1,1).data[3],
+        deck:c.getImageData(960,710,1,1).data[3],oldDesk:c.getImageData(1500,930,1,1).data[3]};
+    });
+    assert(alignment.left.every(p=>p[1]>=370&&p[1]<=450)&&alignment.right.every(p=>p[1]>=370&&p[1]<=450),'Side displays must stay on the matching wall plaques');
+    assert(alignment.corner===0,'Sign text must retain the underlying painted material');
+    assert(alignment.deck>240&&alignment.oldDesk===0,'Booth must remain centered with its deck intact, not offset onto the right floor');
+
     assert(requests.some(r=>/clubhouse/.test(r))&&requests.some(r=>/booth/.test(r)),'Original room and booth must be retained');
 
     await page.goto(base+'index.html?quality=standard');await ready();
@@ -123,12 +136,12 @@ async function main(){
 
     await page.getByLabel('The sign',{exact:true}).fill('COME BACK SOON');
 
-    await page.getByLabel('Colors').selectOption('sunset');await page.getByLabel('On the big screen').selectOption('liquid');
+    await page.getByLabel('Colors').selectOption('sunset');await page.getByText('Wall signs and booth display',{exact:true}).click();
 
     assert((await page.locator('#open').getAttribute('href')).includes('COME+BACK+SOON'),'Full preview did not encode title');
     assert(!(await page.locator('#url').inputValue()).includes('background=')&&!(await page.locator('#url').inputValue()).includes('title='),'OBS links must follow shared display choices');
 
-    assert((await page.locator('#open').getAttribute('href')).includes('background=liquid'),'Full-screen link did not follow controls');
+    assert((await page.locator('#open').getAttribute('href')).includes('palette=sunset'),'Full-screen link did not follow controls');
 
     await page.getByRole('button',{name:'Pause motion',exact:true}).click();
 
@@ -157,18 +170,18 @@ async function main(){
     await page.setViewportSize({width:1920,height:1080});
     await page.locator('#screen-upload').setInputFiles(path.join(app,'spirit-lobby','art','clubhouse-clean.webp'));
     await page.getByRole('status').filter({hasText:'Added and previewing'}).waitFor();
-    const imported=await page.getByLabel('On the big screen').inputValue();
+    const imported=await page.locator('[name=leftScreen]').inputValue();
     await page.locator('#screen-target').selectOption('left');await page.locator('#screen-assets').getByRole('button',{name:'Use on selected screen'}).click();
-    assert(await page.locator('[name=leftScreen]').inputValue()===imported,'Wall displays must accept library media');await page.locator('#screen-target').selectOption('main');
+    assert(await page.locator('[name=leftScreen]').inputValue()===imported,'Wall displays must accept library media');await page.locator('#screen-target').selectOption('left');
     assert(/^[a-f0-9]{32}$/.test(imported),'Imported artwork did not enter the shared library');
     const previewFrame=page.frames().find(f=>f.url().includes('index.html'));
-    await previewFrame.waitForFunction(id=>{const c=document.querySelector('canvas');return c.dataset.screen===id&&c.dataset.screenReady==='true';},imported);
+    await previewFrame.waitForFunction(id=>{const c=document.querySelector('canvas');return JSON.parse(c.dataset.screenMedia).left?.id===id&&JSON.parse(c.dataset.screenMedia).left?.ready===true;},imported);
     await page.getByRole('button',{name:'Apply screens to OBS',exact:true}).click();
     await page.locator('#screen-status').filter({hasText:'Saved.'}).waitFor();
     const follower=await browser.newPage({viewport:{width:1920,height:1080}});
     await follower.goto(await page.locator('#url').inputValue());
     await follower.locator('canvas[data-ready="true"]').waitFor();
-    await follower.waitForFunction(id=>document.querySelector('canvas').dataset.screen===id&&document.querySelector('canvas').dataset.screenReady==='true',imported);
+    await follower.waitForFunction(id=>JSON.parse(document.querySelector('canvas').dataset.screenMedia).left?.id===id&&JSON.parse(document.querySelector('canvas').dataset.screenMedia).left?.ready===true,imported);
     await follower.close();
     await page.locator('#screen-assets').getByRole('button',{name:'Remove from library'}).click();
     await page.locator('#screen-status').filter({hasText:'Original and imported files were preserved'}).waitFor();
@@ -177,18 +190,18 @@ async function main(){
     if(fs.existsSync(videoAsset)){
       await page.locator('#screen-upload').setInputFiles(videoAsset);
       await page.locator('#screen-status').filter({hasText:'Added and previewing'}).waitFor();
-      const videoId=await page.getByLabel('On the big screen').inputValue();
-      await previewFrame.waitForFunction(id=>document.querySelector('canvas').dataset.screen===id&&document.querySelector('canvas').dataset.screenReady==='true',videoId);
+      const videoId=await page.locator('[name=leftScreen]').inputValue();
+      await previewFrame.waitForFunction(id=>JSON.parse(document.querySelector('canvas').dataset.screenMedia).left?.id===id&&JSON.parse(document.querySelector('canvas').dataset.screenMedia).left?.ready===true,videoId);
       const media=await previewFrame.evaluate(async id=>{
-        const {ScreenContent}=await import('./screen-content.js'),{readConfig}=await import('./config.js');const owner=await new ScreenContent().load(),config=readConfig('?layer=background&background='+id);owner.tick(config);
-        await new Promise(resolve=>owner.slots.get('main').media.addEventListener('loadeddata',resolve,{once:true}));owner.tick(config);const slot=owner.slots.get('main');
+        const {ScreenContent}=await import('./screen-content.js'),{readConfig}=await import('./config.js');const owner=await new ScreenContent().load(),config=readConfig('?layer=background&leftScreen='+id);owner.tick(config);
+        await new Promise(resolve=>owner.slots.get('left').media.addEventListener('loadeddata',resolve,{once:true}));owner.tick(config);const slot=owner.slots.get('left');
         const flags={muted:slot.media.muted,loop:slot.media.loop};owner.suspend(true);flags.paused=slot.media.paused;owner.dispose();flags.released=owner.slots.size===0;return flags;
       },videoId);
       assert(media.muted&&media.loop&&media.paused&&media.released,'Custom video must be silent, repeat and release its resources');
       await page.locator('#screen-assets').getByRole('button',{name:'Remove from library'}).click();
       await page.locator('#screen-status').filter({hasText:'Original and imported files were preserved'}).waitFor();
     }
-    await page.getByLabel('On the big screen').selectOption('cosmos');
+    await page.locator('[name=leftScreen]').selectOption('text');
     await page.getByRole('button',{name:'Apply screens to OBS',exact:true}).click();
     await page.locator('#screen-status').filter({hasText:'Saved.'}).waitFor();
     const journey=await page.evaluate(async()=>{

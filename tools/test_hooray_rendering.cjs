@@ -48,12 +48,12 @@ const duration=2.809002;
   for(const frame of results.frames){
    assert(frame.painted>500,'foil must remain visible during the performance');
    assert(frame.painted<1920*1080*.12,'native alpha must leave at least 88% of the view completely clear');
-   assert(frame.central<1120*600*.055,'central confetti must stay sparse');
+   assert.equal(frame.central,0,'the redesigned celebration belongs to the border; gameplay stays clear');
    assert(frame.edge>800,'matching border accents must be visible');
    assert.equal(frame.green,0,'no green matte or green fringe');
    assert(frame.deterministic,'pause must reconstruct exactly the same frame');
   }
-  assert(results.frames.some(f=>f.central>500),'confetti must reach across the picture');
+  assert(results.frames.some(f=>f.edge>2500),'the border celebration must have a readable paper shower');
   assert(results.frames.some(f=>f.solid>10000),'foil must include crisp solid pieces');
   assert.equal(new Set(results.frames.map(f=>f.image)).size,6,'performance must evolve');
   assert(results.frames.at(-1).painted<results.frames[2].painted,'ending must fade out');

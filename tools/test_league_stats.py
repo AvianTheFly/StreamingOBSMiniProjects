@@ -255,7 +255,7 @@ class ConfigurationAndChatTests(unittest.TestCase):
         self.assertFalse(reader.connected)
 
     def test_collector_does_not_record_spectated_or_closed_client_game(self):
-        tracker=Mock();tracker.import_requested=False
+        tracker=Mock();tracker.import_requested=False;tracker.records={}
         tracker.enrichment_requested=False;tracker.lock=threading.RLock()
         tracker.settings=copy.deepcopy(config.DEFAULTS)
         collector=Collector(tracker,threading.Event(),client=Mock(),fetch=Mock())

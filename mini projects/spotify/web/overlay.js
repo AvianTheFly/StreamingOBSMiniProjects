@@ -8,8 +8,11 @@ let data={playing:false,bands:[]},lastSuccess=0,frame=0,lastFrame=0,sourceVisibl
 let stopped=false,pollTimer=0,pending=null,pollGeneration=0,failures=0;
 const world=new ReactiveWorld({geometry:false}),journey=new VisualJourney();
 const musicFeed=new MusicFeed(world,journey);
-// Begin with the user's preferred high-tech instrument; the musical journey
-// retains all families and develops continuously from this initial silhouette.
+// Load deterministic correspondence before a musical transition needs it.
+// Missing/stale preparation falls back to the same live matching algorithm.
+VisualMorph.loadPrepared(VisualJourney.names.length);
+// Begin with the woven infinity ribbon; the musical journey explores the
+// curated families while keeping their internal choreography continuous.
 journey.stage=6;journey.next=3;journey.visits.fill(0);journey.visits[6]=1;journey.recent=[6];
 let radiance=null,graphicsUnavailable=false;
 const visualizerTiming={frames:0,paintMs:0,sampleAgeMs:null,analysisMs:0,receivedAt:0,rttMs:0};
@@ -93,6 +96,6 @@ window.addEventListener('obsSourceVisibleChanged',event=>{sourceVisible=event.de
 document.addEventListener('visibilitychange',visibility);
 window.addEventListener('pagehide',()=>{
  stopped=true;pollGeneration++;clearTimeout(pollTimer);pending?.controller.abort();clearTimeout(pending?.timer);
- hide();radiance?.dispose();
+ hide();radiance?.dispose();VisualMorph.clear();
 });
-window.addEventListener('pageshow',()=>{if(stopped){stopped=false;failures=0;poll();}});
+window.addEventListener('pageshow',()=>{if(stopped){stopped=false;failures=0;VisualMorph.loadPrepared(VisualJourney.names.length);poll();}});

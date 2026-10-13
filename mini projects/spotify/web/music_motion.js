@@ -6,6 +6,8 @@
  'use strict';
  const Pacing=typeof module!=='undefined'&&module.exports?require('./music_pacing.js'):root.MusicPacing;
  const Strings=typeof module!=='undefined'&&module.exports?require('./music_strings.js'):root.MusicStrings;
+ const Articulation=typeof module!=='undefined'&&module.exports?require('./music_articulation.js'):root.MusicArticulation;
+ const Dance=typeof module!=='undefined'&&module.exports?require('./music_dance.js'):root.MusicDance;
  const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,Number.isFinite(x)?x:0));
  class MusicMotion{
   constructor(){
@@ -21,10 +23,13 @@
    this.sustained=0;this.phraseBody=0;this.breath=0;this.strings=new Strings();this.pacing=new Pacing();
    this.roughness=0;this.grain=0;this.textureRate=70;this.texturePhase=0;
    this.sway=0;this.swayVelocity=0;
+   this.articulation=new Articulation();
+   this.dance=new Dance();
   }
   step(input,dt){
    if((input.energy||0)<.001)return;
    dt=clamp(dt,0,.07);const bands=input.bands||[];this.pacing.step(input,dt);
+   this.articulation.step(input,dt);
    const wasAbsolute=this.absoluteVoices;
    this.absoluteVoices=Array.isArray(input.voice_levels)&&input.voice_levels.length===8;
    if(wasAbsolute!==this.absoluteVoices)this.ready=false;
@@ -108,6 +113,7 @@
     // No beat, flux or transient enters this sustained-motion clock.
     this.flowPhases[i]+=dt*this.pacing.speed*(this.absoluteVoices?this.presenceVoices[i]:this.voices[i])*(.7+this.voiceTones[i]*2.7+i*.12);
    }
+   this.dance.step(input,this,dt);
    for(let i=0;i<48;i++)this.forceBands[i]+=(clamp(bands[i])-this.forceBands[i])*(1-Math.exp(-dt*20));
    this.strings.step(this,this.forceBands,dt);
    for(const [key,target] of [['roughness',clamp(input.roughness)],['grain',clamp(input.noisiness??(1-(input.tonality??1)))]])
@@ -133,7 +139,7 @@
    flowPhases:this.flowPhases.slice(),voiceTones:this.voiceTones.slice(),voiceWidths:this.voiceWidths.slice(),
    voiceBalances:this.voiceBalances.slice(),sustained:this.sustained,phraseBody:this.phraseBody,breath:this.breath,
    roughness:this.roughness,grain:this.grain,textureRate:this.textureRate,texturePhase:this.texturePhase,sway:this.sway,swayVelocity:this.swayVelocity,
-   strings:this.strings.snapshot(),pacing:this.pacing.snapshot()};}
+   strings:this.strings.snapshot(),pacing:this.pacing.snapshot(),articulation:this.articulation.snapshot(),dance:this.dance.snapshot()};}
  }
  root.MusicMotion=MusicMotion;if(typeof module!=='undefined'&&module.exports)module.exports=MusicMotion;
 })(globalThis);

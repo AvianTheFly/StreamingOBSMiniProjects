@@ -3,6 +3,7 @@ import os
 import time
 import threading
 import psutil
+from lib.process_inventory import process_snapshot
 
 DESKTOP_APPS = {'chrome.exe', 'msedge.exe', 'firefox.exe', 'brave.exe', 'opera.exe',
                 'chatgpt.exe', 'discord.exe', 'obs64.exe', 'explorer.exe',
@@ -55,8 +56,8 @@ class PointerState:
             now = time.monotonic()
             if now - self.last_scan > 1:
                 self.last_scan = now
-                hosts = {p.pid for p in psutil.process_iter(['name'])
-                         if p.info['name'] == 'TransparentTwitchChatWPF.exe'}
+                hosts = {p.pid for p in process_snapshot()
+                         if p.name == 'TransparentTwitchChatWPF.exe'}
                 windows = []
                 def inspect(hwnd, _):
                     pid = types.DWORD()

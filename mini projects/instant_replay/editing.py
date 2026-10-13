@@ -57,12 +57,13 @@ def _export(source, root, start, end, name):
             data = library.read()
             previous_revision = data["revision"]
             original = data["clips"].get(library.clip_id(source), {})
-            data["clips"][library.clip_id(output)] = {
+            data["clips"][library.clip_id(output)] = {**original,
                 "path": str(output), "title": name,
                 "notes": original.get("notes", ""),
                 "favorite": original.get("favorite", False), "kept": True,
                 "trim_source": str(source), "trim_start": start, "trim_end": end,
-                "purpose": 'highlight' if library.highlight_candidate(original) else 'replay_only',
+                "purpose": library.capture_purpose(original),
+                "review_state": library.review_state(original), "duration": end-start,
             }
             # Publish only a complete file. Library scans ignore the .partial file.
             temporary.replace(output)

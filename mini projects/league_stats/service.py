@@ -3,12 +3,16 @@ import copy
 import queue
 import threading
 import time
+import events
 from . import analytics, commands, config, insights, observations, management, timeline
 from .community import Community, spotlight
 from .normalize import live, postgame
 from .store import Store
 from .ranked import Ranked
-from . import presentation, chat_replies, audience
+from . import presentation, chat_replies, audience, capture, postgame_report, report_visuals
+from . import recap_stories, recap_analysis
+from .recap_show import RecapShow, SAFE_PHASES
+from .six_seven import SixSevenFinder
 
 
 class Tracker:
@@ -41,6 +45,11 @@ class Tracker:
         self.enrichment_requested=False
         self.enrichment_status={'configured':False,'state':'starting','message':'Checking optional enrichment'}
         self.reply = reply
+        self.client_phase = ''
+        self.report_revision = 0
+        self.report_cache = None
+        self.recap_show = RecapShow(monotonic)
+        self.six_seven = SixSevenFinder(monotonic, clock)
 
     def _reply(self, message, text, *, helper=False):
         if self.reply and self.settings['chat_replies']:
@@ -107,6 +116,7 @@ class Tracker:
     def _put(self, record):
         saved = self.store.put(record)
         self.records[saved['id']] = analytics.public(saved)
+        self.report_revision += 1
         if self.current and self.current['id']==saved['id']:
             self.current = saved
         return saved
@@ -123,6 +133,10 @@ class Tracker:
                 old = self.current
             # The authoritative post-game record must never be downgraded on a stale live poll.
             if old.get('source') in ('league_client','match_v5'):
+                return
+            if old and record['duration'] < old.get('duration', 0):
+                return  # A stale poll cannot rewind the personal progression.
+            if old.get('state') == 'complete' and record['state'] != 'complete':
                 return
             record['started_at'] = old.get('started_at',record['started_at'])
             if record['state']=='complete':
@@ -148,16 +162,21 @@ class Tracker:
                     record['metrics']['cs_at_'+minute] = checkpoint['cs']
             if context:
                 record.update(context)
+            capture.extend(record, old, data)
             self._manual_metrics(record)
             self.current = record
             self.account = account
             self.records[record['id']] = record
+            self.report_revision += 1
             self.last_seen = self.monotonic()
             self.status = 'Tracking '+record['champion']
             self.error = None
             if self.monotonic()-self.last_save>=10 or record['state']=='complete':
                 self._put(record)
                 self.last_save = self.monotonic()
+            notice = self.six_seven.observe(data, record['id'], live=record['state']=='live')
+        if notice:
+            events.emit('chat.overlay.notice', **notice)
 
     _manual_metrics = staticmethod(observations.metrics)
 
@@ -287,6 +306,51 @@ class Tracker:
         with self.lock:
             records = self._selection(filters,include_excluded=True)
             return dict(exported_at=self.clock(), matches=copy.deepcopy([analytics.public(r) for r in records]))
+
+    def postgame_report(self):
+        """Read-only cached presentation; account and review filters remain authoritative."""
+        with self.lock:
+            key = (self.report_revision, self.account, self.settings['include_custom'])
+            if not self.report_cache or self.report_cache[0] != key:
+                records = self._selection({})
+                candidates = [r for r in records if r.get('state') in {'complete', 'partial'}]
+                last = max(candidates, key=lambda r:r.get('started_at', 0), default=None)
+                if last and 'official_events' not in last and (last.get('timeline_version') or 'personal_events' not in last):
+                    restored = postgame_report.restore(last, self.store.get(last['id']), self.catalog, self.item_catalog)
+                    records = [restored if r['id'] == last['id'] else r for r in records]
+                self.report_cache = (key, postgame_report.build(records, self.current))
+                if last:
+                    stored = self.store.get(last['id'])
+                    display = next(r for r in records if r['id'] == last['id'])
+                    self.report_cache[1]['visuals'] = report_visuals.project(display, report_visuals.scoreboard(display, stored, self.catalog))
+                    self.report_cache[1]['stories'] = recap_stories.project(self.report_cache[1], records)
+                    self.report_cache[1]['analysis'] = recap_analysis.project(self.report_cache[1], stored)
+                    # Older local records predate champion IDs in the public archive.
+                    if not self.report_cache[1]['match'].get('champion_id'):
+                        own = next((p for p in self.report_cache[1]['visuals']['team'] if p['own']), {})
+                        self.report_cache[1]['match']['champion_id'] = own.get('champion_id')
+            result = copy.deepcopy(self.report_cache[1])
+            report = result.get('match')
+            recent = report and 0 <= self.clock() - report.get('ended_at', report.get('started_at', 0) + report.get('duration', 0)) <= 900
+            # Never show an older result over a new game, queue, replay or lost client.
+            same_match = not self.current or (report and report['id'] == self.current['id'])
+            self.recap_show.sync(report['id'] if report else None)
+            safe = self.client_phase in SAFE_PHASES and same_match
+            result['show'] = self.recap_show.snapshot(auto=self.settings['postgame_auto'], eligible=recent, safe=safe)
+            result['visible'] = result['show']['visible']
+            return result
+
+    def control_postgame(self, body):
+        with self.lock:
+            report = self.postgame_report()
+            self.recap_show.validate(body)
+            action = body['action']
+            if action == 'show' and (not report.get('match') or not report['show']['safe']):
+                raise ValueError('Recap can be shown between games after the League client connects.')
+            if action in {'hide','auto'}:
+                self.settings = config.save({'postgame_auto':action=='auto'}, self.settings_path)
+            self.recap_show.apply(body)
+            return self.postgame_report()
 
     def snapshot(self, *, overlay=False, **filters):
         with self.lock:

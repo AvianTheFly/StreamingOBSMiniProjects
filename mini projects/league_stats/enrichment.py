@@ -1,6 +1,6 @@
 """Bounded resumable optional enrichment, independent of launcher availability."""
 from collections import deque
-from .riot import Deferred, RiotFailure
+from .riot import Deferred, RiotFailure, MatchForbidden
 
 
 class Enrichment:
@@ -54,7 +54,8 @@ class Enrichment:
                     if match_id!=f'{region.upper()}_{record["game_id"]}':raise RiotFailure('Riot returned a different match identity')
                     if not self.tracker.enrich(data,record['account'],official_account=remote,identity_scope=self.riot.fingerprint.hex()[:16]):raise RiotFailure('Your verified Riot account is absent from this match')
                     self.saved_matches+=1;self.message='Verified match saved'
-                    self.pending.append((identity,'timeline',0))
+                    # Finish this match before backfilling older matches.
+                    self.pending.insert(1,(identity,'timeline',0))
             else:
                 data=self.riot.match(record['game_id'],region,timeline=True)
                 if data is None:self.outcomes[(identity,kind)]=('not_found',now+600);self.message='Timeline not available; match totals are preserved'
@@ -62,6 +63,10 @@ class Enrichment:
             self.pending.popleft()
         except Deferred:
             pass  # Do not pop or consume an attempt while waiting for a budget/key.
+        except MatchForbidden as exc:
+            self.pending.popleft()
+            self.outcomes[(identity,kind)]=('restricted',now+3600)
+            self.message=str(exc)+'; local data is preserved'
         except (RiotFailure,ValueError,OSError,TypeError,KeyError) as exc:
             self.message=str(exc) if isinstance(exc,(RiotFailure,ValueError)) else 'Enrichment could not be saved; original data is preserved'
             self.pending.popleft()

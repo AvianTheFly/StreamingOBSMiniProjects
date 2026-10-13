@@ -2,7 +2,7 @@ import { state } from './state.js';
 import { feature, icon } from './catalog.js';
 import { esc } from './utils.js';
 
-const SHORTCUTS = ['instant_replay', 'soundboard', 'specific_song', 'scene_voice_switcher', 'starting_soon'];
+const SHORTCUTS = ['instant_replay', 'soundboard', 'spotify', 'scene_voice_switcher', 'starting_soon'];
 let _page = 'dashboard';
 
 export function initNav(navigate) {

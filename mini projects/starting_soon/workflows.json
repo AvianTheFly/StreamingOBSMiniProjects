@@ -50,8 +50,8 @@
       ],
       "owner_hashes": {
         "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
-        "starting_soon": "5ee563e95c9990438f778ae9cdba15e8042bdba73a22cbcb0ef1680fc2e94d07",
-        "coordination": "c4fc5a67e5e47be4bc18ef0c9359201377f1dcd8de6671d557968aab81c68b17"
+        "starting_soon": "782dc00ebed03a680b05d4be8f2411f375808f61f174269b98a51ad970aace86",
+        "coordination": "75830bfb9b0c501c3bde2e42d470c914410b3e8310d04af7c61f48505744b6d5"
       },
       "edges": [
         {
@@ -71,7 +71,7 @@
         {
           "path": "mini projects/starting_soon/service.py",
           "symbol": "StartingSoon.execute",
-          "hash": "7b33908a6793aed9c769fe608197ff0418c24160d9d5df3945d248440ff631e1"
+          "hash": "0165e101465033f871c55ed54c1e74171be8fa3e32695ddcdda345ee55dab507"
         }
       ]
     },
@@ -131,9 +131,9 @@
       ],
       "owner_hashes": {
         "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
-        "starting_soon": "5ee563e95c9990438f778ae9cdba15e8042bdba73a22cbcb0ef1680fc2e94d07",
-        "coordination": "c4fc5a67e5e47be4bc18ef0c9359201377f1dcd8de6671d557968aab81c68b17",
-        "media_workers": "99a1a00f5854b87301b5e62b0837f5e035bf87e45a4552403c603e0e3de1f064"
+        "starting_soon": "782dc00ebed03a680b05d4be8f2411f375808f61f174269b98a51ad970aace86",
+        "media_workers": "430dcd38f7473e0ef7852463e4282093c752c1e3ce682b8b599edad0ed625c55",
+        "coordination": "75830bfb9b0c501c3bde2e42d470c914410b3e8310d04af7c61f48505744b6d5"
       },
       "edges": [
         {
@@ -166,7 +166,7 @@
         {
           "path": "mini projects/starting_soon/service.py",
           "symbol": "StartingSoon.execute",
-          "hash": "7b33908a6793aed9c769fe608197ff0418c24160d9d5df3945d248440ff631e1"
+          "hash": "0165e101465033f871c55ed54c1e74171be8fa3e32695ddcdda345ee55dab507"
         }
       ]
     },
@@ -237,11 +237,11 @@
         {
           "path": "mini projects/starting_soon/service.py",
           "symbol": "StartingSoon.status",
-          "hash": "71f12008da5f79d61c18d61b74203e5ef399f564928bd7676afcd1c8be99f3ff"
+          "hash": "f30747fa8834106444ffdba89426171b7a26d0e364fb3e5672f0a0674fc187cb"
         }
       ],
       "owner_hashes": {
-        "starting_soon": "034269c9d36ddc168fbdd32b28df62984b9ca56729322dd5c8134be40c65c922"
+        "starting_soon": "782dc00ebed03a680b05d4be8f2411f375808f61f174269b98a51ad970aace86"
       }
     },
     {
@@ -249,11 +249,11 @@
       "label": "Play Sanctuary opening",
       "topic": "Stream opening",
       "trigger": {
-        "label": "Play intro / Skip to lobby",
+        "label": "Play intro / Cinematics / Skip to lobby",
         "event": "hub_action",
         "kind": "control"
       },
-      "detail": "The approved 40-second Sanctuary edit plays once on the existing clip worker and owned nested stage. Cleanup precedes source reuse and exact transform restoration; per-asset faders remain with ClipLevels. Completion or Skip asks the scene-switcher public interface to enter a lobby with the captured manual revision. Newer scene choices cancel that return. Decode failure returns to Starting Soon and exposes an error. The same service loop owns opening state and cleanup; there is no second worker.",
+      "detail": "The retained calm intro or explicitly selected October 10 ram-impact cinematic plays once on the existing clip worker and owned nested stage. Cleanup precedes source reuse and exact transform restoration; per-asset faders remain with ClipLevels. Completion or Skip asks the scene-switcher public interface to enter a lobby with the captured manual revision. Newer scene choices cancel that return. Decode failure returns to Starting Soon and exposes an error. The same service loop owns opening state and cleanup; there is no second worker.",
       "steps": [
         {
           "id": "0",
@@ -313,7 +313,7 @@
         {
           "path": "mini projects/starting_soon/opening.py",
           "symbol": "Opening.start",
-          "hash": "347a5a615704374feb8c124819f251f029dcd6b1237e38b2834723ea0c69527e"
+          "hash": "3f5e451109a1b6224326c0d270386cada751b216066e7d0c441d9334aaf2ec8e"
         },
         {
           "path": "mini projects/starting_soon/opening.py",
@@ -328,13 +328,13 @@
         {
           "path": "mini projects/starting_soon/opening.py",
           "symbol": "Opening.close",
-          "hash": "7d0d69d16cfc534f50d9efe9c4fc5ea6d96f7d5edcc065b0331dc68bd09c2e99"
+          "hash": "86c0c70d6931bb15165136c82d368bf1c39ee83a6c657544da7b50be21fee92f"
         }
       ],
       "owner_hashes": {
-        "scene_voice_switcher": "d22677dc856ffd2f18ebc165dbb5a6d6dd8be248e85508bb1ef5ba04b6f9ad86",
-        "starting_soon": "5ee563e95c9990438f778ae9cdba15e8042bdba73a22cbcb0ef1680fc2e94d07",
-        "coordination": "c4fc5a67e5e47be4bc18ef0c9359201377f1dcd8de6671d557968aab81c68b17"
+        "scene_voice_switcher": "657288d0fe9ddd1d750b6a28373f8898ad636b2d07587d11e27791817c6ac08d",
+        "starting_soon": "782dc00ebed03a680b05d4be8f2411f375808f61f174269b98a51ad970aace86",
+        "coordination": "75830bfb9b0c501c3bde2e42d470c914410b3e8310d04af7c61f48505744b6d5"
       }
     }
   ]

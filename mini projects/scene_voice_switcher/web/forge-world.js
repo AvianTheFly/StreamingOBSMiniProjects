@@ -15,6 +15,7 @@ scene.patches.push(
  {rect:[1422, 409, 294, 304],move:(u,v,t)=>[Math.sin(t*.9+v)*3*edge(u,v),Math.cos(t*1.3+u)*5*edge(u,v)]},
  {rect:[1661, 418, 240, 364],move:(u,v,t)=>[Math.sin(t*.9+v)*2*edge(u,v),Math.cos(t*1.3+u)*4*edge(u,v)]}
 );
-scene.artUrl='./art/forge-chaos-v1.png';
+scene.artUrl='./art/forge-habitat-v3.png';scene.adaptiveScreen=true;scene.residents=false;
+scene.patches.push({rect:[160,325,395,325],move:(u,v,t)=>[Math.sin(t*2.7+v*7)*2*edge(u,v),Math.sin(t*3.4+u*6)*3*edge(u,v)]});
 const comic=chaosCast(scene.id);
 export const world={scene,cues:comic.cues,artists:comic.artists,seed:83,createMotion:()=>new PaintedWorld(scene,forgeAmbience)};

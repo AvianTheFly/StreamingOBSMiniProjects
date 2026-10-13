@@ -65,7 +65,8 @@ class LeagueClient:
             if not isinstance(message, list) or len(message) < 3 or message[:2] != [8, 'OnJsonApiEvent']:
                 return False
             uri = message[2].get('uri')
-            return uri in {'/lol-gameflow/v1/gameflow-phase', '/lol-champ-select/v1/session'} or (
+            return uri in {'/lol-gameflow/v1/gameflow-phase', '/lol-gameflow/v1/session', '/lol-champ-select/v1/session',
+                           '/lol-matchmaking/v1/search', '/lol-lobby/v2/lobby'} or (
                 isinstance(uri, str) and uri.startswith('/lol-chat/v1/conversations'))
         except (TypeError, ValueError, AttributeError):
             return False
@@ -100,12 +101,46 @@ class LeagueClient:
         if not isinstance(messages, list):
             return []
         local_cell = session.get('localPlayerCellId')
-        local_player = next((p for p in session.get('myTeam', []) if p.get('cellId') == local_cell), {})
+        local_player = next((p for p in session.get('myTeam', [])
+                             if isinstance(p, dict) and local_cell is not None and p.get('cellId') == local_cell), {})
         local_summoner = local_player.get('summonerId')
+        def sender(message):
+            identity = message.get('fromSummonerId')
+            if local_summoner and identity == local_summoner:
+                return 'YOU'
+            for index, player in enumerate(session.get('myTeam') or []):
+                if not isinstance(player, dict):
+                    continue
+                if identity and str(identity) == str(player.get('summonerId')):
+                    return str(player.get('obfuscatedSummonerName') or player.get('gameName')
+                               or player.get('summonerName') or f'Teammate {index + 1}')[:64]
+            # Never infer an identity when the client withholds its mapping.
+            return 'TEAM'
         return [{'id': str(m.get('id', ''))[:100],
                  'body': str(m.get('body', ''))[:500],
-                 'sender': 'YOU' if local_summoner and m.get('fromSummonerId') == local_summoner else 'TEAM'}
+                 'sender': sender(m)}
                 for m in messages[-10:] if isinstance(m, dict) and m.get('type') in {'chat', 'groupchat'} and m.get('body')]
+
+    def queue_details(self, phase):
+        """Read only timer and local role preferences; optional endpoints fail alone."""
+        result = {}
+        if phase not in {'Lobby', 'Matchmaking', 'ReadyCheck', 'ChampSelect'}:
+            return result
+        try:
+            search = self.get('/lol-matchmaking/v1/search')
+            if isinstance(search, dict):
+                result.update(seconds=search.get('timeInQueue'), search_state=search.get('searchState'))
+        except (OSError, ValueError, TypeError):
+            pass
+        try:
+            lobby = self.get('/lol-lobby/v2/lobby')
+            if isinstance(lobby, dict) and isinstance(lobby.get('localMember'), dict):
+                member = lobby['localMember']
+                result.update(roles_known=True, primary=member.get('firstPositionPreference'),
+                              secondary=member.get('secondPositionPreference'))
+        except (OSError, ValueError, TypeError, AttributeError):
+            pass
+        return result
 
     def snapshot(self):
         phase = self.get('/lol-gameflow/v1/gameflow-phase')
@@ -121,4 +156,33 @@ class LeagueClient:
                 pass
             if not isinstance(session, dict):
                 session = None
+        elif phase in {'GameStart', 'InProgress', 'Reconnect', 'WatchInProgress'}:
+            try:
+                session = self.get('/lol-gameflow/v1/session')
+            except (OSError, ValueError, TypeError):
+                pass
         return phase, session
+
+    def replay_active(self):
+        """Observe the replay game process without requiring the optional API.
+
+        None means a game process could not be inspected; callers retain their
+        last observation. Inspect command lines only for the game executable.
+        """
+        import psutil
+        uncertain = False
+        from lib.process_inventory import process_snapshot
+        for entry in process_snapshot():
+            if entry.name.lower() != 'league of legends.exe':
+                continue
+            try:
+                process = psutil.Process(entry.pid)
+                if process.name().lower() != 'league of legends.exe':
+                    continue  # Reject PID reuse after the discovery snapshot.
+                if any(str(arg).strip('"').lower().endswith('.rofl') for arg in process.cmdline()[1:]):
+                    return True
+            except psutil.NoSuchProcess:
+                continue
+            except psutil.AccessDenied:
+                uncertain = True
+        return None if uncertain else False

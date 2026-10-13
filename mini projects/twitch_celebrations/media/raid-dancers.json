@@ -1,0 +1,78 @@
+{
+  "toothless": {
+    "file": "raid-toothless.png",
+    "frames": 133,
+    "fps": 12,
+    "size": 160,
+    "columns": 12,
+    "source": "https://tenor.com/view/toothless-dance-toothless-dance-toothless-dancing-meme-gif-transparent-gif-1646950359065166559",
+    "download": "https://media1.tenor.com/m/FtskoCrIAt8AAAAC/toothless-dance.gif"
+  },
+  "mob": {
+    "file": "raid-mob.png",
+    "frames": 73,
+    "fps": 12,
+    "size": 160,
+    "columns": 12,
+    "source": "https://tenor.com/view/mob-psycho100-mob-anime-fortnite-default-dance-gif-16198946",
+    "download": "https://media1.tenor.com/m/x6vauTszOFMAAAAC/mob-psycho100-mob.gif"
+  },
+  "spin-cat": {
+    "file": "raid-spin-cat.png",
+    "frames": 83,
+    "fps": 12,
+    "size": 160,
+    "columns": 12,
+    "source": "https://tenor.com/view/oiiai-cat-spinning-cat-gif-1612071084703334682",
+    "download": "https://media1.tenor.com/m/Fl86HERrwRoAAAAC/oiiai-cat-spinning-cat.gif"
+  },
+  "dance-cat": {
+    "file": "raid-dance-cat.png",
+    "frames": 120,
+    "fps": 12,
+    "size": 160,
+    "columns": 12,
+    "source": "https://tenor.com/view/%E7%8C%AB-%E8%B8%8A%E3%82%8B-gif-4389291444870408137",
+    "download": "https://media1.tenor.com/m/POnlUEspZ8kAAAAC/%E7%8C%AB-%E8%B8%8A%E3%82%8B.gif"
+  },
+  "crab": {
+    "file": "raid-crab.png",
+    "frames": 89,
+    "fps": 12,
+    "size": 160,
+    "columns": 12,
+    "source": "Existing local crab-rave-dance.mp4"
+  },
+  "minions": {
+    "file": "raid-minions.png",
+    "frames": 13,
+    "fps": 12,
+    "size": 160,
+    "columns": 12,
+    "source": "Existing local minions-dance.mp4"
+  },
+  "tobey": {
+    "file": "raid-tobey.png",
+    "frames": 69,
+    "fps": 12,
+    "size": 160,
+    "columns": 12,
+    "source": "Existing local tobey-dance.mp4"
+  },
+  "squidward": {
+    "file": "raid-squidward.png",
+    "frames": 19,
+    "fps": 12,
+    "size": 160,
+    "columns": 12,
+    "source": "Existing local squidward-dab.mp4"
+  },
+  "pedro": {
+    "file": "raid-pedro.png",
+    "frames": 88,
+    "fps": 12,
+    "size": 160,
+    "columns": 12,
+    "source": "Existing local pedro-dance.mp4"
+  }
+}

@@ -142,6 +142,9 @@ class AnalysisBatch:
         self.store, self.payload = store, dict(payload)
         self.repository = AnalysisStore(store)
         self.videos = candidates(store,payload.get('ids'))
+        if payload.get('only_new'):
+            pending = set(self.repository.pending_ids(self.videos))
+            self.videos = [video for video in self.videos if video['id'] in pending]
         self.options = {k:payload[k] for k in ('sample_seconds','audio_track','audio') if k in payload}
         self.results, self.errors = [], []
         self.index, self.detector = 0, None

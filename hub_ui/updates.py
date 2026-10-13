@@ -30,6 +30,7 @@ class EventInbox(queue.Queue):
 DOMAIN_EVENTS = (
     "coordinator.project_paused", "coordinator.play_cleared",
     "coordinator.project_resumed", "game.connected", "game.disconnected", "sfx.play",
+    "chat.overlay.notice",
 )
 
 

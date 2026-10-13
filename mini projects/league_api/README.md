@@ -1,5 +1,136 @@
 # League API alerts
 
+## Purchase detection research — checked October 13, 2026
+
+The selected live flow is the existing shared Live Client snapshot → local-player
+inventory and gold → recipe accounting → bounded celebration queue → existing OBS
+browser. Purchases remain **inferred**. Riot documents inventory and gold endpoints,
+but no live shop-transaction endpoint. One combined snapshot also avoids creating
+independent inventory/gold requests. The Hub already needs the other game fields.
+[Riot Live Client documentation](https://developer.riotgames.com/docs/lol#live-client-data-api).
+
+The cached catalog and North America's item realm both report **16.20.1**. A
+read-only comparison against this installed client's
+`/lol-game-data/assets/v1/items.json` found 870 matching item IDs, with no differences
+in total prices or direct recipes. The installed-client catalog is a useful
+cross-check, not a live transaction source. Riot provides fewer guarantees for
+LCU endpoints. Data Dragon can lag patches, so the preparation tool now selects
+the regional item version instead of the newest global release. An explicit
+`--version` is available for controlled patch maintenance.
+[Riot versioning guidance](https://developer.riotgames.com/docs/lol#data-dragon),
+[North American realm](https://ddragon.leagueoflegends.com/realms/na.json).
+
+Sources considered:
+
+| Source | Value for this feature | Decision |
+| --- | --- | --- |
+| Live Client API | Current local inventory, stacks, gold and runes | Primary live input, through the existing shared cache |
+| Data Dragon and installed-client item data | IDs, prices, components and transformation relationships | Use cached recipes and local icons; verify against the installed patch |
+| Overwolf GEP | Documents live-client data plus current/total gold; no dedicated purchase event found in its current League event list | Potential experiment for better gold accounting, not a demonstrated transaction feed or an installed dependency |
+| Match-v5 timeline | Post-match purchase, destruction, sale and undo history | Useful future validation against completed matches; not suitable for live popup timing |
+| Screen/OCR observation | Could corroborate the player's visible shop actions | Secondary experiment only; UI scale, hidden shop and fast actions create ambiguity |
+| Game-memory readers | Older integrations may derive extra events this way | Do not build a new dependency on this route |
+
+[Overwolf's current League event reference](https://dev.overwolf.com/ow-native/live-game-data-gep/supported-games/league-of-legends/)
+documents `gold` and `total_gold`; their live availability and accounting semantics
+were not tested here. Riot began blocking unknown third-party memory access on
+October 6, with a transition period for approved existing tools through April
+2027. This makes older memory-based guides a poor foundation for new work.
+[Riot's September 29 notice](https://support.riotgames.com/en-us/riot/performance/game-memory-access-removed-for-third-party-apps).
+
+Current corrections:
+
+- Reconcile up to eight snapshots across 1.25 seconds, covering gold-first,
+  inventory-first, and component-removal-before-result updates. Consumed evidence
+  cannot trigger another purchase. Invalid or discontinuous observations discard
+  pending evidence; reconnects and permission gates retain their existing resets.
+- Subtract consumed components recursively. Zero-cost boot/support upgrades are
+  ignored even when another purchase spends gold in the same interval. A purchase
+  immediately transforming into its final item can display that observed final ID.
+  Riot explicitly documents free mid-lane boot upgrades, including on purchase.
+  [26.1 notes](https://www.leagueoflegends.com/en-us/news/game-updates/patch-26-1-notes/).
+- Account for known sales, stack quantities and one-unit returns. Count changes
+  ignore slot order. Magical Footwear can fund ordinary boot upgrade recipes.
+- Account for Cash Back when rune 8321 is present. The verified current rate is
+  **7.5%**, not the 6% still shown by some older references. Legendary eligibility
+  is inferred from the terminal paid recipe graph with boots/consumables/support
+  categories excluded; it is not an authoritative rarity field. The rebate can
+  exceed an item's remaining combine cost, producing a net gold increase.
+  [26.3 notes](https://www.leagueoflegends.com/en-us/news/game-updates/patch-26-3-notes/),
+  [16.20.1 rune data](https://ddragon.leagueoflegends.com/cdn/16.20.1/data/en_US/runesReforged.json).
+- Allow 40-gold control wards when a completed support quest item is observed.
+  This only helps if the ward is actually represented in the live inventory;
+  visibility of the role quest slot has not been verified in a running match.
+  [26.1 support changes](https://www.leagueoflegends.com/en-us/news/game-updates/patch-26-1-notes/).
+
+Limits: buy-and-undo entirely between polls, immediately consumed purchases,
+unexposed quest slots, concurrent large gold rewards, mode-specific discounts,
+and mismatched patch data can still cause misses or ambiguity. Same-poll events
+do not reveal true click order. Sale credits and rarity are heuristic. The five
+gold accounting allowance covers only small passive-income/rounding differences.
+Patch-specific refund and discount rules need review when the catalog is updated.
+
+The right next validation is a controlled Practice Tool session covering direct
+buys, component combines, multi-buys, sale/undo/rebuy, Cash Back and quest upgrades,
+comparing visible shop actions with the detector. No live match was available
+during this review, so no measured accuracy percentage is claimed. After-match
+timeline comparison would add evidence, but should reconcile undos carefully:
+an open July 2026 report describes missing item IDs on tier-three boot undos.
+This is a reported API defect, not independently reproduced here.
+[Riot developer-relations issue 1174](https://github.com/RiotGames/developer-relations/issues/1174).
+
+### Sales and undo follow-up — October 13, 2026
+
+The initial cancellation rule required a disappearance and a gold increase. That
+missed selling while buying something more expensive, and undoing a Cash Back
+combine that originally increased gold. The detector now keeps up to 64 inferred
+unit receipts for 120 seconds. This is a bounded inference horizon, not a claim
+about how long the game's Undo button remains available.
+
+| Observed action | Popup behavior |
+| --- | --- |
+| Sell an item | Cancel that many matching queued/current purchase cues when the gold balance supports a sale |
+| Undo an observed purchase | Cancel its original cue identity, including a completed recipe or immediate boot transformation |
+| Components return after undo | Do not celebrate those restored components as purchases |
+| Undo an observed sale | Restore inventory silently; do not replay the old purchase chime |
+| Buy the item again at its purchase price | Create a fresh purchase cue |
+| Sell/undo one item and buy another in one poll | Account for the combined balance; only the new purchase gets a cue |
+| Consume an item or complete a recipe | A disappearance alone does not establish a sale or refund |
+
+Each purchase receipt records its observed result, consumed component counts,
+ordinary and rune-adjusted cost possibilities, and popup identity. Sale receipts
+use item-specific catalog proceeds. Matching an inverse inventory change also
+requires the corresponding gold balance, with five gold of rounding/passive
+income allowance. Reversed receipts and snapshot evidence are consumed once.
+Normal component consumption takes priority over a financially equivalent
+undo-and-repurchase interpretation. Gold-first and inventory-first updates retain
+the existing 1.25-second correlation window. Duplicate snapshots preserve history;
+invalid data, discontinuities, reconnects and existing pause gates discard it.
+
+The current 16.20.1 data gives Boots a 300 purchase/210 sale price, Health Potion
+50/20, and Slightly Magical Footwear a 90 sale value. A universal 70% resale rule
+would therefore be wrong. The detector uses the per-item `gold.sell` data.
+[Riot item catalog](https://ddragon.leagueoflegends.com/cdn/16.20.1/data/en_US/item.json),
+[Riot's Magical Footwear sale change](https://www.leagueoflegends.com/en-ph/news/game-updates/patch-13-4-notes/).
+
+Riot's 26.15 notes explicitly fixed the inability to undo mid-lane tier-three
+boots. A later open developer report says the post-match undo event can contain
+zero item IDs. The live implementation consequently matches its own observations
+and does not depend on post-match IDs or assume a positive refund.
+[26.15 bug fix](https://www.leagueoflegends.com/en-us/news/game-updates/league-of-legends-patch-26-15-notes/),
+[reported timeline defect](https://github.com/RiotGames/developer-relations/issues/1174).
+
+Cash Back sale accounting considers both nominal proceeds and proceeds minus the
+modeled rebate; a matching balance is required. These are inference alternatives,
+not verified live transaction fields. Multiple simultaneous actions, coincident
+gold rewards, partially observed rebate timing, and old/missing history can remain
+ambiguous. Actions completed entirely between observations remain invisible.
+An already heard chime cannot be taken back; detection stops the remaining cue
+and audio on the next overlay update. No sale/undo sound or new overlay is added.
+Offline tests cover these reversals; the browser test verifies active sale/undo
+cancellation, silence on undo-sale and a fresh chime on a real repurchase. Live
+Practice Tool validation remains outstanding.
+
 ## Cinematic match screens
 
 The production page has a cinematic match-screen checkbox, three preview buttons,
@@ -243,6 +374,11 @@ Matchmaking, ready checks, planning and incomplete bans select one available
 location in `Lobbies` from the shared published catalog, hiding the central
 desktop capture and Tavern's separate `league client` view. The location stays
 fixed through ready checks and bans; each new entry avoids the previous location.
+An explicit lobby-screen choice takes precedence over the legacy desktop gate;
+the installed default is the existing Udyr animation. The Hub's **Lobby / queue**
+view offers Udyr animation, League client, Desktop and Google Chrome. Choices
+change references inside the shared screen scene, preserving original inputs,
+filters, audio levels and each lobby's saved screen placement.
 When all bans complete (or a queue has no bans and picks begin), it selects
 `League Champion Select World`, a separate scene with the custom browser source
 and the existing `FaceCamWithProps` scene source behind a camera-shaped opening
@@ -272,27 +408,120 @@ in `client_scenes.json`; `idle_presentation` chooses `lobby` or `scene` while
 retaining `idle_scene`. Settings backups include that file. Existing configs
 without the new field keep their configured scene mode.
 
+### Queue timer and roles
+
+The existing **League Queue Badge** browser source serves
+`http://127.0.0.1:7431/stage/queue` at 1920 × 1080. It reads the client's
+`timeInQueue` and local primary/secondary position preferences through the existing
+LCU transport. Initial matchmaking stays aligned with the client clock. The
+timer continues through ready check, planning and bans; completed bans freeze and
+hide it as the draft scene opens. Modes without bans wait for confirmed picking.
+An automatic dodge/requeue retains the original journey even if the client clock
+resets. Confirmed cancellation clears the timer immediately; an uncertain Lobby
+transition gets a two-second bridge before reset. Unavailable client data hides
+the overlay, and unavailable preferences are labeled rather than invented.
+
+The Hub's **Queue timer** chooser offers Bear thunder claws, Turtle protection,
+Ram resolve and Phoenix storm, plus timed rotation. Each theme uses
+an orbiting, faceted spirit relic with opening crests, engraved claws, growing
+laurels, shell petals or feather coronas and a distinct elemental track: thunder pulses,
+flowing water, seismic ridges or braided wind. The larger phase heading, softly
+revealed clock digits and role chips sit in a clear central column; redundant
+spirit subtitles and match-finding filler are removed. The right side is a
+persistent miniature world: a rotating ice cathedral with travelling currents,
+a jade lotus garden with curved petals and swimming koi, an orbiting forge with
+bevelled tools and moving stonework, or a phoenix aviary with articulated wings,
+banking flight and trailing feathers. Depth, camera drift, material shading and
+continuous paths keep the scenery moving as its choreography changes.
+Original lore-inspired tableaux now inhabit these worlds: a spectral storm-bear
+with flowing fur and thunder claws; a swimming jade turtle with articulated
+flippers, prayer beads and protective veils; immense ram horns above a volcanic
+forge; and a cryophoenix surrounded by branching frost currents and rebirth
+crystals. A small spirit-walker channels currents into each apparition, with
+swaying talismans in the bear and turtle scenes. These are artistic interpretations
+informed by [Riot's Udyr design notes](https://www.leagueoflegends.com/en-gb/news/dev/udyr-vgu-rebuilding-the-spirit-walker/).
+The retained turtle draws from [Spirit Guard's Ionian protective spirit](https://www.leagueoflegends.com/en-us/news/game-updates/updating-spirit-guard-udyr/);
+the four-theme selection deliberately mixes that inspiration with Freljord imagery.
+Each spirit has twelve acts: four choreography variations and eight supporting
+effects. Each 45-second appearance
+chooses two different performances and one supporting effect in random order.
+Crystal formations open into bridges and crowns; lotus petals rise into canopies;
+the forge changes its orbit and vertical rhythm; phoenix flight opens into a
+flock, dive or silk wake. Nineteen-second gestures overlap for four seconds,
+blending the same geometry instead of disappearing between short performances.
+Supporting effects include constellations, auroras, shell waves and feather storms.
+Text masks keep the clock column clear.
+**Shuffle spirits · 45s** visits all four spirits in shuffled batches with a
+four-second moving crossfade and no immediate repeat between batches. A browser-session
+seed and the journey identity choose the schedule. A monotonic artwork clock is
+seeded once from queue time; later API clock corrections affect the timer digits
+without resetting or seeking the animation. Picking a named spirit keeps it fixed while its
+three-effect selection changes every 45 seconds.
+Reduced-motion preferences keep the symbol and backdrop static. Hidden
+OBS sources stop polling and drawing. **Preview timer · off stream** is a private
+sample with its own spirit picker, Play/Pause, **New mix** and **Explore loop**
+scrubber. **Explore act** blends into any of the 48 acts and keeps it moving
+continuously; starred acts are the four choreography variations for each world.
+Choosing another act or mix preserves the motion clock. Scrubbing deliberately
+seeks to the chosen moment and pauses the preview.
+**New mix** restores the normal three-act appearance, listed beneath the controls.
+Explore these moments without saving a theme or changing OBS. Those controls
+appear only in the preview. Theme and display choices do not require a
+restart or switch the program scene.
+
 ### Custom champion select world
 
-The live browser scene is `http://127.0.0.1:7431/champ-select`. URLs with
-`?demo=1` show fixed sample champions and chat for preview only. The League production
-controls at `/production` show previews of five worlds and a theme selector;
-`random` chooses a new world per draft. The local team is always left, the enemy
-team right. Each has five portrait picks and five small bans. Champion portraits,
-ban icons, and names are cached from Riot Data Dragon in `media/champion-portraits`,
-`media/champions`, and `champion_catalog.json`. Refresh the cache after a League
-patch with `py -3.11 tools/cache_league_champions.py` from the repository root.
+The live browser is `http://127.0.0.1:7431/champ-select`; `?demo=1&theme=bear`
+opens local rehearsal controls. The four new Udyr-inspired worlds are Thunderclaw
+(bear), Jade Aegis (turtle), Golden Summit (ram), and Ash & Aurora (phoenix).
+The production and Live Desk selectors offer these four; random chooses once per
+draft. Retired saved choices resolve to their matching successor without rewriting
+the settings file. Original earlier artwork remains available on disk.
 
-The watcher uses the already connected `/lol-champ-select/v1/session` stream to
-render tentative and completed picks, completed bans, and the client's countdown
-using its millisecond timer and turn timestamp. It
-reads only the active champion-select chat conversation; direct messages are not
-shown. The browser page receives no lockfile credentials or chat room password.
-During planning and bans the overlay state omits picks, bans, and chat. The OBS
-scene still switches only when the existing ban-completion route permits it.
-`tools/preview_champ_select.cjs` renders all five demo themes without a League
-client and checks the 5+5 picks, 5+5 bans, portraits, and reveal transitions.
-If the OBS scene is removed, run `py -3.11 tools/install_champ_select_scene.py`
-from the repository root while OBS is open to recreate the browser and facecam
-scene items. It snapshots settings first and leaves the older champ-select group
-untouched.
+Each side has exactly five portrait shrines and five ban sockets. Role plaques
+sit above portraits and nameplates below; aliases cannot hide roles. TOP, JUNGLE,
+MID, BOT and SUPPORT come from the client, with ROLE TBD for missing assignments.
+The local player has a small inset diamond rather than a floating YOU label.
+Team labels, live camera aperture, draft timer and team chat remain readable.
+`layout.js` owns 1920x1080 furniture coordinates, and source contacts are measured
+against each new painting in `scene-map.js`.
+
+The paintings stay still. `world-art.js` gives their basins currents, flame tongues,
+ripples and reflected light. `spirit-locks.js` stages storm-claw tears, a jade
+barrier, a charging molten ram and a rising ice/fire phoenix. Power gathers for
+.42 seconds, travels for .30 seconds, then hits at .72 seconds. The portrait and
+frame use that same clock. Heavy fragments, droplets, branching lightning and
+feathers have different trajectories and lifetimes; aftermath lights the selected
+shrine and its dais. Four alpha paintings retain body color instead of turning
+into uniform white outlines. A bounded precomputed atlas erodes their edges into
+vapor; no background image is distorted. Ban seals converge on the new ban, chat
+couriers arrive at the receiving rail and ready lighting sweeps across the team.
+`vfx-timing.js` owns synchronization; `vfx-ink.js` owns analytic drawing mechanics.
+`world-assets.js` releases the active effect and sixteen small erosion frames with
+its existing background/guest lifetime. Artwork prompts and provenance live in
+`media/champ-select/vfx/provenance.json`. The read-only review is
+`tools/test_champ_select_vfx.cjs`; research and phase captures are in
+`output/champ-select-vfx/`.
+`spirit-secrets.js` rotates three tiny discoveries per world: curious Kirby,
+a pearl-stealing goose, a forge apprentice and Boo at the thermal boundary.
+One ten-second act follows eight seconds of initial quiet, then quiet gaps;
+draft events take priority. Hidden detail in the demo advances these variations.
+No preview control sends game actions, changes scenes or saves preferences.
+
+`world-motion.js` owns one capped 30 FPS loop and at most twenty 4.2-second cues.
+The existing visibility poller stops requests and drawing while hidden; assets
+and poses release on hiding/teardown. No mesh warping is used. Role/name plates
+are cleared from the effect canvas and the camera uses its preserved aperture.
+Reduced motion is static. New draft, theme or hidden return establishes a fresh
+baseline, preventing replay of old locks/bans/chat. Normal routing still waits
+until bans finish; the completed ban rack appears without historical impacts.
+
+Champion art remains cached from Riot Data Dragon in `media/champion-portraits`,
+`media/champions` and `champion_catalog.json`. Team chat only uses the active draft
+conversation; no direct messages or client credentials reach the page.
+Generated originals and the exact built-in imagegen prompts live in
+`media/champ-select/udyr-originals`. Display JPEGs preserve those compositions.
+Fonts and their OFL licenses ship locally under `champ_select_web/fonts`.
+Run `tools/test_champ_select_alignment.cjs` and `test_champ_select_reactions.cjs`
+for responsive geometry, privacy/event semantics, lifecycle and visual rehearsal.
+Outputs are under `output/champ-select-spirits`.

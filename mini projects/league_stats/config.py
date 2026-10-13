@@ -11,7 +11,7 @@ PATH = Path(__file__).parent / 'settings.json'
 DEFAULTS = dict(allow_moderators=True, helpers=[], cooldown_seconds=15,
                 helper_enabled=True, include_custom=False, region='na1',
                 custom_counters={}, blocked_helpers=[], viewer_requests=True,
-                request_cooldown_seconds=10,cs_goal=7,chat_replies=True)
+                request_cooldown_seconds=10,cs_goal=7,chat_replies=True,postgame_auto=True)
 REGIONS = {'na1':'americas', 'br1':'americas', 'la1':'americas', 'la2':'americas',
            'euw1':'europe', 'eun1':'europe', 'tr1':'europe', 'ru':'europe',
            'kr':'asia', 'jp1':'asia', 'oc1':'sea', 'ph2':'sea', 'sg2':'sea',
@@ -28,7 +28,7 @@ def read(path=PATH):
 def validate(result):
     if isinstance(result['cs_goal'],bool) or not isinstance(result['cs_goal'],(int,float)) or not 1<=result['cs_goal']<=15:
         raise ValueError('CS goal must be between 1 and 15 per minute')
-    for key in ('allow_moderators','helper_enabled','include_custom','viewer_requests','chat_replies'):
+    for key in ('allow_moderators','helper_enabled','include_custom','viewer_requests','chat_replies','postgame_auto'):
         if not isinstance(result[key],bool):
             raise ValueError(f'{key} must be true or false; original settings preserved')
     for key in ('cooldown_seconds','request_cooldown_seconds'):

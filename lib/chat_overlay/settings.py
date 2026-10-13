@@ -11,10 +11,10 @@ from lib.settings_backups import SettingsBackups
 PATH = PROJECT_ROOT / 'chat_overlay_settings.json'
 LOCK = threading.RLock()
 DEFAULTS = dict(channel='', theme='glass', font='Segoe UI', font_size=17,
-                emote_size=34, opacity=32, max_messages=6, fade_seconds=60,
+                emote_size=34, opacity=32, max_messages=10, fade_seconds=60, fade_hold_seconds=0,
                 accent='#76e4cf', motion=True, badges=True, hide_bots=True,
                 hidden_users=['nightbot', 'streamelements', 'streamlabs'],
-                replacements={}, show_header=False, focus_mode='auto',
+                replacements={}, text_replacements={}, literal_words=[], show_header=False, focus_mode='auto',
                 text_opacity=68, hover_opacity=94, natural_stickers=True, max_stickers=6,
                 auto_start=False, message_gap=5, line_height=135)
 
@@ -60,7 +60,7 @@ def save(patch):
             raise ValueError('Choose a supported font.')
         for name, low, high in [('font_size', 12, 32), ('emote_size', 20, 72),
                                 ('opacity', 0, 90), ('max_messages', 1, 12),
-                                ('fade_seconds', 0, 300), ('text_opacity', 55, 100),
+                                ('fade_seconds', 0, 300), ('fade_hold_seconds', 0, 300), ('text_opacity', 55, 100),
                                 ('hover_opacity', 55, 100), ('max_stickers', 1, 12),
                                 ('message_gap', 0, 12), ('line_height', 115, 160)]:
             value = result[name]
@@ -75,12 +75,25 @@ def save(patch):
         if not isinstance(users, list) or len(users) > 100 or any(not isinstance(u, str) or not re.fullmatch(r'[a-zA-Z0-9_]{1,25}', u) for u in users):
             raise ValueError('Hidden users must be a list of Twitch usernames.')
         result['hidden_users'] = [u.lower() for u in users]
+        literals = result['literal_words']
+        if (not isinstance(literals, list) or len(literals) > 500
+                or any(not isinstance(word, str) or not word.strip() or len(word) > 80
+                       or any(ord(c) < 32 for c in word) for word in literals)):
+            raise ValueError('Words kept as text must be a list of up to 500 words or short phrases.')
         replacements = result['replacements']
         if not isinstance(replacements, dict) or len(replacements) > 200:
             raise ValueError('Sticker replacements must be an object with at most 200 entries.')
         for word, url in replacements.items():
             if not isinstance(word, str) or not word.strip() or len(word) > 80 or any(ord(c) < 32 for c in word) or not image_url(url):
                 raise ValueError('Each sticker needs a word or short phrase and an HTTPS image URL or /viewer_assets/ path.')
+        words = result['text_replacements']
+        if not isinstance(words, dict) or len(words) > 200:
+            raise ValueError('Text replacements must be an object with at most 200 entries.')
+        for word, text in words.items():
+            if (not isinstance(word, str) or not re.fullmatch(r'\w{1,80}', word)
+                    or not isinstance(text, str) or not text.strip() or len(text) > 200
+                    or any(ord(c) < 32 for c in text)):
+                raise ValueError('Each text replacement needs one word and nonempty text (up to 200 characters).')
         SettingsBackups().snapshot()
         write_json(PATH, result)
         return result

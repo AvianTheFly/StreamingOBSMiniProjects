@@ -39,12 +39,13 @@ the README rebuild commands. Render, optimize and build previews with arguments
 `bear bear-alt`. The finite Python exporters/installers honor that output root,
 allowing independent versioned exports without changing another task's directory.
 
-`tools/test_bear_front.cjs` compares sixteen exported approach frames against the
-immutable accepted source in the same Chrome process. It checks native ratios,
-view completeness, visible painted claw contacts, mirrored variants, continuous
+The historical `tools/test_bear_front.cjs` reference comparison was retired in
+the 2026-10-10 test audit. Its functional checks were duplicated in
+`tools/test_bear_storm.cjs`, which now checks current native ratios, view
+completeness, visible painted claw contacts, mirrored variants, continuous
 contact motion, stable support coordinates, non-folding projection and retained
-follow-through. PNG round-tripping matches the renderer's encoder input and
-avoids graphics-process-specific rounding of raw premultiplied canvas pixels.
+follow-through without requiring an old source snapshot. Deliberate new artwork
+does not have to match the v10/v11 pixels.
 `test_bear_motion.cjs` retains the quarter-rig's calibration regression.
 
 `review_bear_alignment.cjs` shows the complete quarter-to-frontal handover and

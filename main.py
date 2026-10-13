@@ -198,6 +198,8 @@ def _run_hub(stop_event, *, only, skip, debug, wait_for_obs, started_projects) -
     _print_project_table(projects)
     _print_runtime_options(only_names, skip_names, debug=debug)
     if obs_ready:
+        from lib.hub_runtime.outputs import start_capture
+        start_capture(stop_event)
         _start_voice(stop_event)
         _start_projects(projects, stop_event)
     else:
@@ -213,6 +215,8 @@ def _run_hub(stop_event, *, only, skip, debug, wait_for_obs, started_projects) -
                     continue
                 if stop_event.is_set(): return
                 try:
+                    from lib.hub_runtime.outputs import start_capture
+                    start_capture(stop_event)
                     _start_voice(stop_event)
                     _start_projects(pending, stop_event)
                 except BaseException:

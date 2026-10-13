@@ -10,6 +10,27 @@ CAPTURE_SOURCE = 'Display Capture'
 _lock = threading.Lock()
 
 
+def apply_content(spec, *, client):
+    """Apply a published display selection without input settings or scene writes.
+
+    The feature supplies the scene, allowed sources and choice as complete data.
+    Unknown personal overlays and every original input/filter remain untouched.
+    """
+    with _lock:
+        scene, sources, selected = spec['scene'], spec['sources'], spec['selected']
+        if selected is not None and selected not in sources:
+            raise ValueError('Invalid display selection')
+        rows = client.get_scene_item_list(scene).scene_items
+        matches = [row for row in rows if row['sourceName'] == selected]
+        if selected is not None and len(matches) != 1:
+            raise ValueError('Display selection must be installed exactly once')
+        for row in rows:
+            if row['sourceName'] in sources:
+                visible = row['sourceName'] == selected
+                if row['sceneItemEnabled'] != visible:
+                    client.set_scene_item_enabled(scene, row['sceneItemId'], visible)
+
+
 def snapshot(*, client=None):
     """Read the loaded capture visibility without changing OBS or saved data."""
     from obs.client import get_obs

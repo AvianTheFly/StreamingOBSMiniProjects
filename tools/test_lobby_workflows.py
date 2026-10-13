@@ -82,8 +82,10 @@ class LobbyWorkflowTests(unittest.TestCase):
         self.assertTrue(self.obs.items[-1]['sceneItemEnabled'])
         self.phase('Matchmaking'); queue = self.obs.selected(); self.assertNotEqual(first, queue)
         before = list(self.obs.writes)
-        self.phase('ReadyCheck'); self.phase('ChampSelect', session(bans=[False]))
+        self.phase('ReadyCheck')
         self.assertEqual(self.obs.writes, before)
+        self.phase('ChampSelect', session(bans=[False])); self.assertEqual(self.obs.scene, 'Lobbies')
+        self.assertEqual(self.obs.selected(), queue)
         self.phase('ChampSelect', session(bans=[True])); self.assertEqual(self.obs.scene, 'Draft')
         self.phase('InProgress'); self.director.request('Test', owner='game')
         self.remaining = 6.5; self.phase('WaitingForStats')
@@ -93,6 +95,18 @@ class LobbyWorkflowTests(unittest.TestCase):
         self.assertEqual(self.obs.scene, 'Lobbies'); self.assertNotEqual(self.obs.selected(), queue)
         before = list(self.obs.writes)
         self.phase('Lobby'); self.phase('None'); self.watcher.apply_pending(verify_active=True)
+        self.assertEqual(self.obs.writes, before)
+
+    def test_banning_event_returns_from_manual_scene_without_rotating_existing_queue(self):
+        self.phase('Matchmaking')
+        before = list(self.obs.writes)
+        self.phase('ChampSelect', session(phase='PLANNING', bans=[False]))
+        self.assertEqual(self.obs.writes, before)
+        self.director.request('just screen', owner='user', automatic=False)
+        self.phase('ChampSelect', session(bans=[False]))
+        self.assertEqual(self.obs.scene, 'Lobbies')
+        before = list(self.obs.writes)
+        self.phase('ChampSelect', session(bans=[False]))
         self.assertEqual(self.obs.writes, before)
 
     def test_new_manual_choice_during_result_hold_cancels_idle_without_hiding_screen(self):

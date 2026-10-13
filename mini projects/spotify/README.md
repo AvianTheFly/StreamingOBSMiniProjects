@@ -1,8 +1,14 @@
 # Spotify overlay
 
 Starts with this checkout's Hub. Uses the Spotify desktop app's Windows media
-session: no API key, login, or Premium requirement. It reads playback without
-controlling Spotify. Spotify on a phone or the browser is not supported.
+session: no API key, login, or Premium requirement. Audio-bearing Soundboard,
+TikTok, Sound Effects and browser effects pause Spotify before playback and
+resume it after the final overlapping clip cleans up, including cancellation
+and playback failure. Already-paused Spotify stays paused. A manual resume,
+changed track, stopped or replaced session cancels restoration. Silent videos
+leave Spotify alone. The Spotify module must be running in the Hub; unavailable
+Windows controls do not prevent clips from playing. Spotify on a phone or the
+browser is not supported.
 
 OBS source: **Hub Spotify Visualizer**, in the **Spotify Overlay** scene.
 The new scene is added to the current OBS scene on first setup. Add that scene
@@ -16,35 +22,29 @@ The installed OBS source is 1200 × 900, with a 1200 × 660 sculpture canvas,
 so its roughly 950-pixel presentation no longer enlarges a 400-pixel raster.
 Its scene position and displayed size are preserved by inverse source scaling.
 
-The production visualizer is a seventeen-scene musical journey. It uses different
-compositions, rather than morphing every preset from one central ribbon mesh.
+The production visualizer is a twelve-stage musical journey. The current
+catalog and interaction audit are:
 
-| Scene | Spatial character | Musical role |
-| --- | --- | --- |
-| Prism drive | Receding hexagonal corridor, turning vanishing point, spectrum dashes | Bass weight, forward travel, trance/EDM energy |
-| Interference silk | Two slim ribbons with a clear central path and supporting contours | Tonal detail, sustained texture, spacious passages |
-| Orbit engine | Five depth-sorted gimbals around a bass-driven core | Circular hypnotic movement and stereo depth |
-| Crystal assembly | A central crystal with four orbiting satellites and three open arcs | Harder edges and rhythmic structure |
-| Copper dunes | Warm spectral landscape with 4.8 seconds of real band history | Acoustic, folk, country and quiet listening direction |
-| Petal chamber | Eight layered petals around an open central aperture | Kaleidoscopic concert geometry |
-| Signal architecture | Two staggered banks of eight spectral towers with released peak caps | Clear current/recent per-register response |
-| Flow choreography | Two flowing ribbons with restrained supporting traces | Poi/flow-art motion and relaxed musical travel |
-| Resonance lattice | Suspended crosshatched membrane, sparse panels and corner brackets | Band history sculpts relief; bass bows the structure |
-| Waveform loom | Eight ordered waveform sheets folding through depth | Separate spectral voices, captured waveform detail and stereo breadth |
-| Phase helix | Double coil with frequency-bearing rungs and ribbon rails | Kick compression/rebound changes radius; mids articulate the strands |
-| Morphic shell | Ribbed surface unfolding between angular and rounded contours | Bass expands the aperture; mids thicken the shell; highs travel along its ribs |
-| Faerie constellation | Near/far winged lights following braided paths | Eight spectral voices control independent wings, cores and accents |
-| Cinder phoenix | Swept wings, seven flight feathers per side and flowing tail plumes | Bass drives wing lift; local voices articulate individual feathers |
-| Stormclaw bear | Recognizable ears, muzzle, faceted brow and three claw arcs per side | Heavy low-end stance, midrange claws and clear facial details |
-| Verdant turtle | Domed plated shell with swimming flippers, head and tail | Spectral plates, buoyant bass response and stereo depth |
-| Sundering ram | Spiral horns, spectral ridges and a faceted face | Horn compression/rebound and independent local accents |
+| Stage | Shape and interaction |
+| --- | --- |
+| Prism drive | Nested tunnel rings pass a delayed twisting crest into depth. |
+| Silk vortex | Three spiral sails wind around a shared throat; delayed partner notes trade radial pull and depth torsion. |
+| Orbit engine | Five gimbals trade tilt and opposing torque around the bass core. |
+| Folded light | Eight panels share complete hinges; local folds and a delayed lead ripple cross the connected fan. |
+| Aurora falls | Two pairs of curtains orbit shared axes with actual depth clearance at over/under crossings. |
+| Petal chamber | Eight petals exchange hinge rotation and opening with their neighbours. |
+| Infinity current | A continuous trefoil trades pull between opposing lobes; contrasting edges reveal its rolling surface. |
+| Sonic medusa | Eight attached tendrils form four braids below a pulsing canopy; partner gestures steer each pair. |
+| Resonance lattice | A connected grid propagates register gestures across its depth. |
+| Phase mandala | Three pairs of counter-rotating rosettes exchange lobe expansion and depth through delayed partner gestures. |
+| Phase helix | Paired rails and connecting rungs share a traveling phase bend. |
+| Morphic shell | A closed ribbed shell carries periodic twists through its surface. |
 
 The scene director measures audible exposure, spectral changes and attack
 strength. Each scene continuously reshapes on independent, music-driven slow phases.
 Opening, curl, depth and contour change together without resetting at song or
-scene boundaries. Tunnels round and corkscrew, rings warp and unfold, crystals
-change proportions, terrain rises and bends, petals curl in 3D, the city arcs,
-and flow paths evolve their harmonic shape. Beats retain their faster response.
+scene boundaries. Tunnels corkscrew, rings warp, connected panels fold, curtains weave, petals
+curl in 3D, and closed ribbons trade torsion across their lobes. Beats retain their faster response.
 A family has at least 45 audible seconds to develop; an eventual family change
 takes roughly 24–33 seconds and directly inherits both evolving shapes. Sustained music also advances the show.
 Recent scenes are excluded and visit counts encourage variety. Quiet signals
@@ -156,6 +156,14 @@ speakers. It follows Spotify when it restarts. No output-device setting or
 virtual cable is needed; the former SPOTIFY_AUDIO_DEVICE setting is unused.
 Capture failures appear in module status and leave the geometry quiet; the
 module never falls back to desktop capture. Nothing is saved or played back.
+Float PCM capture and `audio_level.py` compensate quiet playback before analysis.
+The visual-only RMS reference targets 0.12, with at most 10000x gain and a
+30-second release. Constant playback-volume differences cancel out while short
+musical dips, stereo balance and spectral detail remain. Silence freezes the
+reference. A large mid-song volume reduction readjusts gradually (about 69
+audible seconds for a tenfold reduction); loopback cannot distinguish that change
+from a sustained quieter musical passage. Fully muted Spotify supplies no audio
+to visualize. No Spotify, Windows or OBS fader is changed.
 Spectral valleys remain deep rather than being flattened by a raised dB floor.
 Separate loudness, bass, treble, signed waveform, spectral pitch/tonality,
 stereo width/balance, spectral flux and beat-onset features drive
@@ -642,7 +650,7 @@ so side views retain real relief and coherent shading. Musical springs, voices,
 input gain and saved OBS placement retain their existing roles.
 `node tools/test_spotify_camera.cjs` checks rigid geometry, all three angle
 ranges, silence, cadence and view bounds; `node tools/test_spotify_camera_gpu.cjs`
-checks actual pixels for 85 views across all 17 stages.
+checks actual pixels for five views of every current stage.
 Native OBS QA also records the changing camera angles and uses the actual live
 Spotify feed when `SPOTIFY_NATIVE_LIVE=1`. It waits through silence, observes a
 bounded span of each stage and checks quiet contours separately from stronger
@@ -677,3 +685,61 @@ the picture and recreates the bounded renderer; audio history, input calibration
 and the scene journey remain intact. An unavailable GPU keeps the stable Canvas
 fallback. `tools/test_spotify_radiance.cjs` checks both cases using actual pixels,
 context loss/restoration and GPU resource cleanup.
+
+Musical articulation: eight frequency registers reshape the existing sculpture.
+Each region responds with amplitude-dependent height, bending, real depth,
+contour weight and brightness. Held harmonic phrases bend a continuous region
+whose centre follows spectral pitch; attacks briefly flex those same surfaces;
+upper-register texture adds fine attached ripples. There are no separate ribbons,
+outward triangles, rays or floating strokes. Phrase and percussion responses
+remain distinct in mixtures. Bass retains the sculpture's weighted response.
+The descriptors measure sound characteristics, not isolated vocal/instrument
+stems; sustained singing and instruments can both drive the held-partial bend.
+Quiet passages retain their amplitude difference, held noise does not manufacture
+repeated hits, and silence/paused playback does not invent movement.
+
+`audio_articulation.py` reuses the existing magnitude transform and one bounded
+spectral envelope. Four scalars cross the existing mailbox, with no extra worker
+or FFT. `music_articulation.js` advances on captured audio generations;
+`stage_articulation.js` supplies a bounded continuous field to the existing
+renderer. Shared face and contour vertices use the same field, preserving joins
+through all scenes and morphs without adding render primitives or resources.
+OBS placement, source settings, label styling and personal volume stay unchanged.
+
+Run `py -3.11 -X utf8 tools/run_offline_tests.py tools.test_spotify_articulation`
+for equal-RMS phrase/percussion, mixtures, pitch height, quiet contrast, complete
+IPC and FFT-count checks. Generate the synthetic frames with
+`py -3.11 tools/test_spotify_articulation.py --fixture`, then run
+`node tools/test_spotify_articulation.cjs` for gesture/silence checks and actual
+WebGL pixels across all current scenes, including a structural comparison at installed
+size. It checks isolated register response, height/depth, amplitude contrast and
+unchanged primitive counts when the field is enabled.
+
+Directional choreography: `music_dance.js` measures pitch position and signed
+pitch change inside each of eight frequency registers, then combines them with
+register rise/release and stereo position. Coupled damped torsion springs make
+neighbouring parts share tension; a fixed 1.6-second history lets a note travel
+along a line instead of moving every vertex together. Equal-volume notes can
+curl in different directions and move at different speeds. Presence still scales
+the response, so quiet passages within a song retain their contrast. Silence
+freezes the history. All motion advances on the existing capture clock.
+
+`stage_articulation.js` applies that history as twisting, lateral flow and real
+depth to shared vertices. Individual designs also sample it for their own
+interactions above. No separate floating accents are introduced. Bass springs
+retain a local role in each new design (throat, folds, curtain height, ribbon
+radius, canopy and rosette radius). The installed page starts with Infinity
+current. Title/artist text uses 15/11 px instead of 17/12 px.
+
+`node tools/test_spotify_dance.cjs` checks equal-level directional response,
+stereo steering, audible-time flow, bounded history, silence and capture cadence.
+It verifies full shared hinges, canopy/tendril attachment and closed trefoil
+seams, then compares actual WebGL output with only gesture history changed for
+every stage and renders `output/spotify/dance-catalog.png` for visual review.
+
+The interaction regression also holds a receiving part's own note, amplitude,
+camera and travel fixed while changing only its partner's delayed note. All six
+new ensembles must visibly answer that partner. Paired aurora strands must cross
+at least twice with real depth separation. Shared hinges, canopy attachments and
+closed trefoil seams remain exact; ribbon widths interpolate register levels
+continuously so uneven spectra cannot put steps into the ribbon edge.

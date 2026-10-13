@@ -5,6 +5,7 @@ import {bloom,wave} from './party-bloom.js';
 import {balloons,lanterns,jellyfish} from './party-floaters.js';
 import {robot,moon,portal} from './party-guests.js';
 import {planes,fireflies,pinball,fireworks} from './party-sparks.js';
+import {drawPartyVisitor} from './party-staging.js';
 const artists={confetti,bubbles,meteors,visitor,vinyl,ducks,bloom,wave,balloons,lanterns,jellyfish,robot,moon,portal,planes,fireflies,pinball,fireworks};
 export class Celebration {
   constructor(){this.catalog=[];this.instances=[];this.seen=new Map();this.serial=0;this.waveSerial=0;this.disposed=false;}
@@ -22,7 +23,7 @@ export class Celebration {
   waveTime(t){const e=this.instances.find(e=>e.kind==='wave'&&t>=e.waveStart&&t<e.waveEnd);return e?(e.waveIndex%2?1.2:3.1)+t-e.waveStart:t;}
   draw(c,t,colors,stage='front'){
     for(const e of this.instances){const age=t-e.started;if(e.stage!==stage||age<0||age>=e.life)continue;
-      c.save();c.globalAlpha*=Math.min(1,age*6,(e.life-age)*2);artists[e.kind](c,age,colors,e);c.restore();
+      c.save();c.globalAlpha*=Math.min(1,age*6,(e.life-age)*2);drawPartyVisitor(c,artists[e.kind],age,colors,e);c.restore();
     }
   }
   clear(){this.instances=[];}

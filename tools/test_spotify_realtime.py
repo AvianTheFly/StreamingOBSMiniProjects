@@ -339,6 +339,7 @@ class RealtimeTests(unittest.TestCase):
              patch('spotify.audio_worker.psutil.Process') as process, \
              patch('spotify.audio_worker.time.monotonic', side_effect=itertools.count(0, 3)), \
              patch('spotify.audio_worker.capture_process', capture), \
+             patch('spotify.audio_worker.AudioLevel.apply', side_effect=lambda packet: packet), \
              patch.object(state, 'publish_audio', side_effect=publish), \
              patch.object(state, 'set_status', create=True):
             capture_worker(state, stop)

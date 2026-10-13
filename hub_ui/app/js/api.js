@@ -36,6 +36,8 @@ export const api = {
   runProjectAction: (project, action) => _req("POST", `/api/project-actions/${encodeURIComponent(project)}/${encodeURIComponent(action)}`),
   runWorkflow: (id) => _req("POST", `/api/workflows/${encodeURIComponent(id)}`),
 
+  playProjectAsset: (project, source) => _req('POST', `/api/projects/${encodeURIComponent(project)}/play-asset`, {source}),
+
   // ── Settings ──────────────────────────────────────────────────────────
   getSettings: () => _req("GET",  "/api/settings"),
   saveSettings:(s)  => _req("POST", "/api/settings", s),
@@ -47,6 +49,10 @@ export const api = {
 
   // ── Instant replay ────────────────────────────────────────────────────
   getReplayClips: () => _req("GET", "/api/projects/instant_replay/clips"),
+  getReplayQueue: () => _req('GET', '/api/projects/instant_replay/queue'),
+  editReplayQueue: data => _req('POST', '/api/projects/instant_replay/queue', data),
+  playReplayPaths: paths => _req('POST', '/api/projects/instant_replay/play', {paths,mode:'showcase'}),
+  playReplayRandom: () => _req('POST', '/api/projects/instant_replay/play', {random:true,mode:'showcase'}),
   captureQuickReplay: (seconds = 15) => _req('POST', '/api/projects/instant_replay/capture', {seconds}),
   playReplayClip: (path, mode) => _req("POST", "/api/projects/instant_replay/play", { path, mode }),
   playReplayGroup: (group_id, mode = 'showcase') => _req("POST", "/api/projects/instant_replay/play", { group_id, mode }),
@@ -57,6 +63,7 @@ export const api = {
   setReplayView: (view) => _req("POST", "/api/projects/instant_replay/companion", { view }),
   saveReplayPresentation: (data) => _req("POST", "/api/projects/instant_replay/presentation", data),
   replayPreview: (path) => _req("GET", `/api/projects/instant_replay/preview?path=${encodeURIComponent(path)}`),
+  replayPoster: (path) => _req('GET', `/api/projects/instant_replay/poster?path=${encodeURIComponent(path)}`),
   trimReplay: (data) => _req("POST", "/api/projects/instant_replay/trim", data),
   replayTrimStatus: (job) => _req("GET", `/api/projects/instant_replay/trim?job=${encodeURIComponent(job)}`),
 
@@ -80,6 +87,17 @@ export const api = {
   getAfterpartyActions: () => _req('GET', '/api/spirit-lobby/actions'),
   afterpartyAction: action => _req('POST', '/api/spirit-lobby/action', {action}),
   getStartingScreen: () => _req('GET', '/api/starting-soon'),
+  getStageAppearance: () => _req('GET', '/api/league-stage'),
+  selectStageImage: (image, revision) => _req('POST', '/api/league-stage/select', {image, revision}),
+  setDraftTheme: theme => _req('POST', '/api/league-stage/draft-theme', {theme}),
+  setQueueTheme: theme => _req('POST', '/api/league-stage/queue-theme', {theme}),
+  setLobbyContent: content => _req('POST', '/api/projects/scene_voice_switcher/screen_content', {content}),
+  uploadStageImage: async file => {
+    const response = await fetch('/api/league-stage/upload?name=' + encodeURIComponent(file.name), {method:'POST', headers:{'Content-Type':file.type || 'application/octet-stream'}, body:file});
+    const data = await response.json();
+    if(!response.ok) throw Error(data.error || 'Upload failed');
+    return data;
+  },
   saveStartingScreen: body => _req('POST', '/api/starting-soon/settings', body),
   startingScreenAction: (action, body = {}) => _req('POST', '/api/starting-soon/' + action, body),
   selectStreamStage: (stage, source = null) => _req('POST', '/api/projects/scene_voice_switcher/select_stage', {stage, source}),

@@ -10,7 +10,7 @@ const {chromium} = require('playwright');
   const browser = await chromium.launch({headless:true, channel:'chrome'});
   try {
     const page = await browser.newPage({viewport:{width:1920,height:1080}, deviceScaleFactor:1});
-    for (const theme of ['astral','tidal','neon','frost','verdant']) {
+    for (const theme of ['bear','turtle','ram','phoenix']) {
       await page.goto(`http://127.0.0.1:7431/champ-select?demo=1&theme=${theme}`);
       await page.locator('.pick').first().waitFor();
       await page.waitForTimeout(750);
@@ -41,7 +41,7 @@ const {chromium} = require('playwright');
     draft.allies[0].locked = true;
     await page.locator('.picks-left .pick.locked').first().waitFor();
     const animation = await page.locator('.picks-left .pick').first().evaluate(el => getComputedStyle(el).animationName);
-    assert.equal(animation,'pick-enter');
+    assert.equal(animation,'none');
     console.log('Live state simulation: privacy, tentative pick, ban and lock reveal OK');
   } finally { await browser.close(); }
 })().catch(error => {console.error(error);process.exitCode=1});

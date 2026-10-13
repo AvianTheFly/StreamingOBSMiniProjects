@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Four spirits · Queue timer</title><link rel="stylesheet" href="/stage/queue.css"></head>
+<body><section id="queueCard" hidden aria-label="League queue timer">
+  <canvas id="queueAtmosphere" width="1208" height="308" aria-hidden="true"></canvas>
+  <div class="relic-chamber" aria-hidden="true"></div>
+  <canvas id="spirit" width="300" height="300" aria-hidden="true"></canvas>
+  <div class="queue-copy"><div class="queue-heading"><i class="status-beacon" aria-hidden="true"></i><span id="queueStatus">IN QUEUE</span></div>
+    <div class="queue-clock"><strong id="queueTime">0:00</strong></div>
+    <div id="queueRoles" class="queue-roles">Waiting for role preferences</div>
+  </div><canvas id="queueTrack" class="queue-track" width="1208" height="40" aria-hidden="true"></canvas>
+</section><script type="module" src="/stage/queue.js"></script></body></html>

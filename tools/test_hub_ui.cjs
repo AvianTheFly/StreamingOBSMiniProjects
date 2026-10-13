@@ -33,41 +33,19 @@ async function main() {
     if (process.argv.includes('--live')) {
       const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
       const errors = [];
-      const chooseStage=async id=>{if(!await page.locator('#deskStageMenu').evaluate(el=>el.open))await page.locator('#deskStageMenu > summary').click();await page.locator('#deskTab-'+id).click();};
-    page.on('pageerror', e => errors.push(e.message));
-      // Chromium's stream interception can delay EventSource headers; its native
-      // GET transport stays direct while every other request is read-only.
+      page.on('pageerror', e => errors.push(e.message));
       await page.route(url => new URL(url).pathname !== '/api/events', route => route.request().method() === 'GET' ? route.continue() : route.abort());
-      await page.goto('http://127.0.0.1:7420/#dashboard', { waitUntil: 'domcontentloaded' });
-      await page.waitForFunction(() => document.querySelector('#loadedCount')?.textContent.includes('features loaded')).catch(async error=>{
-        console.error('Live browser errors:',errors);
-        console.error('Live page:',await page.locator('#page').innerText());
-        throw error;
-      });
-      await page.locator('#currentScene').filter({ hasNotText: '—' }).waitFor();
-      await page.waitForFunction(() => ['true','false'].includes(document.querySelector('[data-action="quick_replay"]')?.dataset.available));
-      // A read-only live check cannot require a running replay buffer or idle
-      // capture worker. Disposable fixtures below exercise enabled actions.
-      const observed=await page.evaluate(async()=>fetch('/api/coordination').then(r=>r.json()));
-      if(observed.replay_buffer?.active===false)
-        assert(await page.locator('[data-action="quick_replay"]').isDisabled(),'Stopped replay buffer must disable live capture');
-      await page.locator('.desk-audio-drawer > summary').click();
-    await page.locator('.desk-audio-channel').first().waitFor();
-      await page.screenshot({ path: path.join(output, 'live-desk.png'), animations: 'disabled' });
-      if (!await page.locator('.desk-extras').evaluate(el=>el.open)) await page.locator('.desk-extras > summary').click();
-      await chooseStage('game');
-      await page.waitForFunction(()=>!document.querySelector('#voiceState').textContent.includes('Checking'));
-      await page.screenshot({path:path.join(output,'live-in-game.png'),animations:'disabled'});
-      await chooseStage('game');
-      for (const panel of ['scenes','clips','music','sounds','waiting']) {
-        if(panel==='scenes'&&!await page.locator('#deskStageMenu').evaluate(el=>el.open))
-          await page.locator('#deskStageMenu > summary').click();
-        await page.locator(`[data-desk-panel="${panel}"]`).click();
-        await page.waitForFunction(()=>!document.querySelector('#deskResultCount').textContent.includes('Loading'));
-        assert.equal(await page.locator('#deskRetry').count(),0,`${panel} catalog must be available`);
-        await page.screenshot({path:path.join(output,`live-controls-${panel}.png`),animations:'disabled'});
-        await page.locator('#deskPanelClose').click();
-      }
+      await page.goto('http://127.0.0.1:7420/#dashboard', {waitUntil:'domcontentloaded'});
+      await page.waitForFunction(()=>document.querySelector('#streamState')?.textContent !== 'Connecting…');
+      await page.locator('[data-stage-tile="loading"]').click();
+      await page.screenshot({path:path.join(output,'live-desk.png'),animations:'disabled'});
+      await page.locator('#deskChangeImage').click();
+      await page.locator('.stage-image-option').first().waitFor();
+      await page.screenshot({path:path.join(output,'live-image-chooser.png'),animations:'disabled'});
+      await page.locator('.stage-appearance-dialog [data-close]').click();
+      await page.locator('#deskSounds').click();
+      await page.locator('.stage-sound-list button').first().waitFor();
+      await page.locator('.stage-sounds-dialog [data-close]').click();
       await page.locator('a[data-page="library"]').click();
       await page.locator('.guide-area').first().waitFor();
       await page.screenshot({ path: path.join(output, 'live-library.png'), animations: 'disabled' });
@@ -85,8 +63,7 @@ async function main() {
       await page.screenshot({ path: path.join(output, 'live-spotify.png'), animations: 'disabled' });
       await page.setViewportSize({ width: 390, height: 900 });
       await page.goto('http://127.0.0.1:7420/#dashboard');
-      await page.waitForFunction(() => document.querySelector('#loadedCount')?.textContent.includes('features loaded'));
-      await page.waitForFunction(() => document.querySelector('#currentScene')?.textContent !== '—');
+      await page.waitForFunction(()=>document.querySelector('#streamState')?.textContent !== 'Connecting…');
       await page.screenshot({ path: path.join(output, 'live-mobile.png'), animations: 'disabled' });
       assert.deepEqual(errors, [], 'Live pages must load without JavaScript errors');
       console.log('Read-only live views verified and captured.');
@@ -103,7 +80,9 @@ async function main() {
       { name: 'Desktop audio', kind: 'wasapi_output_capture', volume_db: -12, muted: false },
       { name: 'Media music', kind: 'ffmpeg_source', volume_db: -9, muted: false },
     ];
-    const chooseStage=async id=>{if(!await page.locator('#deskStageMenu').evaluate(el=>el.open))await page.locator('#deskStageMenu > summary').click();await page.locator('#deskTab-'+id).click();};
+    const chooseStage=async id=>page.locator(`[data-stage-tile="${id}"]`).click();
+    let selectedImage='sanctuary',imageRevision=0,uploaded=false;
+    const appearance=()=>({selected:selectedImage,revision:imageRevision,images:[{id:'sanctuary',title:'Spirit sanctuary',image_url:'/assets/loading-mastery.jpg'},{id:'frost',title:'Frost',image_url:'/assets/loading-mastery.jpg'},...(uploaded?[{id:'uploaded',title:'My image',image_url:'/assets/loading-mastery.jpg'}]:[])]});
     page.on('pageerror', e => errors.push(e.message));
     await page.addInitScript(() => {
       window.fixtureSources = [];
@@ -121,7 +100,9 @@ async function main() {
     await page.route('http://hub.test/**', async route => {
       const req = route.request(), url = new URL(req.url());
       if (req.method() === 'POST') {
-        requests.push({ path: url.pathname, body: req.postDataJSON() });
+        requests.push({ path: url.pathname, body: url.pathname.endsWith('/upload')?null:req.postDataJSON() });
+        if(url.pathname==='/api/league-stage/upload'){uploaded=true;return route.fulfill({json:{...appearance(),uploaded:'uploaded'}});}
+        if(url.pathname==='/api/league-stage/select'){selectedImage=req.postDataJSON().image;imageRevision++;return route.fulfill({json:appearance()});}
         await new Promise(resolve => setTimeout(resolve, 350));
         if (!failAction && url.pathname === '/api/obs/audio') {
           const { input, ...changes } = req.postDataJSON();
@@ -131,6 +112,7 @@ async function main() {
         if(!failAction && scoped)serverProjects=serverProjects.map(p=>p.name===scoped[1]?{...p,...(['pause','resume'].includes(scoped[2])?{is_paused:scoped[2]==='pause'}:{is_active:false})}:p);
         return route.fulfill({ json: failAction ? { ok: false, error: 'Fixture rejected action' } : { ok: true, lobby: 'TavernLobby' } });
       }
+      if(url.pathname==='/api/league-stage')return route.fulfill({json:appearance()});
       if (url.pathname === '/api/status') return route.fulfill({ json: { projects:serverProjects } });
       if (url.pathname === '/api/coordination') {
         coordinationCalls++;
@@ -148,7 +130,7 @@ async function main() {
       if (url.pathname === '/api/projects/instant_replay/stage') return route.fulfill({json:{active:false,pending:false,capture:{status:'idle'}}});
       if (url.pathname === '/api/voice') return route.fulfill({json:{ready:true,recording:false}});
       if (url.pathname === '/api/hub-actions') return route.fulfill({json:{workflows:[{id:'break',name:'Take a break',steps:[{project:'starting_soon',action:'start'}]}]}});
-      if (url.pathname === '/api/starting-soon') return route.fulfill({json:{playlists:[{id:'best',name:'Best moments',paths:['C:/fixture/escape.mp4']}]}});
+      if (url.pathname === '/api/starting-soon') return route.fulfill({json:{artwork:['one.png'],artwork_index:0,artwork_catalog:[{file:'one.png',title:'One'}],playlists:[{id:'best',name:'Best moments',paths:['C:/fixture/escape.mp4']}]}});
       if (url.pathname === '/api/editor-profiles') {
         profileCalls++;
         await new Promise(resolve => setTimeout(resolve, 450));
@@ -171,216 +153,49 @@ async function main() {
       return route.fulfill({ body: fs.readFileSync(file), contentType });
     });
     await page.goto('http://hub.test/#dashboard');
-    await chooseStage('game');
-    await page.getByRole('button', { name: 'Replay last 15s', exact: true }).waitFor();
-    await page.waitForFunction(() => !document.querySelector('[data-action="quick_replay"]').disabled);
-    assert.equal(await page.locator('#loadedCount').innerText(), '13 features loaded');
-    assert.equal(profileCalls, 0, 'Home must not wait on profile discovery');
-    assert.equal(checks, 0, 'Collapsed diagnostics do not poll Twitch');
-    assert.equal(await page.locator('#currentScene').innerText(), 'TavernLobby');
+    await page.waitForFunction(()=>document.querySelector('#streamState')?.textContent==='Not streaming');
+    const beforeBrowsing=requests.length;
+    for(const stage of ['starting','lobby','draft','loading','game','ending'])await chooseStage(stage);
+    assert.equal(requests.length,beforeBrowsing,'Stage browsing does not change output');
+    assert.equal(await page.locator('.desk-extras,.desk-diagnostics,.desk-audio-drawer,[data-desk-panel="music"]').count(),0,'Removed clutter is absent');
+    assert.equal(profileCalls,0);assert.equal(checks,0);
+    await chooseStage('loading');
+    assert(await page.locator('[data-cue="mastery"]').isDisabled());
+    assert(await page.locator('#deskShowStage').isDisabled(),'Loading requires a confirmed match');
+    await page.locator('#deskChangeImage').click();
+    await page.locator('[data-image="frost"]').click();
+    assert.equal(requests.length,beforeBrowsing,'Image browsing does not save');
+    await page.locator('.stage-appearance-dialog [data-close]').click();
+    assert.equal(selectedImage,'sanctuary','Cancel preserves the saved image');
+    await page.locator('#deskChangeImage').click();await page.locator('[data-image="frost"]').click();
+    await page.locator('#useStageImage').click();
+    await page.waitForFunction(()=>!document.querySelector('.stage-appearance-dialog').open);
+    assert.deepEqual(requests.at(-1),{path:'/api/league-stage/select',body:{image:'frost',revision:0}});
+    assert.equal(await page.locator('#deskArtName').innerText(),'Frost');
+    await page.locator('#deskChangeImage').click();
+    await page.locator('#stageUpload').setInputFiles({name:'mine.png',mimeType:'image/png',buffer:Buffer.from('fixture')});
+    await page.getByText('Uploaded · choose Use image to apply').waitFor();
+    assert.equal(selectedImage,'frost','Upload adds to the library without applying');
+    await page.locator('#useStageImage').click();await page.waitForFunction(()=>!document.querySelector('.stage-appearance-dialog').open);
+    assert.equal(selectedImage,'uploaded');
+    for(const stage of ['starting','loading','game']){
+      await chooseStage(stage);await page.locator('#deskSounds').click();
+      await page.getByRole('searchbox',{name:'Find a sound'}).fill('violin');
+      await page.locator('.stage-sound-list button').click();
+      await until(()=>requests.at(-1)?.path==='/api/projects/sound_effects/play');
+      assert.deepEqual(requests.at(-1).body,{source:'Sad violin'});
+      await page.locator('.stage-sounds-dialog [data-close]').click();
+    }
+    await chooseStage('starting');
+    assert.equal(await page.locator('#deskStageCues button').count(),0,'Starting Soon has no obsolete button cluster');
+    await page.locator('#deskShowStage').click();await until(()=>requests.at(-1)?.path==='/api/starting-soon/start');
+    await page.waitForFunction(()=>!document.querySelector('#deskShowStage').hasAttribute('aria-busy'));
     await page.setViewportSize({width:1280,height:720});
     await page.screenshot({path:path.join(output,'fixture-compact.png'),animations:'disabled'});
-    assert(await page.locator('.desk-replay-choices').evaluate(el=>el.getBoundingClientRect().bottom<=innerHeight), 'Stream steps and replay choices fit a 720px desktop');
-    assert.equal(await page.locator('.desk-extras').getAttribute('open'),null,'Extra tools start collapsed');
+    assert(await page.locator('.stage-desk-footer').evaluate(el=>el.getBoundingClientRect().bottom<=innerHeight),'Primary desk fits 720px desktop');
     await page.setViewportSize({width:1440,height:1000});
-    await page.screenshot({ path: path.join(output, 'fixture-desk.png'), animations: 'disabled' });
-    await page.locator('.desk-extras > summary').click();
-
-    // The operating surface controls the actual named sources and active owners.
-    await page.locator('.desk-audio-drawer > summary').click();
-    await page.locator('.desk-audio-channel').first().waitFor();
-    assert.equal(await page.locator('.desk-audio-channel').count(),2);
-    assert.equal(await page.locator('#streamState').innerText(),'Not streaming');
-    assert.equal(await page.locator('#stopAudioAction').isVisible(),false,'Spotify overlay is not an audio producer');
-    const homeMic=page.getByRole('slider',{name:'Microphone volume',exact:true});
-    await homeMic.focus();
-    await page.evaluate(p=>window.emitStatus(p),projects);
-    assert.equal(await homeMic.evaluate(el=>document.activeElement===el),true);
-    holdNextAudio=true;
-    await homeMic.press('ArrowLeft');
-    await until(()=>releaseAudio);
-    await homeMic.press('ArrowLeft');
-    await page.waitForFunction(()=>!document.querySelector('[aria-label="Microphone volume"]').hasAttribute('aria-busy'));
-    releaseAudio();releaseAudio=null;
-    await page.waitForTimeout(60);
-    assert.equal(await homeMic.inputValue(),'-7','Old audio responses cannot replace a newer adjustment');
-    assert.equal(await homeMic.evaluate(el=>document.activeElement===el),true,'Saving a fader preserves keyboard focus');
-    await homeMic.press('ArrowRight');await homeMic.press('ArrowRight');await homeMic.press('ArrowRight');
-    await page.waitForFunction(()=>!document.querySelector('[aria-label="Microphone volume"]').hasAttribute('aria-busy'));
-    assert.equal(audioInputs.find(i=>i.name==='Microphone').volume_db,-5.5,'Continuous fader input applies the latest requested level');
-    assert.equal(audioInputs.find(i=>i.name==='Desktop audio').volume_db,-12);
-    assert.equal(audioInputs.find(i=>i.name==='Media music').volume_db,-9);
-    failAction=true;
-    await homeMic.press('ArrowLeft');
-    await page.waitForFunction(()=>!document.querySelector('[aria-label="Microphone volume"]').hasAttribute('aria-busy'));
-    assert.equal(await homeMic.inputValue(),'-5.5','Rejected volume restores the last accepted value');
-    await page.getByRole('button',{name:'Mute Microphone',exact:true}).click();
-    await page.getByText('Fixture rejected action',{exact:true}).waitFor();
-    await page.waitForFunction(()=>!document.querySelector('[data-audio-input="Microphone"] button').disabled);
-    assert.equal(await page.locator('[data-audio-input="Microphone"] button').innerText(),'Mute','Rejected mute retains OBS state');
-    failAction=false;
-    await page.getByRole('button',{name:'Mute Microphone',exact:true}).click();
-    await page.getByRole('button',{name:'Unmute Microphone',exact:true}).waitFor();
-    await page.getByRole('button',{name:'Unmute Microphone',exact:true}).click();
-    await page.getByRole('button',{name:'Mute Microphone',exact:true}).waitFor();
-
-    serverProjects=projects.map(p=>p.name==='specific_song'?{...p,is_active:true,current_activity:'Playing: Tattoo'}:p);
-    await page.evaluate(p=>window.emitStatus(p),serverProjects);
-    streamActive=true;
-    const homeMusic=page.locator('[data-playback-project="specific_song"]');
-    await homeMusic.getByRole('button',{name:'Pause Music',exact:true}).click();
-    await homeMusic.getByRole('button',{name:'Resume Music',exact:true}).waitFor();
-    assert.equal(requests.at(-1).path,'/api/project-actions/specific_song/pause');
-    assert.equal(await page.locator('#streamState').innerText(),'Live · OBS');
-    assert.equal(await homeMusic.locator('.desk-playback-state').innerText(),'Paused');
-    pauseClaims={specific_song:{owners:[{kind:'playback',owner:'instant_replay',sequence:4}]}};
-    await page.getByRole('button',{name:'Show game',exact:true}).click();
-    await page.waitForFunction(()=>document.querySelector('[data-playback-project="specific_song"] .desk-playback-state').textContent.includes('Waiting for'));
-    assert(await homeMusic.getByRole('button',{name:'Resume Music',exact:true}).isDisabled(),'Resume cannot bypass another playback owner');
-    await page.screenshot({path:path.join(output,'fixture-production-active.png'),animations:'disabled'});
-    pauseClaims={};
-    await page.getByRole('button',{name:'Show game',exact:true}).click();
-    await page.waitForFunction(()=>!document.querySelector('[data-playback-project="specific_song"] [data-action="resume"]').disabled);
-    await homeMusic.getByRole('button',{name:'Resume Music',exact:true}).focus();
-    await page.evaluate(p=>window.emitStatus(p),serverProjects);
-    assert.equal(await page.evaluate(()=>document.activeElement.textContent),'Resume');
-    await homeMusic.getByRole('button',{name:'Resume Music',exact:true}).click();
-    await homeMusic.getByRole('button',{name:'Pause Music',exact:true}).waitFor();
-    await homeMusic.getByRole('button',{name:'Stop Music',exact:true}).click();
-    await homeMusic.waitFor({state:'detached'});
-    assert.equal(requests.at(-1).path,'/api/project-actions/specific_song/revert');
-    assert.equal(serverProjects.find(p=>p.name==='spotify').is_active,true,'Stop acts on the chosen project only');
-    await page.getByRole('button',{name:'Hide overlay Spotify overlay',exact:true}).click();
-    await page.getByRole('button',{name:'Show overlay Spotify overlay',exact:true}).waitFor();
-    await page.getByRole('button',{name:'Show overlay Spotify overlay',exact:true}).click();
-    await page.getByRole('button',{name:'Hide overlay Spotify overlay',exact:true}).waitFor();
-    streamActive=false;serverProjects=projects;
-
-    await page.getByRole('button',{name:'Alerts & overlays',exact:true}).click();
-    await page.getByRole('button',{name:'Pause League events',exact:true}).click();
-    await page.getByRole('button',{name:'Resume League events',exact:true}).waitFor();
-    assert.equal(requests.at(-1).path,'/api/project-actions/league/pause');
-    assert.equal(serverProjects.find(p=>p.name==='league_api').is_paused,undefined,'Pause is scoped to the selected feature');
-    await page.getByRole('button',{name:'Resume League events',exact:true}).click();
-    await page.getByRole('button',{name:'Pause League events',exact:true}).waitFor();
-    await page.locator('#deskPanelClose').click();
-
-    // Focus modes affect presentation only. Browsing a focused catalog is read-only.
-    const beforeModes=requests.length;
-    await chooseStage('game');
-    assert.equal(await page.locator('#gameTools').isVisible(),true);
-    await page.waitForFunction(()=>document.querySelector('#voiceState').textContent==='Microphone ready');
-    assert.equal(await page.locator('[data-action="stop_listen"]').isVisible(),false,'Idle voice hides finish controls');
-    assert.equal(await page.locator('#deskStageMenu > summary').isVisible(),true);
-    assert.equal(requests.length,beforeModes);
-    await page.screenshot({path:path.join(output,'fixture-in-game.png'),animations:'disabled'});
-    await chooseStage('game');
-    const sounds=page.locator('#deskSection-game [data-desk-panel="sounds"]');
-    await sounds.click();
-    await page.locator('.desk-choice strong').filter({hasText:'Hooray'}).waitFor();
-    assert.equal(await page.evaluate(()=>document.activeElement.id),'deskPanelSearch','Picker starts with search focused');
-    assert.equal(await page.locator('#deskPanelTransport').isVisible(),false,'Idle players hide playback controls');
-    await page.locator('#deskPanelSearch').fill('missing sound');
-    await page.getByRole('button',{name:'Clear search',exact:true}).click();
-    assert.equal(await page.locator('#deskPanelSearch').inputValue(),'');
-    const playing=projects.map(p=>p.name==='soundboard'?{...p,is_active:true,is_paused:false,current_activity:'Playing: Hooray'}:p);
-    await page.evaluate(p=>window.emitStatus(p),playing);
-    assert.equal(await page.locator('#deskPanelTransport').isVisible(),true);
-    assert.equal(await page.locator('#deskPanelTransport button').allTextContents().then(a=>a.join(',')),'Pause,Skip,Stop');
-    assert.equal(await page.locator('#deskPanelActivity').innerText(),'Hooray');
-    await page.evaluate(p=>window.emitStatus(p),playing.map(p=>p.name==='soundboard'?{...p,is_paused:true}:p));
-    assert.equal(await page.locator('#deskPanelTransport button').allTextContents().then(a=>a.join(',')),'Resume,Skip,Stop');
-    await page.evaluate(()=>window.fixtureSources.at(-1).onerror());
-    assert.equal(await page.locator('#deskConnection').innerText(),'Hub disconnected');
-    assert(await page.locator('.desk-choice button').first().isDisabled());
-    await page.waitForFunction(()=>window.fixtureSources.length>1 && document.querySelector('#statusText').textContent.includes('connected'));
-    await page.evaluate(p=>window.emitStatus(p),projects);
-    assert.equal(requests.length,beforeModes,'Opening a catalog must not trigger playback');
-    await page.getByRole('searchbox',{name:'Find in these controls'}).fill('hooray');
-    assert.equal(await page.locator('.desk-choice').count(),1);
-    await page.screenshot({path:path.join(output,'fixture-sounds.png'),animations:'disabled'});
-    const play=page.locator('.desk-choice button');
-    await play.click();
-    assert(await play.isDisabled());
-    await page.waitForFunction(()=>!document.querySelector('.desk-choice button').disabled);
-    assert.deepEqual(requests.at(-1),{path:'/api/projects/soundboard/play-asset',body:{source:'hooray'}});
-    assert.equal(await page.locator('#deskPanelFeedback').innerText(),'Play requested · Hooray');
-    await page.getByRole('button',{name:'Audio cues',exact:true}).click();
-    await page.locator('.desk-choice strong').filter({hasText:'Sad violin'}).waitFor();
-    await page.getByRole('searchbox',{name:'Find in these controls'}).fill('Sad');
-    await page.locator('.desk-choice button').click();
-    await page.waitForFunction(()=>!document.querySelector('.desk-choice button').disabled);
-    assert.deepEqual(requests.at(-1),{path:'/api/projects/sound_effects/play',body:{source:'Sad violin'}});
-    await page.locator('#deskPanelSearch').press('Escape');
-    await page.waitForFunction(()=>document.activeElement?.matches('#deskSection-game [data-desk-panel="sounds"]'));
-    assert.equal(await sounds.evaluate(el=>el===document.activeElement),true,'Closing restores focus');
-
-    await page.locator('.desk-extras [data-desk-panel="clips"]').click();
-    await page.locator('.desk-choice strong').filter({hasText:'A good escape'}).waitFor();
-    await page.locator('#deskReplayMode').selectOption('replay');
-    await page.locator('.desk-choice button').click();
-    await page.waitForFunction(()=>!document.querySelector('.desk-choice button').disabled);
-    assert.deepEqual(requests.at(-1),{path:'/api/projects/instant_replay/play',body:{path:'C:/fixture/escape.mp4',mode:'replay'}});
-    await page.locator('#deskPanelClose').click();
-
-    await page.locator('#deskSection-game [data-desk-panel="music"]').click();
-    await page.locator('.desk-choice strong').filter({hasText:'Tattoo'}).waitFor();
-    await page.locator('.desk-choice button').click();
-    await page.waitForFunction(()=>!document.querySelector('.desk-choice button').disabled);
-    assert.deepEqual(requests.at(-1),{path:'/api/projects/specific_song/play',body:{source:'Loreen'}});
-    await page.locator('#deskPanelClose').click();
-
-    await page.locator('.desk-extras [data-desk-panel="waiting"]').click();
-    await page.locator('.desk-choice strong').filter({hasText:'Best moments'}).waitFor();
-    await page.getByRole('button',{name:'Show playlist',exact:true}).click();
-    await page.waitForFunction(()=>!document.querySelector('.desk-choice button').disabled);
-    assert.deepEqual(requests.slice(-2),[{path:'/api/starting-soon/start',body:{}},{path:'/api/starting-soon/play',body:{paths:['C:/fixture/escape.mp4']}}]);
-    await page.locator('#deskPanelClose').click();
-
-    await page.getByRole('button',{name:'Workflows',exact:true}).click();
-    await page.getByRole('button',{name:'Run',exact:true}).click();
-    await page.waitForFunction(()=>!document.querySelector('[data-workflow]').disabled);
-    assert.equal(requests.at(-1).path,'/api/workflows/break');
-    await page.locator('#deskPanelClose').click();
-    await chooseStage('lobby');
-    await page.getByRole('button',{name:'Show desktop',exact:true}).click();
-    await chooseStage('game');
-    await page.waitForFunction(()=>!document.querySelector('[data-hub-action="show_screen"]').disabled);
-    assert.equal(requests.at(-1).path,'/api/hub-actions/show_screen');
-
-    // Late catalog responses cannot overwrite a reopened panel or a newer route.
-    staleCoordination=true;
-    await sounds.click();
-    await page.locator('#deskPanelClose').click();
-    await page.locator('#deskStageMenu > summary').click();
-    await page.locator('[data-desk-panel="scenes"]').click();
-    await page.getByRole('button',{name:'Show',exact:true}).first().waitFor();
-    await page.waitForTimeout(650);
-    assert.equal(await page.locator('#deskPanelTitle').innerText(),'Scenes');
-    assert.equal(await page.locator('.desk-choice strong').first().innerText(),'Gameplay');
-    await page.locator('#deskPanelClose').click();staleCoordination=false;
-
-    // Preserve focused controls on SSE updates and block repeated pending actions.
-    await page.getByRole('button', { name: 'Replay last 15s', exact: true }).focus();
-    await page.evaluate(p => window.emitStatus(p), projects);
-    assert.equal(await page.evaluate(() => document.activeElement?.textContent.trim()), 'Replay last 15s');
-    await page.getByRole('button', { name: 'Replay last 15s', exact: true }).click();
-    assert.equal(await page.locator('[data-action="quick_replay"]').getAttribute('aria-busy'), 'true');
-    assert(await page.locator('[data-action="quick_replay"]').isDisabled());
-    await page.waitForFunction(() => !document.querySelector('[data-action="quick_replay"]').disabled);
-    assert.equal(requests.filter(r => r.path.endsWith('/instant_replay/quick_replay')).length, 1);
-    await chooseStage('game');
-    await page.getByRole('button', { name: 'Show game', exact: true }).click();
-    await page.waitForFunction(() => !document.querySelector('#gameAction').disabled);
-    assert.deepEqual(requests.at(-1), { path: '/api/projects/scene_voice_switcher/select_stage', body: { stage: 'game', source: null } });
-    failAction = true;
-    await page.getByRole('button', { name: 'Replay latest', exact: true }).click();
-    await page.getByText('Fixture rejected action', { exact: true }).waitFor();
-    failAction = false;
-    await page.locator('.desk-diagnostics > summary').click();
-    await page.getByText('Fixture check ready', { exact: true }).waitFor();
-    assert.equal(checks, 1);
-    await page.locator('.desk-diagnostics > summary').click();
+    const routes=await page.evaluate(async()=>{const {stageRoutes}=await import('/js/pages/desk-stage-map.js');return stageRoutes('loading',{});});
+    assert.deepEqual(routes,[['Game clock starts','game'],['Back to client','lobby']]);
 
     // Search navigation, escaping, filter state and deep links.
     await page.getByRole('button', { name: 'Find a control or page' }).click();
@@ -406,7 +221,7 @@ async function main() {
     await page.locator('a[data-page="projects/soundboard"]').click();
     assert.equal(profileCalls, 0);
     await page.locator('.feature-disclosure > summary').filter({ hasText: 'Hotkeys & profiles' }).click();
-    await page.locator('a[data-page="projects/specific_song"]').click();
+    await page.goto('http://hub.test/#projects/specific_song');
     await page.goto('http://hub.test/#projects/tik_tok');
     await page.getByRole('heading', { name: 'TikTok clips', exact: true }).waitFor();
     await page.locator('a[data-page="projects/soundboard"]').click();
@@ -492,11 +307,11 @@ async function main() {
     // cannot write into a different page. Offline controls become unavailable.
     await page.locator('a[data-page="dashboard"]').click();
     await chooseStage('game');
-    await page.getByRole('button', { name: 'Replay last 15s', exact: true }).waitFor();
+    await page.locator('#deskSounds').waitFor();
     await page.evaluate(() => window.fixtureSources.at(-1).onerror());
-    assert(await page.getByRole('button', { name: 'Replay last 15s', exact: true }).isDisabled());
+    assert(await page.locator('#deskSounds').isDisabled());
     await page.evaluate(() => window.fixtureSources.at(-1).onopen());
-    await page.waitForFunction(() => !document.querySelector('[data-action="quick_replay"]').disabled);
+    await page.waitForFunction(()=>!document.querySelector('#deskSounds').disabled);
     staleCoordination = true;
     await page.locator('a[data-page="library"]').click();
     await page.locator('.skip-link').focus();
@@ -514,21 +329,13 @@ async function main() {
       await page.getByRole('heading', { name: 'Live desk', exact: true }).waitFor();
       const overflow = await page.locator('#page').evaluate(el => el.scrollWidth > el.clientWidth + 1);
       assert.equal(overflow, false, `Desk must fit ${width}px`);
-      if (!await page.locator('.desk-extras').evaluate(el=>el.open)) await page.locator('.desk-extras > summary').click();
       await chooseStage('game');
       if (width === 390) {
-        largeCatalog=true;
-        await page.setViewportSize({width:390,height:640});
-        await page.locator('#deskSection-game [data-desk-panel="sounds"]').click();
-        await page.locator('.desk-choice strong').filter({hasText:'Hooray'}).waitFor();
-        assert.equal(await page.locator('.desk-dialog').evaluate(el=>el.scrollWidth>el.clientWidth+1),false);
-        const searchTop=await page.locator('#deskPanelSearch').evaluate(el=>el.getBoundingClientRect().top);
-        await page.locator('#deskPanelResults').evaluate(el=>{el.scrollTop=el.scrollHeight;});
-        assert.equal(await page.locator('#deskPanelSearch').evaluate(el=>el.getBoundingClientRect().top),searchTop,'Search stays visible while browsing long lists');
-        assert(await page.locator('#deskPanelDetail').evaluate(el=>el.getBoundingClientRect().bottom<innerHeight),'Specialized controls remain visible on short screens');
+        await page.locator('#deskSounds').click();
+        await page.locator('.stage-sound-list button').first().waitFor();
+        assert.equal(await page.locator('.stage-sounds-dialog').evaluate(el=>el.scrollWidth>el.clientWidth+1),false);
         await page.screenshot({path:path.join(output,'fixture-mobile-controls.png'),animations:'disabled'});
-        await page.locator('#deskPanelClose').click();
-        await page.setViewportSize({width:390,height:900});
+        await page.locator('.stage-sounds-dialog [data-close]').click();
         assert.equal(await page.locator('#nav').evaluate(el => el.inert), true);
         await page.getByRole('button', { name: 'Open navigation' }).click();
         assert.equal(await page.locator('#navToggle').getAttribute('aria-expanded'), 'true');
@@ -539,7 +346,7 @@ async function main() {
       }
     }
     assert.deepEqual(errors, [], 'No uncaught browser errors');
-    console.log('Hub UI: navigation, actions, errors, focus, faders, stale updates, lifecycle, diagnostics and four responsive widths passed.');
+    console.log('Hub UI: navigation, actions, errors, focus, faders, stale updates, lifecycle, stage image editing, global effects and four responsive widths passed.');
   } finally { await browser.close(); }
 }
 main().catch(e => { console.error(e); process.exitCode = 1; });

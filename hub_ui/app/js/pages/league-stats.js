@@ -1,6 +1,8 @@
 import {esc} from '../utils.js';
 import {toast} from '../toast.js';
 import {createTools} from './league-stats-tools.js';
+import {createRecapController} from './league-recap-controller.js';
+let closeRecap=null;
 let root=null,timer=null,epoch=0,busy=false,settingsLoaded=false,tools=null;
 const url='/api/league-stats', $=id=>root?.querySelector('#'+id);
 const n=(v,d=0)=>v==null?'—':Number(v).toLocaleString(undefined,{maximumFractionDigits:d});
@@ -12,7 +14,7 @@ const card=(title,value,sub='')=>`<div class="card" style="padding:18px"><div st
 function table(headers,rows){return `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;text-align:left"><thead><tr>${headers.map(h=>`<th style="padding:10px;border-bottom:1px solid var(--line);color:var(--muted)">${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map(c=>`<td style="padding:10px;border-bottom:1px solid var(--line)">${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;}
 export async function mount(container){
  root=container;const token=++epoch;settingsLoaded=false;
- root.innerHTML=`<div class="page-header"><div><div class="page-title">League Stats</div><div class="page-subtitle">Every game adds to your personal record. Trusted viewers fill in the misses.</div></div><a class="btn" href="/league-stats/overlay.html" target="_blank">Stream overlay ↗</a></div>
+ root.innerHTML=`<div class="page-header"><div><div class="page-title">League Stats</div><div class="page-subtitle">Every game adds to your personal record. Trusted viewers fill in the misses.</div></div><a class="btn" href="/league-stats/postgame.html?control=1" target="_blank">Post-game show ↗</a><a class="btn" href="/league-stats/overlay.html" target="_blank">Stream overlay ↗</a></div>
  <div class="card" style="margin-bottom:16px"><p id="lsStatus" role="status">Connecting to tracker…</p><p id="lsSync" style="color:var(--muted)"></p><div style="display:flex;gap:10px;flex-wrap:wrap"><label>Period <select id="lsPeriod" class="input"><option value="all">All recorded</option><option value="today">Today</option><option value="session">Saved stream session</option></select></label><label>Champion <select id="lsChampion" class="input"><option value="">All champions</option></select></label><label>Queue <select id="lsQueue" class="input"><option value="">All queues</option></select></label><label>Account <select id="lsAccount" class="input"><option value="">Current account</option></select></label><button class="btn" id="lsImport">Import recent 100 games</button><a class="btn" id="lsExport" href="${url}/export" download>Export JSON</a></div></div>
  <div id="lsCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px"></div>
  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:18px;margin-bottom:18px;align-items:start">
@@ -22,6 +24,7 @@ export async function mount(container){
  <section class="card" style="margin-bottom:18px"><div class="card-title">All tracked statistics</div><p style="color:var(--muted)">Totals include saved live and partial observations. Per-game averages use completed games with that field. Coverage shows how many games reported it; a missing stat stays unknown.</p><div id="lsMetrics"></div></section>
  <section class="card" style="margin-bottom:18px"><div class="card-title">Items you finish with</div><p style="color:var(--muted)">Final inventory frequency and observed win rate. Item appearances during the game are saved separately as observations, since upgrades and transformations are not always purchases.</p><div id="lsItems"></div></section>
  <section class="card"><div class="card-title">Recent matches</div><div id="lsMatches"></div><p id="lsArchive" style="color:var(--muted);overflow-wrap:anywhere"></p><p style="color:var(--muted)">Streaming Hub is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games. Riot Games and League of Legends are trademarks or registered trademarks of Riot Games, Inc.</p></section>`;
+ closeRecap=createRecapController(root);
  tools=createTools(root,request,refresh);
  for(const id of ['lsPeriod','lsChampion','lsQueue','lsAccount'])$(id).onchange=()=>refresh();
  root.querySelectorAll('[data-miss]').forEach(b=>b.onclick=()=>act('observe',{metric:b.dataset.miss}));
@@ -29,7 +32,7 @@ export async function mount(container){
  $('lsSave').onclick=async()=>{try{await request(`${url}/settings`,{...tools.preferences(),helpers:$('lsHelpers').value.split(/[\s,]+/).filter(Boolean),allow_moderators:$('lsMods').checked,helper_enabled:$('lsEnabled').checked,cooldown_seconds:Number($('lsCooldown').value),include_custom:$('lsCustom').checked,region:$('lsRegion').value.trim().toLowerCase()});toast.success('Tracker preferences saved');await refresh();}catch(e){toast.error(e.message);}};
  await refresh();if(token===epoch)timer=setInterval(refresh,2000);
 }
-export function unmount(){epoch++;clearInterval(timer);root=null;busy=false;}
+export function unmount(){epoch++;clearInterval(timer);closeRecap?.();closeRecap=null;root=null;busy=false;}
 async function act(action,body){try{const result=await request(`${url}/${action}`,body);toast.success(result.message||result.text||'Saved');await refresh();}catch(e){toast.error(e.message);}}
 function options(id,values,first,labels={}){const el=$(id),value=el.value;const html=`<option value="">${esc(first)}</option>`+values.map(v=>`<option value="${esc(v)}">${esc(labels[v]||v)}</option>`).join('');if(el.innerHTML!==html){el.innerHTML=html;el.value=value;}}
 async function refresh(){

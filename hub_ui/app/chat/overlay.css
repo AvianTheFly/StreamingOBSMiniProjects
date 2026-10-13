@@ -12,9 +12,6 @@ body.with-header header{display:flex}
 /* Short speaker-color inlays keep the personality without large glowing borders. */
 .message::before{content:'';position:absolute;top:8px;left:-1px;width:2px;height:14px;border-radius:2px;background:var(--user-color,var(--accent))}
 .message{--age:1;--ink:var(--text-alpha,.68)}
-.message:nth-last-child(n+4){--age:.85}
-.message:nth-last-child(3){--age:.9}
-.message:nth-last-child(2){--age:.95}
 .message:last-child{border-top-color:color-mix(in srgb,var(--accent) 32%,#ffffff16)}
 .message:last-child::after{content:'';position:absolute;right:9px;top:9px;height:3px;width:3px;transform:rotate(45deg);background:var(--accent);opacity:.8}
 .name{display:block;color:var(--user-color,var(--accent));font-weight:700;font-size:max(11px,calc(var(--font-size)*.7));letter-spacing:.25px;line-height:1.3;padding-right:8px;margin-bottom:2px}
@@ -28,7 +25,6 @@ body.with-header header{display:flex}
 .emote-only .emote{height:calc(var(--emote-size)*1.1)}
 .mention{border-left-color:var(--accent)}
 .mention::before{background:var(--accent);height:calc(100% - 16px)}
-.message.leaving{opacity:0}
 body[data-theme=minimal] .message{background:none;border:0;border-radius:0;box-shadow:none;padding:3px 7px 4px}
 body[data-theme=minimal] .name{display:inline;font-size:.78em;margin-right:7px}
 body[data-theme=minimal] .message::before,body[data-theme=minimal] .message::after{display:none}
@@ -36,7 +32,7 @@ body[data-theme=neon] .message{border-left-color:var(--accent);box-shadow:inset 
 body.no-motion .message{animation:none;transition:none}
 #notice{position:absolute;bottom:10px;left:12px;right:12px;font-size:11px;color:#cbd4e2}
 #notice:empty{display:none}
-@keyframes arrive{from{opacity:0;transform:translateY(3px)}to{transform:none}}
+@keyframes arrive{from{transform:translateY(3px)}to{transform:none}}
 @media(prefers-reduced-motion:reduce){.message{animation:none;transition:none}}
 /* Opacity belongs to content, never the card: passing over chat cannot create
    a larger or darker gameplay obstruction. There is no hover scale or motion. */
@@ -47,3 +43,20 @@ body.no-motion .name,body.no-motion .body{transition:none}
 body[data-lobby=true] .message{--age:1;--ink:1}
 body[data-lobby=true] .name{display:block;font-size:.8em;margin-bottom:2px}
 @media(prefers-reduced-motion:reduce){.name,.body{transition:none}}
+.game-notice .discovery-line{display:block}
+/* The Joker marker distinguishes jokes from command reminders and viewer chat.
+   Content alpha composes with the existing row fade, including hover/lobby states. */
+body .message.chat-joke{animation:none;background:rgba(9,17,26,calc(var(--card-alpha)*.4));box-shadow:none;border-color:#ffffff08}
+body .message.chat-joke::before,body .message.chat-joke::after{display:none}
+body .message.chat-joke .name,body .message.chat-joke .body{opacity:calc(var(--ink)*var(--age)*.55)}
+body .message.chat-joke .body{font-weight:400}
+.joke-label{font-size:.85em;letter-spacing:.08em;color:#abb5c5}
+body[data-theme=minimal] .game-notice .name{display:block;margin-bottom:2px}
+/* Command reminders have a static keyboard label, distinct from joke notices.
+   Content stays subdued even on hover; normal message aging still owns expiry. */
+.message.command-guide{animation:none;box-shadow:none;background:rgba(9,17,26,calc(var(--card-alpha)*.35));border-color:#a4b8cc19;font-size:calc(var(--font-size)*.9)}
+.message.command-guide::before,.message.command-guide::after{display:none}
+.message.command-guide .name,.message.command-guide .body{opacity:calc(var(--ink)*var(--age)*.60)}
+.message.command-guide .name{color:#afc2d2;font-weight:600;letter-spacing:.7px}
+.message.command-guide .body{font-weight:400}
+body[data-theme=minimal] .command-guide .name{display:block;margin-bottom:2px}

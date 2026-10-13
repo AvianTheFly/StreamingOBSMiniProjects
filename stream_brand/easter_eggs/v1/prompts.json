@@ -1,0 +1,231 @@
+{
+  "tool": "built-in image_gen",
+  "date": "2026-10-13",
+  "format": "8 columns x 3 rows; eight sequential poses for each of three acts",
+  "cast": [
+    {
+      "id": "kirby",
+      "name": "Kirby",
+      "reference": "game-guests-v1.png",
+      "identity": "Pink round Kirby, blue eyes, small arm flippers, red feet.",
+      "source": "https://www.nintendo.co.jp/clv/manuals/en/pdf/CLV-P-NAAPE.pdf",
+      "acts": [
+        [
+          "hello",
+          "Poyo hello",
+          "greeting",
+          "neutral; notices viewer; raises right arm; wave outward; wave inward; both arms up happy; little bow; smile settled"
+        ],
+        [
+          "dance",
+          "Victory two-step",
+          "dance",
+          "ready; left foot and left arm out; dip center; right foot and right arm out; crouch anticipation; airborne joyful twirl; land squash; triumphant both arms up"
+        ],
+        [
+          "inhale",
+          "Snack in, star out",
+          "signature",
+          "sees a small gold star next to him; leans toward star; mouth starts opening; huge round inhaling mouth with star near mouth; puffed cheeks star gone; cheeks squeeze; spits small bright gold star to right; happy closed-mouth innocent smile"
+        ]
+      ],
+      "prompt": "Use case: stylized-concept. Production animation SPRITE SHEET, true transparent RGBA. Match the corresponding character in the supplied reference sheet. Create EXACTLY 24 distinct full-body animation drawings arranged in EXACTLY 8 equal columns and 3 equal rows, landscape canvas 3072x1152 (8:3). Every cell is square and has the same size. Read each row LEFT TO RIGHT as EIGHT successive animation poses. The same character appears once per cell, 24 total, no other characters. CONSISTENCY: same identity, body size, materials, light direction and viewpoint in every cell; feet baseline at 85% of each cell, body centered horizontally, consistent body height about 55% cell height. Leave wide transparent safety margin all around each cell, keep every limb, prop, tail and motion effect fully inside its own cell. NO text, numbers, grid lines, labels, logos, ground plane, cast shadow, backdrops, panels, checkerboard, or speech bubbles. Genuine alpha transparency not painted black or white. Crisp readable silhouettes, charming polished 3D toy illustration, deliberate expressive poses. Don't reuse one drawing with tiny changes: illustrate the changing limbs/expressions in each pose. Animation readability and consistent registration are paramount.\nCHARACTER: Pink round Kirby, blue eyes, small arm flippers, red feet.\nROW 1: Poyo hello. Eight successive cells: neutral; notices viewer; raises right arm; wave outward; wave inward; both arms up happy; little bow; smile settled.\nROW 2: Victory two-step. Eight successive cells: ready; left foot and left arm out; dip center; right foot and right arm out; crouch anticipation; airborne joyful twirl; land squash; triumphant both arms up.\nROW 3: Snack in, star out. Eight successive cells: sees a small gold star next to him; leans toward star; mouth starts opening; huge round inhaling mouth with star near mouth; puffed cheeks star gone; cheeks squeeze; spits small bright gold star to right; happy closed-mouth innocent smile.\nEvery row must have exactly eight equally spaced figures; every pose should be fully visible with transparent gutters. No labels."
+    },
+    {
+      "id": "boo",
+      "name": "Boo",
+      "reference": "game-guests-v1.png",
+      "identity": "Round white Mario Boo ghost, tiny arms, pointed tail, little fangs and pink tongue.",
+      "source": "https://www.nintendo.com/en-ca/store/products/amiibo-boo-super-mario-104015/",
+      "acts": [
+        [
+          "peekaboo",
+          "Too shy to say hi",
+          "greeting",
+          "hands covering face; peeks between fingers; one eye visible; hands lower with bashful smile; small wave; looks caught; blush covers face again; peeks with tiny smile"
+        ],
+        [
+          "dance",
+          "Ghost mambo",
+          "dance",
+          "smile; left arm up body tilted left; dip with tail left; right arm up body tilted right; tongue out shimmy; spin three-quarter back; turn front laughing; settle cheerful"
+        ],
+        [
+          "scare",
+          "Scared of its own boo",
+          "funny",
+          "sneaky narrowed eyes; builds breath cheeks puffed; opens mouth wide; big tongue-out scare pose arms spread; startles at itself; arms jerk up eyes wide; hides face embarrassed; small sheepish peek"
+        ]
+      ],
+      "prompt": "Use case: stylized-concept. Production animation SPRITE SHEET, true transparent RGBA. Match the corresponding character in the supplied reference sheet. Create EXACTLY 24 distinct full-body animation drawings arranged in EXACTLY 8 equal columns and 3 equal rows, landscape canvas 3072x1152 (8:3). Every cell is square and has the same size. Read each row LEFT TO RIGHT as EIGHT successive animation poses. The same character appears once per cell, 24 total, no other characters. CONSISTENCY: same identity, body size, materials, light direction and viewpoint in every cell; feet baseline at 85% of each cell, body centered horizontally, consistent body height about 55% cell height. Leave wide transparent safety margin all around each cell, keep every limb, prop, tail and motion effect fully inside its own cell. NO text, numbers, grid lines, labels, logos, ground plane, cast shadow, backdrops, panels, checkerboard, or speech bubbles. Genuine alpha transparency not painted black or white. Crisp readable silhouettes, charming polished 3D toy illustration, deliberate expressive poses. Don't reuse one drawing with tiny changes: illustrate the changing limbs/expressions in each pose. Animation readability and consistent registration are paramount.\nCHARACTER: Round white Mario Boo ghost, tiny arms, pointed tail, little fangs and pink tongue.\nROW 1: Too shy to say hi. Eight successive cells: hands covering face; peeks between fingers; one eye visible; hands lower with bashful smile; small wave; looks caught; blush covers face again; peeks with tiny smile.\nROW 2: Ghost mambo. Eight successive cells: smile; left arm up body tilted left; dip with tail left; right arm up body tilted right; tongue out shimmy; spin three-quarter back; turn front laughing; settle cheerful.\nROW 3: Scared of its own boo. Eight successive cells: sneaky narrowed eyes; builds breath cheeks puffed; opens mouth wide; big tongue-out scare pose arms spread; startles at itself; arms jerk up eyes wide; hides face embarrassed; small sheepish peek.\nEvery row must have exactly eight equally spaced figures; every pose should be fully visible with transparent gutters. No labels."
+    },
+    {
+      "id": "crewmate",
+      "name": "Crewmate",
+      "reference": "game-guests-v1.png",
+      "identity": "Red Among Us crewmate, cyan glossy single visor, red backpack, short legs, floating red mitten hands only when gesture needs them; no face.",
+      "source": "https://innersloth.zendesk.com/hc/en-us/articles/7913947403924-Roles-Explanation",
+      "acts": [
+        [
+          "salute",
+          "Crew reporting",
+          "greeting",
+          "neutral; turns to viewer; hand rises; crisp salute at visor; lowers hand; thumbs up; little bow; neutral"
+        ],
+        [
+          "dance",
+          "Emergency disco",
+          "dance",
+          "ready bent knees; leans left one hand high; squat; leans right opposite hand high; both hands point up; funny crossed-step; triumphant disco point; settles"
+        ],
+        [
+          "task",
+          "One more card swipe",
+          "funny",
+          "holds small white card beside small floating grey reader; moves card toward slot; too-fast swipe; recoils at red light; slow careful retry; reader light green; relieved thumbs up holding card; tucks card away"
+        ]
+      ],
+      "prompt": "Use case: stylized-concept. Production animation SPRITE SHEET, true transparent RGBA. Match the corresponding character in the supplied reference sheet. Create EXACTLY 24 distinct full-body animation drawings arranged in EXACTLY 8 equal columns and 3 equal rows, landscape canvas 3072x1152 (8:3). Every cell is square and has the same size. Read each row LEFT TO RIGHT as EIGHT successive animation poses. The same character appears once per cell, 24 total, no other characters. CONSISTENCY: same identity, body size, materials, light direction and viewpoint in every cell; feet baseline at 85% of each cell, body centered horizontally, consistent body height about 55% cell height. Leave wide transparent safety margin all around each cell, keep every limb, prop, tail and motion effect fully inside its own cell. NO text, numbers, grid lines, labels, logos, ground plane, cast shadow, backdrops, panels, checkerboard, or speech bubbles. Genuine alpha transparency not painted black or white. Crisp readable silhouettes, charming polished 3D toy illustration, deliberate expressive poses. Don't reuse one drawing with tiny changes: illustrate the changing limbs/expressions in each pose. Animation readability and consistent registration are paramount.\nCHARACTER: Red Among Us crewmate, cyan glossy single visor, red backpack, short legs, floating red mitten hands only when gesture needs them; no face.\nROW 1: Crew reporting. Eight successive cells: neutral; turns to viewer; hand rises; crisp salute at visor; lowers hand; thumbs up; little bow; neutral.\nROW 2: Emergency disco. Eight successive cells: ready bent knees; leans left one hand high; squat; leans right opposite hand high; both hands point up; funny crossed-step; triumphant disco point; settles.\nROW 3: One more card swipe. Eight successive cells: holds small white card beside small floating grey reader; moves card toward slot; too-fast swipe; recoils at red light; slow careful retry; reader light green; relieved thumbs up holding card; tucks card away.\nEvery row must have exactly eight equally spaced figures; every pose should be fully visible with transparent gutters. No labels."
+    },
+    {
+      "id": "creeper",
+      "name": "Creeper",
+      "reference": "game-guests-v1.png",
+      "identity": "Minecraft green voxel Creeper, tall rectangular head and black pixel face, armless body and four block feet. Keep voxel geometry, no hands ever.",
+      "source": "https://www.minecraft.net/fr-ca/article/meet-creeper",
+      "acts": [
+        [
+          "hello",
+          "Friendly head tilt",
+          "greeting",
+          "neutral; head tilts left; tilts right curious; leans forward greeting; gentle head bow; tiny hop; soft landing; neutral curious"
+        ],
+        [
+          "dance",
+          "Four-foot shuffle",
+          "dance",
+          "neutral; front left foot forward rear right back; lower center; front right forward rear left back; tilted left shuffle; tilted right shuffle; small hop all feet tucked; feet spread landing"
+        ],
+        [
+          "fakeout",
+          "Definitely not exploding",
+          "funny",
+          "innocent; crouches; puffs slightly; tense upright; bright pale-green flash body but green silhouette preserved; small colorful square confetti pops above head; looks sideways embarrassed; relaxed innocent"
+        ]
+      ],
+      "prompt": "Use case: stylized-concept. Production animation SPRITE SHEET, true transparent RGBA. Match the corresponding character in the supplied reference sheet. Create EXACTLY 24 distinct full-body animation drawings arranged in EXACTLY 8 equal columns and 3 equal rows, landscape canvas 3072x1152 (8:3). Every cell is square and has the same size. Read each row LEFT TO RIGHT as EIGHT successive animation poses. The same character appears once per cell, 24 total, no other characters. CONSISTENCY: same identity, body size, materials, light direction and viewpoint in every cell; feet baseline at 85% of each cell, body centered horizontally, consistent body height about 55% cell height. Leave wide transparent safety margin all around each cell, keep every limb, prop, tail and motion effect fully inside its own cell. NO text, numbers, grid lines, labels, logos, ground plane, cast shadow, backdrops, panels, checkerboard, or speech bubbles. Genuine alpha transparency not painted black or white. Crisp readable silhouettes, charming polished 3D toy illustration, deliberate expressive poses. Don't reuse one drawing with tiny changes: illustrate the changing limbs/expressions in each pose. Animation readability and consistent registration are paramount.\nCHARACTER: Minecraft green voxel Creeper, tall rectangular head and black pixel face, armless body and four block feet. Keep voxel geometry, no hands ever.\nROW 1: Friendly head tilt. Eight successive cells: neutral; head tilts left; tilts right curious; leans forward greeting; gentle head bow; tiny hop; soft landing; neutral curious.\nROW 2: Four-foot shuffle. Eight successive cells: neutral; front left foot forward rear right back; lower center; front right forward rear left back; tilted left shuffle; tilted right shuffle; small hop all feet tucked; feet spread landing.\nROW 3: Definitely not exploding. Eight successive cells: innocent; crouches; puffs slightly; tense upright; bright pale-green flash body but green silhouette preserved; small colorful square confetti pops above head; looks sideways embarrassed; relaxed innocent.\nEvery row must have exactly eight equally spaced figures; every pose should be fully visible with transparent gutters. No labels."
+    },
+    {
+      "id": "goose",
+      "name": "Knife goose",
+      "reference": "game-stunts-v1.png",
+      "identity": "White Untitled Goose Game goose, orange beak and orange webbed feet, mischievous black eyes. Same charming softly shaded style as reference. Kitchen knife only in the knife-march performance, comic prop no attacking.",
+      "source": "https://untitled.goose.game/",
+      "acts": [
+        [
+          "honk",
+          "A very polite honk",
+          "greeting",
+          "upright beak closed; neck rises; beak opens small; beak wide honk wings slightly raised; closes beak smugly; little bow; one wing wave; upright"
+        ],
+        [
+          "march",
+          "Stolen cutlery parade",
+          "dance",
+          "knife sideways in beak standing; left foot steps right wing up; low bob knife stays in beak; right foot steps left wing up; both wings spread proud; high marching step; low marching step; smug settled knife held"
+        ],
+        [
+          "theft",
+          "Your cup is my cup",
+          "funny",
+          "looks at small gold cup on right; crouches toward cup; beak reaches handle; grabs cup handle; lifts cup with beak; glances toward viewer; turns right cup in beak; leans into getaway run"
+        ]
+      ],
+      "prompt": "Use case: stylized-concept. Production animation SPRITE SHEET, true transparent RGBA. Match the corresponding character in the supplied reference sheet. Create EXACTLY 24 distinct full-body animation drawings arranged in EXACTLY 8 equal columns and 3 equal rows, landscape canvas 3072x1152 (8:3). Every cell is square and has the same size. Read each row LEFT TO RIGHT as EIGHT successive animation poses. The same character appears once per cell, 24 total, no other characters. CONSISTENCY: same identity, body size, materials, light direction and viewpoint in every cell; feet baseline at 85% of each cell, body centered horizontally, consistent body height about 55% cell height. Leave wide transparent safety margin all around each cell, keep every limb, prop, tail and motion effect fully inside its own cell. NO text, numbers, grid lines, labels, logos, ground plane, cast shadow, backdrops, panels, checkerboard, or speech bubbles. Genuine alpha transparency not painted black or white. Crisp readable silhouettes, charming polished 3D toy illustration, deliberate expressive poses. Don't reuse one drawing with tiny changes: illustrate the changing limbs/expressions in each pose. Animation readability and consistent registration are paramount.\nCHARACTER: White Untitled Goose Game goose, orange beak and orange webbed feet, mischievous black eyes. Same charming softly shaded style as reference. Kitchen knife only in the knife-march performance, comic prop no attacking.\nROW 1: A very polite honk. Eight successive cells: upright beak closed; neck rises; beak opens small; beak wide honk wings slightly raised; closes beak smugly; little bow; one wing wave; upright.\nROW 2: Stolen cutlery parade. Eight successive cells: knife sideways in beak standing; left foot steps right wing up; low bob knife stays in beak; right foot steps left wing up; both wings spread proud; high marching step; low marching step; smug settled knife held.\nROW 3: Your cup is my cup. Eight successive cells: looks at small gold cup on right; crouches toward cup; beak reaches handle; grabs cup handle; lifts cup with beak; glances toward viewer; turns right cup in beak; leans into getaway run.\nEvery row must have exactly eight equally spaced figures; every pose should be fully visible with transparent gutters. No labels."
+    },
+    {
+      "id": "climber",
+      "name": "Getting Over It climber",
+      "reference": "game-stunts-v1.png",
+      "identity": "Adult short dark-haired muscular man waist-deep in round black iron cauldron. No legs. Consistent face and pot. Wooden long-handled steel sledgehammer gripped by both hands except wave. Whole hammer fits in cell.",
+      "source": "https://www.foddy.net/blog/2017/09/getting-over-it/",
+      "acts": [
+        [
+          "salute",
+          "Summit salute",
+          "greeting",
+          "hammer across chest; raises hammer diagonally; plants hammer to side; one hand waves; bigger wave; returns hand to hammer; proud chin nod; neutral"
+        ],
+        [
+          "dance",
+          "Cauldron groove",
+          "dance",
+          "pot upright hammer horizontal; pot tilts left shoulders left; pot straight lowered shoulders; pot right shoulders right; hammer high triumphant; pot left bounce; pot right bounce; upright grin"
+        ],
+        [
+          "slip",
+          "I had that",
+          "signature",
+          "hammer head planted on tiny grey stone right; leans forward pushing; pot lifts slightly; pot higher hammer braced; balancing proud precarious; hammer slips sideways shocked face; pot tipped back arms flail holding hammer; lands in pot slumped defeated"
+        ]
+      ],
+      "prompt": "Use case: stylized-concept. Production animation SPRITE SHEET, true transparent RGBA. Match the corresponding character in the supplied reference sheet. Create EXACTLY 24 distinct full-body animation drawings arranged in EXACTLY 8 equal columns and 3 equal rows, landscape canvas 3072x1152 (8:3). Every cell is square and has the same size. Read each row LEFT TO RIGHT as EIGHT successive animation poses. The same character appears once per cell, 24 total, no other characters. CONSISTENCY: same identity, body size, materials, light direction and viewpoint in every cell; feet baseline at 85% of each cell, body centered horizontally, consistent body height about 55% cell height. Leave wide transparent safety margin all around each cell, keep every limb, prop, tail and motion effect fully inside its own cell. NO text, numbers, grid lines, labels, logos, ground plane, cast shadow, backdrops, panels, checkerboard, or speech bubbles. Genuine alpha transparency not painted black or white. Crisp readable silhouettes, charming polished 3D toy illustration, deliberate expressive poses. Don't reuse one drawing with tiny changes: illustrate the changing limbs/expressions in each pose. Animation readability and consistent registration are paramount.\nCHARACTER: Adult short dark-haired muscular man waist-deep in round black iron cauldron. No legs. Consistent face and pot. Wooden long-handled steel sledgehammer gripped by both hands except wave. Whole hammer fits in cell.\nROW 1: Summit salute. Eight successive cells: hammer across chest; raises hammer diagonally; plants hammer to side; one hand waves; bigger wave; returns hand to hammer; proud chin nod; neutral.\nROW 2: Cauldron groove. Eight successive cells: pot upright hammer horizontal; pot tilts left shoulders left; pot straight lowered shoulders; pot right shoulders right; hammer high triumphant; pot left bounce; pot right bounce; upright grin.\nROW 3: I had that. Eight successive cells: hammer head planted on tiny grey stone right; leans forward pushing; pot lifts slightly; pot higher hammer braced; balancing proud precarious; hammer slips sideways shocked face; pot tipped back arms flail holding hammer; lands in pot slumped defeated.\nEvery row must have exactly eight equally spaced figures; every pose should be fully visible with transparent gutters. No labels."
+    },
+    {
+      "id": "hornet",
+      "name": "Hornet",
+      "reference": "game-stunts-v1.png",
+      "identity": "Hornet from Hollow Knight, long white two-horn mask, black oval eye holes, red flowing cloak, slender black limbs, silver sewing needle. No mouth. Same polished dimensional reference style.",
+      "source": "https://hollowknightsilksong.com/",
+      "acts": [
+        [
+          "bow",
+          "Quiet challenger",
+          "greeting",
+          "stands needle at side; needle points down; head inclines; deep courtly bow cloak drapes; rises halfway; straightens; small hand acknowledgement; ready stance"
+        ],
+        [
+          "flourish",
+          "Needle recital",
+          "signature",
+          "ready needle diagonally down; winds needle to left; sweeps needle across front; overhead needle flourish red cloak fans; pivots on one leg; needle sweeps low; elegant finish needle forward; rest"
+        ],
+        [
+          "silk",
+          "Silk got tangled",
+          "funny",
+          "holds loose silk loop; tosses loop upward; loop circles needle; silk catches around own red cloak; looks down surprised; lifts one foot freeing silk; snaps free cloak flares; stands composed with silk loop beside needle"
+        ]
+      ],
+      "prompt": "Use case: stylized-concept. Production animation SPRITE SHEET, true transparent RGBA. Match the corresponding character in the supplied reference sheet. Create EXACTLY 24 distinct full-body animation drawings arranged in EXACTLY 8 equal columns and 3 equal rows, landscape canvas 3072x1152 (8:3). Every cell is square and has the same size. Read each row LEFT TO RIGHT as EIGHT successive animation poses. The same character appears once per cell, 24 total, no other characters. CONSISTENCY: same identity, body size, materials, light direction and viewpoint in every cell; feet baseline at 85% of each cell, body centered horizontally, consistent body height about 55% cell height. Leave wide transparent safety margin all around each cell, keep every limb, prop, tail and motion effect fully inside its own cell. NO text, numbers, grid lines, labels, logos, ground plane, cast shadow, backdrops, panels, checkerboard, or speech bubbles. Genuine alpha transparency not painted black or white. Crisp readable silhouettes, charming polished 3D toy illustration, deliberate expressive poses. Don't reuse one drawing with tiny changes: illustrate the changing limbs/expressions in each pose. Animation readability and consistent registration are paramount.\nCHARACTER: Hornet from Hollow Knight, long white two-horn mask, black oval eye holes, red flowing cloak, slender black limbs, silver sewing needle. No mouth. Same polished dimensional reference style.\nROW 1: Quiet challenger. Eight successive cells: stands needle at side; needle points down; head inclines; deep courtly bow cloak drapes; rises halfway; straightens; small hand acknowledgement; ready stance.\nROW 2: Needle recital. Eight successive cells: ready needle diagonally down; winds needle to left; sweeps needle across front; overhead needle flourish red cloak fans; pivots on one leg; needle sweeps low; elegant finish needle forward; rest.\nROW 3: Silk got tangled. Eight successive cells: holds loose silk loop; tosses loop upward; loop circles needle; silk catches around own red cloak; looks down surprised; lifts one foot freeing silk; snaps free cloak flares; stands composed with silk loop beside needle.\nEvery row must have exactly eight equally spaced figures; every pose should be fully visible with transparent gutters. No labels."
+    },
+    {
+      "id": "salvager",
+      "name": "Salvage robot",
+      "reference": "game-stunts-v1.png",
+      "identity": "Our original R.E.P.O.-inspired toy salvage robot: squat weathered yellow-orange cylindrical body, huge protruding white eyes black pupils, short mechanical arms black claw mitts, small black wheeled feet. Match reference exactly, not an official R.E.P.O. design.",
+      "source": "https://store.steampowered.com/app/3241660/REPO/",
+      "acts": [
+        [
+          "hello",
+          "Boot-up wave",
+          "greeting",
+          "head lowered eyes half closed; eyes open; looks at viewer; right claw raises; wave outward; wave inward; both claws excited; neutral friendly"
+        ],
+        [
+          "dance",
+          "Do the actual robot",
+          "dance",
+          "ready; left arm straight right arm bent; both elbows right; knee-wheel dip; right arm straight left bent; head angled left; both arms up freeze; settles"
+        ],
+        [
+          "trophy",
+          "Very valuable. Very fragile.",
+          "funny",
+          "holds small gold trophy in both claws; proudly lifts trophy; trophy tilts; trophy just above claws eyes wide; catches sideways; trophy nearly slips again; hugs trophy tight relieved; gives sheepish little wave while holding trophy"
+        ]
+      ],
+      "prompt": "Use case: stylized-concept. Production animation SPRITE SHEET, true transparent RGBA. Match the corresponding character in the supplied reference sheet. Create EXACTLY 24 distinct full-body animation drawings arranged in EXACTLY 8 equal columns and 3 equal rows, landscape canvas 3072x1152 (8:3). Every cell is square and has the same size. Read each row LEFT TO RIGHT as EIGHT successive animation poses. The same character appears once per cell, 24 total, no other characters. CONSISTENCY: same identity, body size, materials, light direction and viewpoint in every cell; feet baseline at 85% of each cell, body centered horizontally, consistent body height about 55% cell height. Leave wide transparent safety margin all around each cell, keep every limb, prop, tail and motion effect fully inside its own cell. NO text, numbers, grid lines, labels, logos, ground plane, cast shadow, backdrops, panels, checkerboard, or speech bubbles. Genuine alpha transparency not painted black or white. Crisp readable silhouettes, charming polished 3D toy illustration, deliberate expressive poses. Don't reuse one drawing with tiny changes: illustrate the changing limbs/expressions in each pose. Animation readability and consistent registration are paramount.\nCHARACTER: Our original R.E.P.O.-inspired toy salvage robot: squat weathered yellow-orange cylindrical body, huge protruding white eyes black pupils, short mechanical arms black claw mitts, small black wheeled feet. Match reference exactly, not an official R.E.P.O. design.\nROW 1: Boot-up wave. Eight successive cells: head lowered eyes half closed; eyes open; looks at viewer; right claw raises; wave outward; wave inward; both claws excited; neutral friendly.\nROW 2: Do the actual robot. Eight successive cells: ready; left arm straight right arm bent; both elbows right; knee-wheel dip; right arm straight left bent; head angled left; both arms up freeze; settles.\nROW 3: Very valuable. Very fragile.. Eight successive cells: holds small gold trophy in both claws; proudly lifts trophy; trophy tilts; trophy just above claws eyes wide; catches sideways; trophy nearly slips again; hugs trophy tight relieved; gives sheepish little wave while holding trophy.\nEvery row must have exactly eight equally spaced figures; every pose should be fully visible with transparent gutters. No labels."
+    }
+  ]
+}

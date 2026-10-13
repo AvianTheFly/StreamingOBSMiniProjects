@@ -57,13 +57,18 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(len(self.e.queue),8)
         self.assertEqual(self.e.snapshot()['name'],'b')
 
-    def test_raid_expires_at_eight_seconds(self):
-        self.e.submit('raid','Eight second party',42)
-        self.assertEqual(self.e.snapshot()['duration'],8)
-        self.now=7.99
-        self.assertIsNotNone(self.e.snapshot())
-        self.now=8
-        self.assertIsNone(self.e.snapshot())
+    def test_raid_expires_with_its_single_pass_music(self):
+        for theme, score in self.e.raid_scores.items():
+            self.now=0;self.e.clear()
+            self.e.submit('raid','One musical phrase',42,theme=theme)
+            duration=score['duration']
+            self.assertTrue(6 < duration < 6.7)
+            self.assertEqual(self.e.snapshot()['duration'],duration)
+            self.now=duration-.001;self.assertIsNotNone(self.e.snapshot())
+            self.now=duration;self.assertIsNone(self.e.snapshot())
+            import wave
+            with wave.open(str(ROOT/'mini projects/twitch_celebrations/media'/score['audio'])) as audio:
+                self.assertAlmostEqual(audio.getnframes()/audio.getframerate(),duration,places=4)
 
     def test_subs_are_prioritized_and_can_enter_a_full_lower_priority_queue(self):
         for i in range(8):self.e.submit('cheer','Hype')
@@ -73,11 +78,11 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(self.e.snapshot()['kind'],'raid')
         self.now=8
         self.assertEqual(self.e.snapshot()['kind'],'subscribe')
-        self.now=11.8
+        self.now=12.8
         self.assertEqual(self.e.snapshot()['kind'],'cheer')
 
     def test_supporter_expiry_matches_short_contract(self):
-        for kind,duration in [('subscribe',3.8),('gift',3.8),('follow',2.2)]:
+        for kind,duration in [('subscribe',4.8),('gift',3.8),('follow',2.2)]:
             self.now=0;self.e.clear();self.e.submit(kind,'Friend')
             self.assertEqual(self.e.snapshot()['duration'],duration)
             self.now=duration-.01;self.assertIsNotNone(self.e.snapshot())
@@ -101,6 +106,26 @@ class EngineTests(unittest.TestCase):
 
 
 class HTTPTests(unittest.TestCase):
+    def test_static_raid_manifests_are_original_json_bytes(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);(root/'media').mkdir()
+            payload=b'{"frames": [1, 2], "label": "dance"}'
+            for name in ('raid-dancers.json','raid-penguin-frames.json'):
+                (root/'media'/name).write_bytes(payload)
+            service=Service(threading.Event())
+            server=ThreadingHTTPServer(('127.0.0.1',0),handler(service,root,0))
+            server.RequestHandlerClass=handler(service,root,server.server_port)
+            thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
+            try:
+                for name in ('raid-dancers.json','raid-penguin-frames.json'):
+                    with urlopen(f'http://127.0.0.1:{server.server_port}/'+name) as response:
+                        self.assertEqual(response.headers.get_content_type(),'application/json')
+                        actual=response.read();self.assertEqual(actual,payload)
+                        self.assertEqual(json.loads(actual)['frames'],[1,2])
+            finally:
+                server.shutdown();server.server_close();thread.join()
+
     def test_api_csrf_host_and_media_paths(self):
         service=Service(threading.Event())
         server=ThreadingHTTPServer(('127.0.0.1',0),handler(service,ROOT/'mini projects/twitch_celebrations',0))
@@ -110,6 +135,10 @@ class HTTPTests(unittest.TestCase):
         url=f'http://127.0.0.1:{port}'
         try:
             with urlopen(url+'/') as r: self.assertIn(b'Let the spirits celebrate',r.read())
+            for name in ('subscriber_story.js','subscriber_party.js','subscriber_acts.js','raid_music.js','raid_cast.js','raid_penguins.js','raid_party.js','raid_story.js','raid_effects.js','raid_acts.js','raid_guests.js','raid_crossovers.js'):
+                with urlopen(url+'/'+name) as r:
+                    self.assertIn(r.headers.get_content_type(), ('text/javascript','application/javascript'))
+                    self.assertEqual(r.read(),(ROOT/'mini projects/twitch_celebrations'/name).read_bytes())
             # Approved follower sprites belong to celebrations. Transition-art
             # cleanup must not remove their dependencies or break readiness.
             for name in ('bear-attack.png','turtle.png','ram-charge.png','phoenix-hero.png'):
@@ -169,7 +198,7 @@ class TransportTests(unittest.TestCase):
         self.assertFalse(e.submit('subscribe','Supporter',event_id='sub1'))
         item=e.snapshot()
         self.assertEqual(item['kind'],'subscribe')
-        self.assertEqual(item['duration'],3.8)
+        self.assertEqual(item['duration'],4.8)
         self.assertEqual(item['details'],dict(tier='2000',months=18,message='love this crew',renewal=True))
         e.clear();e.submit('follow','Friend',details={'tier':'3000'})
         self.assertEqual(e.snapshot()['duration'],2.2)

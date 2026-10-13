@@ -123,7 +123,7 @@ def sync_labels(data):
             return
         meta=data['clips'].get(library.clip_id(path), {})
         title,context=presentation.clip_copy(path,meta)
-        _state.update(title=title,context=context,purpose='highlight' if library.highlight_candidate(meta) else 'replay_only')
+        _state.update(title=title,context=context,purpose=library.capture_purpose(meta))
 
 
 def entering():

@@ -3,12 +3,13 @@
 # Handlers for game-level lifecycle events: game detected and game ended.
 #
 # Scene switching is intentionally NOT done here.  When a game starts or ends,
-# this module emits hub events ("game.connected" / "game.disconnected") and
-# scene_voice_switcher subscribes to those events and performs the actual switch.
+# league_api publishes the artwork-clock boundaries through the shared contract.
+# Standalone League falls back to emitting the same hub lifecycle events.
 # This keeps each project responsible for its own scenes.
 
 import obs
 import events as hub_events
+from lib.coordination.game_policy import game_scene_policy
 
 from ..config import (
     GAME_START_SCENE, GAME_START_SOURCE, GAME_START_DURATION, GAME_START_ENABLED,
@@ -22,8 +23,9 @@ from ..utils import show_overlay
 def make_game_start_handler():
     def handle_game_start():
         print("[league] Game detected — notifying hub.")
-        # Notify other projects (scene_voice_switcher will switch to game scene).
-        hub_events.emit("game.connected")
+        # In the Hub the image owner already published this boundary.
+        if game_scene_policy.match_state() is None:
+            hub_events.emit("game.connected")
 
         if not GAME_START_ENABLED or GAME_START_SOURCE is None:
             return
@@ -47,6 +49,7 @@ def make_game_end_handler():
                 print(f"[league] Failed to hide {source}: {e}")
 
         # Notify other projects (scene_voice_switcher will switch back to lobby).
-        hub_events.emit("game.disconnected")
+        if game_scene_policy.match_state() is None:
+            hub_events.emit("game.disconnected")
 
     return handle_game_end

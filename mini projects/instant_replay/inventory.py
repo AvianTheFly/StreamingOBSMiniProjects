@@ -17,7 +17,7 @@ def _replay_entries(root, *, highlights_only=False, labels=None):
     if not root.is_dir():
         return []
     files = list(media_entries(root, _REPLAY_MEDIA_EXTENSIONS))
-    for folder in (root / 'clips', root / 'edited', root / 'replay-only', root / 'cuts'):
+    for folder in (root / 'clips', root / 'edited', root / 'replay-only', root / 'review-later', root / 'cuts'):
         files.extend(media_entries(folder, _REPLAY_MEDIA_EXTENSIONS, recursive=True))
     paths = {path for path, _ in files}
     files = [(path, stat) for path, stat in files if path.name.endswith(TRIMMED_SUFFIX) or path.with_name(path.stem + TRIMMED_SUFFIX) not in paths]
@@ -75,14 +75,16 @@ class ReplayInventory:
     def _get_most_recent_clip(self) -> list[str]:
         """Return [path] or [] if no clips."""
         with self.state._lock:
-            if self.state._clip_registry:
-                return [self.state._clip_registry[-1]['path']]
-        files = _replay_files_on_disk()
-        return [str(files[0])] if files else []
+            recent = [e['path'] for e in reversed(self.state._clip_registry)]
+        from . import library
+        candidates = library.replay_paths(recent) or library.replay_paths(_replay_files_on_disk())
+        return candidates[:1]
 
     def _get_all_clips_in_order(self) -> list[str]:
         with self.state._lock:
-            return [e['path'] for e in self.state._clip_registry]
+            paths = [e['path'] for e in self.state._clip_registry]
+        from . import library
+        return library.replay_paths(paths)
 
     def _resolve_play_spec(self, spec: str) -> list[str]:
         """
@@ -102,8 +104,10 @@ class ReplayInventory:
                 number = _WORD_TO_NUM.get(raw_num)
         with self.state._lock:
             matches = [e for e in self.state._clip_registry if e['tag'].lower() == tag]
+        from . import library
+        eligible = set(library.replay_paths([e['path'] for e in matches]))
+        matches = [e for e in matches if str(Path(e['path']).resolve()) in eligible]
         if not matches:
-            from . import library
             persisted = library.tagged_paths(tag, REPLAY_DIR)
             if number is not None:
                 return [persisted[number - 1]] if 0 < number <= len(persisted) else []

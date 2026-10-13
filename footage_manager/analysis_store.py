@@ -36,6 +36,13 @@ class AnalysisStore:
         self.store.execute('INSERT OR REPLACE INTO analyses VALUES (?,?,?,?,?,?,?)',
             (video['id'],self.signature(video),VERSION,'complete',json.dumps(options),json.dumps(result),time.time()))
 
+    def pending_ids(self, videos):
+        """New/changed sources only; do not discard useful older estimates."""
+        completed = {row['video_id']: row['signature'] for row in self.store.rows(
+            "SELECT video_id, signature FROM analyses WHERE state='complete'")}
+        return [video['id'] for video in videos
+                if completed.get(video['id']) != self.signature(video)]
+
     def duplicate_candidates(self, video, options):
         """Same-size/current generations are only candidates, never proof of identity."""
         rows=self.store.rows('''SELECT v.*, a.signature AS analysis_signature,

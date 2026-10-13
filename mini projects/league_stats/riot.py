@@ -19,6 +19,10 @@ class RiotFailure(ValueError):
     """Sanitized failure: no response bodies, headers or credentials escape."""
 
 
+class MatchForbidden(RiotFailure):
+    """A match is restricted even though Riot just accepted this key."""
+
+
 class KeySource:
     def __init__(self,path=ENV_FILE):
         self.path=path
@@ -44,12 +48,14 @@ class RiotClient:
         self.blocked_until=0;self.last_request=-1000;self.last_success=None
         self.state='unconfigured';self.message='Local tracking works without a Riot key'
         self.platform='na1';self.key_source='root .env'
+        self.authorization_check=None;self.authorization_until=0
 
     def credential(self):
         key,self.key_source=self.keys.read()
         fingerprint=hashlib.sha256(key.encode()).digest() if key else None
         if fingerprint!=self.fingerprint:
             self.identities.clear()
+            self.authorization_check=None;self.authorization_until=0
             if self.state=='unauthorized':self.blocked_until=0
             self.fingerprint=fingerprint
             self.state='ready' if key else 'unconfigured'
@@ -79,6 +85,17 @@ class RiotClient:
         key=self.credential();now=self.clock()
         if not key:raise Deferred('Riot key is not configured')
         if now<self.blocked_until:raise Deferred(self.message)
+        if method!='authorization' and self.authorization_check:
+            # A restricted old match can return 403 with a valid personal key.
+            # Verify through Riot, paced by the same request owner, before
+            # deciding whether to skip that record or suspend the credential.
+            denied=self.authorization_check
+            self.get(self.platform,'/lol/status/v4/platform-data',method='authorization')
+            self.authorization_until=self.clock()+60
+            self.authorization_check=None
+            if denied==(host,path):
+                raise MatchForbidden('Riot restricts access to this archived match')
+            now=self.clock()
         calls=self.calls.setdefault(host,deque())
         while calls and calls[0]<=now-120:calls.popleft()
         wait=max(0,1.5-(now-self.last_request),calls[0]+120-now if len(calls)>=90 else 0)
@@ -109,6 +126,13 @@ class RiotClient:
             except ValueError:delay=120
             if not math.isfinite(delay) or delay<0:delay=120
             self.blocked_until=now+max(1,delay);self.state='rate_limited';self.message='Riot rate limit; queued work will resume automatically'
+            raise Deferred(self.message)
+        if code==403 and method in ('match','timeline'):
+            if now<self.authorization_until:
+                raise MatchForbidden('Riot restricts access to this archived match')
+            self.authorization_check=(host,path)
+            self.blocked_until=now+1.5;self.state='waiting'
+            self.message='Checking access to a restricted archived match'
             raise Deferred(self.message)
         if code in (401,403):
             self.blocked_until=now+600;self.state='unauthorized';self.message='Riot key was refused; renew it in the Developer Portal'

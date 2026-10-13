@@ -37,6 +37,34 @@
       {
         "id": "chart",
         "label": "Living treasure map"
+      },
+      {
+        "id": "game-kirby",
+        "label": "Kirby discovers bubble tea"
+      },
+      {
+        "id": "game-creeper",
+        "label": "Creeper mistakes coral for cover"
+      },
+      {
+        "id": "game-goose",
+        "label": "Knife goose inspects the tea service"
+      },
+      {
+        "id": "game-climber",
+        "label": "Getting Over the reef counter"
+      },
+      {
+        "id": "league-udyr",
+        "label": "Iron Mantle: protect the poro"
+      },
+      {
+        "id": "league-poro",
+        "label": "Poro steals the last biscuit"
+      },
+      {
+        "id": "league-scuttle",
+        "label": "Rift Scuttler claims a tiny vision shrine"
       }
     ]
   },
@@ -44,60 +72,52 @@
     "world": "forge",
     "actions": [
       {
-        "id": "hammer",
-        "label": "Balance team bonk"
+        "id": "game-crewmate",
+        "label": "Crewmate repairs the forge rune; it overachieves"
       },
       {
-        "id": "duck",
-        "label": "Apprentice gets promoted"
+        "id": "game-climber",
+        "label": "Getting Over the monumental anvil"
       },
       {
-        "id": "runes",
-        "label": "Hotfix rollercoaster"
+        "id": "game-salvager",
+        "label": "Salvage robot delivers a helmet for the duck"
       },
       {
-        "id": "crystals",
-        "label": "XP piñata"
+        "id": "league-udyr",
+        "label": "Blazing Stampede: stubborn training post"
       },
       {
-        "id": "moth",
-        "label": "Debug swarm"
+        "id": "league-poro",
+        "label": "Poro steals the last biscuit"
       },
       {
-        "id": "forged",
-        "label": "Legendary honk reveal"
+        "id": "league-teemo",
+        "label": "Teemo leaves a suspicious mushroom"
       },
       {
-        "id": "hotfix",
-        "label": "Emergency snack patch"
+        "id": "border-climber",
+        "label": "Getting Over the screen corner"
       },
       {
-        "id": "loot",
-        "label": "Chest quality assurance"
+        "id": "border-poro",
+        "label": "Poro peeks from behind the frame"
       },
       {
-        "id": "goblin-bonk",
-        "label": "The balance department"
+        "id": "border-goose",
+        "label": "Knife goose patrols the frame"
       },
       {
-        "id": "duck-knights",
-        "label": "Raid party of extremely small tanks"
+        "id": "moment-awakening",
+        "label": "The mountain ram wakes the forge"
       },
       {
-        "id": "anvil-audit",
-        "label": "The sword failed inspection"
+        "id": "moment-weather",
+        "label": "The furnace exhales a shower of embers"
       },
       {
-        "id": "duck-levelup",
-        "label": "Apprentice to final boss"
-      },
-      {
-        "id": "anvil-moonwalk",
-        "label": "Heavy metal movement tech"
-      },
-      {
-        "id": "goblin-delivery",
-        "label": "Patch delivery service"
+        "id": "moment-lanterns",
+        "label": "The duck blueprint gains even larger horns"
       }
     ]
   },
@@ -105,28 +125,52 @@
     "world": "sanctuary",
     "actions": [
       {
-        "id": "boat",
-        "label": "Paper-boat delivery"
+        "id": "game-kirby",
+        "label": "Kirby discovers extremely relaxing shrine tea"
       },
       {
-        "id": "mushroom",
-        "label": "Mushroom on an errand"
+        "id": "game-boo",
+        "label": "Boo hides behind the tea table"
       },
       {
-        "id": "moths",
-        "label": "Moon moth visitors"
+        "id": "game-hornet",
+        "label": "Hornet uses the shrine beam as a shortcut"
       },
       {
-        "id": "tea",
-        "label": "Tea with wings"
+        "id": "league-udyr",
+        "label": "Wilding Claw: ring the practice bell"
       },
       {
-        "id": "frog",
-        "label": "One polite croak"
+        "id": "league-poro",
+        "label": "Poro steals the last biscuit"
       },
       {
-        "id": "stars",
-        "label": "Lantern constellation"
+        "id": "league-scuttle",
+        "label": "Rift Scuttler claims a tiny vision shrine"
+      },
+      {
+        "id": "border-climber",
+        "label": "Getting Over the screen corner"
+      },
+      {
+        "id": "border-poro",
+        "label": "Poro peeks from behind the frame"
+      },
+      {
+        "id": "border-goose",
+        "label": "Knife goose patrols the frame"
+      },
+      {
+        "id": "moment-awakening",
+        "label": "The turtle sends ripples through the shrine"
+      },
+      {
+        "id": "moment-weather",
+        "label": "Blossoms drift from the bonsai"
+      },
+      {
+        "id": "moment-lanterns",
+        "label": "The leading snail gets a tiny victory lap"
       }
     ]
   },
@@ -188,6 +232,30 @@
       {
         "id": "luggage-loot",
         "label": "Baggage claim is a boss fight"
+      },
+      {
+        "id": "game-kirby",
+        "label": "Kirby samples first-class snacks"
+      },
+      {
+        "id": "game-boo",
+        "label": "Boo is shy at boarding"
+      },
+      {
+        "id": "game-goose",
+        "label": "Knife goose clears airport security"
+      },
+      {
+        "id": "league-udyr",
+        "label": "Wingborne Storm: one very cold drink"
+      },
+      {
+        "id": "league-poro",
+        "label": "Poro steals the last biscuit"
+      },
+      {
+        "id": "league-teemo",
+        "label": "Teemo leaves a suspicious mushroom"
       }
     ]
   },
@@ -217,6 +285,34 @@
       {
         "id": "lifebuoy",
         "label": "Tiny rescue service"
+      },
+      {
+        "id": "game-crewmate",
+        "label": "Crewmate repairs the storm lights"
+      },
+      {
+        "id": "game-boo",
+        "label": "Boo is nervous about thunder"
+      },
+      {
+        "id": "game-goose",
+        "label": "Knife goose slides the lighthouse cup"
+      },
+      {
+        "id": "game-climber",
+        "label": "Getting Over the coastal counter"
+      },
+      {
+        "id": "league-udyr",
+        "label": "Iron Mantle: protect the poro"
+      },
+      {
+        "id": "league-poro",
+        "label": "Poro steals the last biscuit"
+      },
+      {
+        "id": "league-scuttle",
+        "label": "Rift Scuttler claims a tiny vision shrine"
       }
     ]
   },
@@ -224,28 +320,52 @@
     "world": "phoenix-observatory",
     "actions": [
       {
-        "id": "comet",
-        "label": "Comet with tea"
+        "id": "game-kirby",
+        "label": "Kirby orders tea, receives Wingborne Storm"
       },
       {
-        "id": "astronomer",
-        "label": "Duck astronomer"
+        "id": "game-hornet",
+        "label": "Hornet anchors silk to the observatory stonework"
       },
       {
-        "id": "phoenix",
-        "label": "Pocket phoenix"
+        "id": "game-climber",
+        "label": "Getting Over the floating observatory"
       },
       {
-        "id": "planets",
-        "label": "Planets on parade"
+        "id": "league-udyr",
+        "label": "Wingborne Storm: one very cold drink"
       },
       {
-        "id": "wish",
-        "label": "A passing wish"
+        "id": "league-poro",
+        "label": "Poro steals the last biscuit"
       },
       {
-        "id": "moon",
-        "label": "A curious little moon"
+        "id": "league-scuttle",
+        "label": "Rift Scuttler claims a tiny vision shrine"
+      },
+      {
+        "id": "border-climber",
+        "label": "Getting Over the screen corner"
+      },
+      {
+        "id": "border-poro",
+        "label": "Poro peeks from behind the frame"
+      },
+      {
+        "id": "border-goose",
+        "label": "Knife goose patrols the frame"
+      },
+      {
+        "id": "moment-awakening",
+        "label": "The cryophoenix unfurls a frozen firestorm"
+      },
+      {
+        "id": "moment-weather",
+        "label": "A little sparkle follows the frozen tea spill"
+      },
+      {
+        "id": "moment-lanterns",
+        "label": "The egg attempts to warm its own hat"
       }
     ]
   },
@@ -275,6 +395,30 @@
       {
         "id": "leaves",
         "label": "Autumn makes a turtle"
+      },
+      {
+        "id": "game-crewmate",
+        "label": "Crewmate checks the platform circuit"
+      },
+      {
+        "id": "game-goose",
+        "label": "Knife goose catches the wrong train"
+      },
+      {
+        "id": "game-climber",
+        "label": "Getting Over the station steps"
+      },
+      {
+        "id": "league-udyr",
+        "label": "Blazing Stampede: stubborn training post"
+      },
+      {
+        "id": "league-poro",
+        "label": "Poro steals the last biscuit"
+      },
+      {
+        "id": "league-teemo",
+        "label": "Teemo leaves a suspicious mushroom"
       }
     ]
   },
@@ -336,6 +480,30 @@
       {
         "id": "last-call",
         "label": "One more dungeon"
+      },
+      {
+        "id": "game-boo",
+        "label": "Boo fails to scare the bartender"
+      },
+      {
+        "id": "game-goose",
+        "label": "Knife goose visits the tavern"
+      },
+      {
+        "id": "game-climber",
+        "label": "Getting Over last orders"
+      },
+      {
+        "id": "league-udyr",
+        "label": "Wilding Claw: ring the practice bell"
+      },
+      {
+        "id": "league-poro",
+        "label": "Poro steals the last biscuit"
+      },
+      {
+        "id": "league-teemo",
+        "label": "Teemo leaves a suspicious mushroom"
       }
     ]
   },
@@ -397,6 +565,30 @@
       {
         "id": "toaster-disco",
         "label": "Zero gravity breakfast club"
+      },
+      {
+        "id": "game-crewmate",
+        "label": "Crewmate does one actual task"
+      },
+      {
+        "id": "game-kirby",
+        "label": "Kirby takes a star out of orbit"
+      },
+      {
+        "id": "game-salvager",
+        "label": "Salvage robot handles fragile cargo"
+      },
+      {
+        "id": "league-udyr",
+        "label": "Wilding Claw: ring the practice bell"
+      },
+      {
+        "id": "league-poro",
+        "label": "Poro steals the last biscuit"
+      },
+      {
+        "id": "league-scuttle",
+        "label": "Rift Scuttler claims a tiny vision shrine"
       }
     ]
   },
@@ -458,6 +650,30 @@
       {
         "id": "coin-conga",
         "label": "Exact change conga"
+      },
+      {
+        "id": "game-kirby",
+        "label": "Kirby eats the bonus star"
+      },
+      {
+        "id": "game-crewmate",
+        "label": "Crewmate repairs the arcade cabinet"
+      },
+      {
+        "id": "game-salvager",
+        "label": "Salvage robot fumbles the arcade prize"
+      },
+      {
+        "id": "league-udyr",
+        "label": "Blazing Stampede: stubborn training post"
+      },
+      {
+        "id": "league-poro",
+        "label": "Poro steals the last biscuit"
+      },
+      {
+        "id": "league-teemo",
+        "label": "Teemo leaves a suspicious mushroom"
       }
     ]
   },
@@ -465,28 +681,52 @@
     "world": "aurora-camp",
     "actions": [
       {
-        "id": "marshmallows",
-        "label": "Marshmallow hikers"
+        "id": "game-kirby",
+        "label": "Kirby overcommits to a toasted marshmallow"
       },
       {
-        "id": "kettle",
-        "label": "Starlight from the kettle"
+        "id": "game-creeper",
+        "label": "The forest answers Creeper with thunder"
       },
       {
-        "id": "moths",
-        "label": "Firelight moths"
+        "id": "game-goose",
+        "label": "Knife goose steals the camp tea"
       },
       {
-        "id": "camper",
-        "label": "Duck under the stars"
+        "id": "league-udyr",
+        "label": "Iron Mantle: protect the poro"
       },
       {
-        "id": "constellation",
-        "label": "A tiny northern constellation"
+        "id": "league-poro",
+        "label": "Poro steals the last biscuit"
       },
       {
-        "id": "lantern",
-        "label": "Lantern on a night walk"
+        "id": "league-scuttle",
+        "label": "Rift Scuttler claims a tiny vision shrine"
+      },
+      {
+        "id": "border-climber",
+        "label": "Getting Over the screen corner"
+      },
+      {
+        "id": "border-poro",
+        "label": "Poro peeks from behind the frame"
+      },
+      {
+        "id": "border-goose",
+        "label": "Knife goose patrols the frame"
+      },
+      {
+        "id": "moment-awakening",
+        "label": "The thunder-bear answers the forest runes"
+      },
+      {
+        "id": "moment-weather",
+        "label": "Fireflies gather in the ancient forest"
+      },
+      {
+        "id": "moment-lanterns",
+        "label": "The wooden spoon achieves legendary status"
       }
     ]
   }

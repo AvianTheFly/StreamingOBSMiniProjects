@@ -115,6 +115,7 @@ assert not log._started
                 'filter_projects', '_print_project_table', '_print_runtime_options',
                 '_start_voice', '_start_projects')}
             stack.enter_context(patch('lib.settings_backups.start_settings_backups'))
+            capture = stack.enter_context(patch('lib.hub_runtime.outputs.start_capture'))
             budget_bind = stack.enter_context(patch('lib.media_jobs.jobs.bind'))
             stack.enter_context(patch('lib.browser_effects.start_browser_effects'))
             stack.enter_context(patch('lib.coordination.scene_events.start_scene_events'))
@@ -130,6 +131,7 @@ assert not log._started
             mocks['_configure_runtime'].assert_called_once_with(True)
             budget_bind.assert_called_once_with(stop)
             if obs_ready:
+                capture.assert_called_once_with(stop)
                 self.assertEqual(result, projects)
                 mocks['_start_voice'].assert_called_once_with(stop)
                 mocks['_start_projects'].assert_called_once_with(projects, stop)
@@ -137,11 +139,13 @@ assert not log._started
                 self.assertEqual(mocks['filter_projects'].call_args.kwargs['skip'], {'love_me'})
                 background.assert_not_called()
             elif not wait_for_obs:
+                capture.assert_not_called()
                 self.assertEqual(result, [])
                 mocks['discover_runnable_projects'].assert_not_called()
                 mocks['_start_voice'].assert_not_called()
                 background.assert_not_called()
             else:
+                capture.assert_not_called()
                 self.assertEqual(result, projects)
                 mocks['_start_projects'].assert_called_once_with(projects[:3], stop)
                 mocks['_start_voice'].assert_not_called()
@@ -149,6 +153,7 @@ assert not log._started
                 with patch('obs.get_obs'), patch.object(stop, 'wait', return_value=False):
                     background.call_args.kwargs['target']()
                 mocks['_start_voice'].assert_called_once_with(stop)
+                capture.assert_called_once_with(stop)
                 self.assertEqual(mocks['_start_projects'].call_args.args, (projects[3:], stop))
 
     def test_online_startup(self):
@@ -180,6 +185,22 @@ assert not log._started
              patch('lib.process_priority.raise_priority'), patch.dict(main.os.environ):
             main._configure_runtime(True)
             level.assert_called_once_with(main.log.DEBUG)
+
+
+class ReplayStartupTests(unittest.TestCase):
+    def test_stopped_hub_does_not_start_capture(self):
+        from lib.hub_runtime.outputs import start_capture
+        stop = threading.Event()
+        stop.set()
+        with patch('obs.outputs.start_replay_buffer') as start:
+            start_capture(stop)
+        start.assert_not_called()
+
+    def test_capture_failure_does_not_abort_hub_startup(self):
+        from lib.hub_runtime.outputs import start_capture
+        with patch('obs.outputs.start_replay_buffer', side_effect=RuntimeError('unavailable')) as start:
+            start_capture(threading.Event())
+        start.assert_called_once_with()
 
 
 class EditorLifecycleTests(unittest.TestCase):

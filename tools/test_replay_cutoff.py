@@ -109,6 +109,9 @@ class CutoffTests(unittest.TestCase):
             callback('save and replay',123)
             callback('quick replay 30',123)
             callback('save 30',123)
+            callback('mark',123)
+            callback('mark 60',123)
+            callback('mark full',123)
             stop.set()
             return Mock()
         with ExitStack() as stack:
@@ -126,6 +129,10 @@ class CutoffTests(unittest.TestCase):
             call(capture,pressed_at=123),
             call(capture,seconds=30,purpose='replay_only',pressed_at=123)])
         capture._on_save.assert_called_once_with(tag='',clip_seconds=30,full_save=False,pressed_at=123)
+        self.assertEqual(capture._on_mark.call_args_list,[
+            call(tag='',clip_seconds=0,full_save=False,pressed_at=123),
+            call(tag='',clip_seconds=60,full_save=False,pressed_at=123),
+            call(tag='',clip_seconds=0,full_save=True,pressed_at=123)])
 
     def test_timestamp_survives_stop_and_transcription_delay(self):
         voice = Mock()

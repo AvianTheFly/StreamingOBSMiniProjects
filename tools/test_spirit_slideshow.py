@@ -101,5 +101,55 @@ class CalmSlideshowRequirements(unittest.TestCase):
         with self.assertRaises(ValueError): validate(bad)
 
 
+class RamImpactSlideshowRequirements(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.root = Path(__file__).resolve().parents[1]/'stream_brand/spirit_slideshow/v4'
+        cls.plan = load_plan(cls.root/'timeline.json')
+
+    def test_physical_impact_precedes_momentum_fall(self):
+        shots = self.plan['shots'][14:18]
+        self.assertEqual([s['action'] for s in shots],
+                         ['charge', 'physical_contact', 'wall_breach', 'downward_fall'])
+        self.assertTrue(all(s['viewpoint'] == 'first-person ram' for s in shots))
+        self.assertTrue(all(s['bridge_state'] == 'already collapsed' for s in shots))
+        self.assertIn('physically contact', shots[1]['cause'])
+        self.assertIn('momentum', shots[3]['cause'])
+        self.assertTrue(all(s['frames'] >= 40 for s in shots))
+        self.assertEqual([s['frames'] for s in shots], [40, 40, 50, 50])
+
+    def test_unaffected_artwork_music_and_cut_times_preserved(self):
+        previous = load_plan(self.root.parent/'v3/timeline.json')
+        self.assertEqual(self.plan['music_source'], previous['music_source'])
+        self.assertEqual(self.plan['calm_edit'], previous['calm_edit'])
+        self.assertLess(len(self.plan['shots']), len(previous['shots']))
+        previous_by_id = {s['id']: s for s in previous['shots']}
+        unchanged = [s for s in self.plan['shots'] if s['id'] in previous_by_id]
+        self.assertEqual(len(unchanged), 20)
+        for new in unchanged:
+            old = previous_by_id[new['id']]
+            self.assertEqual((old['start_frame'], old['end_frame']),
+                             (new['start_frame'], new['end_frame']))
+            self.assertEqual(old['sha256'], new['sha256'])
+
+    def test_original_provenance_spans_generation_sessions(self):
+        import json
+        import tempfile
+        from unittest.mock import patch
+        from stream_brand.spirit_slideshow.review import generation_originals
+        from stream_brand.spirit_slideshow.timeline import fingerprint
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            old, new = root/'old.png', root/'new.png'
+            old.write_bytes(b'original earlier session')
+            new.write_bytes(b'original repair session')
+            log = {'new_generation_records': [{'original': str(new)}],
+                   'reused_original_generation_log': {'images': [{'original': str(old)}]}}
+            (root/'generation-log.json').write_text(json.dumps(log), encoding='utf-8')
+            with patch('stream_brand.spirit_slideshow.review.GENERATED', root/'unavailable-session'):
+                originals = generation_originals(root)
+            self.assertEqual(originals, {fingerprint(old): str(old), fingerprint(new): str(new)})
+
+
 if __name__ == '__main__':
     unittest.main()

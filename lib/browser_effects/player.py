@@ -6,6 +6,7 @@ from .audio import prepare_audio
 from .runtime import get_channel
 from .obs_source import attach, source_name
 from .catalog import effect_for
+from lib.audio_focus import interrupt_audio
 
 
 class BrowserPlayer:
@@ -40,6 +41,16 @@ class BrowserPlayer:
         if cancelled():
             return
         self.loaded = True
+        release_audio = interrupt_audio(filepath, cancelled=cancelled)
+        if cancelled():
+            release_audio()
+            return
+        try:
+            return self._play_prepared(stem, media, effect, cancelled, timeout, allowed=allowed)
+        finally:
+            release_audio()
+
+    def _play_prepared(self, stem, media, effect, cancelled, timeout, *, allowed):
         self.playback_id = playback_id = self.channel.begin(stem, media, effect)
         started_at = time.monotonic()
         confirmed = False

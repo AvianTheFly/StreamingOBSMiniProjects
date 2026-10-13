@@ -42,4 +42,4 @@ for(let from=0;from<Journey.names.length;from++)for(let to=0;to<Journey.names.le
 assert(worst<.1,'the field must morph continuously with the sculpture');
 const state=JSON.stringify(j.snapshot());capture();capture();assert.equal(JSON.stringify(j.snapshot()),state);
 console.log(JSON.stringify({passed:true,sustainedUpperVoice:true,independentPaths:8,memorySeconds:4.8,
- samples:j.space.count,silenceHolds:true,spatialPairs:272,maximumMorphStep:worst,renderIsPure:true}));
+ samples:j.space.count,silenceHolds:true,spatialPairs:Journey.names.length*(Journey.names.length-1),maximumMorphStep:worst,renderIsPure:true}));

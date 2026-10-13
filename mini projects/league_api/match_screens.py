@@ -3,6 +3,8 @@
 Only fresh, observed win/lose candidates choose result art. Disconnects and client
 phases may reserve two seconds for an in-flight result, never invent an outcome.
 State belongs to the service so losing the game API does not erase the finish.
+The automatic result may retain a finite opaque tail during scene handoff;
+its original expiry still gates routing. Preview deadlines remain independent.
 """
 from pathlib import Path
 import threading
@@ -96,6 +98,24 @@ class MatchScreens:
             if not self._show(key, preview=True):
                 raise ValueError('Enable cinematic match screens and check the artwork files before previewing.')
 
+    def protect_result(self):
+        """Keep the picture through routing/transition without extending its hold."""
+        with self.lock:
+            if self.current and self.current['key'] in {'victory', 'defeat'}:
+                self.current['protect_until'] = self.current['expires'] + 10
+                return self.current['id']
+        return None
+
+    def automatic_screen(self):
+        """Copy the real schedule; desk previews never alter lifecycle timing."""
+        with self.lock:
+            return dict(self.current) if self.current else None
+
+    def release_result(self, screen_id):
+        with self.lock:
+            if self.current and self.current['id'] == screen_id:
+                self.current = None
+
     def scene_hold(self, previous_phase=None, phase=None, disconnected=False):
         with self.lock:
             if not self.enabled:
@@ -115,9 +135,11 @@ class MatchScreens:
         with self.lock:
             now = self.clock()
             screen = self.demo if self.demo and now < self.demo['expires'] else self.current
-            if not self.enabled or not screen or now >= screen['expires']:
+            deadline = screen.get('protect_until', screen['expires']) if screen else 0
+            if not self.enabled or not screen or now >= deadline:
                 return None
             return {**screen, 'image': '/match-art/' + screen['key'],
                     'delay': max(0, screen['started']-now),
                     'elapsed': now-screen['started'],
-                    'remaining': max(0, screen['expires']-now)}
+                    'protected': 'protect_until' in screen,
+                    'remaining': max(0, deadline-now)}

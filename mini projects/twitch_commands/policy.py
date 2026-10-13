@@ -25,6 +25,8 @@ def match(data,message):
 
 def render(row,data,message,*,now=None,choose=random.choice):
     kind = row.get('kind','text')
+    if kind == 'clip':
+        return 'Creates a 60-second Stream Highlight; moderators only, shared 90-second cooldown.'
     if kind=='index':
         names = [c['command'] for c in data['commands'] if c['enabled'] and c.get('permission','everyone')=='everyone']
         words = str(message.get('text','')).split()

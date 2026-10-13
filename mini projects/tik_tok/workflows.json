@@ -17,7 +17,7 @@
         "event": "source.request",
         "kind": "control"
       },
-      "detail": "",
+      "detail": "Audio-stream metadata is checked before playback. Audible assets acquire a Spotify interruption immediately before source startup and release after source cleanup, including cancellation, timeout and failure. Silent or unknown media leaves Spotify alone. Overlapping claims restore only after the final release; already-paused Spotify stays paused. User resumes, changed tracks and stopped/replaced sessions revoke restoration. No fallback timer or extra worker is created.",
       "steps": [
         {
           "id": "0",
@@ -63,9 +63,9 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "media_workers": "99a1a00f5854b87301b5e62b0837f5e035bf87e45a4552403c603e0e3de1f064",
-        "coordination": "1bf723a6b7eb5bb30c91ed682b26757815ed275e05f71b3c9938ba24205a6910",
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "media_workers": "430dcd38f7473e0ef7852463e4282093c752c1e3ce682b8b599edad0ed625c55",
+        "coordination": "adbef1aa441fcdee05337d67c4c8444234f9fec2c63a23e4d8bdb28d02dfadd3",
         "tik_tok": "378f778b4a6ab09e54b4eeb41d7fdd06cc588b5d023a6327d5062127d7b711e2"
       },
       "edges": [
@@ -94,7 +94,12 @@
         {
           "path": "lib/shared_media/media_project.py",
           "symbol": "run_media_project",
-          "hash": "186d06d32a7b8727dd359d8fe448e968f8a34d46afa939ce57f7e48d7678bdb7"
+          "hash": "062ad31184c3ba77993b47226753e984579d70d41fbd67600e737e587047dd11"
+        },
+        {
+          "path": "lib/shared_media/asset_playback.py",
+          "symbol": "AssetPlayback.play",
+          "hash": "b883a28d9e2b1bad80a964fb5e863b10d9f0eba4380eb3976f103d0018fd618d"
         }
       ]
     }

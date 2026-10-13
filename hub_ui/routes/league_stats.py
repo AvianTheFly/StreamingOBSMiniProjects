@@ -16,6 +16,8 @@ class LeagueStatsRoutes:
                 self._json(200,data)
             elif path=='/api/league-stats/overlay':
                 self._json(200,api.overlay_state(**filters))
+            elif path=='/api/league-stats/postgame':
+                self._json(200,api.postgame())
             elif path=='/api/league-stats/export':
                 # Export every filtered record, not just the 50 shown in the UI.
                 data = api.export(**filters)
@@ -28,6 +30,8 @@ class LeagueStatsRoutes:
                 self.wfile.write(payload)
             else:
                 self._err(404,'Unknown tracker endpoint')
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            return  # A hidden OBS page cancels its in-flight read.
         except (ValueError,OSError) as exc:
             self._err(400,str(exc))
 

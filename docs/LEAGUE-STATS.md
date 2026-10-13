@@ -391,3 +391,112 @@ budgets, 429 retention, cross-source encrypted identities, closed-launcher work,
 rank baselines/promotions, goal coverage, and recap exclusions.
 Actual live collection still requires a real League game; fixtures do not certify
 that the current client build exposes every optional field.
+
+
+## Compact post-game display (October 2026)
+
+Open `http://127.0.0.1:7420/league-stats/postgame.html` for the most recent recorded
+match. The OBS automatic source adds `?stream=1`, uses a native 960 by 540 browser,
+and fits the existing 896 by 504 lobby display at (60, 180). The review scene renders
+the same readable layout at double size. No program scene is changed by installation.
+The automatic source hides outside the recent, confirmed post-game window.
+
+The persistent portrait, K/D/A, five headline metrics and final item icons surround
+seven views: Highlights, Tempo, Combat, Build, Economy, Vision and Moments.
+All reported metrics remain available in the optional details. Pages rotate
+every twelve seconds. Repeated visits advance each page's remaining rows. Select a tab, use the arrows for more rows, or pause rotation. All stats opens the
+complete list; the recorded-history link opens lifetime analysis. Missing values
+are dashes; observed timestamps are marked approximate. The 640 by 360 fallback is
+independently laid out rather than scaling the old full-screen report.
+
+The existing collector also reads the League end-game stats block after gameplay,
+checks the game ID and local player's PUUID, and preserves the original response.
+Local client timelines provide basic combat/objective events and progression.
+Riot Match-v5 timelines add purchase transactions, ward placement/clearing and
+ability **upgrade** timestamps; they do not provide every individual ability cast.
+Final spell-cast totals are retained when reported. Unrelated player combat is
+excluded from the personal timeline; both teams' objectives remain visible.
+
+A personal application key is stored only in the root `.env` `RIOT_API_KEY`; browser
+reports contain no credentials. The key can be replaced without restarting Hub.
+Development keys expire daily; the approved personal application is the ongoing
+private-use configuration. Recent timelines finish before old match backfill.
+Some older matches return 403 even with a valid key: the transport checks Riot's
+platform endpoint under the same budget, then skips restricted records for an hour.
+A failed authorization check pauses enrichment. Existing local data is preserved.
+
+Artwork uses Riot Data Dragon 16.20.1. The versioned `art/catalog.json` maps official
+champion/item IDs to Riot CDN images; common current-match assets are cached locally.
+No asset or tooltip comes from arbitrary match-provided URLs. Validation:
+`tools/test_league_postgame.cjs` covers both sizes, all pages, automatic rotation,
+pause, disclosure, source visibility, missing data and escaping. Python regressions
+cover verified identity, event filtering, client/official coverage and key failures.
+
+
+### Post-game show controls
+
+Hub → League Stats → **Post-game show** is the operator surface. A larger version
+opens at `/league-stats/postgame.html?control=1`. Both display the exact shared OBS
+selection. The seven tabs select a story; arrows browse its remaining detail. A manual
+selection holds automatic rotation for 30 seconds, then resumes. Explicit Pause
+stays paused until Play. Play resumes the automatic
+12-second sequence. All statistics and the complete personal timeline remain in
+the optional details below, including purchase/ward/upgrade events.
+
+**Show on OBS** enables the current recap for up to 30 minutes in the lobby.
+**Hide from OBS** removes it and saves automatic appearances off. **Auto after
+games** restores automatic display for fresh completed/partial matches. These
+controls do not switch scenes. Gameplay, queue, champion select, replay and a lost
+League connection still prevent automatic or manual display. A newer match resets
+manual intent. The preview remains usable while the broadcast display is hidden.
+
+Highlights lead with actual match feats and your busiest takedown minute.
+Alternate visits compare earlier games with the same champion, role and queue
+(at least three, up to twenty). Percentage changes show their actual sign; ranking includes
+this match and shares tied ranks. Deathless, skillshots dodged and plates are
+reported facts, not a fabricated performance grade. The busiest minute counts only personal kills/assists in a 60-second window.
+Tempo cycles lane gold lead, farm growth and champion damage using actual Riot
+frame timestamps; the farming highlight is the fastest sampled 3–5 minute window
+starting after minute two. Lane comparisons require a confirmed opponent. No nearby objective is credited without evidence.
+`tools/test_league_recap_show.cjs` runs two browsers against a disposable real
+Tracker to verify synchronization, hide/show, safety gates, stale commands and
+960/640 layouts. It never writes live personal settings or contacts OBS.
+
+
+### Data audit and display decisions · 2026-10-13
+
+The archive audit found 70 games, 66 Match-v5 timelines and one saved League client
+end screen. All 66 timelines include current/total gold, lane/jungle CS, XP,
+level, damageStats, championStats and sampled position. There are 140 distinct
+challenge keys and 19 event types across the archive; presence is not evidence
+that every statistic is meaningful in every game mode. Field-level coverage is
+saved in `output/league-postgame/show-v3/data-inventory.json` (field names and
+counts only, no account identifiers or credentials).
+
+| Evidence | Useful recap | Precision and limits |
+| --- | --- | --- |
+| Final player stats and challenges | KDA, team participation, damage composition, taken/mitigated/healing, CC, spell counts, dodges, plates | Final reported totals; no invented grade or individual cast timestamps |
+| Timeline participant frames | Gold lead, CS/damage growth, sampled peak wallet, best observed farm window | Actual frame time, not frame index × 60; gaps over 95 seconds break the line |
+| Personal kill/death/assist events | Busiest minute and moment cards | Timestamped events; no unrelated combat |
+| Item purchase/sale/undo events | Purchase icon order, transaction journal, final inventory | Purchase order is not a claim that every item was kept; journal retains sales/undo |
+| Skill level-up events | Q/W/E/R upgrade order and timing | Upgrades, not casts |
+| Ward placement/clearing | Personal event tracks and totals | Exact recorded event times; no inferred ward lifetime, visibility coverage or missing placement coordinates |
+| Structures and epic monsters | Both teams' objective sequence with explicit last-hit/assist/team attribution | Proximity alone never means participation |
+| Saved client end screen and live observations | Fallback totals/events and capture coverage | Identity-checked; observations remain approximate |
+| Sampled positions, health, resources, stats, runes, pings and remaining challenges | Retained raw for future analyses | Coarse positions are not movement paths; sparse health is not a death recap. Opaque counters are not broadcast facts |
+
+For the latest Udyr match, frames occur at 240.121 and 300.148 seconds. The old
+nominal 5-minute checkpoint selected 240.121, so its value must not be presented
+as an exact 5:00 measurement. The recap now plots all samples at their recorded
+times. Existing archive checkpoint values remain intact; legacy labels use their
+stored sample timestamp when shown.
+
+Research: [Riot's client and Data Dragon documentation](https://developer.riotgames.com/docs/lol)
+explains the live endpoints and official static assets. The actual saved [Match-v5](https://developer.riotgames.com/apis/#match-v5)
+payloads supplied the field-level coverage audit rather than assuming fields
+were present from a generic API description.
+[Carbon's chart guidance](https://www.carbondesignsystem.com/building-blocks/data-visualization/simple-charts)
+informed the use of time-series lines and part-to-whole damage displays. Numeric
+bar/ring encodings use a zero origin, units stay visible, and missing values never
+become zero. The seven-tab frame remains 960 × 540 with a separately checked
+640 × 360 layout; no hover or click is required to read an automatic page.

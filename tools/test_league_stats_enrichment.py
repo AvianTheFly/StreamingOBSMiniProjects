@@ -7,7 +7,7 @@ import unittest
 from unittest.mock import Mock,patch
 from tools import test_league_stats as fixtures
 from tools.test_league_stats_extensions import timeline_data
-from league_stats.riot import RiotClient,KeySource,Deferred,RiotFailure
+from league_stats.riot import RiotClient,KeySource,Deferred,RiotFailure,MatchForbidden
 from league_stats.enrichment import Enrichment
 from league_stats.collector import Collector
 from league_stats import ranked
@@ -46,10 +46,25 @@ class TransportTests(unittest.TestCase):
         self.now+=179
         with self.assertRaises(Deferred):self.riot.match(7,'na1')
         self.assertEqual(self.http.get.call_count,1)
-        self.now+=1;self.http.get.return_value=response(code=403)
+        self.now+=1;self.http.get.return_value=response(code=401)
         with self.assertRaises(Deferred):self.riot.match(7,'na1')
         self.key='replacement';self.now+=2;self.http.get.return_value=response({})
         self.riot.match(7,'na1');self.assertEqual(self.riot.state,'connected')
+
+    def test_restricted_old_match_does_not_disable_valid_key(self):
+        self.http.get.side_effect=[response(code=403),response({}),response({'ok':True})]
+        with self.assertRaises(Deferred):self.riot.match(7,'na1')
+        self.now+=2
+        with self.assertRaises(MatchForbidden):self.riot.match(7,'na1')
+        self.assertEqual(self.riot.state,'connected')
+        self.now+=2;self.assertEqual(self.riot.match(8,'na1'),{'ok':True})
+
+    def test_invalid_key_403_requires_failed_authorization_probe(self):
+        self.http.get.return_value=response(code=403)
+        with self.assertRaises(Deferred):self.riot.match(7,'na1')
+        self.now+=2
+        with self.assertRaises(Deferred):self.riot.match(7,'na1')
+        self.assertEqual(self.riot.state,'unauthorized')
 
     def test_404_is_distinct_and_failure_does_not_expose_response_body(self):
         self.http.get.return_value=response(code=404)
@@ -96,6 +111,16 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(saved['account'],'p');self.assertEqual(saved['api_account'],'api-puuid')
         self.assertEqual(saved['metrics']['cs_at_10'],72);self.assertEqual(len(self.tracker.records),1)
         self.assertEqual(saved['timeline_version'],1)
+
+    def test_newest_match_timeline_precedes_older_backfill(self):
+        work=self.make_work()
+        older=fixtures.match();older['gameId']=8;older['gameCreation']-=10000
+        self.tracker.enrich(older,'p')
+        official=fixtures.match(modern=True);official['metadata']={'matchId':'NA1_7'}
+        self.http.get.side_effect=[response({'puuid':'p'}),response(official)]
+        work.tick();self.advance(2);work.tick()
+        self.assertEqual(work.pending[0][:2],('p:7','timeline'))
+        self.assertEqual(work.pending[1][:2],('p:8','match'))
 
     def test_foreign_public_participant_is_never_credited(self):
         work=self.make_work();data=fixtures.match(modern=True);data['metadata']={'matchId':'NA1_7'}

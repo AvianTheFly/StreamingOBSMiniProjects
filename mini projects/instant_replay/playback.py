@@ -1,6 +1,5 @@
 """One replay presentation owner through cancellation, cleanup, and scene return."""
 from __future__ import annotations
-import random
 import threading
 import time
 from pathlib import Path
@@ -17,6 +16,7 @@ from .inventory import _replay_files_on_disk
 from .source_playback import _start_replay_clip
 from lib.asset_fader import AssetFader
 from lib.runtime_cleanup import run_cleanup
+from .play_queue import ReplayQueue
 
 
 class ReplayPlayback:
@@ -26,6 +26,7 @@ class ReplayPlayback:
         self._playback_gate = threading.Lock()
         self._stopping = threading.Event()
         self.last_random_clip = [None]
+        self.queue = ReplayQueue()
         self.replay_fader = AssetFader(SOURCE_NAME, Path(__file__).parent / 'asset_volumes.json')
 
     def _end_replay(self, *, cancelled: bool=False) -> None:
@@ -41,6 +42,13 @@ class ReplayPlayback:
             self._playback_gate.release()
         else:
             print('[instant_replay] Playback cleanup still pending at shutdown.')
+
+    def edit_queue(self, body, paths=()):
+        snapshot = self.queue.edit(body, paths)
+        with self.state._lock:
+            self.state._is_multi_clip_active[0] = bool(snapshot['upcoming']) or snapshot['random']
+            self.state._random_playback_active[0] = snapshot['random']
+        return snapshot
 
     def _pause_replay(self) -> None:
         with self.state._lock:
@@ -82,6 +90,7 @@ class ReplayPlayback:
         if not self._playback_gate.acquire(blocking=False):
             print('[instant_replay] Replay already starting/playing; stop it before choosing another.')
             return
+        queue_session = None
         try:
             if self._stopping.is_set():
                 return
@@ -93,6 +102,7 @@ class ReplayPlayback:
                 self.state._replay_active[0] = True
                 self.state._replay_paused[0] = False
             from . import library
+            queue_session = self.queue.begin([] if random_forever else clips, shuffle=random_forever)
             labels = library.read()['clips']
             kind = presentation or ('highlights' if random_forever else stage.classify(clips))
             transition = stage.begin(kind, in_game=bool(self.live_state.get('in_game', lambda: False)()),
@@ -114,38 +124,31 @@ class ReplayPlayback:
                     self.state._cancel_watcher.wait(0.1)
                 if self.state._cancel_watcher.is_set():
                     break
-                if random_forever:
-                    candidates = _replay_files_on_disk(highlights_only=True)
-                    if not candidates:
-                        print('[instant_replay] Random playback stopped: no saved clips remain.')
-                        break
-                    pool = [path for path in candidates if path != self.last_random_clip[0]] or candidates
-                    choice = random.choice(pool)
-                    self.last_random_clip[0] = choice
-                    clip = str(choice)
-                    total: int | str = '∞'
-                    print(f'[instant_replay] ðŸŽ² Random clip: {choice.name}')
-                else:
-                    if index >= len(clips):
-                        break
-                    clip = clips[index]
-                    total = len(clips)
+                candidates = _replay_files_on_disk(highlights_only=True) if self.queue.snapshot()['random'] else []
+                entry = self.queue.take(queue_session, candidates)
+                if entry is None:
+                    break
+                clip = entry['path']
+                queue_state = self.queue.snapshot()
+                total = queue_state['total']
                 index += 1
                 if self.state._cancel_watcher.is_set():
                     break
                 clip_path = Path(clip)
+                if library.read()['clips'].get(library.clip_id(clip), {}).get('trashed'):
+                    continue
                 self.live_state['playback_detail'] = {'name': labels.get(library.clip_id(clip), {}).get('title') or clip_path.name, 'index': index, 'total': total}
                 if not clip_path.is_file() or clip_path.stat().st_size <= 0:
                     print(f'[instant_replay] Missing or empty clip: {clip}')
                     continue
                 display_title, context = clip_copy(clip_path, labels.get(library.clip_id(clip), {}))
-                next_title = '' if random_forever else (
-                    clip_copy(clips[index], labels.get(library.clip_id(clips[index]), {}))[0]
-                    if index < len(clips) else '')
+                upcoming = queue_state['upcoming']
+                next_path = upcoming[0]['path'] if upcoming else None
+                next_title = clip_copy(next_path, labels.get(library.clip_id(next_path), {}))[0] if next_path else ''
                 handoff = session.activated and index > 1
                 stage.start(kind, display_title, index, total, context=context, next_title=next_title,
                             handoff=handoff,clip_path=str(clip_path),
-                            purpose='highlight' if library.highlight_candidate(labels.get(library.clip_id(clip_path), {})) else 'replay_only')
+                            purpose=library.capture_purpose(labels.get(library.clip_id(clip_path), {})))
                 if handoff and not stage.cover_for_swap(self.state._cancel_watcher, session.owns_scene):
                     self.state._cancel_watcher.set()
                     break
@@ -201,6 +204,8 @@ class ReplayPlayback:
         except Exception as exc:
             print(f'[instant_replay] Playback failed: {exc}')
         finally:
+            if queue_session is not None:
+                self.queue.close(queue_session)
             def finish_session():
                 session = self.state._scene_session[0]
                 self.state._scene_session[0] = None
@@ -214,6 +219,8 @@ class ReplayPlayback:
                             finish_session, lambda: obs.park_media_source(SCENE, SOURCE_NAME),
                             lambda: _unmute_desktop(force=True), stage.finish)
             finally:
+                if queue_session is not None:
+                    self.queue.finish(queue_session)
                 with self.state._lock:
                     self.state._replay_active[0] = False
                     self.state._replay_paused[0] = False

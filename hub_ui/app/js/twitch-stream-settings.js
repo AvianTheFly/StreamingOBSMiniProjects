@@ -9,9 +9,9 @@ export function watchTwitchSettings(element) {
       const response = await fetch('/api/twitch-stream-settings');
       const status = await response.json();
       if (disposed) return;
-      element.innerHTML = `<div class="section-eyebrow">Twitch startup check</div>
+      element.innerHTML = `<div class="section-eyebrow">Twitch VOD & rewind settings</div>
         <div>${esc(status.message)}</div>
-        <button class="btn btn-secondary btn-sm mt-12" data-twitch-retry ${status.busy ? 'disabled' : ''}>Check again</button>`;
+        <button class="btn btn-secondary btn-sm mt-12" data-twitch-retry ${status.busy ? 'disabled' : ''}>Check settings</button>`;
       element.querySelector('[data-twitch-retry]').onclick = async () => {
         try {
           await fetch('/api/twitch-stream-settings', {method: 'POST',
@@ -19,7 +19,7 @@ export function watchTwitchSettings(element) {
         } finally { if (!disposed) refresh(); }
       };
     } catch {
-      if (!disposed) element.textContent = 'Twitch startup check status unavailable.';
+      if (!disposed) element.textContent = 'Twitch settings check status unavailable.';
     }
     if (!disposed) {
       clearTimeout(timer);

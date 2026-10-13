@@ -44,3 +44,15 @@ update OBS and `.env` together, migrate library paths and path-derived IDs, and
 restart the supported Hub to load the new environment. Do not restore the old
 F: path accidentally during unrelated settings recovery. OBS records and replay
 buffer saves share the recording directory; keep both aligned with the Hub.
+
+## One-minute review captures (2026-10-10)
+
+Press `|`, then say `mark` to save the last 60 seconds for later review.
+OBS SimpleOutput and AdvOut `RecRBTime` are 75 seconds: a useful minute plus
+15 seconds for voice transcription and the save request. The running Replay
+Buffer output was verified with `max_time_sec=75`; its 1500 MB limit is unchanged.
+Kill and death highlights retain 30 seconds of lead-in. Kills separated by at
+most 30 seconds share the first-kill anchor. Replay-only quick captures retain
+their existing selectable duration. Storage remains `C:\StreamingMedia\Replays`.
+A pre-change profile copy is in `C:\StreamingMedia\HubReviewArtifacts\replay-minute-20261010`;
+it may include private settings and must not be published.

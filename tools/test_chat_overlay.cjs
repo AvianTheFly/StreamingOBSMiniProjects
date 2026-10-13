@@ -3,12 +3,12 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');const path=require('node:path');
 const {chromium}=require('playwright');
 const root=path.resolve(__dirname,'../hub_ui/app');
-const settings={channel:'udyrisabotlaner',theme:'glass',font:'Segoe UI',font_size:17,emote_size:34,opacity:32,max_messages:6,fade_seconds:60,accent:'#76e4cf',motion:true,badges:true,hide_bots:true,hidden_users:['nightbot'],replacements:{hooray:'/viewer_assets/botlaneBear-chat.png'},show_header:false};
+const settings={channel:'udyrisabotlaner',theme:'glass',font:'Segoe UI',font_size:17,emote_size:34,opacity:32,max_messages:10,fade_seconds:60,accent:'#76e4cf',motion:true,badges:true,hide_bots:true,hidden_users:['nightbot'],text_replacements:{god:'gyatt 😂'},replacements:{hooray:'/viewer_assets/botlaneBear-chat.png'},show_header:false};
 const fixtureEmotes={Party:{url:'https://cdn.test/party.gif',provider:'7TV'},Hat:{url:'https://cdn.test/hat.gif',provider:'7TV',zero_width:true}};
 for(let i=0;i<100;i++)fixtureEmotes['Rave'+i]={url:`https://cdn.test/rave${i}.gif`,static_url:`https://cdn.test/still${i}.gif`,animated:true,category:'Rave / EDM',provider:'7TV · Chaos pack'};
 (async()=>{const browser=await chromium.launch({headless:true,channel:'chrome'});try{
  const page=await browser.newPage({viewport:{width:1440,height:1200}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
- await page.route('http://chat.test/**',route=>{const url=new URL(route.request().url());if(url.pathname==='/api/chat/settings')return route.fulfill({json:settings});if(url.pathname==='/api/chat/catalog')return route.fulfill({json:{emotes:fixtureEmotes,badges:{},providers:{}}});let relative=url.pathname==='/chat/'?'/chat/index.html':url.pathname;const file=url.pathname.startsWith('/viewer_assets/')?path.join(root,'../',relative):path.join(root,relative);if(!fs.existsSync(file)||!fs.statSync(file).isFile())return route.fulfill({status:404});return route.fulfill({body:fs.readFileSync(file),contentType:file.endsWith('.js')?'application/javascript':file.endsWith('.css')?'text/css':'text/html'});});
+ await page.route('http://chat.test/**',route=>{const url=new URL(route.request().url());if(url.pathname==='/api/chat/settings')return route.fulfill({json:settings});if(url.pathname==='/api/chat/catalog')return route.fulfill({json:{emotes:fixtureEmotes,badges:{},providers:{}}});if(url.pathname==='/shared/visible-poll.js')return route.fulfill({body:fs.readFileSync(path.resolve(root,'../../lib/browser_effects/web/visible-poll.js')),contentType:'application/javascript'});if(url.pathname==='/api/chat/pointer')return route.fulfill({json:{game:true,x:null,y:null}});let relative=url.pathname==='/chat/'?'/chat/index.html':url.pathname;const file=url.pathname.startsWith('/viewer_assets/')?path.join(root,'../',relative):path.join(root,relative);if(!fs.existsSync(file)||!fs.statSync(file).isFile())return route.fulfill({status:404});return route.fulfill({body:fs.readFileSync(file),contentType:file.endsWith('.js')?'application/javascript':file.endsWith('.css')?'text/css':'text/html'});});
  // Keep images valid and deterministic without external network dependencies.
  await page.route('https://cdn.test/**',r=>r.request().url().includes('/still')?r.fulfill({status:404}):r.fulfill({body:Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7','base64'),contentType:'image/gif'}));
  let ws;await page.routeWebSocket('wss://irc-ws.chat.twitch.tv/**',socket=>{ws=socket;socket.onMessage(message=>{if(message.includes('JOIN'))socket.send('@room-id=53924461 :tmi.twitch.tv ROOMSTATE #udyrisabotlaner\r\n');});});
@@ -18,9 +18,26 @@ for(let i=0;i<100;i++)fixtureEmotes['Rave'+i]={url:`https://cdn.test/rave${i}.gi
  await page.waitForSelector('.message');assert.equal(await page.locator('.body').textContent(),'<img src=x onerror=alert(1)>   ');assert.equal(await page.locator('.body img').count(),3);assert.equal(await page.locator('.zero').count(),1);assert.equal(await page.locator('.body img[onerror]').count(),0);
  emit('b','Nightbot','hidden');await page.waitForTimeout(50);assert.equal(await page.locator('.message').count(),1);
  ws.send('@target-msg-id=a :tmi.twitch.tv CLEARMSG #udyrisabotlaner :gone\r\n');await page.waitForFunction(()=>!document.querySelector('.message'));
+ emit('guide','UdyrIsABotLaner','[COMMAND GUIDE] !discord (Everyone): Join Discord | !clip (Mods): save a Twitch clip hooray Party');
+ await page.waitForSelector('.command-guide');assert.equal(await page.locator('.command-guide img').count(),0,'guides remain still literal text');
+ assert.match(await page.locator('.command-guide .name').textContent(),/⌨ COMMAND GUIDE/);
+ emit('fake','Tester','[COMMAND GUIDE] copied marker');await page.waitForSelector('[data-id=fake]');
+ assert.equal(await page.locator('[data-id=fake].command-guide').count(),0,'viewer copies keep normal chat styling');
+ const guideStyle=await page.evaluate(()=>{const guide=document.querySelector('.command-guide'),ordinary=document.querySelector('[data-id=fake]');return {guide:Number(getComputedStyle(guide.querySelector('.body')).opacity),ordinary:Number(getComputedStyle(ordinary.querySelector('.body')).opacity),motion:getComputedStyle(guide).animationName};});
+ assert(guideStyle.guide<guideStyle.ordinary*.7,'guide is visibly more transparent');assert.equal(guideStyle.motion,'none');
+ const distinct=await page.evaluate(async()=>{const {isCommandGuide}=await import('/chat/command_guide.js');const {renderNotice}=await import('/chat/game_notices.js');renderNotice(document.querySelector('#messages'),{id:'joke',title:'🎭 Spirit joke',lines:['The spirits blame the minions.']},()=>{});return {joke:document.querySelector('[data-id=joke]').className,foreign:isCommandGuide({text:'[COMMAND GUIDE] test',prefix:'udyrisabotlaner!user',tags:{'source-room-id':'other','room-id':'here'}},'udyrisabotlaner')};});
+ assert(!distinct.joke.includes('command-guide'));assert.equal(distinct.foreign,false);
+ emit('real-joke','UdyrIsABotLaner','🃏 The spirits blame the minions.');await page.waitForSelector('.chat-joke');
+ assert.match(await page.locator('.chat-joke .name').textContent(),/JOKE/);
+ assert.equal(await page.locator('.chat-joke.command-guide').count(),0,'jokes and guides have distinct indicators');
+ await page.setViewportSize({width:480,height:500});await page.screenshot({path:path.resolve(__dirname,'../output/command-guide-overlay.png')});await page.setViewportSize({width:1440,height:1200});
+ ws.send(':tmi.twitch.tv CLEARCHAT #udyrisabotlaner\r\n');await page.waitForFunction(()=>!document.querySelector('.message'));
  emit('c','Tester','😀 Kappa','emotes=25:2-6');await page.waitForSelector('.message');assert.equal(await page.locator('.body img').getAttribute('alt'),'Kappa');
  ws.send('@target-user-id=42 :tmi.twitch.tv CLEARCHAT #udyrisabotlaner :tester\r\n');await page.waitForFunction(()=>!document.querySelector('.message'));
- for(let i=0;i<20;i++)emit('m'+i,'Tester','message '+i);await page.waitForTimeout(100);assert.equal(await page.locator('.message').count(),6);
+ emit('gyatt','Tester','oh my GOD! Kappa','emotes=25:11-15');await page.waitForSelector('.message');assert.equal(await page.locator('.body').textContent(),'oh my gyatt 😂! ');assert.equal(await page.locator('.body img').getAttribute('alt'),'Kappa');
+ ws.send('@target-user-id=42 :tmi.twitch.tv CLEARCHAT #udyrisabotlaner :tester\r\n');await page.waitForFunction(()=>!document.querySelector('.message'));
+ for(let i=0;i<20;i++)emit('m'+i,'Tester','message '+i);await page.waitForTimeout(100);assert.equal(await page.locator('.message').count(),10);
+ assert.equal(await page.locator('.message').first().getAttribute('data-id'),'m10');
  const readability=await page.evaluate(async()=>{
   const {applyReadability}=await import('/chat/readability.js');
   const list=document.querySelector('#messages'),row=list.lastElementChild,body=row.querySelector('.body');
@@ -38,6 +55,43 @@ for(let i=0;i<100;i++)fixtureEmotes['Rave'+i]={url:`https://cdn.test/rave${i}.gi
  assert.equal(readability.hover.background,readability.resting.background,'hover must not darken cards');
  assert.equal(readability.desktop.background,readability.resting.background,'desktop clarity affects content only');
  assert.equal(readability.hover.rect,readability.resting.rect,'hover must not grow or move cards');
+ const lifetime=await page.evaluate(async()=>{
+  const {ageMessages,removeMessage}=await import('/chat/message_lifetime.js');
+  const list=document.querySelector('#messages'),rows=[...list.children],now=Date.now();
+  ageMessages(list,0,now);
+  rows.forEach((row,i)=>row.dataset.time=now-[0,15000,30000,59000,60000,61000,0,0,0,0][i]);
+  ageMessages(list,60,now);
+  const fades=rows.slice(0,4).map(row=>row.getAnimations().find(a=>a.effect.getKeyframes().some(k=>k.opacity==='0')));
+  fades.forEach(a=>a.pause());
+  const opacity=rows.slice(0,4).map(row=>Number(getComputedStyle(row).opacity));
+  ageMessages(list,60,now+1000);
+  const same=rows[2].getAnimations().includes(fades[2]);
+  rows[2].classList.add('reading','desktop-reading');
+  const readable=Number(getComputedStyle(rows[2]).opacity);
+  ageMessages(list,120,now);const extended=rows[2].getAnimations().find(a=>a.effect.getTiming().duration===120000);extended.pause();
+  const changed=Number(getComputedStyle(rows[2]).opacity);
+  ageMessages(list,0,now);const disabled=Number(getComputedStyle(rows[2]).opacity);
+  ageMessages(list,60,now);const removed=rows[2].getAnimations().find(a=>a.effect.getTiming().duration===60000);removeMessage(rows[2]);
+  return {opacity,same,readable,changed,disabled,expired:!rows[4].isConnected&&!rows[5].isConnected,cancelled:removed.playState==='idle'};
+ });
+ lifetime.opacity.forEach((value,i)=>assert(Math.abs(value-[1,.75,.5,1/60][i])<.002,'fade tracks original message age'));
+ assert(lifetime.same,'unchanged polling must not restart fades');assert(lifetime.expired,'messages expire at exactly their lifetime');
+ assert(Math.abs(lifetime.readable-.5)<.002,'readability cannot revive an aging row');assert(Math.abs(lifetime.changed-.75)<.002,'changed duration retains original age');
+ assert.equal(lifetime.disabled,1);assert(lifetime.cancelled,'removal cancels the owned animation');
+ const held=await page.evaluate(async()=>{
+  const {ageMessages,clearMessages}=await import('/chat/message_lifetime.js');
+  const list=document.createElement('section');document.body.append(list);const now=Date.now();
+  for(const age of [0,29999,30000,45000,59999,60000]){const row=document.createElement('article');row.className='message';row.dataset.time=now-age;list.append(row);}
+  const rows=[...list.children];ageMessages(list,30,now,30);
+  const animations=rows.slice(0,5).map(row=>row.getAnimations().find(a=>a.effect.getTiming().delay===30000));
+  animations.forEach(a=>a.pause());
+  const opacity=rows.slice(0,5).map(row=>Number(getComputedStyle(row).opacity));
+  ageMessages(list,30,now+1,30);const same=rows[3].getAnimations().includes(animations[3]);
+  const expired=!rows[5].isConnected;clearMessages(list);const cancelled=animations.every(a=>a.playState==='idle');list.remove();
+  return {opacity,same,expired,cancelled};
+ });
+ held.opacity.forEach((v,i)=>assert(Math.abs(v-[1,1,1,.5,1/30000][i])<.002,'30-second hold precedes continuous fade'));
+ assert(held.same&&held.expired&&held.cancelled,'held fades retain timing and release on expiry/removal');
  const phraseTests=await page.evaluate(async()=>{
   const {fragments}=await import('/chat/protocol.js');
   const aliases={gg:'https://cdn.test/gg.gif','gg wp':'https://cdn.test/wp.gif',cook:'https://cdn.test/cook.gif','let him cook':'https://cdn.test/chef.gif',copium:'https://cdn.test/cope.gif'};
@@ -60,6 +114,10 @@ for(let i=0;i<100;i++)fixtureEmotes['Rave'+i]={url:`https://cdn.test/rave${i}.gi
  assert.equal(phraseTests.zero[0].zero_width,true);
  const protocol=await page.evaluate(async()=>{const p=await import('/chat/protocol.js');return {tags:p.parseLine('@display-name=A\\sB;id=x :a!b PRIVMSG #x :hi').tags,parts:p.fragments('hi',{gifs:'0-1|id|https://cdn.test/a.gif'},{},{})};});assert.equal(protocol.tags['display-name'],'A B');assert.equal(protocol.parts[0].url,'https://cdn.test/a.gif');
  await page.setViewportSize({width:339,height:467});await page.screenshot({path:path.resolve(__dirname,'../tmp_obs_debug/chat-overlay-test.png'),omitBackground:true});
+ await page.goto('http://chat.test/chat/overlay.html?lobby');await page.waitForFunction(()=>document.querySelector('#connection').textContent==='LIVE');
+ emit('lobby','Tester','Persistent lobby message');await page.waitForSelector('.message');
+ await page.evaluate(s=>{document.querySelector('.message').dataset.time=Date.now()-120000;window.postMessage({chatSettings:s},location.origin);},settings);
+ await page.waitForTimeout(1100);assert.equal(await page.locator('.message').count(),1,'desktop lifetime must not change lobby persistence');
  await page.setViewportSize({width:1440,height:1200});await page.goto('http://chat.test/chat/');await page.waitForSelector('output');await page.frameLocator('iframe').locator('.message').first().waitFor();
  await page.locator('[name=text_opacity]').fill('80');await page.locator('[name=text_opacity]').dispatchEvent('input');
  await page.waitForTimeout(3300);

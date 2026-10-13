@@ -76,12 +76,13 @@ def parse_command(text: str) -> tuple[str | None, str, float, bool]:
       spec        — matched tag ('win', 'escape', 'fail') or "".
       clip_seconds — explicit clip duration in seconds (0 = not specified).
                     A numeric token ("30") or word-number ("thirty") sets this.
-                    When non-zero, it overrides kill/mark anchors and saves
+                    When non-zero, it overrides game anchors and saves
                     exactly that many seconds from the end of the buffer.
       full_save   — True when the user says "save full" (entire buffer).
 
     Priority in _on_save (highest first):
-      full_save > clip_seconds > manual mark > kill anchor > full buffer
+      full_save > clip_seconds > kill anchor > death anchor > full buffer
+    'mark' uses the same duration/tag syntax, saving for review instead of replay.
 
     For 'play':
       spec — the play spec string ('all', 'highlights', 'win', …) or "".
@@ -131,11 +132,11 @@ def parse_command(text: str) -> tuple[str | None, str, float, bool]:
     elif any(a in lowered for a in _PLAY_ALIASES):
         cmd = "play"
 
-    if cmd == "save":
+    if cmd in ("save", "mark"):
         # Find the index of the save word
         save_idx = 0
         for i, tok in enumerate(tokens):
-            if any(a in tok for a in _SAVE_ALIASES):
+            if any(a in tok for a in (_SAVE_ALIASES if cmd == 'save' else _MARK_ALIASES)):
                 save_idx = i
                 break
 
@@ -168,7 +169,7 @@ def parse_command(text: str) -> tuple[str | None, str, float, bool]:
             if not tag:
                 tag = _match_tag(stripped)
 
-        return ("save", tag, clip_seconds, full_save)
+        return (cmd, tag, clip_seconds, full_save)
 
     if cmd == "play":
         play_idx = 0

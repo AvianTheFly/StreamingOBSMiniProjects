@@ -1,4 +1,4 @@
-"""Startup check lifecycle and nonce ownership, without launching a browser."""
+"""Manual check lifecycle and nonce ownership, without launching a browser."""
 import threading
 import unittest
 from unittest.mock import patch
@@ -11,7 +11,25 @@ class StreamSettingsTests(unittest.TestCase):
         service = StreamSettingsService()
         with patch('lib.twitch_stream_settings.service.threading.Thread'):
             service.start(threading.Event())
+            service.retry()
         return service
+
+    def test_startup_does_not_open_browser_or_start_check(self):
+        service = StreamSettingsService()
+        stop = threading.Event()
+        with patch('lib.twitch_stream_settings.service.threading.Thread') as thread, \
+             patch('lib.twitch_stream_settings.service.subprocess.Popen') as launch:
+            service.start(stop, port=7430)
+            thread.assert_not_called()
+            launch.assert_not_called()
+            self.assertEqual(service.snapshot()['state'], 'idle')
+            self.assertFalse(service.snapshot()['busy'])
+            self.assertIsNone(service.nonce)
+            self.assertFalse(service.report({'nonce': 'unknown', 'state': 'ready'}))
+            self.assertTrue(service.retry())
+            thread.assert_called_once()
+            self.assertIs(service.stop, stop)
+            self.assertEqual(service.port, 7430)
 
     def test_single_check_and_stop_gate(self):
         service = self.service()

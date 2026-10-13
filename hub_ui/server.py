@@ -22,6 +22,7 @@ from .routes.chat import ChatRoutes
 from .routes.twitch_commands import TwitchCommandRoutes
 from .routes.starting_soon import StartingSoonRoutes
 from .routes.league_stats import LeagueStatsRoutes
+from .routes.league_stage import LeagueStageRoutes
 from .routes.workflow_map import WorkflowMapRoutes
 from .routes.mood_cues import MoodCueRoutes
 from .routes.spirit_lobby import SpiritLobbyRoutes
@@ -34,7 +35,7 @@ class InvalidRequestBody(ValueError):
     pass
 
 
-class _Handler(AudioRoutes, ProfileRoutes, ProjectRoutes, ControlRoutes, TransitionRoutes, ChatRoutes, TwitchCommandRoutes, StartingSoonRoutes, LeagueStatsRoutes, WorkflowMapRoutes, MoodCueRoutes, SpiritLobbyRoutes, EffectsGalleryRoutes, http.server.BaseHTTPRequestHandler):
+class _Handler(AudioRoutes, ProfileRoutes, ProjectRoutes, ControlRoutes, TransitionRoutes, ChatRoutes, TwitchCommandRoutes, StartingSoonRoutes, LeagueStatsRoutes, LeagueStageRoutes, WorkflowMapRoutes, MoodCueRoutes, SpiritLobbyRoutes, EffectsGalleryRoutes, http.server.BaseHTTPRequestHandler):
 
     def log_message(self, fmt, *args):  # suppress default request logs
         pass
@@ -77,6 +78,8 @@ class _Handler(AudioRoutes, ProfileRoutes, ProjectRoutes, ControlRoutes, Transit
 
     def do_GET(self):
         path = urllib.parse.urlparse(self.path).path.rstrip("/") or "/"
+        if path == '/api/league-stage' or path.startswith('/api/league-stage/art/'):
+            return self._get_league_stage(path)
         if path == '/api/effects-gallery' or path.startswith('/effects/art/') or path.startswith('/effects/audio/'):
             return self._get_effects_gallery(path)
         if path == '/api/spirit-lobby' or path.startswith('/api/spirit-lobby/'):
@@ -138,6 +141,8 @@ class _Handler(AudioRoutes, ProfileRoutes, ProjectRoutes, ControlRoutes, Transit
 
     def _route_post(self):
         path = urllib.parse.urlparse(self.path).path.rstrip("/")
+        if path.startswith('/api/league-stage/'):
+            return self._post_league_stage(path)
         if path.startswith('/api/spirit-lobby/'):
             return self._post_spirit_lobby(path)
         if path.startswith('/api/mood-cues/'):

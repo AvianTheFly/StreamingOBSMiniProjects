@@ -17,7 +17,7 @@
         "event": "stats.snapshot",
         "kind": "poll"
       },
-      "detail": "The collector preserves live observations and chat handling during InProgress/Reconnect. Historical downloads, archive enrichment, catalogue and rank refresh wait until gameplay ends. Pending work and explicit import/refresh intent remain queued; the public status explains the deferral. The existing worker resumes optional work after leaving those phases, including after a transient live-feed disconnect.",
+      "detail": "The collector preserves live observations and chat handling during InProgress/Reconnect. Historical downloads, archive enrichment, catalogue and rank refresh wait until gameplay ends. Pending work and explicit import/refresh intent remain queued; the public status explains the deferral. The existing worker resumes optional work after leaving those phases, including after a transient live-feed disconnect. Personal combat and all global objective times are retained, with bounded ten-second personal telemetry and explicitly observed level/item changes. Stale polls cannot rewind a capture. No extra worker is created. After gameplay, the same worker verifies end-screen identity and reads bounded client timelines. Riot finishes the newest match timeline before older backfill. A 403 match response triggers a paced platform authorization check: a valid key skips that restricted match for an hour; a refused key pauses requests. The key and response bodies never enter public status. Accepted live snapshots also advance the local 6–7 finder: exact player K/D 6/7, 67 CS and either team-score orientation. A silent initial baseline, per-match deduplication and 12-second spacing prevent noise; delayed finds must still be true. The state owner emits outside its lock through the existing Hub event stream, with no Twitch post or new worker.",
       "steps": [
         {
           "id": "0",
@@ -49,7 +49,7 @@
         }
       ],
       "owner_hashes": {
-        "league_stats": "42e175520989b16f3c7831482f7085bbdc3067f653278af42de10a39f99e8051"
+        "league_stats": "20fd3b76ad13c4336afce2bcecbbcce66b029c47815f18e6002ed68dbdf9a7c5"
       },
       "edges": [
         {
@@ -69,7 +69,42 @@
         {
           "path": "mini projects/league_stats/collector.py",
           "symbol": "Collector.step",
-          "hash": "d9f7c9da1c44a028750b8e03b22e7142434d23635fc95915faff32ada95e0fcc"
+          "hash": "0f0f9c4d6268bd3c5d797caebaffce91aa998ae67e29a13c1db37dec60117690"
+        },
+        {
+          "path": "mini projects/league_stats/capture.py",
+          "symbol": "extend",
+          "hash": "9146bb3d4949a1e6a872885dbf5f846d34e091c1e405d19bf4033a734f344bbf"
+        },
+        {
+          "path": "mini projects/league_stats/client_enrichment.py",
+          "symbol": "ClientEnrichment.tick",
+          "hash": "f4017c668a92b5aafc6e90f142bc4b621be178869e37ceac57c63ee8d1197ce3"
+        },
+        {
+          "path": "mini projects/league_stats/enrichment.py",
+          "symbol": "Enrichment.tick",
+          "hash": "ebe5d23af5c707d500376277c6f9ea0231d7e6d8bf264ec49f8464a523ed3613"
+        },
+        {
+          "path": "mini projects/league_stats/riot.py",
+          "symbol": "RiotClient.get",
+          "hash": "d7a644f8b61402361c1fcb45dc0073d1f9e3ddc585a28cda251bb226f229d9ca"
+        },
+        {
+          "path": "mini projects/league_stats/service.py",
+          "symbol": "Tracker.ingest",
+          "hash": "09e0042fffade4e0d2d6d823114ea885bf7978c00412775efaa1dd23878bf99d"
+        },
+        {
+          "path": "mini projects/league_stats/six_seven.py",
+          "symbol": "SixSevenFinder",
+          "hash": "48f129e6a1bcd5a02ab35456a8e69bd1c7aa7d2918d4143fc160a71037bbbb16"
+        },
+        {
+          "path": "mini projects/league_stats/six_seven.py",
+          "symbol": "findings",
+          "hash": "12b15b4cbc70a9e1198ec8aad021509bb7e31d7cd48c79eb0a99a025f636871c"
         }
       ]
     },
@@ -114,7 +149,7 @@
         }
       ],
       "owner_hashes": {
-        "league_stats": "042e2ac8caa8aff6c1076617d040f77e80317baa638c1dd8fac6cb6e0656cf28"
+        "league_stats": "20fd3b76ad13c4336afce2bcecbbcce66b029c47815f18e6002ed68dbdf9a7c5"
       },
       "edges": [
         {
@@ -167,7 +202,7 @@
         "event": "stats.match",
         "kind": "poll"
       },
-      "detail": "",
+      "detail": "Preserve partial observations on disconnect without claiming a result. Matching final stats enrich the same archive row. The Match Chronicle appears only for the recent current match in a confirmed between-game phase, and hides on gameplay, queue, replay, lost client or expiry. Scene routing stays with the existing League owner.",
       "steps": [
         {
           "id": "0",
@@ -199,7 +234,7 @@
         }
       ],
       "owner_hashes": {
-        "league_stats": "042e2ac8caa8aff6c1076617d040f77e80317baa638c1dd8fac6cb6e0656cf28"
+        "league_stats": "20fd3b76ad13c4336afce2bcecbbcce66b029c47815f18e6002ed68dbdf9a7c5"
       },
       "edges": [
         {
@@ -224,12 +259,17 @@
         {
           "path": "mini projects/league_stats/collector.py",
           "symbol": "Collector.step",
-          "hash": "9d9a0741ef2e25c133f9cd0caaf3db06a5fc6f1dc54db5072a6dd45fc34d147f"
+          "hash": "0f0f9c4d6268bd3c5d797caebaffce91aa998ae67e29a13c1db37dec60117690"
         },
         {
           "path": "mini projects/league_stats/service.py",
           "symbol": "Tracker.enrich",
           "hash": "60dfe43db2bd53f2e7503b37bb20cbeceb64de3e29cea1ed8e02a783081072c1"
+        },
+        {
+          "path": "mini projects/league_stats/service.py",
+          "symbol": "Tracker.postgame_report",
+          "hash": "33f907b8f84666158a8810c308cfda3fdec56d63190364f27512759d166b0d5b"
         }
       ],
       "effects": [
@@ -267,7 +307,7 @@
         "label": "Choose a stat view",
         "kind": "browser"
       },
-      "detail": "Local overlay presets keep 520 by 190 dimensions, use whitelisted themes, and never write OBS state. Browser preview lifetime owns its polling; hidden previews are removed. Review drafts stay local until explicit Save and pending-save edits retain the updated revision. Aggregate coverage groups reported metrics in one archive pass instead of scanning every match twice per metric. Observed and completed values remain separate; missing statistics remain unknown, derived rates retain their original meaning, and source records are not mutated.",
+      "detail": "Local overlay presets keep 520 by 190 dimensions, use whitelisted themes, and never write OBS state. Browser preview lifetime owns its polling; hidden previews are removed. Review drafts stay local until explicit Save and pending-save edits retain the updated revision. Aggregate coverage groups reported metrics in one archive pass instead of scanning every match twice per metric. Observed and completed values remain separate; missing statistics remain unknown, derived rates retain their original meaning, and source records are not mutated. Match Chronicle is a native 960 by 540 report with automatic six-event pages and a responsive 640 by 360 layout, progression, comparisons against at least three earlier same-champion/role/queue games, all-stat details and a recorded-lifetime link. Exact official timelines replace live events; missing statistics stay unavailable. The additive OBS installer attaches to the existing idle scene without choosing a scene or changing existing sources. Additional reported metrics cycle automatically in the analysis panel. Saved local event logs are projected using confirmed archived player identities; saved checkpoints can supply a sparse progression chart, explicitly labelled. Cancelled reads stop without a second error response. The icon-led recap rotates impact, purchase order, ability-upgrade order, personal/global objective timeline and all-stat pages every twelve seconds, with pause and direct page controls. Own-team bars use measured champion damage; no skill score is invented. Official item/champion art uses a versioned Data Dragon catalogue with local cached assets and CDN fallback. Ability casts have totals only, not exact cast timestamps. The post-game show now uses a single feature-owned monotonic playhead shared by Hub and OBS. Selecting a story or browsing its detail holds an automatically playing show for 30 seconds after the last command, then rotation resumes. Explicit Pause stays paused across selections; Play resumes immediately. Hide persists automatic display off; Auto re-enables post-game appearances. Manual Show expires after thirty minutes and never bypasses gameplay, champion select, account/current-match or client-connection gates. Match and revision checks reject stale controls. New matches reset manual show intent and playhead. Seven stories rotate: Highlights, Tempo, Combat, Build, Economy, Vision and Moments. Highlights lead with actual personal takedowns and feats; alternate visits compare earlier covered same-champion/role/queue games. Tempo uses actual sample timestamps for lane lead, CS and champion damage, and the highest CS/min observed 3–5 minute window after minute two. Combat separates damage types, casts and defensive/support totals. Economy charts sampled unspent gold, not inferred recall timing. Vision distinguishes personal wards and both teams objective events. Archived timeline projection verifies match and participant identity, bounds samples to 720 and is cached per report revision. Missing data stays unavailable; sample gaps are not drawn as continuous play. No new worker or network requests are added. No grade or causal objective claim is inferred. The Hub iframe is removed when collapsed or unmounted and its resize observer is disconnected. Browser reads retain shared visibility cancellation; operator mutations are bounded to one in flight and cancelled on exit.",
       "steps": [
         {
           "id": "0",
@@ -359,11 +399,66 @@
           "path": "mini projects/league_stats/analytics.py",
           "symbol": "aggregate",
           "hash": "7f054ef941d024c02fae462d0f47ceedd7b3bf62f4031e9fa14e9d15927870d1"
+        },
+        {
+          "path": "mini projects/league_stats/postgame_report.py",
+          "symbol": "build",
+          "hash": "f99256e1d796bca8c63d1a21fa2d0dbd8257034414bec457aae98e2af9b43351"
+        },
+        {
+          "path": "mini projects/league_stats/recap_events.py",
+          "symbol": "official_events",
+          "hash": "25227eee1551a517944b0729550c65587b7fb7c4ddc7489e5f7823da42b658c5"
+        },
+        {
+          "path": "mini projects/league_stats/obs_presentation.py",
+          "symbol": "install",
+          "hash": "018cbea736c3f6e08fba1e02a54e6b7f2a29ca87f9d00c321bd73daa7ea3d3b0"
+        },
+        {
+          "path": "mini projects/league_stats/report_visuals.py",
+          "symbol": "project",
+          "hash": "535e999e39a043cdce8616d07413921dc0e695e4b89be0f5d2f3b1d39da22a2c"
+        },
+        {
+          "path": "mini projects/league_stats/recap_show.py",
+          "symbol": "RecapShow.snapshot",
+          "hash": "b8295101de5a289e11f6cfbb67f7363f555dc2740d030d50adad01f8af4ad03c"
+        },
+        {
+          "path": "mini projects/league_stats/recap_show.py",
+          "symbol": "RecapShow.apply",
+          "hash": "9cd06144a3174a49a4bd1a3a5d4f68264644790727a745a5c26e3331d332d937"
+        },
+        {
+          "path": "mini projects/league_stats/recap_stories.py",
+          "symbol": "project",
+          "hash": "3a684bc08bc55bbf74fc2c10d313bb6d7e46c3f3f445655687aedd784e7f5a6d"
+        },
+        {
+          "path": "mini projects/league_stats/service.py",
+          "symbol": "Tracker.control_postgame",
+          "hash": "4d3b804e6ec4422e5a39cad51ad3556f9fde02a7955ffbea026fcb5d775ac6a2"
+        },
+        {
+          "path": "mini projects/league_stats/recap_analysis.py",
+          "symbol": "project",
+          "hash": "ce67b06336eac6a0edea6379f4154a27ed70ec07223999633edec99d9f452d52"
+        },
+        {
+          "path": "mini projects/league_stats/recap_show.py",
+          "symbol": "RecapShow.playhead",
+          "hash": "fc4055b46a3e4480e1628d62118ba6fbcaa6de835dfd693850cb749aed7d5d8e"
+        },
+        {
+          "path": "mini projects/league_stats/service.py",
+          "symbol": "Tracker.postgame_report",
+          "hash": "33f907b8f84666158a8810c308cfda3fdec56d63190364f27512759d166b0d5b"
         }
       ],
       "owner_hashes": {
-        "league_stats": "d313ddf48be41de6d02622e93ba8c4699126d35ad38b7e79f564e06edeb0b963",
-        "hub": "40bd807609f763027d6a9c5ba598e6d523b408028fbb059df52f91098d54ba4a"
+        "hub": "57c944b11afa7c433bcfbb2b0642d28ddd78d7d13842ec11b7e83417e1a6b524",
+        "league_stats": "20fd3b76ad13c4336afce2bcecbbcce66b029c47815f18e6002ed68dbdf9a7c5"
       }
     }
   ]

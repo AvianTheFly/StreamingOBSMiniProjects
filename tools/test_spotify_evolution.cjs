@@ -36,7 +36,7 @@ const held=j.shapePhase;w.step({energy:0},1/30);j.step(w,1/30);assert.equal(j.sh
 // The four new sculptures are fully framed even as their camera and shape
 // phases diverge. A prior unbounded lattice roll clipped its top and bottom.
 j.motion.spring=.3;j.motion.width=.9;
-for(const name of ['Resonance lattice','Waveform loom','Phase helix','Morphic shell']){
+for(const name of ['Resonance lattice','Phase mandala','Phase helix','Morphic shell']){
  const stage=Journey.names.indexOf(name);assert(stage>=0);
  for(let phase=0;phase<40;phase+=.5){
   j.travel=phase*4;

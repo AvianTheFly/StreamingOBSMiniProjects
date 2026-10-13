@@ -1,0 +1,22 @@
+{
+  "presentation": "Upper spirit crop, color grading, feathering and procedural loop; original file and original OBS input preserved.",
+  "extractedCrop": {
+    "y": 0,
+    "height": 440,
+    "x": 480,
+    "width": 1000
+  },
+  "sourceSha256": "248C87E85BE64A8A098C4BBA031047F059D031CBFFB7F47D28CDFC7120B9F486",
+  "source": "F:\\EVERYTHING STREAM RELATED\\Assets\\VisualAndAudio\\background effects\\UDYR ANIMATION.mp4",
+  "webp": {
+    "height": 220,
+    "quality": 88,
+    "width": 500
+  },
+  "frames": {
+    "phoenix": 20,
+    "bear": 8,
+    "ram": 2,
+    "turtle": 14
+  }
+}

@@ -14,6 +14,7 @@ from lib.shared_media.layout_rules import (
 from lib.shared_media.single_source_state import SingleSourceStateStore
 from lib.shared_media.playback_worker import PlaybackWorker
 from lib.shared_media.media_startup import media_startup
+from lib.audio_focus import interrupt_audio
 
 from .config import CONFIG
 
@@ -146,6 +147,7 @@ class SoundboardPlayer:
                 self._browser.loaded = False
 
         state_applied = False
+        release_audio = lambda: None
         try:
             if self._cancelled():
                 return
@@ -167,6 +169,9 @@ class SoundboardPlayer:
                 if self._cancelled():
                     return
                 # Prepare presentation BEFORE the file change's implicit start.
+                release_audio = interrupt_audio(filepath, cancelled=self._cancelled)
+                if self._cancelled():
+                    return
                 changed = obs.set_media_source_file(SINGLE_SOURCE_NAME, filepath, managed_decode=True)
                 if changed and not self._wait_for_media_file(filepath):
                     raise RuntimeError(f"OBS did not confirm file swap to '{filepath.name}'.")
@@ -192,6 +197,7 @@ class SoundboardPlayer:
             except Exception as exc:
                 print(f"{_TAG} Could not save single-source override for '{stem}': {exc}")
             self._stop_and_hide_source()
+            release_audio()
             with self._lock:
                 self._is_busy = False
                 self._paused = False

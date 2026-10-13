@@ -1,6 +1,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs');
 const Motion=require('../mini projects/spotify/web/music_motion.js');
 const Stages=require('../mini projects/spotify/web/stage_geometry.js');
+const Journey=require('../mini projects/spotify/web/journey.js');
 const base={energy:.7,loudness:.5,beat:0,roughness:.65,noisiness:.35,texture_rate:90,
  tonality:.65,bands:Array(48).fill(.3)};
 const held=new Motion();
@@ -28,7 +29,7 @@ const fast=new Motion();fast.step({...base,bands:Array(48).fill(.01)},1/100);
 fast.step({...base,bands:Array(48).fill(.9)},1/100);
 assert(fast.voices[4]>.7&&fast.presenceVoices[4]<fast.voices[4]*.5,'direct attacks and structural presence have independent time scales');
 const grit=new Motion();for(let i=0;i<240;i++)grit.step({...base,loudness:1,roughness:1,noisiness:1},1/60);
-for(let stage=0;stage<17;stage++){
+for(let stage=0;stage<Journey.names.length;stage++){
  let displacement=0;
  for(let x=-150;x<=150;x+=15)for(let y=-80;y<=80;y+=20){
   grit.texturePhase=0;const a=Stages.deform([x,y,0],grit,stage);

@@ -30,7 +30,7 @@ for(let i=0;i<1800;i++){
  const input=signal(i/30,true);input.bands=input.bands.map((v,k)=>v*(.55+.45*Math.sin(i*.4+k)**2));
  input.balance=Math.sin(i*.1);w.step(input,1/30);j.step(w,1/30,input);
  if(i%30!==0)continue;
- for(let stage=0;stage<17;stage++)for(let y=-80;y<=80;y+=20)for(let x=-150;x<=150;x+=30){
+ for(let stage=0;stage<Journey.names.length;stage++)for(let y=-80;y<=80;y+=20)for(let x=-150;x<=150;x+=30){
   const p=[x,y,0],q=Stages.deform(p,j.motion,stage),limit=Stages.bendLimits[stage];
   assert(Math.abs(q[1]-y)<=limit+1e-6&&Math.abs(q[0]-x)<=limit*.18+1e-6,'each scene must obey its silhouette budget');
   maxDeformation=Math.max(maxDeformation,Math.hypot(q[0]-x,q[1]-y));

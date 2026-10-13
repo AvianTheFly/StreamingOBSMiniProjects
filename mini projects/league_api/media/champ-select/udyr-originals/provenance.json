@@ -1,0 +1,10 @@
+{
+  "tool": "built-in image_gen",
+  "originals": {
+    "bear.png": "ac8510bdd87d57c7d7cc90d53cb516f465631b0528ab3c097095db88bcb90121",
+    "phoenix.png": "631572055fe75f6ad1be42fae7a5ed99c25bd3094191b8e96b46da2bbfe48ef7",
+    "ram.png": "601739e08cc51b4179c7b36f286a7e3db6455c4988a8e91716bdcf09d32b1df4",
+    "turtle.png": "202bd04d985e723a609bd45c82a582dfe25e0a5acd7755670e115fed3bd4ff2b"
+  },
+  "delivery": "JPEG conversion only; no background morphing or regeneration for Easter eggs."
+}

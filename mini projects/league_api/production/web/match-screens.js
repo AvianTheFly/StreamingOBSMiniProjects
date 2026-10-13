@@ -1,6 +1,6 @@
 import { ProductionScene } from './scene.js';
 // One composed match presentation. Server deadlines survive Live Client shutdown;
-// local deadlines remove it even if the service itself becomes unavailable.
+// local safety deadlines remove it even if the service becomes unavailable.
 const layer = document.createElement('div');
 layer.id = 'match-screen';
 layer.style.cssText = 'position:absolute;inset:0;z-index:100;pointer-events:none;display:none;background:#04090e';
@@ -56,7 +56,9 @@ function paint() {
         elapsed, duration:state.duration}});
   }
   layer.style.display = 'block';
-  layer.style.opacity = String(Math.max(0, Math.min(1, elapsed / .3, remaining / .3)));
+  // Automatic results stay opaque through scene preparation and the transition.
+  // Previews and the opening picture keep their original finite fade.
+  layer.style.opacity = String(Math.max(0, Math.min(1, elapsed / .3, state.protected ? 1 : remaining / .3)));
   painted = true;
 }
 window.leagueMatchScreens = {

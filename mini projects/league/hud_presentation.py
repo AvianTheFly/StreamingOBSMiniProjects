@@ -11,10 +11,13 @@ HUD_ITEMS = (
 
 
 class HudPresentation:
-    def __init__(self):
+    def __init__(self, stances=None):
         self.applied = {}
+        self.stances = stances
 
     def update(self, running=False, alive=False):
+        if self.stances is not None:
+            self.stances.update(running, alive)
         for (scene, source), visible in zip(HUD_ITEMS, (running, running and alive)):
             if self.applied.get((scene, source)) is visible:
                 continue

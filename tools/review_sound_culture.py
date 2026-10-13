@@ -23,14 +23,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--speech', action='store_true', help='Review speech with one already-cached CPU model')
     parser.add_argument('--write-timing', action='store_true', help='Regenerate authored, non-personal visual timing data')
+    parser.add_argument('--keys', nargs='+', default=KEYS, help='Exact case-sensitive hotkeys to review; unbound keys are preserved and skipped')
+    parser.add_argument('--out', type=Path, default=OUT, help='Read-only media review output directory')
     options = parser.parse_args()
+    out = options.out
     ensure_import_paths()
     load_project_env()
     from soundboard.config import CONFIG
     from lib.browser_effects.catalog import load_catalog
-    OUT.mkdir(parents=True, exist_ok=True)
+    out.mkdir(parents=True, exist_ok=True)
     hotkeys = json.loads((ROOT / 'mini projects/soundboard/hotkeys_editor.json').read_text())['profiles']['default']['hotkeys']
-    names = list(dict.fromkeys(name for key in KEYS for name in (hotkeys[key] if isinstance(hotkeys[key], list) else [hotkeys[key]])))
+    names = list(dict.fromkeys(name for key in options.keys for name in (hotkeys.get(key, []) if isinstance(hotkeys.get(key, []), list) else [hotkeys[key]]) if name))
     catalog = load_catalog(ROOT / 'mini projects/soundboard')
     files = {p.stem.casefold(): p for p in Path(CONFIG.asset_dir).iterdir() if p.suffix.lower() in CONFIG.valid_extensions}
     review, thumbnails = [], []
@@ -65,7 +68,7 @@ def main():
             card = Image.new('RGB', (660, 152), '#1c293c')
             ImageDraw.Draw(card).text((10, 5), name, fill='white')
             for j, fraction in enumerate([.15, .48, .8]):
-                target = OUT / f'original-{index}-{j}.png'
+                target = out / f'original-{index}-{j}.png'
                 subprocess.run(['ffmpeg', '-v', 'error', '-ss', str(duration*fraction), '-i', str(source), '-frames:v', '1', '-vf', 'scale=210:118:force_original_aspect_ratio=decrease,pad=210:118:(ow-iw)/2:(oh-ih)/2', '-y', str(target)], check=True)
                 card.paste(Image.open(target).convert('RGB'), (j*220, 28))
             thumbnails.append(card)
@@ -74,8 +77,8 @@ def main():
         sheet = Image.new('RGB', (1320, 608), '#111a28')
         for n, card in enumerate(thumbnails[start:start+8]):
             sheet.paste(card, (n%2*660, n//2*152))
-        sheet.save(OUT / f'originals-{start+1}.png')
-    (OUT / 'media-context.json').write_text(json.dumps(review, indent=2), encoding='utf-8')
+        sheet.save(out / f'originals-{start+1}.png')
+    (out / 'media-context.json').write_text(json.dumps(review, indent=2), encoding='utf-8')
     if options.write_timing:
         timing = {(row['effect'].get('scene') or row['effect'].get('style') or 'muffins'): {
             'duration': round(row['duration'], 5), 'sha256': row['sha256'], 'envelope': row['envelope'],
@@ -94,7 +97,7 @@ def main():
         segments, _ = model.transcribe(row['path'], beam_size=3, word_timestamps=True)
         row['speech'] = [{'start': s.start, 'end': s.end, 'text': s.text, 'words': [{'start': w.start, 'end': w.end, 'word': w.word} for w in (s.words or [])]} for s in segments]
         print(row['name'], row['speech'], flush=True)
-    (OUT / 'media-context.json').write_text(json.dumps(review, indent=2), encoding='utf-8')
+    (out / 'media-context.json').write_text(json.dumps(review, indent=2), encoding='utf-8')
 
 
 if __name__ == '__main__':

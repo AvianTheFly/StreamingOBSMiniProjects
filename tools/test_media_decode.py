@@ -29,7 +29,7 @@ class DecodeTests(unittest.TestCase):
             ]:
                 media_metadata.clear_metadata_cache()
                 result = SimpleNamespace(returncode=0, stdout=json.dumps({'streams': [{
-                    'codec_name': codec, 'width': width, 'height': height, 'avg_frame_rate': fps}]}))
+                    'codec_type': 'video', 'codec_name': codec, 'width': width, 'height': height, 'avg_frame_rate': fps}]}))
                 with self.subTest(codec=codec, width=width, fps=fps), \
                      patch.dict(os.environ, {'HUB_MEDIA_DECODE_MODE': 'auto'}), \
                      patch.object(media_metadata.subprocess, 'run', return_value=result):

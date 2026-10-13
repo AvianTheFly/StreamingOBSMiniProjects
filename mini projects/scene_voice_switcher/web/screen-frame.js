@@ -1,5 +1,6 @@
 // Lobby art policy: the desktop's saved rectangle is also its painted aperture.
 import {drawDisplayFrame} from './shared/display-frame.js';
+import {habitatMediaFrame} from './habitat-media-frame.js';
 const materials={
  forge:{dark:'#231a16',metal:'#a27334',light:'#ffd282',accent:'#57d8ef'},
  future:{dark:'#102333',metal:'#328bba',light:'#9efaff',accent:'#27e3ef'},
@@ -8,4 +9,4 @@ const materials={
  reef:{dark:'#19292a',metal:'#a17c43',light:'#f1c987',accent:'#76e5dc'},
  'aurora-camp':{dark:'#243026',metal:'#95834f',light:'#dfd098',accent:'#79d8be'},
 };
-export function screenFrame(c,rect,id){drawDisplayFrame(c,rect,materials[id]);}
+export function screenFrame(c,rect,id){if(!habitatMediaFrame(c,rect,id))drawDisplayFrame(c,rect,materials[id]);}

@@ -7,6 +7,7 @@ from pathlib import Path
 
 import requests
 from lib.league_live_client import fetch_snapshot, LiveClientUnavailable
+from lib.coordination.game_policy import game_scene_policy
 
 from ..config import (
     POLL_INTERVAL,
@@ -21,6 +22,7 @@ from .league_events import LeagueEvents
 from .game_state_detector import GameStateDetector
 from .match_lifecycle import MatchLifecycle
 from ..hud_presentation import HudPresentation
+from ..udyr_stances import UdyrStances
 from ..kill_audio_player import LeagueKillAudioPlayer
 
 # ── Handlers ──────────────────────────────────────────────────────────────────
@@ -111,7 +113,8 @@ class LeagueAPIWatcher:
 
         self.detector       = GameStateDetector(self.events)
         self.match_lifecycle = MatchLifecycle()
-        self.hud = HudPresentation()
+        self.stances = UdyrStances(stop_event)
+        self.hud = HudPresentation(self.stances)
         self.hud.hide()
         self.game_connected = False
         self._game_start_iso: str | None    = None
@@ -129,6 +132,12 @@ class LeagueAPIWatcher:
             return
         self.detector.start_recall_watch(self._last_resource_value, self._last_active)
 
+    def on_stance_key(self, key) -> bool:
+        return self.stances.press(key)
+
+    def on_chat_key(self) -> None:
+        self.stances.enter()
+
     def shutdown(self) -> None:
         """
         Crash-safe cleanup — call this from an atexit hook or on forced exit.
@@ -144,6 +153,7 @@ class LeagueAPIWatcher:
         self._force_streak_reset()
         self.kill_audio_player.stop()
         self.hud.hide()
+        self.stances.close()
 
         if not (self.game_connected or self._pending_save):
             return
@@ -176,29 +186,40 @@ class LeagueAPIWatcher:
             try:
                 data = self._fetch()
                 running = self.match_lifecycle.observe(data)
+                shared_match = game_scene_policy.match_state()
+                if shared_match is not None:
+                    running = shared_match['running']
                 me, riot_game_name = self._find_active_player(data)
                 self.hud.update(running=running and me is not None,
                                 alive=me is not None and not me.get('isDead', False))
+                self.stances.observe(data)
+                if running:
+                    self._on_connected()
+                else:
+                    self._on_disconnected()
                 if running and me is not None:
                     active = data.get("activePlayer", {})
                     self._last_active = active
                     self._last_resource_value = active.get("championStats", {}).get("resourceValue", 0.0)
-                    self._on_connected()
                     if not getattr(self, "_name_logged", False):
                         print(f"[league] Tracking as: '{riot_game_name}' (this is what KillerName events will match)")
                         self._name_logged = True
                     self.detector.process(me, data, riot_game_name)
-                else:
-                    self._on_disconnected()
-                self.stop_event.wait(POLL_INTERVAL)
+                # Shared live-client cache already caps total HTTP traffic at
+                # four snapshots/sec across every consumer. No per-key request.
+                self.stop_event.wait(min(POLL_INTERVAL, .25) if running else POLL_INTERVAL)
 
             except (requests.exceptions.ConnectionError, requests.exceptions.Timeout, LiveClientUnavailable):
-                self._on_disconnected()
+                shared_match = game_scene_policy.match_state()
+                if shared_match is None or not shared_match['running']:
+                    self._on_disconnected()
                 self.stop_event.wait(DISCONNECTED_INTERVAL)
 
             except Exception as e:
                 print(f"[league] Unexpected error: {e}")
-                self._on_disconnected()
+                shared_match = game_scene_policy.match_state()
+                if shared_match is None or not shared_match['running']:
+                    self._on_disconnected()
                 self.stop_event.wait(DISCONNECTED_INTERVAL)
 
         print("[league] Stopped.")

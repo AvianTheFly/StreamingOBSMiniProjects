@@ -17,8 +17,10 @@ import threading
 import time
 
 from lib.league_live_client import LiveClientUnavailable, fetch_snapshot
+from lib.league_match import MatchLifecycle
+from lib.coordination.game_policy import game_scene_policy
 
-from .config import LEAGUE_POLL_INTERVAL, DEATH_PRE_ROLL_SECONDS
+from .config import LEAGUE_POLL_INTERVAL, DEATH_PRE_ROLL_SECONDS, KILL_STREAK_RESET_SECONDS
 
 
 class KillTracker:
@@ -42,7 +44,7 @@ class KillTracker:
         self._last_death_wall: float | None = None
 
         # Seconds of inactivity before the next kill starts a new streak.
-        self._streak_reset_window: float = 20.0
+        self._streak_reset_window: float = KILL_STREAK_RESET_SECONDS
 
         # The local player's summonerName, filled once the API responds.
         self._summoner_name   = ""
@@ -52,6 +54,8 @@ class KillTracker:
         self._seen_event_ids: set[int] = set()
 
         self._game_connected  = False
+        self._lifecycle = MatchLifecycle()
+        self._generation = None
 
     # ── Public read-only properties ───────────────────────────────────────────
 
@@ -116,26 +120,17 @@ class KillTracker:
                 with self._lock:
                     self._summoner_name = summoner
 
-                if not self._game_connected:
-                    self._game_connected = True
-                    print(
-                        f"[instant_replay] League game detected. "
-                        f"Tracking kills for: {summoner!r}"
-                    )
-
-                self._process_events(data.get("events", {}).get("Events", []), summoner)
+                if self._observe_match(data):
+                    self._process_events(data.get("events", {}).get("Events", []), summoner)
                 self._stop_event.wait(LEAGUE_POLL_INTERVAL)
 
             except LiveClientUnavailable:
-                if self._game_connected:
-                    self._game_connected = False
-                    with self._lock:
-                        # Reset event history so we re-process if a new game starts.
-                        self._seen_event_ids.clear()
-                        self._last_kill_wall = None
-                        self._first_kill_wall = None
-                        self._last_death_wall = None
-                    print("[instant_replay] League client disconnected — standing by.")
+                shared_match = game_scene_policy.match_state()
+                if shared_match is None or not shared_match['running']:
+                    was_running = self.game_connected
+                    self._set_running(False)
+                    if was_running:
+                        print("[instant_replay] League client disconnected — standing by.")
                 self._stop_event.wait(1.0)
 
             except Exception as exc:
@@ -143,6 +138,28 @@ class KillTracker:
                 self._stop_event.wait(1.0)
 
         print("[instant_replay] Kill tracker stopped.")
+
+    def _set_running(self, running):
+        with self._lock:
+            if self._game_connected and not running:
+                self._last_kill_wall = self._first_kill_wall = self._last_death_wall = None
+            self._game_connected = running
+
+    def _observe_match(self, data):
+        prior_time = self._lifecycle.game_time
+        running = self._lifecycle.observe(data)
+        rewound = prior_time is not None and self._lifecycle.game_time < prior_time - 2
+        shared_match = game_scene_policy.match_state()
+        if shared_match is not None:
+            running = shared_match['running']
+            rewound = rewound or (self._generation is not None and self._generation != shared_match['generation'])
+            self._generation = shared_match['generation']
+        if rewound:
+            with self._lock:
+                self._seen_event_ids.clear()
+                self._last_kill_wall = self._first_kill_wall = self._last_death_wall = None
+        self._set_running(running)
+        return running
 
     def _process_events(self, events: list[dict], summoner: str) -> None:
         """

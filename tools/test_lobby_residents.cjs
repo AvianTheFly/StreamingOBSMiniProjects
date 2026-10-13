@@ -5,7 +5,8 @@ async function main(){
  const browser=await chromium.launch({channel:'chrome',headless:true}),page=await browser.newPage(),report=[];
  try{
   await page.goto('http://127.0.0.1:7420/lobby-motion/index.html?world=arcade&paused=1&auto=0');await page.locator('canvas[data-ready=true]').waitFor();
-  for(const id of ['arcade','tavern','forge','future','sky-harbor']){
+  // Forge's mountain opening replaces the resident shelf; habitat QA covers its new cast.
+  for(const id of ['arcade','tavern','future','sky-harbor']){
    const result=await page.evaluate(async id=>{
     const {loadWorld}=await import('./worlds.js'),world=await loadWorld(id),art=await world.createMotion().load(),residents=art.residents;
     const cast=residents.sprites.map((sprite,i)=>{const data=sprite.getContext('2d').getImageData(0,0,sprite.width,sprite.height).data;let clear=0,opaque=0;for(let j=3;j<data.length;j+=4){clear+=data[j]===0;opaque+=data[j]>245;}return {bounds:residents.bounds[i],clear:clear/(data.length/4),opaque:opaque/(data.length/4)};});
@@ -16,7 +17,7 @@ async function main(){
     const references=[...residents.sprites];art.dispose();const released=residents.sprites.length===0&&residents.bounds.length===0&&references.every(s=>s.width===1&&s.height===1);
     // A world closed during decode must never retain a late-arriving sprite cache.
     const late=world.createMotion(),loading=late.load();late.dispose();await loading;late.dispose();const lateReleased=late.residents.sprites.length===0&&late.base.width===1;
-    return {id,cast,motion,excluded,released,lateReleased,cues:world.cues.length};
+      return {id,cast,motion,excluded,released,lateReleased,cues:world.cues.filter(c=>!['game-','league-','moment-','border-'].some(prefix=>c.id.startsWith(prefix))).length};
    },id);
    if(result.cast.length!==3||result.cast.some(s=>s.clear<.15||s.opaque<.15)||result.motion<1000||!result.excluded||!result.released||!result.lateReleased||result.cues!==14)throw new Error(JSON.stringify(result));
    report.push(result);

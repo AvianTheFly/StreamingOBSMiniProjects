@@ -11,6 +11,8 @@ from lib.json_store import write_json, json_transaction
 LOCK = threading.RLock()
 STATE_FILE = Path(__file__).with_name("replay_library.json")
 MEDIA_EXTENSIONS = {".mkv", ".mp4", ".mov", ".webm", ".avi", ".flv", ".m4v"}
+PURPOSES = ('highlight', 'replay_only', 'review_later')
+REVIEW_STATES = ('pending', 'kept', 'dismissed')
 
 
 class Conflict(ValueError):
@@ -36,12 +38,24 @@ def _write(data):
     write_json(STATE_FILE, data)
 
 
+def capture_purpose(meta):
+    """Preserve legacy eligibility without collapsing a deliberate review save."""
+    return meta.get('purpose') if meta.get('purpose') in PURPOSES else 'highlight'
+
+
+def review_state(meta):
+    return meta.get('review_state') if meta.get('review_state') in REVIEW_STATES else ('kept' if meta.get('kept') else 'pending')
+
+
+def replay_candidate(meta):
+    return not meta.get('trashed') and capture_purpose(meta) != 'review_later' and review_state(meta) != 'dismissed'
+
+
 def highlight_candidate(meta):
-    """Older clips stay eligible; only an explicit replay-only choice excludes."""
-    return meta.get('purpose') != 'replay_only'
+    return not meta.get('trashed') and capture_purpose(meta) == 'highlight' and review_state(meta) != 'dismissed'
 
 
-def highlight_paths(paths):
+def _eligible_paths(paths, predicate):
     labels = read()['clips']
     result=[]
     for p in paths:
@@ -50,9 +64,17 @@ def highlight_paths(paths):
         if not resolved.is_file():
             meta=next((m for m in labels.values() if str(resolved) in m.get('archived_from', [])), {})
             resolved=Path(meta.get('path', resolved))
-        if resolved.is_file() and highlight_candidate(meta):
+        if resolved.is_file() and predicate(meta):
             result.append(str(resolved))
     return result
+
+
+def highlight_paths(paths):
+    return _eligible_paths(paths, highlight_candidate)
+
+
+def replay_paths(paths):
+    return _eligible_paths(paths, replay_candidate)
 
 
 def remember_capture(path, *, tag="untagged", saved_at=None, purpose='highlight', capture_source=None):
@@ -63,7 +85,8 @@ def remember_capture(path, *, tag="untagged", saved_at=None, purpose='highlight'
         meta = data["clips"].setdefault(clip_id(path), {})
         meta.update(path=str(path), tag=str(tag or "untagged"),
                     saved_at=float(saved_at) if saved_at is not None else None,
-                    kept=True, purpose=purpose)
+                    kept=purpose != 'review_later', purpose=purpose,
+                    review_state='pending' if purpose == 'review_later' else 'kept')
         if capture_source:
             meta['capture_source'] = str(Path(capture_source).resolve())
         _write(data)
@@ -92,6 +115,8 @@ def tagged_paths(tag, root):
     rows = []
     with LOCK:
         for meta in read()["clips"].values():
+            if not replay_candidate(meta):
+                continue
             path = Path(meta.get("path", ""))
             if str(meta.get("tag", "")).casefold() != str(tag).casefold():
                 continue
@@ -112,6 +137,8 @@ def search_paths(query, root):
     matches = []
     for row in disk_rows(root):
         meta = metadata.get(clip_id(row["path"]), {})
+        if not replay_candidate(meta):
+            continue
         haystack = " ".join((str(meta.get("title") or ""), row["name"])).casefold()
         if needle in haystack:
             matches.append((needle == str(meta.get("title") or "").casefold(),
@@ -168,9 +195,10 @@ def decorate(rows):
                    notes=meta.get("notes", ""), favorite=meta.get("favorite", False),
                    kept=meta.get("kept", False), tag=meta.get("tag", row.get("tag", "")),
                    game=meta.get("game", ""))
-        row.update(purpose='highlight' if highlight_candidate(meta) else 'replay_only',
-                   highlight_candidate=highlight_candidate(meta))
-    return {"clips": rows, "groups": data["groups"], "revision": data["revision"]}
+        row.update(purpose=capture_purpose(meta), review_state=review_state(meta), trashed=bool(meta.get('trashed')),
+                   highlight_candidate=highlight_candidate(meta), replay_candidate=replay_candidate(meta))
+    return {"clips": [r for r in rows if not r['trashed']], "trash": [r for r in rows if r['trashed']],
+            "groups": data["groups"], "revision": data["revision"], 'capabilities': {'trash': True, 'queue': True}}
 
 
 def disk_rows(root):
@@ -199,17 +227,36 @@ def mutate(body, root):
         if body.get("revision") != data["revision"]:
             raise Conflict("Library changed in another window. Refresh, then retry your edit.")
         action = body.get("action")
-        if action == 'purpose':
+        if action in ('trash', 'restore'):
+            paths = body.get('paths')
+            if not isinstance(paths, list) or not 1 <= len(paths) <= 200:
+                raise ValueError('Choose 1–200 clips.')
+            validated = [resolve(str(p), root) for p in paths]
+            for path in validated:
+                data['clips'].setdefault(clip_id(path), {}).update(path=str(path), trashed=action == 'trash')
+        elif action == 'purpose':
             purpose = body.get('purpose')
             paths = body.get('paths')
-            if purpose not in ('highlight', 'replay_only') or not isinstance(paths, list) or not 1 <= len(paths) <= 200:
+            if purpose not in PURPOSES or not isinstance(paths, list) or not 1 <= len(paths) <= 200:
                 raise ValueError('Choose 1–200 clips and a capture purpose.')
             validated = [resolve(str(p), root) for p in paths]
             for path in validated:
                 data['clips'].setdefault(clip_id(path), {}).update(path=str(path), purpose=purpose, kept=True)
+                if purpose == 'highlight':
+                    data['clips'][clip_id(path)]['review_state'] = 'kept'
+        elif action == 'review':
+            decision, paths = body.get('decision'), body.get('paths')
+            if decision not in REVIEW_STATES or not isinstance(paths, list) or not 1 <= len(paths) <= 200:
+                raise ValueError('Choose 1–200 clips and a review decision.')
+            validated = [resolve(str(p), root) for p in paths]
+            for path in validated:
+                meta = data['clips'].setdefault(clip_id(path), {})
+                meta.update(path=str(path), review_state=decision)
+                if decision == 'kept':
+                    meta['kept'] = True
         elif action == "clip":
-            if 'purpose' in body and body['purpose'] not in ('highlight', 'replay_only'):
-                raise ValueError('Choose Highlight candidate or Replay only.')
+            if 'purpose' in body and body['purpose'] not in PURPOSES:
+                raise ValueError('Choose Replay ready, Replay only or Review later.')
             path = resolve(str(body.get("path", "")), root)
             key = clip_id(path)
             meta = data["clips"].setdefault(key, {})
@@ -265,13 +312,16 @@ def volume_source(path, labels, levels):
 
 
 def group_paths(identifier, root, *, by_name=False):
-    groups = read()["groups"]
+    data = read()
+    groups = data["groups"]
     group = next((g for g in groups if
                   (g["name"].casefold() == identifier.casefold() if by_name else g["id"] == identifier)), None)
     if group is None:
         raise ValueError("Compilation not found.")
     if not group["paths"]:
         raise ValueError("Add clips to this compilation first.")
+    if any(data['clips'].get(clip_id(path), {}).get('trashed') for path in group['paths']):
+        raise ValueError('A montage clip is in Trash. Restore it or remove it from the montage.')
     return [str(resolve(path, root)) for path in group["paths"]]
 
 
@@ -280,7 +330,7 @@ def retain_after_merge(path):
     with LOCK, json_transaction(STATE_FILE):
         data = read()
         meta = data["clips"].get(clip_id(path), {})
-        if not meta.get("kept"):
+        if not meta.get("kept") and not meta.get("trashed"):
             return False
         if not meta.get("merged"):
             meta["merged"] = True

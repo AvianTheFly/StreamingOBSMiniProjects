@@ -163,13 +163,13 @@ class ClientSceneTests(unittest.TestCase):
         self.assertEqual(reader.chat_messages({'chatDetails': {'chatRoomName': 'draft-room'}}),
                          [{'id': '3', 'body': 'test message', 'sender': 'TEAM'}])
 
-    def test_phase_routes_and_bans_wait_for_both_teams(self):
+    def test_phase_routes_keep_queue_through_bans_then_show_draft(self):
         for phase in ['Matchmaking', 'ReadyCheck']:
             self.assertEqual(route(phase), 'queue')
         self.assertEqual(route('ChampSelect', session('PLANNING', [False])), 'queue')
         self.assertEqual(route('ChampSelect', session(bans=[True, False])), 'queue')
         self.assertEqual(route('ChampSelect', session(bans=[True, True])), 'champions')
-        self.assertEqual(route('ChampSelect', session()), 'queue')
+        self.assertEqual(route('ChampSelect', session()), 'champions')
         self.assertEqual(route('ChampSelect', session('PICK')), 'champions')
         self.assertEqual(route('ChampSelect', session('PLANNING')), 'queue')
         self.assertEqual(route('ChampSelect', session('FINALIZATION')), 'champions')
@@ -203,7 +203,7 @@ class ClientSceneTests(unittest.TestCase):
         return ClientScenes(path, reader=reader, obs_factory=lambda: obs, clock=lambda: now[0],
                             director=SceneDirector(lambda: obs))
 
-    def test_manual_draft_and_queue_survive_same_phase_then_release(self):
+    def test_manual_draft_and_queue_survive_same_event_then_release_on_picks(self):
         with tempfile.TemporaryDirectory() as folder:
             reader = Mock(); obs = FakeOBS()
             watcher = self.make_watcher(folder, reader, obs, [0])
@@ -212,10 +212,12 @@ class ClientSceneTests(unittest.TestCase):
             self.assertEqual(watcher.target, 'champions')
             self.assertTrue(obs.items[1]['sceneItemEnabled'])
             watcher.hide_now()
-            reader.snapshot.return_value = ('ChampSelect', session('PICK'))
             watcher.tick()
             self.assertEqual(watcher.target, 'queue')
-            self.assertFalse(obs.items[1]['sceneItemEnabled'])
+            reader.snapshot.return_value = ('ChampSelect', session('PICK'))
+            watcher.tick()
+            self.assertEqual(watcher.target, 'champions')
+            self.assertTrue(obs.items[1]['sceneItemEnabled'])
             reader.snapshot.return_value = ('Lobby', None); watcher.tick()
             self.assertEqual(obs.scene, 'just screen')
             self.assertIsNone(watcher.manual_choice)
@@ -233,6 +235,50 @@ class ClientSceneTests(unittest.TestCase):
             reader.snapshot.side_effect = read
             with self.assertRaisesRegex(ValueError, 'superseded'): watcher.present_champions()
             self.assertEqual(obs.scene, 'Newer choice')
+
+    def test_desk_choices_work_without_client_and_preserve_observed_state(self):
+        with tempfile.TemporaryDirectory() as folder:
+            reader = Mock(); obs = FakeOBS()
+            watcher = self.make_watcher(folder, reader, obs, [0])
+            watcher.settings.update(champion_scene='Draft', loading_scene='Loading')
+            obs.get_scene_list = lambda: SimpleNamespace(scenes=[{'sceneName': n} for n in ['Test','Lobbies','Draft','Loading']])
+            initial = watcher.stage.snapshot(False)
+            watcher.director.hold_automatic('streamer')
+            for target, scene in [('loading','Loading'),('champions','Draft'),('queue','Lobbies')]:
+                state = watcher.present_stage(target)
+                self.assertEqual(obs.scene, scene)
+                self.assertFalse(state['connected'])
+                self.assertEqual(state['manual_stage'], target)
+                self.assertEqual(watcher.stage.snapshot(False), initial)
+                self.assertIsNone(watcher.director.snapshot()['pending_scene'])
+            reader.snapshot.assert_not_called()
+            self.assertEqual(watcher.director.snapshot()['automatic_holds'], ['streamer'])
+
+    def test_desk_loading_survives_same_phase_then_new_phase_resumes(self):
+        with tempfile.TemporaryDirectory() as folder:
+            reader = Mock(); obs = FakeOBS()
+            watcher = self.make_watcher(folder, reader, obs, [0])
+            watcher.settings['loading_scene'] = 'Loading'
+            obs.get_scene_list = lambda: SimpleNamespace(scenes=[{'sceneName': n} for n in ['Test','Lobbies','just screen','Loading']])
+            reader.snapshot.return_value = ('Lobby', None)
+            watcher.tick(); watcher.present_stage('loading'); watcher.tick()
+            self.assertEqual(obs.scene, 'Loading')
+            reader.snapshot.return_value = ('Matchmaking', None); watcher.tick()
+            self.assertEqual(obs.scene, 'Lobbies')
+            self.assertIsNone(watcher.manual_choice)
+
+    def test_desk_selection_rejects_newer_intent_before_preparation(self):
+        with tempfile.TemporaryDirectory() as folder:
+            watcher = self.make_watcher(folder, Mock(), FakeOBS(), [0])
+            obs = watcher.obs_factory()
+            def connect():
+                watcher.director.request('Newer choice', owner='user', automatic=False)
+                return obs
+            watcher.obs_factory = connect
+            with self.assertRaisesRegex(ValueError, 'superseded'):
+                watcher.present_stage('queue')
+            self.assertEqual(obs.writes, [('scene','Newer choice')])
+            self.assertIsNone(watcher.manual_choice)
 
     def test_hold_drops_obsolete_draft_when_game_starts(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -256,11 +302,43 @@ class ClientSceneTests(unittest.TestCase):
             watcher.apply_pending(verify_active=True)
             self.assertEqual(obs.scene, 'Manual'); self.assertEqual(len(obs.writes), writes)
             reader.snapshot.return_value = ('ChampSelect', session(bans=[False])); watcher.tick()
-            self.assertEqual(obs.scene, 'Manual'); self.assertEqual(len(obs.writes), writes)
+            self.assertEqual(obs.scene, 'Lobbies')
+            self.assertFalse(obs.items[1]['sceneItemEnabled'])
             reader.snapshot.return_value = ('ChampSelect', session(bans=[True])); watcher.tick()
             self.assertEqual(obs.scene, 'Lobbies')
             reader.snapshot.return_value = ('Lobby', None); watcher.tick()
             self.assertEqual(obs.scene, 'just screen')
+
+    def test_each_new_draft_event_routes_from_any_scene_but_updates_do_not(self):
+        with tempfile.TemporaryDirectory() as folder:
+            reader = Mock(); obs = FakeOBS()
+            watcher = self.make_watcher(folder, reader, obs, [0])
+            watcher.settings['champion_scene'] = 'Draft'
+            obs.get_scene_list = lambda: SimpleNamespace(scenes=[{'sceneName': n} for n in ['Test', 'Lobbies', 'Draft']])
+            reader.snapshot.return_value = ('Matchmaking', None); watcher.tick()
+            for data, expected in [(session('PLANNING', [False]), 'Lobbies'), (session(bans=[False]), 'Lobbies'),
+                                   (session('PICK'), 'Draft'), (session('FINALIZATION'), 'Draft')]:
+                watcher.director.request('Unrelated scene', owner='user', automatic=False)
+                reader.snapshot.return_value = ('ChampSelect', data); watcher.tick()
+                self.assertEqual(obs.scene, expected)
+                watcher.director.request('Manual choice', owner='user', automatic=False)
+                writes = list(obs.writes)
+                watcher.tick()
+                self.assertEqual(obs.scene, 'Manual choice')
+                self.assertEqual(obs.writes, writes)
+
+    def test_newer_manual_intent_during_ban_read_rejects_scene_and_preparation(self):
+        with tempfile.TemporaryDirectory() as folder:
+            reader = Mock(); obs = FakeOBS()
+            watcher = self.make_watcher(folder, reader, obs, [0])
+            reader.snapshot.return_value = ('Matchmaking', None); watcher.tick()
+            def read():
+                watcher.director.request('Newer choice', owner='user', automatic=False)
+                return ('ChampSelect', session(bans=[False]))
+            reader.snapshot.side_effect = read
+            before = len(obs.writes); watcher.tick()
+            self.assertEqual(obs.scene, 'Newer choice')
+            self.assertEqual(obs.writes[before:], [('scene', 'Newer choice')])
 
     def test_active_draft_does_not_reclaim_another_scene_choice(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -280,6 +358,17 @@ class ClientSceneTests(unittest.TestCase):
             obs.scene = 'InstantReplay'
             watcher.apply_pending(verify_active=True)
             self.assertEqual(obs.scene, 'InstantReplay')
+
+    def test_unavailable_client_does_not_suppress_post_game_fallback(self):
+        with tempfile.TemporaryDirectory() as folder:
+            reader = Mock(); obs = FakeOBS()
+            watcher = self.make_watcher(folder, reader, obs, [0])
+            self.assertFalse(watcher.routes_lobbies())
+            reader.snapshot.return_value = ('InProgress', None); watcher.tick()
+            self.assertTrue(watcher.routes_lobbies())
+            reader.snapshot.side_effect = OSError('Client unavailable'); watcher.tick()
+            self.assertFalse(watcher.routes_lobbies())
+            self.assertTrue(watcher.enabled)
 
     def test_replay_active_defers_phase_change_until_playback_ends(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -353,6 +442,7 @@ class ClientSceneTests(unittest.TestCase):
             self.assertEqual(obs.scene, 'Lobbies')
             reader.snapshot.return_value = ('ChampSelect', session(bans=[False, True])); watcher.tick()
             self.assertEqual(obs.scene, 'Lobbies')
+            self.assertFalse(obs.items[1]['sceneItemEnabled'])
             reader.snapshot.return_value = ('ChampSelect', session(bans=[True, True])); watcher.tick()
             self.assertTrue(obs.items[1]['sceneItemEnabled'])
             reader.snapshot.return_value = ('Lobby', None); watcher.tick()
@@ -448,6 +538,46 @@ class ClientSceneTests(unittest.TestCase):
             watcher = self.make_watcher(folder, reader, obs, now)
             watcher.run(stop, threading.Event())
             self.assertEqual(reader.snapshot.call_count, 3)
+            self.assertEqual(obs.scene, 'Lobbies')
+            connection.close.assert_called_once()
+
+    def test_event_socket_failure_still_observes_http_phases_on_existing_worker(self):
+        with tempfile.TemporaryDirectory() as folder:
+            reader = Mock(); obs = FakeOBS(); stop = threading.Event()
+            watcher = self.make_watcher(folder, reader, obs, [0])
+            reader.connect_events.side_effect = OSError('WAMP closed')
+            phases = iter([('ChampSelect', session(bans=[False])), ('Lobby', None)])
+            def read():
+                result = next(phases)
+                if result[0] == 'Lobby': stop.set()
+                return result
+            reader.snapshot.side_effect = read
+            with patch.object(stop, 'wait', return_value=False):
+                watcher.run(stop, threading.Event())
+            self.assertTrue(watcher.connected)
+            self.assertFalse(watcher.snapshot()['event_stream'])
+            self.assertEqual(reader.snapshot.call_count, 2)
+            self.assertEqual(obs.scene, 'just screen')
+            self.assertTrue(any(write == ('scene', 'Lobbies') for write in obs.writes))
+
+    def test_quiet_event_stream_still_refreshes_client_phases(self):
+        from websocket import WebSocketTimeoutException
+        with tempfile.TemporaryDirectory() as folder:
+            reader = Mock(); obs = FakeOBS(); stop = threading.Event(); now = [0]
+            watcher = self.make_watcher(folder, reader, obs, now)
+            connection = Mock(); reader.connect_events.return_value = connection
+            def receive():
+                now[0] += 2
+                raise WebSocketTimeoutException()
+            connection.recv.side_effect = receive
+            phases = iter([('Lobby', None), ('Matchmaking', None)])
+            def read():
+                result = next(phases)
+                if result[0] == 'Matchmaking': stop.set()
+                return result
+            reader.snapshot.side_effect = read
+            watcher.run(stop, threading.Event())
+            self.assertEqual(reader.snapshot.call_count, 2)
             self.assertEqual(obs.scene, 'Lobbies')
             connection.close.assert_called_once()
 

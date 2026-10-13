@@ -1,0 +1,920 @@
+{
+  "enabled": true,
+  "editorial_note": "Single-message League, gamer and dry humor. No claims of viral ranking or creator originality. Social video research was access-limited; selected lines do not depend on audio or video. The final 20 are familiar circulating dad jokes.",
+  "research_sources": [
+    {
+      "url": "https://www.reddit.com/r/leagueoflegends/comments/1b9xv88/whats_the_funniest_chat_youve_read_in_league/",
+      "use": "Community banter reference; not copied wholesale."
+    },
+    {
+      "url": "https://www.reddit.com/r/leagueoflegends/comments/1d8pgj0/your_worst_league_of_legenda_pun/",
+      "use": "Pun reference; overly context-dependent entries excluded."
+    },
+    {
+      "url": "https://ads.tiktok.com/business/library/TikTok_Next_2026_Trend_Report.pdf?trk=article-ssr-frontend-pulse_little-text-block",
+      "use": "Broad humor/community context, not evidence these jokes are viral."
+    }
+  ],
+  "jokes": [
+    {
+      "id": "league-001",
+      "category": "league",
+      "text": "My team treats the minimap like the terms and conditions.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-002",
+      "category": "league",
+      "text": "I bought a control ward. Apparently that makes me the team's sole investor.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-003",
+      "category": "league",
+      "text": "My Flash is on cooldown. The wall I flashed into is doing great.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-004",
+      "category": "league",
+      "text": "Solo queue is a group project where everyone has already emailed the professor.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-005",
+      "category": "league",
+      "text": "I pinged that the enemy was missing. My team took it as a challenge to find them.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-006",
+      "category": "league",
+      "text": "The enemy jungler is camping my lane. At this point, I should be charging rent.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-007",
+      "category": "league",
+      "text": "My support said they needed space. They're in top lane now.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-008",
+      "category": "league",
+      "text": "Every League guide starts with 'it's simple' and ends with a spreadsheet.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-009",
+      "category": "league",
+      "text": "I don't chase Singed. I accompany him on a brief educational tour of the respawn screen.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-010",
+      "category": "league",
+      "text": "Our team has great communication. Five people, five plans, all in capital letters.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-011",
+      "category": "league",
+      "text": "I checked the replay. Turns out the lag was between my brain and my hand.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-012",
+      "category": "league",
+      "text": "I play scaling champions because 'eventually' is a very comforting deadline.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-013",
+      "category": "league",
+      "text": "My jungler said 'play safe.' I've been under this tower long enough to receive mail.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-014",
+      "category": "league",
+      "text": "Buying boots doesn't fix bad positioning. It just gets me there sooner.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-015",
+      "category": "league",
+      "text": "I don't miss cannon minions. I grant scholarships.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-016",
+      "category": "league",
+      "text": "I have excellent map awareness. I'm aware there's a map.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-017",
+      "category": "league",
+      "text": "League taught me to stay humble. Then it gave me a rank so I could prove it.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-018",
+      "category": "league",
+      "text": "My mechanics are a little rusty. My excuses are in midseason form.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-019",
+      "category": "league",
+      "text": "I warded the bush, saw five people, and walked in anyway. Knowledge isn't always power.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-020",
+      "category": "league",
+      "text": "The enemy has a win condition. We have a group chat.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-021",
+      "category": "league",
+      "text": "We're not losing. We're providing the before footage for somebody's montage.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-022",
+      "category": "league",
+      "text": "My champion scales. Unfortunately, so does my confidence.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-023",
+      "category": "league",
+      "text": "The surrender vote is the closest this team has come to working together.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-024",
+      "category": "league",
+      "text": "I watched a Challenger guide. We now have the same mouse sensitivity and nothing else.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-025",
+      "category": "league",
+      "text": "Nothing brings a team together like arguing over whose fault it is that they aren't together.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-026",
+      "category": "league",
+      "text": "The shopkeeper keeps selling me damage. At some point, he's got to ask what I'm doing with it.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-027",
+      "category": "league",
+      "text": "My lane opponent recalled. I also needed a break, so I died.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-028",
+      "category": "league",
+      "text": "The tutorial taught me to attack the enemy. Ranked taught me that the definition of enemy is flexible.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-029",
+      "category": "league",
+      "text": "I save my ultimate for the perfect moment. The perfect moment has yet to survive me.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-030",
+      "category": "league",
+      "text": "My win rate is private. Unfortunately, the match history is a snitch.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-031",
+      "category": "league",
+      "text": "Bot lane is couples therapy where both people brought a weapon.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-032",
+      "category": "league",
+      "text": "Top lane is a single-player game with occasional home invasions.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-033",
+      "category": "league",
+      "text": "Jungle is customer service, except all three customers are on fire.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-034",
+      "category": "league",
+      "text": "Support is putting child locks on a sports car.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-035",
+      "category": "league",
+      "text": "Playing ADC is spending 25 minutes assembling furniture so an assassin can sit on it.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-036",
+      "category": "league",
+      "text": "My duo says we're on the same page. I think one of us has the wrong book.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-037",
+      "category": "league",
+      "text": "Ranked is the only place where 'play like a team' counts as a controversial opinion.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-038",
+      "category": "league",
+      "text": "The enemy team has synergy. We have matching respawn timers.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-039",
+      "category": "league",
+      "text": "That wasn't a failed dive. It was a tower inspection. Very secure.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-040",
+      "category": "league",
+      "text": "We lost Baron, but we gained five different explanations.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-041",
+      "category": "league",
+      "text": "Udyr has four stances. Mine has a fifth: reconsidering.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-042",
+      "category": "league",
+      "text": "Udyr bot lane: because sometimes the marksman is the ammunition.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-043",
+      "category": "league",
+      "text": "Udyr changes animal forms and still somehow queues as the team's emotional support bear.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-044",
+      "category": "league",
+      "text": "My Udyr build is off-meta. So is my route back to lane.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-045",
+      "category": "league",
+      "text": "Teemo doesn't control the map. He leaves it a very unpleasant review.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-046",
+      "category": "league",
+      "text": "Yuumi is the only teammate who can go AFK and still have plausible deniability.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-047",
+      "category": "league",
+      "text": "Blitzcrank doesn't need a dating app. He already makes terrible connections.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-048",
+      "category": "league",
+      "text": "Thresh offered me a lantern. I chose the authentic walking experience.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-049",
+      "category": "league",
+      "text": "Bard went roaming. We hope to hear from him over the holidays.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-050",
+      "category": "league",
+      "text": "Shen is the friend who says 'I'm on my way' and, for once, actually means it.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-051",
+      "category": "league",
+      "text": "Yasuo mains don't see a losing lane. They see a progress bar.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-052",
+      "category": "league",
+      "text": "Zilean can rewind time and still chooses to spend it in solo queue.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-053",
+      "category": "league",
+      "text": "Nasus has been farming so long, the minions are asking about employee benefits.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-054",
+      "category": "league",
+      "text": "Veigar measures success in stacks. Finally, a short king with long-term goals.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-055",
+      "category": "league",
+      "text": "Dr. Mundo goes where he pleases. Apparently my backline accepts walk-ins.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-056",
+      "category": "league",
+      "text": "Malphite's whole career is one good entrance.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-057",
+      "category": "league",
+      "text": "Rammus is the only League player with a healthy relationship with chat.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-058",
+      "category": "league",
+      "text": "Fiddlesticks is what happens when the ward actually finds something.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-059",
+      "category": "league",
+      "text": "Aurelion Sol created stars. Somehow he's still expected to help with the wave.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-060",
+      "category": "league",
+      "text": "Ekko gets to undo his mistakes. I have to put mine in the stream highlights.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-061",
+      "category": "league",
+      "text": "Ornn upgrades items for free. My team still wants to speak to his manager.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-062",
+      "category": "league",
+      "text": "Garen's combo has fewer steps than my coffee order. Both keep me up at night.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-063",
+      "category": "league",
+      "text": "Jhin doesn't count to five. Finally, a champion who respects my attention span.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-064",
+      "category": "league",
+      "text": "Karthus contributes after dying. I've been researching the first half extensively.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-065",
+      "category": "league",
+      "text": "Rengar doesn't see a bush. He sees a delivery address.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-066",
+      "category": "league",
+      "text": "Warwick smells low health. I smell a fight we should absolutely not take.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-067",
+      "category": "league",
+      "text": "League is free to play. Everything after the download is a negotiation.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-068",
+      "category": "league",
+      "text": "I don't need a coach to identify my mistakes. Four volunteers show up every game.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-069",
+      "category": "league",
+      "text": "'We scale' is just 'trust the process' with a death timer.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "league-070",
+      "category": "league",
+      "text": "The best part of a five-man premade is knowing exactly who to forgive tomorrow.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-001",
+      "category": "gamer",
+      "text": "I spent two hours optimizing my settings. The game now runs my bad decisions at 144 FPS.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-002",
+      "category": "gamer",
+      "text": "My PC has liquid cooling. I have a glass of water I've ignored for three hours.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-003",
+      "category": "gamer",
+      "text": "I paid for the whole health bar. I'm going to use the last pixel.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-004",
+      "category": "gamer",
+      "text": "The boss has three phases. I have denial, bargaining, and loading screen.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-005",
+      "category": "gamer",
+      "text": "I love games with meaningful choices. Especially 'retry' and 'retry.'",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-006",
+      "category": "gamer",
+      "text": "My inventory is full because one day this specific rock will be important.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-007",
+      "category": "gamer",
+      "text": "The game told me to follow my instincts. That was an expensive tutorial.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-008",
+      "category": "gamer",
+      "text": "I turned off motion blur. My decision-making is still blurry.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-009",
+      "category": "gamer",
+      "text": "I don't hoard healing potions. I'm saving them for the sequel.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-010",
+      "category": "gamer",
+      "text": "Stealth mission update: nobody can report me if everybody is already reporting me.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-011",
+      "category": "gamer",
+      "text": "I chose the dialogue option that sounded polite in my head. Apparently my character yelled it.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-012",
+      "category": "gamer",
+      "text": "Every RPG has a world-ending disaster that can wait while I catch seventeen fish.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-013",
+      "category": "gamer",
+      "text": "My character can carry six swords, three shields, and a ladder. One more flower? Absolutely not.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-014",
+      "category": "gamer",
+      "text": "Fast travel is great. I wish the grocery store had discovered that technology.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-015",
+      "category": "gamer",
+      "text": "I named my save file 'final.' That was six final saves ago.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-016",
+      "category": "gamer",
+      "text": "Achievements: 99%. Willingness to find the last collectible: an ongoing negotiation.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-017",
+      "category": "gamer",
+      "text": "I bought a game to relax. Now I have a second job with crafting requirements.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-018",
+      "category": "gamer",
+      "text": "The hardest boss in any game is a friend saying 'one more?' when you're already in bed.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-019",
+      "category": "gamer",
+      "text": "Games need a difficulty between 'the enemies apologize' and 'the enemies have read my diary.'",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-020",
+      "category": "gamer",
+      "text": "My keyboard has RGB. The extra colors help me locate the wrong key faster.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-021",
+      "category": "gamer",
+      "text": "I don't rage quit. I perform an emergency desktop inspection.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-022",
+      "category": "gamer",
+      "text": "Gaming chairs are great. Mine supports every bad decision I make.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-023",
+      "category": "gamer",
+      "text": "I finally beat my backlog. Then the sale ended and they emailed me another one.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-024",
+      "category": "gamer",
+      "text": "Autocorrect has never played this game and is still the most confident person in team chat.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-025",
+      "category": "gamer",
+      "text": "Nothing makes me suspicious faster than a room full of free healing items.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-026",
+      "category": "gamer",
+      "text": "NPCs say the same thing every time you talk to them. So do I, but mine is 'one more game.'",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-027",
+      "category": "gamer",
+      "text": "A checkpoint is the game's way of saying, 'You're about to learn something.'",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-028",
+      "category": "gamer",
+      "text": "I have a strategy. The enemies keep being extremely rude about it.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-029",
+      "category": "gamer",
+      "text": "My favorite horror mechanic is realizing I forgot to save.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "gamer-030",
+      "category": "gamer",
+      "text": "I set the game to easy. Turns out the difficulty setting doesn't affect my friends.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-001",
+      "category": "dry",
+      "text": "I joined a procrastination support group. We haven't picked a date.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-002",
+      "category": "dry",
+      "text": "My bank app asked if I wanted push notifications. I already feel pushed enough.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-003",
+      "category": "dry",
+      "text": "I cleaned my desk and found a to-do list. That feels like a threat.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-004",
+      "category": "dry",
+      "text": "I set realistic goals. Then I give them unrealistic deadlines to keep things interesting.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-005",
+      "category": "dry",
+      "text": "My password manager says my password is weak. It's doing its best.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-006",
+      "category": "dry",
+      "text": "I finally got eight hours of sleep. It took three nights, but still.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-007",
+      "category": "dry",
+      "text": "I don't have a five-year plan. I have a charger in every room.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-008",
+      "category": "dry",
+      "text": "I bought a standing desk. Now I can make the same mistakes at a different altitude.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-009",
+      "category": "dry",
+      "text": "My phone says my screen time went down. Apparently the PC doesn't report to management.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-010",
+      "category": "dry",
+      "text": "I put 'works well under pressure' on my resume. My printer immediately called my bluff.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-011",
+      "category": "dry",
+      "text": "I keep an open mind. Unfortunately, there are forty-seven tabs in it.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-012",
+      "category": "dry",
+      "text": "I love a self-checkout. Finally, a job interview I can fail while buying bread.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-013",
+      "category": "dry",
+      "text": "My fridge has a light because even my midnight decisions deserve a spotlight.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-014",
+      "category": "dry",
+      "text": "I started budgeting. Apparently 'a little treat' is an entire department.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-015",
+      "category": "dry",
+      "text": "I bought a planner to organize my life. Finding the planner is now my first goal.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-016",
+      "category": "dry",
+      "text": "My smart watch told me to stand up. I've been taking orders from a rectangle all day.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-017",
+      "category": "dry",
+      "text": "I don't hold grudges. I keep well-organized patch notes.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-018",
+      "category": "dry",
+      "text": "I ordered a book on patience. Tracking says tomorrow. Unacceptable.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-019",
+      "category": "dry",
+      "text": "I have a strict bedtime routine. First, I ignore my bedtime.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-020",
+      "category": "dry",
+      "text": "I started a podcast with my inner critic. Terrible cohost. Won't let me finish.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-021",
+      "category": "dry",
+      "text": "My email has a priority inbox. Apparently everyone's priorities are different from mine.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-022",
+      "category": "dry",
+      "text": "I like my coffee like my patch notes: strong enough to change my behavior.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-023",
+      "category": "dry",
+      "text": "I practiced mindfulness. I am now fully present for how much I have to do.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-024",
+      "category": "dry",
+      "text": "The gym said 'bring a friend.' That's two problems now.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-025",
+      "category": "dry",
+      "text": "I bought noise-canceling headphones. My responsibilities still get through.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-026",
+      "category": "dry",
+      "text": "I took a personality test. Apparently I need to accept cookies before I can find myself.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-027",
+      "category": "dry",
+      "text": "I asked my calendar for some space. It suggested a thirty-minute meeting.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-028",
+      "category": "dry",
+      "text": "I keep telling myself I'm a morning person. My morning person has requested a transfer.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-029",
+      "category": "dry",
+      "text": "I got a reusable water bottle to save the planet. It has spent three days beside the sink.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-030",
+      "category": "dry",
+      "text": "My recipe said 'season to taste.' Finally, an exam I'm qualified to fail.",
+      "provenance": "written for this channel; may share common humor premises"
+    },
+    {
+      "id": "dry-031",
+      "category": "dry",
+      "text": "I used to be addicted to soap. I'm clean now.",
+      "provenance": "familiar circulating joke"
+    },
+    {
+      "id": "dry-032",
+      "category": "dry",
+      "text": "I don't trust stairs. They're always up to something.",
+      "provenance": "familiar circulating joke"
+    },
+    {
+      "id": "dry-033",
+      "category": "dry",
+      "text": "I only know 25 letters of the alphabet. I don't know y.",
+      "provenance": "familiar circulating joke"
+    },
+    {
+      "id": "dry-034",
+      "category": "dry",
+      "text": "I ordered a chicken and an egg online. I'll let you know.",
+      "provenance": "familiar circulating joke"
+    },
+    {
+      "id": "dry-035",
+      "category": "dry",
+      "text": "I used to hate facial hair. Then it grew on me.",
+      "provenance": "familiar circulating joke"
+    },
+    {
+      "id": "dry-036",
+      "category": "dry",
+      "text": "I told my suitcase there'd be no vacation this year. Now I'm dealing with emotional baggage.",
+      "provenance": "familiar circulating joke"
+    },
+    {
+      "id": "dry-037",
+      "category": "dry",
+      "text": "I tried to catch fog yesterday. Mist.",
+      "provenance": "familiar circulating joke"
+    },
+    {
+      "id": "dry-038",
+      "category": "dry",
+      "text": "A book fell on my head. I've only got my shelf to blame.",
+      "provenance": "familiar circulating joke"
+    },
+    {
+      "id": "dry-039",
+      "category": "dry",
+      "text": "I used to be a baker, but I couldn't make enough dough.",
+      "provenance": "familiar circulating joke"
+    },
+    {
+      "id": "dry-040",
+      "category": "dry",
+      "text": "I have a joke about construction, but I'm still working on it.",
+      "provenance": "familiar circulating joke"
+    },
+    {
+      "id": "dry-041",
+      "category": "dry",
+      "text": "I have a joke about time travel, but you didn't like it.",
+      "provenance": "familiar circulating joke"
+    },
+    {
+      "id": "dry-042",
+      "category": "dry",
+      "text": "I was going to tell a chemistry joke, but I didn't think I'd get a reaction.",
+      "provenance": "familiar circulating joke"
+    },
+    {
+      "id": "dry-043",
+      "category": "dry",
+      "text": "Why can't you hear a pterodactyl use the bathroom? The P is silent.",
+      "provenance": "familiar circulating joke"
+    },
+    {
+      "id": "dry-044",
+      "category": "dry",
+      "text": "What's the difference between a poorly dressed man on a tricycle and a well-dressed man on a bicycle? Attire.",
+      "provenance": "familiar circulating joke"
+    },
+    {
+      "id": "dry-045",
+      "category": "dry",
+      "text": "I asked the librarian if they had books about paranoia. She whispered, 'They're right behind you.'",
+      "provenance": "familiar circulating joke"
+    },
+    {
+      "id": "dry-046",
+      "category": "dry",
+      "text": "I bought a ceiling fan. Complete waste of money. He just stands there saying he loves the ceiling.",
+      "provenance": "familiar circulating joke"
+    },
+    {
+      "id": "dry-047",
+      "category": "dry",
+      "text": "I thought the dryer was shrinking my clothes. Turns out it was the refrigerator.",
+      "provenance": "familiar circulating joke"
+    },
+    {
+      "id": "dry-048",
+      "category": "dry",
+      "text": "I got fired from the calendar factory. All I did was take a day off.",
+      "provenance": "familiar circulating joke"
+    },
+    {
+      "id": "dry-049",
+      "category": "dry",
+      "text": "I bought a thesaurus, but all the pages were blank. I have no words to describe how angry I am.",
+      "provenance": "familiar circulating joke"
+    },
+    {
+      "id": "dry-050",
+      "category": "dry",
+      "text": "I tried writing with a broken pencil. Pointless.",
+      "provenance": "familiar circulating joke"
+    }
+  ]
+}

@@ -12,15 +12,40 @@ from lib.coordination.lobbies import LobbyCatalog
 from lib.display_capture import CAPTURE_SCENE
 
 class LobbyManagementTests(unittest.TestCase):
+    def test_afterparty_camera_is_centered_above_the_booth_and_preserves_overrides(self):
+        spec=layouts.defaults('Spirit Afterparty')
+        x,y,w,h=spec['camera']
+        self.assertEqual(x+w/2,960)
+        self.assertLessEqual(y+h,680)  # Keep the deck and its controls intact.
+        plan=presentation.plan('Spirit Afterparty',{})
+        camera=next(row for row in plan['layers'] if row['source']=='FaceCamWithProps')
+        self.assertEqual(camera['transform']['positionX'],x)
+        self.assertEqual(camera['transform']['boundsHeight'],h)
+        for row in plan['layers']:
+            if 'url_query' in row:
+                self.assertEqual(json.loads(row['url_query']['holes'])[1],spec['camera'])
+        custom=[800,250,420,380]
+        saved={'locations':{'Spirit Afterparty':{'camera':custom,'personal':'keep'}}}
+        self.assertEqual(settings.location('Spirit Afterparty',saved)['camera'],custom)
+        self.assertEqual(settings.location('Spirit Afterparty',saved)['personal'],'keep')
+
     def test_enlarged_desktop_is_uncropped_and_clear_of_camera_and_chat_in_every_world(self):
         for name in layouts.LAYOUTS:
             spec=layouts.defaults(name);x,y,w,h=spec['screen']
-            self.assertEqual((w,h),(896,504),name)
+            if name in layouts.SPIRIT_ART:
+                self.assertGreaterEqual(w,768,name)  # Individually composed media spaces stay readable.
+            else:
+                self.assertEqual((w,h),(896,504),name)
             self.assertEqual(w*9,h*16,name)
-            for key in ('camera','chat'):
+            for key in (() if name == 'Spirit Afterparty' else ('camera','chat')):
                 xx,yy,ww,hh=spec[key]
                 self.assertTrue(x+w<=xx or xx+ww<=x or y+h<=yy or yy+hh<=y,name+'/'+key)
             blueprint=presentation.plan(name,{})
+            if name == 'Spirit Afterparty':
+                self.assertNotIn(CAPTURE_SCENE,[p['source'] for p in blueprint['layers']])
+                self.assertIn(CAPTURE_SCENE,blueprint['hide'])
+                self.assertIn('FaceCamWithProps',[p['source'] for p in blueprint['layers']])
+                continue
             layers=blueprint['layers'];screen=next(p for p in layers if p['source']==CAPTURE_SCENE)
             self.assertEqual(screen['transform']['boundsType'],'OBS_BOUNDS_SCALE_INNER')
             self.assertEqual(screen['transform']['cropLeft'],0)
@@ -82,6 +107,8 @@ class LobbyManagementTests(unittest.TestCase):
     def setUp(self):
         self.folder=tempfile.TemporaryDirectory(); self.addCleanup(self.folder.cleanup)
         self.path=Path(self.folder.name)/'preferences.json'
+        # Indirect settings reads must use the same disposable fixture too.
+        self.enterContext(patch.object(settings, 'PATH', self.path))
 
     def test_passage_upgrade_covers_new_worlds_without_replacing_personal_settings(self):
         from scene_voice_switcher.passage_installation import patch_collection
@@ -184,7 +211,10 @@ class LobbyManagementTests(unittest.TestCase):
         client=Mock()
         client.get_scene_item_list.side_effect=lambda name: SimpleNamespace(scene_items=rows if name=='ForgeLobby' else [])
         spec={'screen':[100,200,600,300],'camera':[800,300,400,500],'chat':[1500,200,300,500],'rotation':True}
-        with patch.object(presentation,'ART',art),patch.object(settings,'location',return_value=spec):
+        with patch.object(presentation,'artwork',return_value=art/'forge-base.png'), \
+             patch.object(presentation,'foreground',return_value=art/'forge-foreground-cutout.png'), \
+             patch.object(settings,'location',return_value=spec), \
+             patch.object(settings,'read',return_value={}):
             presentation.restore(client,'ForgeLobby')
         browser=client.set_input_settings.call_args.args
         self.assertEqual(browser[0],'ForgeLobby Chat')

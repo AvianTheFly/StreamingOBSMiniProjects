@@ -3,6 +3,17 @@ from pathlib import Path
 from hub_ui import updates
 
 class SceneRoutes:
+    def _svs_display_state(self):
+        from urllib.parse import urlparse, parse_qs
+        from scene_voice_switcher.screen_content import visibility
+        try:
+            source = parse_qs(urlparse(self.path).query).get('source', [''])[0]
+            self._json(200, visibility(source))
+        except ValueError as exc:
+            self._err(400, str(exc))
+        except Exception as exc:
+            self._err(503, str(exc))
+
     def _svs_catalog(self):
         try:
             from scene_voice_switcher.api import catalog
@@ -29,6 +40,15 @@ class SceneRoutes:
 
 
     def _svs_post(self, action: str, body: dict):
+        if action == 'screen_content':
+            try:
+                from scene_voice_switcher.screen_content import select
+                self._json(200, select(body.get('content')))
+            except ValueError as exc:
+                self._err(400, str(exc))
+            except Exception as exc:
+                self._err(500, str(exc))
+            return
         if action == 'next_lobby':
             try:
                 from scene_voice_switcher.api import next_lobby
@@ -95,7 +115,9 @@ class SceneRoutes:
                 return
             try:
                 import obs
-                obs.switch_scene(scene, owner='hub_ui', reason='Scene button')
+                if not obs.switch_scene(scene, owner='hub_ui', reason='Scene button'):
+                    self._err(409, 'Scene choice was superseded; try again')
+                    return
                 updates.broadcast("project_action", {"project": "scene_voice_switcher", "action": "switch_scene", "scene": scene})
                 self._json(200, {"ok": True})
             except Exception as exc:

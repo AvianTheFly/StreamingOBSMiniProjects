@@ -131,7 +131,7 @@ assert all(signal.getsignal(s) == handler for s, handler in before.items())
         stop.is_set.side_effect = [False, False, True]
         stop.wait.return_value = False
         tracker = KillTracker(stop)
-        snapshot = {'activePlayer': {'riotIdGameName': 'Me'},
+        snapshot = {'gameData': {'gameTime': 10}, 'activePlayer': {'riotIdGameName': 'Me'},
                     'events': {'Events': [{'EventID': 1, 'EventName': 'ChampionKill',
                                            'KillerName': 'Me', 'VictimName': 'Other',
                                            'EventTime': 10.0}]}}
@@ -141,6 +141,16 @@ assert all(signal.getsignal(s) == handler for s, handler in before.items())
         self.assertEqual(fetch.call_count, 2)
         self.assertFalse(tracker.game_connected)
         self.assertIsNone(tracker.last_kill_wall_time)
+
+    def test_kills_thirty_seconds_apart_share_the_anchor_then_reset(self):
+        tracker = KillTracker(threading.Event())
+        def kill(event_id):
+            return [{'EventID':event_id,'EventName':'ChampionKill','KillerName':'Me','VictimName':'Other','EventTime':float(event_id)}]
+        with patch('instant_replay.kill_tracker.time.time',return_value=100):tracker._process_events(kill(1),'Me')
+        with patch('instant_replay.kill_tracker.time.time',return_value=130):tracker._process_events(kill(2),'Me')
+        self.assertEqual(tracker.first_kill_wall_time,100)
+        with patch('instant_replay.kill_tracker.time.time',return_value=161):tracker._process_events(kill(3),'Me')
+        self.assertEqual(tracker.first_kill_wall_time,161)
 
     def test_full_save_uses_original_without_cutting(self):
         with patch.object(replay_capture, '_trim_from_end') as trim:
@@ -188,6 +198,12 @@ assert all(signal.getsignal(s) == handler for s, handler in before.items())
         self.assertEqual(_parse_command('save 30.'), ('save', '', 30, False))
         self.assertEqual(_parse_command('mark')[0], 'mark')
         self.assertEqual(_parse_command('save full')[3], True)
+
+    def test_mark_review_duration_and_tag(self):
+        for spoken,expected in [('mark',('mark','',0,False)),('mark 30',('mark','',30,False)),
+                                ('mark sixty seconds',('mark','',60,False)),('mark full',('mark','',0,True)),
+                                ('mark win 45',('mark','win',45,False))]:
+            self.assertEqual(_parse_command(spoken),expected)
 
     def test_audio_restore_uses_the_pre_replay_mute_state(self):
         with patch.object(replay_audio, '_is_muted', True), \

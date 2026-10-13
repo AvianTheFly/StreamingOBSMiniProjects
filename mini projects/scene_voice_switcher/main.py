@@ -41,10 +41,15 @@ def run(input_queue: queue.Queue, stop_event: threading.Event, *, startup_event=
     # Events, commands and delayed returns share one bounded-lifetime loop.
     pending_revision = None
     def connected(data):
-        input_queue.put(('game.connected', scene_director.snapshot()['manual_revision']))
+        revision = scene_director.snapshot()['manual_revision']
+        game_scene_policy.game_started()
+        input_queue.put(('game.connected', revision))
     def disconnected(data):
         game_scene_policy.hold(disconnected=True)
-        input_queue.put(('game.disconnected', scene_director.snapshot()['manual_revision']))
+        revision = data.get('manual_revision')
+        if revision is None:
+            revision = scene_director.snapshot()['manual_revision']
+        input_queue.put(('game.disconnected', revision))
     def revert():
         input_queue.put('game')
 
@@ -75,6 +80,7 @@ def run(input_queue: queue.Queue, stop_event: threading.Event, *, startup_event=
             except queue.Empty:
                 raw = None
             try:
+                session_controls.reconcile()
                 if isinstance(raw, tuple):
                     event, revision = raw
                     scene_director.cancel_pending('scene_voice_switcher')
@@ -83,7 +89,7 @@ def run(input_queue: queue.Queue, stop_event: threading.Event, *, startup_event=
                         show_game(automatic=True, expected_manual_revision=revision)
                         with active_lock:
                             active_source[0] = None
-                    elif not game_scene_policy.automatic_lobbies():
+                    else:
                         pending_revision = revision
                 elif isinstance(raw, str) and raw.strip():
                     scene_director.cancel_pending('scene_voice_switcher')
@@ -94,7 +100,8 @@ def run(input_queue: queue.Queue, stop_event: threading.Event, *, startup_event=
                     else:
                         lobbies = _discover_lobbies()
                         _handle_command(raw, lobbies, active_source, active_lock)
-                if pending_revision is not None and game_scene_policy.hold() <= 0:
+                if (pending_revision is not None and not game_scene_policy.automatic_lobbies()
+                        and game_scene_policy.hold() <= 0):
                     revision, pending_revision = pending_revision, None
                     if not game_scene_policy.automatic_lobbies() and not stop_event.is_set():
                         applied, source = show_lobby(lobbies, automatic=True, expected_manual_revision=revision)

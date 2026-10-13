@@ -1,0 +1,14 @@
+{
+  "architecture": {
+    "checked_modules": 455,
+    "violations": 0
+  },
+  "focused_offline_tests": {
+    "module": "stream_brand.easter_eggs.test_pack",
+    "passed": 2
+  },
+  "browser_rendered_clips": 24,
+  "png_frames": 2880,
+  "decoded_alpha_clips": 24,
+  "workflow_check": "Global checkout has pending reviews in other owners; this standalone pack does not change runtime workflows."
+}

@@ -30,10 +30,10 @@ async function main(){
   const base=live?'http://127.0.0.1:7420/':'http://guide.test/';
   await page.goto(base+'#library',{waitUntil:'domcontentloaded'});await page.locator('.guide-area').first().waitFor();
   assert.equal(new URL(page.url()).hash,'#library','Guided discovery remains directly accessible');
-  assert.equal(await page.locator('.guide-area').count(),6);assert.equal(await page.locator('.library-tile').count(),0);
+  assert.equal(await page.locator('.guide-area').count(),await page.evaluate(async()=>(await import('/js/discovery/catalog.js')).AREAS.length));
   assert.match(await page.title(),/^Your stream/);
-  const coverage=await page.evaluate(async()=>{const {IDEAS,AREAS}=await import('/js/discovery/catalog.js');const {FEATURES,TOOLS}=await import('/js/catalog.js');const c=await (await fetch('/api/workflow-map')).json();const owners=new Set(IDEAS.flatMap(i=>[i.owner,...i.also||[]]));return {missing:[...Object.keys(FEATURES),...TOOLS.map(t=>t.id)].filter(id=>!owners.has(id)),badFlows:IDEAS.filter(i=>i.flow&&!c.flows.some(f=>f.id===i.flow)).map(i=>i.flow),large:AREAS.filter(a=>a.ideas.length>6).map(a=>a.id),count:IDEAS.length};});
-  assert.deepEqual(coverage.missing,[]);assert.deepEqual(coverage.badFlows,[]);assert.deepEqual(coverage.large,[]);assert(coverage.count>=25);
+  const coverage=await page.evaluate(async()=>{const {IDEAS}=await import('/js/discovery/catalog.js');const {FEATURES,TOOLS}=await import('/js/catalog.js');const c=await (await fetch('/api/workflow-map')).json();const owners=new Set(IDEAS.flatMap(i=>[i.owner,...i.also||[]]));return {missing:[...Object.keys(FEATURES),...TOOLS.map(t=>t.id)].filter(id=>!owners.has(id)),badFlows:IDEAS.filter(i=>i.flow&&!c.flows.some(f=>f.id===i.flow)).map(i=>i.flow)};});
+  assert.deepEqual(coverage.missing,[]);assert.deepEqual(coverage.badFlows,[]);
   if(!live){await page.waitForFunction(()=>document.querySelector('#guideScene').textContent==='Replay');assert.match(await page.locator('#guideOwnership').textContent(),/Replay studio holds/);assert.equal(await page.locator('#guideStream').textContent(),'Not streaming');}
   await page.screenshot({path:path.join(output,live?'live-guide-home.png':'guide-home.png'),animations:'disabled',fullPage:true});
   await page.locator('[data-tour]').click();assert.match(await page.locator('#guideTourStep').textContent(),/^1 of 3/);assert.match(await page.locator('#guideIdeaTitle').textContent(),/sound/);

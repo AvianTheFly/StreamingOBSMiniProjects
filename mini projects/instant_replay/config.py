@@ -7,12 +7,14 @@ LEAGUE_REQUEST_TIMEOUT = 2      # seconds before giving up on a request
 
 # ── Clip window ───────────────────────────────────────────────────────────────
 # The clip will start this many seconds BEFORE the first detected kill
-# (only used when no manual mark has been set).
-KILL_PRE_ROLL_SECONDS: float = 10.0
+# Used by a highlight save without an explicit duration.
+KILL_PRE_ROLL_SECONDS: float = 30.0
 
 # The clip will start this many seconds BEFORE the detected death
-# (only used when no manual mark or kill anchor has been set).
-DEATH_PRE_ROLL_SECONDS: float = 8.0
+# Used by a highlight save without an explicit duration or kill anchor.
+DEATH_PRE_ROLL_SECONDS: float = 30.0
+KILL_STREAK_RESET_SECONDS: float = 30.0
+REVIEW_CAPTURE_SECONDS: float = 60.0
 
 # ── OBS ───────────────────────────────────────────────────────────────────────
 SCENE        = "InstantReplay"
