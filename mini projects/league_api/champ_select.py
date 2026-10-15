@@ -23,6 +23,15 @@ def _slot(champion_id=0, locked=False):
     return {'championId': _id(champion_id), 'locked': bool(locked)}
 
 
+def _player_label(player, side, index):
+    """Use only names exposed in this draft; ranked aliases take precedence."""
+    for key in ('obfuscatedSummonerName', 'gameName', 'riotIdGameName', 'summonerName'):
+        value = player.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()[:64]
+    return f"{'Teammate' if side == 'allies' else 'Opponent'} {index + 1}"
+
+
 def project(session, catalog):
     """Put the local team on the left regardless of draft order or side."""
     if not isinstance(session, dict):
@@ -91,9 +100,7 @@ def project(session, catalog):
     for side, players in [('allies', allies), ('enemies', enemies)]:
         for index, slot in enumerate(result[side]):
             player = players[index] if index < len(players) and isinstance(players[index], dict) else {}
-            slot['label'] = str(player.get('obfuscatedSummonerName') or player.get('gameName')
-                                or player.get('summonerName')
-                                or f"{'Teammate' if side == 'allies' else 'Opponent'} {index + 1}")[:64]
+            slot['label'] = _player_label(player, side, index)
             slot['role'] = str(player.get('assignedPosition') or '')[:24]
     return result
 

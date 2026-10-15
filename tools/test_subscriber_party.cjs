@@ -1,6 +1,9 @@
 // Production HTTP/overlay proof. Preview only; never triggers the running Hub.
 const {chromium}=require('playwright'),{spawn}=require('node:child_process'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),crypto=require('node:crypto');
 const root=path.resolve(__dirname,'..'),web=path.join(root,'mini projects/twitch_celebrations'),out=path.join(root,'output/subscriber-party');fs.mkdirSync(out,{recursive:true});
+const captureFollowers=process.argv.includes('--capture-followers'),compareFollowers=process.argv.includes('--compare-followers');
+assert(!(captureFollowers&&compareFollowers),'Capture and compare must be separate runs');
+const followerReference=process.env.FOLLOWER_REFERENCE_FILE||path.join(out,'follower-fingerprints.json');
 const fixture=spawn('py',['-3.11','-u','tools/celebration_fixture.py'],{cwd:root,windowsHide:true,stdio:['pipe','pipe','pipe']});fixture.stderr.on('data',d=>process.stderr.write(d));
 const endpoint=new Promise((resolve,reject)=>{let buffer='';const timeout=setTimeout(()=>reject(Error('Fixture startup timeout')),20000);fixture.stdout.on('data',d=>{buffer+=d;const line=buffer.split(/\r?\n/).find(l=>l.startsWith('{'));if(line){clearTimeout(timeout);resolve('http://127.0.0.1:'+JSON.parse(line).port);}});fixture.on('exit',c=>{clearTimeout(timeout);reject(Error('Fixture exited '+c));});});
 function fakeAudio(){window.audioLog=[];window.Audio=class{constructor(src){this.src=src;this.volume=1;this.position=0;this.paused=true;audioLog.push(this);}get currentTime(){return this.position+(this.paused?0:(performance.now()-this.started)/1000);}set currentTime(v){this.position=v;this.started=performance.now();}play(){this.paused=false;this.started=performance.now();queueMicrotask(()=>this.onplaying?.());return Promise.resolve();}pause(){this.position=this.currentTime;this.paused=true;}};}
@@ -24,9 +27,13 @@ function fakeAudio(){window.audioLog=[];window.Audio=class{constructor(src){this
  assert(proof.rows.every(r=>r.clear&&r.ended&&r.maxGuests<=6&&r.ms<30));assert.equal(proof.cap.level,3);assert.equal(proof.unknown.detail,'♥');assert.equal(proof.coin.x,1729);assert.equal(proof.coin.y,957);assert.equal(proof.heart.x,140);assert.equal(proof.heart.y,910);
  for(const theme of ['crab','dragon','cat','frog']){const rows=proof.rows.filter(r=>r.theme===theme);assert(rows[2].pixels>rows[0].pixels*1.3);assert.equal(rows[4].maxGuests,rows[3].maxGuests);}
  console.log(JSON.stringify({subscriberProof:proof}));
- // Existing follower artwork/layout stays pixel-identical to its approved reference.
+ // Current follower behavior is the default contract. Historical pixels are opt-in.
  const follower=await page.evaluate(async()=>{const {SupporterShow}=await import('/supporter_show.js');const result={};for(const theme of ['crab','dragon','cat','frog']){const s=new SupporterShow(document.querySelector('#stage'));s.start({kind:'follow',theme,name:'Approved follower',duration:2.2},{custom:{}});const frames=[];for(const t of [.3,.8,1.4,1.95]){s.update(t);frames.push(s.canvas.toDataURL());}const panel=document.querySelector('#supporterPanel'),name=document.querySelector('#supporterName');result[theme]={frames,panel:[panel.offsetLeft,panel.offsetTop,panel.offsetWidth],font:getComputedStyle(name).fontSize};s.stop();}return result;});
- const hashes=Object.fromEntries(Object.entries(follower).map(([key,v])=>[key,{...v,frames:v.frames.map(frame=>crypto.createHash('sha256').update(frame).digest('hex'))}]));assert.deepEqual(hashes,JSON.parse(fs.readFileSync(path.join(root,'tmp_obs_debug/approved-follower-fingerprints.json'))));
+ const hashes=Object.fromEntries(Object.entries(follower).map(([key,v])=>[key,{...v,frames:v.frames.map(frame=>crypto.createHash('sha256').update(frame).digest('hex'))}]));
+ for(const [theme,value] of Object.entries(hashes))assert(new Set(value.frames).size>1,theme+' follower animation must advance');
+ assert.equal(await page.locator('#supporterLayer').count(),0,'Follower stop releases its presentation');
+ if(captureFollowers)fs.writeFileSync(followerReference,JSON.stringify(hashes,null,2));
+ if(compareFollowers)assert.deepEqual(hashes,JSON.parse(fs.readFileSync(followerReference,'utf8')),'Explicit follower reference comparison');
  // Literal names fit the single upper thank-you panel, including narrow previews.
  for(const width of [1920,960]){await page.setViewportSize({width,height:width*9/16});for(const name of ['W'.repeat(48),'月光の旅人_Étoile_🌙','<img src=x onerror=alert(1)> & crew']){
   const fitted=await page.evaluate(async name=>{const {SubscriberParty}=await import('/subscriber_party.js');const s=new SubscriberParty(document.getElementById('stage'));s.start({name,details:{months:6,message:'Do not add a second message',tier:'3000'}});s.update(2);const n=document.getElementById('supporterName'),p=s.panel.getBoundingClientRect();const result={text:n.textContent,children:n.children.length,overflow:n.scrollWidth>n.clientWidth+1,bottom:p.bottom,words:s.panel.innerText};s.stop();return result;},name);
@@ -47,5 +54,5 @@ function fakeAudio(){window.audioLog=[];window.Audio=class{constructor(src){this
  await page.goto(base+'/overlay?preview');await page.evaluate(async()=>await(await import('/subscriber_party.js')).subscriberReady);
  for(const months of [1,6,12]){await page.evaluate(async months=>{const {SubscriberParty}=await import('/subscriber_party.js');document.body.style.background='#19252e';const stage=document.getElementById('stage');stage.style.transition='none';stage.className='on';window.review?.stop();window.review=new SubscriberParty(stage);review.start({theme:'crab',name:'CaptainGoodVibes',details:{months}});review.update(3.98);},months);await page.screenshot({path:path.join(out,`subscriber-${months}-months.png`)});}
  if(process.env.SUB_EXPORT==='1')for(const months of [1,6])await require('./export_subscriber_preview.cjs')({browser,base,out,web,months});
- assert.deepEqual(errors,[]);assert.deepEqual(missing,[]);console.log(JSON.stringify({passed:true,followersUnchanged:true,clock,reduced,output:out}));
+ assert.deepEqual(errors,[]);assert.deepEqual(missing,[]);console.log(JSON.stringify({passed:true,followersCompared:compareFollowers,followersCaptured:captureFollowers,clock,reduced,output:out}));
  }finally{if(browser)await browser.close();fixture.stdin.end();}})().catch(e=>{console.error(e);process.exitCode=1;});

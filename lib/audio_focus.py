@@ -24,7 +24,7 @@ def unregister(provider):
             _provider = None
 
 
-def interrupt_audio(path, *, cancelled=lambda: False):
+def interrupt_audio(path, *, cancelled=lambda: False, music=False):
     """Return an idempotent release callback, including unavailable providers.
 
     Unknown metadata leaves background music alone. A cancelled request never
@@ -41,8 +41,10 @@ def interrupt_audio(path, *, cancelled=lambda: False):
     if not audible or cancelled():
         return lambda: None
     try:
-        release = provider.acquire(cancelled)
+        release = provider.acquire_music(cancelled) if music else provider.acquire(cancelled)
     except Exception as exc:
+        if music:
+            raise
         print(f'[audio-focus] Interruption unavailable: {exc}')
         return lambda: None
     released = False

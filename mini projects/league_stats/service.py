@@ -12,6 +12,7 @@ from .ranked import Ranked
 from . import presentation, chat_replies, audience, capture, postgame_report, report_visuals
 from . import recap_stories, recap_analysis
 from .recap_show import RecapShow, SAFE_PHASES
+from . import recap_narratives
 from .six_seven import SixSevenFinder
 
 
@@ -325,18 +326,20 @@ class Tracker:
                     self.report_cache[1]['visuals'] = report_visuals.project(display, report_visuals.scoreboard(display, stored, self.catalog))
                     self.report_cache[1]['stories'] = recap_stories.project(self.report_cache[1], records)
                     self.report_cache[1]['analysis'] = recap_analysis.project(self.report_cache[1], stored)
+                    self.report_cache[1]['narratives'] = recap_narratives.project(self.report_cache[1])
                     # Older local records predate champion IDs in the public archive.
                     if not self.report_cache[1]['match'].get('champion_id'):
                         own = next((p for p in self.report_cache[1]['visuals']['team'] if p['own']), {})
                         self.report_cache[1]['match']['champion_id'] = own.get('champion_id')
             result = copy.deepcopy(self.report_cache[1])
             report = result.get('match')
-            recent = report and 0 <= self.clock() - report.get('ended_at', report.get('started_at', 0) + report.get('duration', 0)) <= 900
-            # Never show an older result over a new game, queue, replay or lost client.
+            # The last completed game stays available throughout a long queue.
+            # Lobby, gameplay, replay and unknown phases never admit the recap.
             same_match = not self.current or (report and report['id'] == self.current['id'])
             self.recap_show.sync(report['id'] if report else None)
+            self.recap_show.observe_phase(self.client_phase)
             safe = self.client_phase in SAFE_PHASES and same_match
-            result['show'] = self.recap_show.snapshot(auto=self.settings['postgame_auto'], eligible=recent, safe=safe)
+            result['show'] = self.recap_show.snapshot(auto=self.settings['postgame_auto'], eligible=bool(report), safe=safe)
             result['visible'] = result['show']['visible']
             return result
 
@@ -346,7 +349,7 @@ class Tracker:
             self.recap_show.validate(body)
             action = body['action']
             if action == 'show' and (not report.get('match') or not report['show']['safe']):
-                raise ValueError('Recap can be shown between games after the League client connects.')
+                raise ValueError('Recap can be shown while queued after the League client connects.')
             if action in {'hide','auto'}:
                 self.settings = config.save({'postgame_auto':action=='auto'}, self.settings_path)
             self.recap_show.apply(body)

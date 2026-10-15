@@ -1,15 +1,16 @@
-"""Replay media trimming with bounded CPU encoding and original-file retention."""
+"""Replay media trimming with bounded encoding and original-file retention."""
 from __future__ import annotations
 import os
 import subprocess
 from pathlib import Path
 from .config import TRIMMED_SUFFIX
 from lib.media_jobs import jobs, MediaJobCancelled
+from .encoding import run_cut
 
 
 def trim_from_end(input_path: str, keep_seconds: float | None,
                    tail_seconds: float = 0, *, fast=False, output_dir=None) -> str | None:
-    """Cut at the command's button press, with bounded CPU-only encoding."""
+    """Cut at the command's button press, retaining every original recording."""
     import math
     base, _ = os.path.splitext(input_path)
     output_path = base + TRIMMED_SUFFIX
@@ -31,15 +32,19 @@ def trim_from_end(input_path: str, keep_seconds: float | None,
         start = 0 if keep_seconds is None else max(0, end - keep_seconds)
         if end - start < 0.1:
             raise ValueError("The button press is outside the available replay buffer")
-        codecs = ['-c', 'copy'] if fast else ['-c:v', 'libx264', '-preset', 'veryfast',
-                  '-crf', '18', '-threads', '2', '-c:a', 'aac', '-b:a', '192k']
-        result = jobs.run([
+        prefix = [
             "ffmpeg", "-nostdin", "-v", "error", "-y", "-threads", "2",
             "-filter_threads", "1", "-ss", f"{start:.6f}", "-i", input_path,
             "-t", f"{end - start:.6f}", "-map", "0:v:0", "-map", "0:a?",
-            "-map_metadata", "0", *codecs,
-            "-f", "matroska", temporary,
-        ], kind='replay-cut', weight=1 if fast else 2, priority=0, text=True, timeout=1800)
+            "-map_metadata", "0",
+        ]
+        suffix = ["-f", "matroska", temporary]
+        if fast:
+            result = jobs.run([*prefix, '-c', 'copy', *suffix], kind='replay-cut',
+                              weight=1, priority=0, text=True, timeout=1800)
+        else:
+            result = run_cut(prefix, ['-c:a', 'aac', '-b:a', '192k', *suffix],
+                             kind='replay-cut', text=True)
         if result.returncode or not Path(temporary).is_file() or not Path(temporary).stat().st_size:
             raise ValueError(result.stderr[-800:] or "No cut produced")
         Path(temporary).replace(output_path)

@@ -18,7 +18,7 @@ def recover_browser(client):
     if source['inputKind'] != 'browser_source':
         raise ValueError(f'{SOURCE} is already a different OBS input type')
     current = client.send('GetInputSettings', {'inputName': SOURCE}, raw=True)['inputSettings']
-    changes = {key: value for key, value in {'url': URL, 'restart_when_active': True}.items()
+    changes = {key: value for key, value in {'url': URL, 'restart_when_active': True, 'fps': 60, 'fps_custom': True}.items()
                if current.get(key) != value}
     if changes:
         SettingsBackups().snapshot()
@@ -44,7 +44,7 @@ def install(client):
     SettingsBackups().snapshot()
     if SCENE not in scenes:
         client.send('CreateScene', {'sceneName': SCENE}, raw=True)
-    settings = {'url': URL, 'width': 1920, 'height': 1080, 'fps': 30,
+    settings = {'url': URL, 'width': 1920, 'height': 1080, 'fps': 60,
                 'fps_custom': True, 'shutdown': False, 'restart_when_active': True}
     items = client.send('GetSceneItemList', {'sceneName': SCENE}, raw=True)['sceneItems']
     if not source:

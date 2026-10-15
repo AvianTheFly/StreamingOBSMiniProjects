@@ -115,6 +115,7 @@ class Collector:
             return
         with self.tracker.lock:
             self.tracker.client_phase = self.phase
+            self.tracker.recap_show.observe_phase(self.phase)
         if self.phase in ('InProgress','Reconnect') and self.account:
             game = self.session.get('gameData',{})
             game_id = game.get('gameId')

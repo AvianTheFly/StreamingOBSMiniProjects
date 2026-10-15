@@ -8,6 +8,11 @@ class NotReady(RuntimeError):
     pass
 
 
+def voice_commands():
+    from .command_guide import command_guide
+    return command_guide()
+
+
 def mutate_library(body):
     if body.get('action') in ('trash', 'restore'):
         # Current selection is published before the worker reads these labels.

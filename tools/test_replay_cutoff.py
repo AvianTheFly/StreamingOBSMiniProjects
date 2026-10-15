@@ -109,6 +109,8 @@ class CutoffTests(unittest.TestCase):
             callback('save and replay',123)
             callback('quick replay 30',123)
             callback('save 30',123)
+            callback('name Dragon steal',123)
+            callback('save and replay name Close fight',123)
             callback('mark',123)
             callback('mark 60',123)
             callback('mark full',123)
@@ -126,9 +128,12 @@ class CutoffTests(unittest.TestCase):
             runtime.run(queue.Queue(),stop)
             self.assertEqual(interface._live,{'unknown':'preserve'},'Shutdown must remove its callbacks and state without clearing unrelated fields')
         self.assertEqual(selection.capture_and_replay.call_args_list,[
-            call(capture,pressed_at=123),
-            call(capture,seconds=30,purpose='replay_only',pressed_at=123)])
-        capture._on_save.assert_called_once_with(tag='',clip_seconds=30,full_save=False,pressed_at=123)
+            call(capture,tag='',seconds=0,full_save=False,pressed_at=123,purpose='highlight'),
+            call(capture,tag='',seconds=30,full_save=False,pressed_at=123,purpose='replay_only'),
+            call(capture,tag='Close fight',seconds=0,full_save=False,pressed_at=123,purpose='highlight')])
+        self.assertEqual(capture._on_save.call_args_list,[
+            call(tag='',clip_seconds=30,full_save=False,pressed_at=123),
+            call(tag='Dragon steal',clip_seconds=0,full_save=False,pressed_at=123)])
         self.assertEqual(capture._on_mark.call_args_list,[
             call(tag='',clip_seconds=0,full_save=False,pressed_at=123),
             call(tag='',clip_seconds=60,full_save=False,pressed_at=123),

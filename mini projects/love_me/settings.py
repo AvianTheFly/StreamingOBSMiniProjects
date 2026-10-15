@@ -11,6 +11,7 @@ from lib.json_store import json_transaction, update_json
 from lib.settings_backups import SettingsBackups
 from .catalog import presets
 from .assets import asset_root
+from .config import LISTENER_HOTKEY, ORIGINAL_HOTKEY
 
 ROOT = Path(__file__).resolve().parent
 FILE = ROOT/'variations.json'
@@ -43,8 +44,8 @@ def validate(row):
     if not isinstance(row.get('name'), str) or not 1 <= len(row['name'].strip()) <= 80:
         raise ValueError('Give this variation a name (up to 80 characters).')
     key = row.get('hotkey', '')
-    if not isinstance(key, str) or key == '987' or (key and (not 2 <= len(key) <= 8 or not key.isascii() or not key.isalnum())):
-        raise ValueError('Use a 2–8 letter/digit sequence; 987 belongs to the original Love Me.')
+    if not isinstance(key, str) or key in {LISTENER_HOTKEY, ORIGINAL_HOTKEY} or (key and (not 1 <= len(key) <= 8 or not key.isascii() or not key.isalnum())):
+        raise ValueError('Use 1–8 letters/digits after opening the listener; 987 opens it and 1 belongs to original Love Me.')
     if row.get('style') not in {'signal','heart','golden','afterglow'}:
         raise ValueError('Unknown artwork direction.')
     if row.get('mode') not in {'once','repeat','continuous'} or row.get('position') not in {'top','left','right'}:

@@ -3,6 +3,7 @@ from __future__ import annotations
 import threading
 import time
 import math
+import uuid
 from pathlib import Path
 from .trimming import trim_from_end as _trim_from_end
 from obs import save_replay_buffer_and_wait
@@ -66,6 +67,12 @@ class ReplayCapture:
             keep_seconds = None
             anchor_label = 'full buffer (no kill or death detected)'
         tag_label = f' [{tag}]' if tag else ''
+        # A scoped event links the button-time moment to its eventual clip, even
+        # when encoding finishes after the full game file has closed.
+        from events import emit
+        marker_id = uuid.uuid4().hex
+        emit('recording.replay', stage='requested', id=marker_id, pressed_at=now,
+             label=tag, seconds=keep_seconds)
         print(f'[instant_replay] 💾 Save{tag_label} triggered — anchor: {anchor_label}')
         with self.state._lock:
             self.state._save_in_progress[0] = True
@@ -115,9 +122,11 @@ class ReplayCapture:
                     if purpose != 'review_later':
                         self.state._clip_registry.append({'tag': tag or 'untagged', 'path': clip, 'index_for_tag': idx, 'saved_at': time.time(), 'purpose': purpose})
                 library.remember_capture(clip, tag=tag or 'untagged', saved_at=time.time(),
-                                         purpose=purpose, capture_source=replay_file if purpose in ('replay_only','review_later') and clip != replay_file else None)
+                                         purpose=purpose, capture_source=replay_file if purpose in ('replay_only','review_later') and clip != replay_file else None,
+                                         title=tag or None)
                 result['path'] = clip
                 result['purpose'] = purpose
+                emit('recording.replay', stage='saved', id=marker_id, path=clip)
                 stage.capture_update('ready', purpose=purpose, seconds=clip_seconds, path=clip,
                                      message={'replay_only':'Replay only · excluded from highlight review', 'review_later':'Marked for review · not in automatic replay', 'highlight':'Saved · replay-ready highlight'}[purpose])
                 inspect_event('replay.save', owner='instant_replay', phase='saved', source=Path(clip).name)

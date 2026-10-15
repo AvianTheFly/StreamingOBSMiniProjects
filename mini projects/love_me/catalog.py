@@ -3,7 +3,7 @@ from copy import deepcopy
 from .score import SIGNAL_WORDS
 
 _PRESETS = [
-    dict(id='signal_found', name='Signal found', hotkey='986', style='signal',
+    dict(id='signal_found', name='Signal found', hotkey='2', style='signal',
          feeling='Longing → recognition → release', spirit='ram',
          description='35 emotional film and TV stills start changing immediately on the musical hit, without repeating. Rapid cuts slow slightly through HAVE YOU BEEN while imagery fades by 15s. Larger worn lettering cycles 23 typefaces.',
          reference='Rihanna — Where Have You Been (orchestral edit)',

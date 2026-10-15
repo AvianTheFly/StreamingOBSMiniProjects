@@ -49,7 +49,8 @@ def make_respawn_handler():
 def make_respawn_sfx_handler():
     def handle_respawn_sfx(player_data):
         print(f"[league] Respawn in {player_data.get('respawnTimer', 0):.1f}s — playing Halo cue.")
-        hub_events.emit("sfx.play", source=RESPAWN_SFX_SOURCE.lower(), concurrent=True)
+        hub_events.emit("sfx.play", source=RESPAWN_SFX_SOURCE.lower(), concurrent=True,
+                        interrupt_music=False)
     return handle_respawn_sfx
 
 

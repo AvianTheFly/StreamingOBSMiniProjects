@@ -6,6 +6,24 @@ projects, and the last 50 transcripts with their destination and outcome.
 Finish recording or cancel the current command there. History stays in RAM
 and can be cleared. Model and microphone settings are linked from that page.
 
+Press a project's voice trigger once to start listening. Press it again while
+listening to finish early; otherwise capture finishes after the project's saved
+quiet pause (normally two seconds) following detected speech. This timeout is
+now a silence interval, not a total recording duration. Short hesitations reset
+when speech continues. A five-second absolute safety limit stops every capture:
+detected speech is transcribed, while no speech is discarded without inference.
+The limit may still cut off a sentence longer than five seconds. After completion,
+normal triggers wait one second before rearming to prevent a late Finish press
+from immediately reopening capture. Processing presses are ignored.
+
+The bundled, cached Silero VAD runs only for active capture on the existing mic
+drain worker. It measures speech, not just microphone loudness, with a bounded
+two-second context window. If detection fails, explicit Finish still works and
+the safety deadline discards automatic capture. Voice shows detector errors,
+waiting for speech, and each session's finish reason. It does not identify the
+speaker or infer that a thought is complete; sufficiently long pauses still end
+capture, and other audible voices may count as speech.
+
 ## Ownership
 
 - `service.py`: one active session across all projects and editor uploads;
@@ -13,6 +31,8 @@ and can be cleared. Model and microphone settings are linked from that page.
 - `listener.py`: one microphone stream and one faster-whisper model; bounded
   audio capture, session-tagged chunks, and exclusive inference.
 - `ptt.py`: hotkey adapter. `shared.VoicePTT` is a compatibility import of it.
+- `endpoint.py`: bounded speech evidence and native-rate audio normalization;
+  the service retains all stop/cancel decisions and deadline ownership.
 
 Projects create `VoicePTT(timeout, on_transcript, tag="project_name")` and call
 `on_trigger()`, `stop()`, or `cancel(reason)`. They keep phrase matching and

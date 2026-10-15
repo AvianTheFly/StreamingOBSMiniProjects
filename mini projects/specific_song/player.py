@@ -24,6 +24,8 @@ from lib.shared_media.controls import effective_volume_db
 from lib.shared_media.playback_worker import PlaybackWorker
 from lib.shared_media.config_overrides import load_config_overrides, audio_tracks_override
 from lib.shared_media.media_startup import media_startup
+from lib.audio_focus import interrupt_audio
+from coordinator import coordinator
 
 from .config import (
     SCENE,
@@ -92,6 +94,7 @@ class SongPlayer:
         self._current_source: str | None = None
         self._requests = PlaybackWorker("specific_song:playback")
         self._cancel_event = threading.Event()
+        self._playback_ticket = None
         self._animator:      "BassAnimator | None"    = None
         self._stop_event     = threading.Event()
         try:
@@ -119,7 +122,9 @@ class SongPlayer:
             return self._is_busy or self._requests.busy
 
     def _cancelled(self) -> bool:
-        return self._abort_flag or self._cancel_event.is_set()
+        return (self._abort_flag or self._cancel_event.is_set()
+                or bool(getattr(self, '_playback_ticket', None)
+                        and self._playback_ticket.cancelled.is_set()))
 
     @property
     def is_paused(self) -> bool:
@@ -231,7 +236,7 @@ class SongPlayer:
 
     # ── Public API ────────────────────────────────────────────────────────────
 
-    def play(self, source_name: str, *, cancelled: threading.Event | None = None) -> None:
+    def play(self, source_name: str, *, cancelled: threading.Event | None = None, ticket=None) -> None:
         """
         Point the single OBS source at source_name's media file, show it,
         wait for it to finish, then hide it.  Blocking — call from a daemon thread.
@@ -249,11 +254,13 @@ class SongPlayer:
             self._paused         = False
             self._current_source = source_name
             self._cancel_event = cancelled if cancelled is not None else threading.Event()
+            self._playback_ticket = ticket
 
         # Resolve the actual media file from the source stem.
         audio_file = _resolve_audio_file(source_name)
         stem = source_name.removeprefix(OBS_SOURCE_PREFIX)
         volume_applied = False
+        release_audio = lambda: None
 
         try:
             if self._cancelled():
@@ -286,6 +293,11 @@ class SongPlayer:
             if self._cancelled():
                 return
 
+            release_audio = interrupt_audio(audio_file, cancelled=self._cancelled, music=True)
+            if ticket is not None and not ticket.wait_until_allowed(self._cancelled):
+                return
+            if self._cancelled():
+                return
             with media_startup(SINGLE_SOURCE_NAME, cancelled=self._cancelled, timeout=MEDIA_START_TIMEOUT):
                 obs.stop_media(SINGLE_SOURCE_NAME)
                 obs.hide_source(SCENE, SINGLE_SOURCE_NAME)
@@ -301,6 +313,10 @@ class SongPlayer:
                 obs.show_source(SCENE, SINGLE_SOURCE_NAME)
                 if same_file:
                     obs.restart_media(SINGLE_SOURCE_NAME)
+                # A Spotify resume can arrive while OBS is applying the file.
+                # Reapply that pause to the newly loaded source before polling.
+                if self.is_paused or (ticket is not None and not ticket.allowed.is_set()):
+                    obs.pause_media(SINGLE_SOURCE_NAME)
             # Decoder dimensions are now ready, rather than the previous file's.
             self._apply_fullscreen(SINGLE_SOURCE_NAME)
             if self._cancelled():
@@ -335,17 +351,31 @@ class SongPlayer:
                     self.remember_obs_volume(stem)
             except Exception as exc:
                 print(f"{_TAG} ⚠  Could not remember OBS volume: {exc}")
-            if self._animator is not None:
-                self._animator.stop()
+            try:
+                if self._animator is not None:
+                    self._animator.stop()
+            finally:
                 self._animator = None
-            with self._lock:
-                self._is_busy        = False
-                self._current_source = None
-                self._paused         = False
+                with self._lock:
+                    self._is_busy        = False
+                    self._current_source = None
+                    self._paused         = False
+                    self._playback_ticket = None
+                release_audio()
 
     def play_async(self, source_name: str) -> threading.Event:
         """Replace pending work; old cleanup finishes before the next file loads."""
-        return self._requests.submit(lambda cancel: self.play(source_name, cancelled=cancel))
+        def run(cancel):
+            ticket = coordinator.request('specific_song', lambda ticket: None)
+            try:
+                while not ticket.ready.wait(.05):
+                    if cancel.is_set() or ticket.cancelled.is_set() or self._stop_event.is_set():
+                        return
+                if ticket.wait_until_allowed(lambda: cancel.is_set() or self._stop_event.is_set()):
+                    self.play(source_name, cancelled=cancel, ticket=ticket)
+            finally:
+                ticket.finish()
+        return self._requests.submit(run)
 
     def pause(self) -> None:
         """Pause the media at its current position."""
@@ -447,6 +477,9 @@ class SongPlayer:
         startup_retried = False
 
         while True:
+            ticket = getattr(self, '_playback_ticket', None)
+            if ticket is not None and not ticket.allowed.is_set():
+                self.pause()
             with self._lock:
                 if self._cancelled():
                     return False

@@ -24,6 +24,18 @@ def apply_content(spec, *, client):
         matches = [row for row in rows if row['sourceName'] == selected]
         if selected is not None and len(matches) != 1:
             raise ValueError('Display selection must be installed exactly once')
+        # Owners may publish a selected input's canvas fit. Parent lobby
+        # rectangles remain authoritative; never touch other inputs or filters.
+        transforms = spec.get('transforms', {})
+        if any(name != selected for name in transforms):
+            raise ValueError('Display transforms must belong to the selected input')
+        if selected in transforms:
+            from lib.coordination.lobby_layout import transform_matches
+            from lib.settings_backups import SettingsBackups
+            item = matches[0]
+            if not transform_matches(item.get('sceneItemTransform', {}), transforms[selected]):
+                SettingsBackups().snapshot()
+                client.set_scene_item_transform(scene, item['sceneItemId'], transforms[selected])
         for row in rows:
             if row['sourceName'] in sources:
                 visible = row['sourceName'] == selected

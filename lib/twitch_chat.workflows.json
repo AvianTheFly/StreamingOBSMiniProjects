@@ -49,8 +49,8 @@
         }
       ],
       "owner_hashes": {
-        "chat_transport": "20a8cca880d0e430f475a1d231b8178e828ad3cf30b5b0afd7ba1a867712979a",
-        "league_stats": "20fd3b76ad13c4336afce2bcecbbcce66b029c47815f18e6002ed68dbdf9a7c5"
+        "league_stats": "9fd0feb4aa79e80e51b1dd530b90756233ee88035137759dc5df422eb2f50264",
+        "chat_transport": "20a8cca880d0e430f475a1d231b8178e828ad3cf30b5b0afd7ba1a867712979a"
       },
       "edges": [
         {

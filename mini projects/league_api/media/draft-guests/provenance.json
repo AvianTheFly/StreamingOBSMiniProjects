@@ -60,6 +60,66 @@
       "file": "game-goose-2.png",
       "source": "mini projects\\scene_voice_switcher\\web\\art\\prepared\\game-goose-2.png",
       "sha256": "75c23c7f2e8faabed07d36fcd8bd2d2d93543d4416b3e33d25fbd3ba15ed4631"
+    },
+    {
+      "file": "game-creeper-0.png",
+      "source": "mini projects\\scene_voice_switcher\\web\\art\\prepared\\game-creeper-0.png",
+      "sha256": "9072143161e348f6254ff6ce61cead6cf6e0c660c5271dc2556723c02d91592a"
+    },
+    {
+      "file": "game-creeper-1.png",
+      "source": "mini projects\\scene_voice_switcher\\web\\art\\prepared\\game-creeper-1.png",
+      "sha256": "38cd5c0718f642e307def18703a14fccd3f7b696834c7184b763132a4bcf1717"
+    },
+    {
+      "file": "game-creeper-2.png",
+      "source": "mini projects\\scene_voice_switcher\\web\\art\\prepared\\game-creeper-2.png",
+      "sha256": "66e225a1af406f48df6d319fccf2792a5a38cb47627f46aba127ebc281ba4fe3"
+    },
+    {
+      "file": "game-climber-0.png",
+      "source": "mini projects\\scene_voice_switcher\\web\\art\\prepared\\game-climber-0.png",
+      "sha256": "28ccb8c5fe12783d3ce27c5b5bf8293e1a16ec27ab88668fa5b0de27c4ffecdb"
+    },
+    {
+      "file": "game-climber-1.png",
+      "source": "mini projects\\scene_voice_switcher\\web\\art\\prepared\\game-climber-1.png",
+      "sha256": "84471a57298805995ef57683be9ba126a2e466795775aa5e709daf6d9f69e185"
+    },
+    {
+      "file": "game-climber-2.png",
+      "source": "mini projects\\scene_voice_switcher\\web\\art\\prepared\\game-climber-2.png",
+      "sha256": "fb65e0861cb27e3d4293aa9e69ce47a25c02ad79497ec9e8e992c49ec77441ff"
+    },
+    {
+      "file": "game-hornet-0.png",
+      "source": "mini projects\\scene_voice_switcher\\web\\art\\prepared\\game-hornet-0.png",
+      "sha256": "30770fa9868e4f14733fc79d5bd51ad57b445de21ad88353fda7d36f9a85765c"
+    },
+    {
+      "file": "game-hornet-1.png",
+      "source": "mini projects\\scene_voice_switcher\\web\\art\\prepared\\game-hornet-1.png",
+      "sha256": "d4af8cd4e61d5cbbc1965c18e778e5927cebd3686875db052d3c104230fd6c0e"
+    },
+    {
+      "file": "game-hornet-2.png",
+      "source": "mini projects\\scene_voice_switcher\\web\\art\\prepared\\game-hornet-2.png",
+      "sha256": "471e144e02200b4b10d37197ae6233cfbf93192df7140cafb22ef761ce8f1ea1"
+    },
+    {
+      "file": "game-salvager-0.png",
+      "source": "mini projects\\scene_voice_switcher\\web\\art\\prepared\\game-salvager-0.png",
+      "sha256": "e3d7a30c290aba6ceb049bacc131782583c463e16a77722b80d73243b53b77fd"
+    },
+    {
+      "file": "game-salvager-1.png",
+      "source": "mini projects\\scene_voice_switcher\\web\\art\\prepared\\game-salvager-1.png",
+      "sha256": "fc6bcd0f908c7b8e4c6f044d371cbcd221a8dc60248bda0749be1cb05b06bcad"
+    },
+    {
+      "file": "game-salvager-2.png",
+      "source": "mini projects\\scene_voice_switcher\\web\\art\\prepared\\game-salvager-2.png",
+      "sha256": "b19cb340a253a75aad81e6778af3aaf3ca177d655cc78055c6345e50ccc99b54"
     }
   ]
 }

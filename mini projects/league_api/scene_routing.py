@@ -52,7 +52,8 @@ def _prepare_scene(client, settings, target):
                 if name not in children:
                     raise ValueError(f'OBS Tavern source is missing: {name}')
                 updates.append(children[name])
-        prepare_lobby(client, scene, candidates, exclusions=exclusions, hide_screen=True)
+        prepare_lobby(client, scene, candidates, exclusions=exclusions, hide_screen=True,
+                      display_mode='league_idle' if target == 'idle' else 'league_queue')
         for item in updates:
             if item['sceneItemEnabled']:
                 client.set_scene_item_enabled(group, item['sceneItemId'], False)

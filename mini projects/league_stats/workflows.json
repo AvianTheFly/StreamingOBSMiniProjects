@@ -49,7 +49,7 @@
         }
       ],
       "owner_hashes": {
-        "league_stats": "20fd3b76ad13c4336afce2bcecbbcce66b029c47815f18e6002ed68dbdf9a7c5"
+        "league_stats": "9fd0feb4aa79e80e51b1dd530b90756233ee88035137759dc5df422eb2f50264"
       },
       "edges": [
         {
@@ -149,7 +149,7 @@
         }
       ],
       "owner_hashes": {
-        "league_stats": "20fd3b76ad13c4336afce2bcecbbcce66b029c47815f18e6002ed68dbdf9a7c5"
+        "league_stats": "9fd0feb4aa79e80e51b1dd530b90756233ee88035137759dc5df422eb2f50264"
       },
       "edges": [
         {
@@ -234,7 +234,7 @@
         }
       ],
       "owner_hashes": {
-        "league_stats": "20fd3b76ad13c4336afce2bcecbbcce66b029c47815f18e6002ed68dbdf9a7c5"
+        "league_stats": "9fd0feb4aa79e80e51b1dd530b90756233ee88035137759dc5df422eb2f50264"
       },
       "edges": [
         {
@@ -269,7 +269,7 @@
         {
           "path": "mini projects/league_stats/service.py",
           "symbol": "Tracker.postgame_report",
-          "hash": "33f907b8f84666158a8810c308cfda3fdec56d63190364f27512759d166b0d5b"
+          "hash": "378dad3734ba15ed3911d1309a79de0a716eee714c549ad2e3ed3fc78297232b"
         }
       ],
       "effects": [
@@ -307,7 +307,7 @@
         "label": "Choose a stat view",
         "kind": "browser"
       },
-      "detail": "Local overlay presets keep 520 by 190 dimensions, use whitelisted themes, and never write OBS state. Browser preview lifetime owns its polling; hidden previews are removed. Review drafts stay local until explicit Save and pending-save edits retain the updated revision. Aggregate coverage groups reported metrics in one archive pass instead of scanning every match twice per metric. Observed and completed values remain separate; missing statistics remain unknown, derived rates retain their original meaning, and source records are not mutated. Match Chronicle is a native 960 by 540 report with automatic six-event pages and a responsive 640 by 360 layout, progression, comparisons against at least three earlier same-champion/role/queue games, all-stat details and a recorded-lifetime link. Exact official timelines replace live events; missing statistics stay unavailable. The additive OBS installer attaches to the existing idle scene without choosing a scene or changing existing sources. Additional reported metrics cycle automatically in the analysis panel. Saved local event logs are projected using confirmed archived player identities; saved checkpoints can supply a sparse progression chart, explicitly labelled. Cancelled reads stop without a second error response. The icon-led recap rotates impact, purchase order, ability-upgrade order, personal/global objective timeline and all-stat pages every twelve seconds, with pause and direct page controls. Own-team bars use measured champion damage; no skill score is invented. Official item/champion art uses a versioned Data Dragon catalogue with local cached assets and CDN fallback. Ability casts have totals only, not exact cast timestamps. The post-game show now uses a single feature-owned monotonic playhead shared by Hub and OBS. Selecting a story or browsing its detail holds an automatically playing show for 30 seconds after the last command, then rotation resumes. Explicit Pause stays paused across selections; Play resumes immediately. Hide persists automatic display off; Auto re-enables post-game appearances. Manual Show expires after thirty minutes and never bypasses gameplay, champion select, account/current-match or client-connection gates. Match and revision checks reject stale controls. New matches reset manual show intent and playhead. Seven stories rotate: Highlights, Tempo, Combat, Build, Economy, Vision and Moments. Highlights lead with actual personal takedowns and feats; alternate visits compare earlier covered same-champion/role/queue games. Tempo uses actual sample timestamps for lane lead, CS and champion damage, and the highest CS/min observed 3–5 minute window after minute two. Combat separates damage types, casts and defensive/support totals. Economy charts sampled unspent gold, not inferred recall timing. Vision distinguishes personal wards and both teams objective events. Archived timeline projection verifies match and participant identity, bounds samples to 720 and is cached per report revision. Missing data stays unavailable; sample gaps are not drawn as continuous play. No new worker or network requests are added. No grade or causal objective claim is inferred. The Hub iframe is removed when collapsed or unmounted and its resize observer is disconnected. Browser reads retain shared visibility cancellation; operator mutations are bounded to one in flight and cancelled on exit.",
+      "detail": "Match Chronicle uses one feature-owned monotonic playhead shared by the Hub controller and OBS, with eight visual pages every twelve seconds. Confirmed matchmaking, ready check and champion select admit the latest completed account match without a fifteen-minute expiry; lobby, end screens, gameplay, replay and unknown client phases hide it. Native scene routing shows the League client in the idle lobby and exclusively selects the recap in queue, including the private ban stage; the draft scene takes over at picks. The existing collector observes phase edges even when browsers are unloaded. Queue entry starts at Highlights; ready check and draft preserve progress. A new match resets manual intent. Hide disables automatic display persistently; Auto enables it; manual Show is bounded to thirty minutes and cannot bypass phase or current-match gates. Match/revision validation rejects stale controls. Manual page/detail choices hold for thirty seconds, then resume; explicit Pause persists until Play. Overview uses participation, team damage and survival rings. Combat ranks measured teammate damage and separates physical, magic and true damage. Tempo and Economy chart sampled time, lane gold and wallet balances without filling gaps or guessing recalls. Build shows item art and ability order; Vision and Moments retain personal combat and both-team objective context. Story uses measured fight-window timelines, covered same-champion/role/queue baseline bars, farm comparisons, cast bars and survival rings with short labels. Missing facts remain unavailable, never zero, and no skill grade or causal objective claim is invented. Native 960 by 540 and 640 by 360 layouts prioritize chart area; all reported stats and complete events remain in controller details. Official artwork uses the existing cache. Report calculation stays cached by revision with identity-checked timeline evidence. Hidden browser reads cancel; controller mutations are bounded to one in flight; collapsing the Hub iframe disposes its polling and observer. No new worker, timer, transport, settings default, archive write or volume write is introduced. The automatic source inherits the existing shared display and all saved per-world placements.",
       "steps": [
         {
           "id": "0",
@@ -413,7 +413,7 @@
         {
           "path": "mini projects/league_stats/obs_presentation.py",
           "symbol": "install",
-          "hash": "018cbea736c3f6e08fba1e02a54e6b7f2a29ca87f9d00c321bd73daa7ea3d3b0"
+          "hash": "df1752b3a4b5feaee49d247e79d14d10ed9dd79b4c2063931386d387d9e29e36"
         },
         {
           "path": "mini projects/league_stats/report_visuals.py",
@@ -438,7 +438,7 @@
         {
           "path": "mini projects/league_stats/service.py",
           "symbol": "Tracker.control_postgame",
-          "hash": "4d3b804e6ec4422e5a39cad51ad3556f9fde02a7955ffbea026fcb5d775ac6a2"
+          "hash": "cb9d5eabdcd6f299036f9f7ab780a37390e817cd6014b0e46b54a9b09e36593f"
         },
         {
           "path": "mini projects/league_stats/recap_analysis.py",
@@ -453,12 +453,22 @@
         {
           "path": "mini projects/league_stats/service.py",
           "symbol": "Tracker.postgame_report",
-          "hash": "33f907b8f84666158a8810c308cfda3fdec56d63190364f27512759d166b0d5b"
+          "hash": "00e31fee132499de8110d6c696a8e08a3d9df44ce672ba8c59e154bde994e70d"
+        },
+        {
+          "path": "mini projects/league_stats/recap_narratives.py",
+          "symbol": "project",
+          "hash": "9d61d19ef0d8346c4176d70b31d44d2b9396e6b9ae33452e142a8ccfc8e526e6"
+        },
+        {
+          "path": "mini projects/league_stats/recap_show.py",
+          "symbol": "RecapShow.observe_phase",
+          "hash": "c006e0ca89b5238d6af139b1945586410c0b40e5badee4eeb762f920b72416a7"
         }
       ],
       "owner_hashes": {
-        "hub": "57c944b11afa7c433bcfbb2b0642d28ddd78d7d13842ec11b7e83417e1a6b524",
-        "league_stats": "20fd3b76ad13c4336afce2bcecbbcce66b029c47815f18e6002ed68dbdf9a7c5"
+        "league_stats": "a7a4f183903723326e9eae4e94625e9039f69360b79895477e90bd3c3402b2f8",
+        "hub": "3c5b85265bfbf90a41653bcd5dcbdf39273f325fcc1275517d06ebd2e4a60987"
       }
     }
   ]

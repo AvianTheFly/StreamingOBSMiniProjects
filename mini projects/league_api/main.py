@@ -58,6 +58,14 @@ class Service:
         self.stage_appearance=StageAppearance(ROOT)
         from .production.stance_accent import StanceAccent
         self.stance_accent = StanceAccent()
+        from .match_recording import MatchRecording
+        import os
+        recording_settings = ROOT / 'match_recording_settings.json'
+        recording_config = json.loads(recording_settings.read_text(encoding='utf-8')) if recording_settings.exists() else {}
+        from .recording_audio import verify_audio
+        self.match_recording = MatchRecording(ROOT, os.environ.get('REPLAY_DIR', 'C:/StreamingMedia/Replays'),
+                                             enabled=recording_config.get('enabled') is True,
+                                             audio_check=lambda client: verify_audio(client, recording_config.get('excluded_audio_sources', [])))
 
     def match_scene_hold(self, **context):
         # Do not take the service lock here: client routing has its own lock.
@@ -224,6 +232,7 @@ class Service:
         # and disabled proxies are scoped exclusively to the fixed loopback URL.
         while not self.stop_event.is_set() and not self.parent_stop.is_set():
             boundaries = []
+            recording_ended = False
             try:
                 data=fetch_snapshot()
                 if not isinstance(data.get('gameData',{}).get('gameTime'),(float,int)):
@@ -239,6 +248,7 @@ class Service:
                             screen['id'] != self.match_handoff.screen_id):
                         self.match_handoff.begin()
                     boundaries = self.match_timing.observe(data, screen)
+                    recording_ended = self.match_timing.lifecycle.ended
                     self.status='Connected to League'; self.error=None; self.last_success=now
                 self.client_scenes.observe_live(data, running=self.match_timing.snapshot()['running'])
             except Exception as exc:
@@ -262,6 +272,11 @@ class Service:
                      manual_revision=self.client_scenes.intent_revision if boundary == 'game.disconnected' else None)
             self.client_scenes.apply_pending()
             self.match_handoff.tick()
+            client_state = self.client_scenes.snapshot()
+            self.match_recording.tick(
+                client_state['phase'] if client_state['connected'] and not client_state['watching_replay'] else None,
+                live=self.match_timing.snapshot()['running'] and not client_state['watching_replay'],
+                ended=recording_ended and not client_state['watching_replay'])
             self.stop_event.wait(max(.25,min(5,float(self.engine.config.get('poll_seconds',.5)))))
 
     def handler(self):
@@ -276,6 +291,8 @@ def run(input_queue,stop_event,*,startup_event=None):
         if startup_event: startup_event.set()
         return
     try:
+        from events import subscribe
+        subscribe('recording.replay', service.match_recording.enqueue_replay)
         service.stance_accent.start()
         try:
             from .interface import _live
@@ -294,6 +311,8 @@ def run(input_queue,stop_event,*,startup_event=None):
         print(f'[league_api] Ready: http://127.0.0.1:{PORT}/production · borders and optional clip alerts',flush=True)
         service.poll()
     finally:
+        from events import unsubscribe
+        unsubscribe('recording.replay', service.match_recording.enqueue_replay)
         service.stance_accent.close()
         game_scene_policy.unregister(service)
         service.stop_event.set()

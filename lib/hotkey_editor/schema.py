@@ -14,7 +14,7 @@ CONFIG_FIELDS = [
     {"section": "Triggers", "key": "trigger_sequences", "label": "Trigger Sequences", "type": "text", "help": "Key sequences that activate this profile, e.g. '/ *'. Separate multiple with ' ; '."},
     {"section": "Triggers", "key": "trigger_max_interval", "label": "Trigger Speed", "type": "number", "step": "0.01", "help": "Seconds allowed between trigger keys."},
     {"section": "Triggers", "key": "manual_trigger_window", "label": "Manual Key Window", "type": "number", "step": "0.1", "help": "Seconds after the trigger sequence to accept direct hotkeys."},
-    {"section": "Triggers", "key": "auto_record_timeout", "label": "Voice Auto Stop", "type": "number", "step": "0.1", "help": "Seconds before voice capture auto-transcribes."},
+    {"section": "Triggers", "key": "auto_record_timeout", "label": "Voice Quiet Pause", "type": "number", "step": "0.1", "help": "Seconds of quiet after speech before finishing. Voice capture has a separate five-second safety limit."},
     {"section": "Interface Hotkeys", "key": "interface_hotkeys", "label": "Project Controls", "type": "hotkey_map", "help": "Hotkeys for verbs like start listen, abort listen, stop, random, next, reload, pause, and resume."},
     {"section": "Features", "key": "manual_hotkeys_enabled", "label": "Manual Hotkeys", "type": "boolean", "help": "Allow trigger sequence + direct key media playback."},
     {"section": "Features", "key": "voice_commands_enabled", "label": "Voice Commands", "type": "boolean", "help": "Allow trigger sequence to open voice matching."},

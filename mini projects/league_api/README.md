@@ -483,14 +483,26 @@ sit above portraits and nameplates below; aliases cannot hide roles. TOP, JUNGLE
 MID, BOT and SUPPORT come from the client, with ROLE TBD for missing assignments.
 The local player has a small inset diamond rather than a floating YOU label.
 Team labels, live camera aperture, draft timer and team chat remain readable.
+Player labels prefer the draft's exposed ranked alias, such as Gromp or Murk Wolf.
+Where names are exposed, game/Riot ID names or Summoner names appear instead.
+Blank or unavailable identities keep Teammate/Opponent numbers; no hidden-player
+lookup is performed. Rehearsal cards show sample aliases. The LIVE badge is removed
+from every draft theme.
+All lettering is native browser text over text-free paintings. Role labels and
+champion names use the bundled condensed font with clean strokes; larger player
+aliases use Segoe UI. Two-line champion names retain a separate player line,
+and the effects canvas clears the entire caption plate. Typography and long-name
+fit are reviewed offline with `tools/test_champ_select_typography.cjs`.
 `layout.js` owns 1920x1080 furniture coordinates, and source contacts are measured
 against each new painting in `scene-map.js`.
 
 The paintings stay still. `world-art.js` gives their basins currents, flame tongues,
 ripples and reflected light. `spirit-locks.js` stages storm-claw tears, a jade
-barrier, a charging molten ram and a rising ice/fire phoenix. Power gathers for
-.42 seconds, travels for .30 seconds, then hits at .72 seconds. The portrait and
-frame use that same clock. Heavy fragments, droplets, branching lightning and
+barrier, a charging molten ram and a rising ice/fire phoenix. The selected card acknowledges immediately, and its spirit hits at .18 seconds.
+The portrait and frame use that same clock. `team-resonance.js` sends a material
+wave outward through that team: nearby cards respond first, followed by platform
+seams, basins and guardians according to distance. Two waves per team may coexist;
+every new lock retains its own local impact. Heavy fragments, droplets, branching lightning and
 feathers have different trajectories and lifetimes; aftermath lights the selected
 shrine and its dais. Four alpha paintings retain body color instead of turning
 into uniform white outlines. A bounded precomputed atlas erodes their edges into
@@ -501,14 +513,22 @@ couriers arrive at the receiving rail and ready lighting sweeps across the team.
 its existing background/guest lifetime. Artwork prompts and provenance live in
 `media/champ-select/vfx/provenance.json`. The read-only review is
 `tools/test_champ_select_vfx.cjs`; research and phase captures are in
-`output/champ-select-vfx/`.
+`output/champ-select-epic-v2/review/`.
 `spirit-secrets.js` rotates three tiny discoveries per world: curious Kirby,
 a pearl-stealing goose, a forge apprentice and Boo at the thermal boundary.
 One ten-second act follows eight seconds of initial quiet, then quiet gaps;
 draft events take priority. Hidden detail in the demo advances these variations.
 No preview control sends game actions, changes scenes or saves preferences.
 
-`world-motion.js` owns one capped 30 FPS loop and at most twenty 4.2-second cues.
+`world-motion.js` owns one deadline-paced 60 FPS loop and at most twenty 4.2-second cues.
+`world-details.js` adds storm constellations, paired koi, lotus reflections,
+sequential forge runes, molten droplets and ice/ember feathers. These analytical
+details share the existing clock. `vfx-lights.js` reuses up to 32 small glow tiles
+instead of allocating radial gradients for every particle every frame. DOM
+response targets are cached without forced layout. The installed OBS browser
+uses its authored 60 FPS. `tools/benchmark_champ_select.cjs` measures actual-stage
+frame pacing; `tools/test_champ_select_resonance.cjs` checks spatial isolation
+and cache lifetime.
 The existing visibility poller stops requests and drawing while hidden; assets
 and poses release on hiding/teardown. No mesh warping is used. Role/name plates
 are cleared from the effect canvas and the camera uses its preserved aperture.

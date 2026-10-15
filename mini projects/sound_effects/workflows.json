@@ -17,7 +17,7 @@
         "event": "sfx.play",
         "kind": "event"
       },
-      "detail": "Audio-stream metadata is checked before playback. Audible assets acquire a Spotify interruption immediately before source startup and release after source cleanup, including cancellation, timeout and failure. Silent or unknown media leaves Spotify alone. Overlapping claims restore only after the final release; already-paused Spotify stays paused. User resumes, changed tracks and stopped/replaced sessions revoke restoration. No fallback timer or extra worker is created.",
+      "detail": "Audible assets normally acquire a native Spotify interruption immediately before source startup and release after source cleanup. The event adapter carries interrupt_music=False only on concurrent requests, allowing League respawn audio to layer over music while preserving the module permission gate, personal asset state and one worker per source. Other cues retain normal audio-stream probing and interruption policy.",
       "steps": [
         {
           "id": "0",
@@ -63,10 +63,10 @@
         }
       ],
       "owner_hashes": {
+        "coordination": "75830bfb9b0c501c3bde2e42d470c914410b3e8310d04af7c61f48505744b6d5",
         "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
-        "sound_effects": "65bc17c0f7ab29429802b35c59fa6efcad6523e844464de8e612baeecf2eac3d",
-        "coordination": "adbef1aa441fcdee05337d67c4c8444234f9fec2c63a23e4d8bdb28d02dfadd3",
-        "media_workers": "430dcd38f7473e0ef7852463e4282093c752c1e3ce682b8b599edad0ed625c55"
+        "media_workers": "a23931f02ef2614b1357960ee7825f499225ec6fcf6f1ae77f82f514c3be7367",
+        "sound_effects": "65bc17c0f7ab29429802b35c59fa6efcad6523e844464de8e612baeecf2eac3d"
       },
       "edges": [
         {
@@ -94,12 +94,12 @@
         {
           "path": "lib/shared_media/media_project.py",
           "symbol": "run_media_project",
-          "hash": "062ad31184c3ba77993b47226753e984579d70d41fbd67600e737e587047dd11"
+          "hash": "b60f39e716c0c2f40521a9c0411507ecb96b13115b9896f472ee3192da5d5480"
         },
         {
           "path": "lib/shared_media/asset_playback.py",
           "symbol": "AssetPlayback.play",
-          "hash": "b883a28d9e2b1bad80a964fb5e863b10d9f0eba4380eb3976f103d0018fd618d"
+          "hash": "d19cdeec45fba0561fcf945ef14346a3c330bf81c9533a7cf85a77575c61191c"
         }
       ]
     }

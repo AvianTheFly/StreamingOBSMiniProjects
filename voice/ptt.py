@@ -26,14 +26,30 @@ class VoicePTT:
         return self.service.begin(self.consumer)
 
     def on_trigger(self):
-        threading.Thread(target=self._on_trigger_worker, daemon=True,
-                         name=f"voice-trigger:{self.consumer.tag}").start()
-
-    def _on_trigger_worker(self):
+        # Reserve before scheduling so repeated triggers cannot grow a thread
+        # queue. Capture intent now: a late Finish must never start a new session.
         if not self._trigger_lock.acquire(blocking=False):
             return
         try:
-            self._on_trigger_sync()
+            snapshot = self.service.diagnostics(include_details=False)
+            finishing = snapshot['owner'] == self.consumer.tag and snapshot['state'] == 'listening'
+            if not finishing and snapshot['state'] != 'idle':
+                self._trigger_lock.release()
+                return
+            threading.Thread(target=self._on_trigger_worker,
+                             args=(finishing, snapshot['session_id'], snapshot['sequence']), daemon=True,
+                             name=f"voice-trigger:{self.consumer.tag}").start()
+        except Exception:
+            self._trigger_lock.release()
+            raise
+
+    def _on_trigger_worker(self, finishing, session_id, sequence):
+        try:
+            if finishing:
+                if self._double_trigger_stops:
+                    self.service.finish(self.consumer, session_id)
+            else:
+                self.service.begin(self.consumer, expected_sequence=sequence)
         finally:
             self._trigger_lock.release()
 

@@ -42,7 +42,7 @@
         }
       ],
       "owner_hashes": {
-        "instant_replay": "1067a8f9ab3dfc22ac30675c89073576bd403c559800328cfe9e7c5a87a06101"
+        "instant_replay": "abc9cf7748945dd6cf61ea55bafe0bf027e7a21ad4cca01bde1a21ab3f2fdcf8"
       },
       "edges": [
         {
@@ -79,7 +79,7 @@
         "event": "replay.save",
         "kind": "event"
       },
-      "detail": "Voice captures preserve their original trigger cutoff. Mark is a new independent review save, never a start point for a later save. Controls are published after startup and withdrawn by their runtime generation.",
+      "detail": "Voice captures preserve their original trigger cutoff. Mark is a new independent review save, never a start point for a later save. Controls are published after startup and withdrawn by their runtime generation. Press | and say name Dragon steal (or save name Dragon steal) to save with a free-form local title/tag and the same Twitch title subject. Duration/full options belong before name; label text is bounded to 160 characters and never parsed as a command, number or fuzzy tag. Empty names do not save. Save-and-replay and mark accept names too, retaining their original purpose and button cutoff. Only highlights request Twitch; its existing title formatter, single-request admission and failure isolation remain authoritative. The capture library writes an explicit title atomically and preserves all other personal fields; missing titles retain prior edits. Voice uses leading actions with shared duration/full/name options; invalid options fail closed. Replay now captures 15 seconds by default without Twitch. Save-and-replay forwards duration/full even without a title. The same | gesture listens during playback; pause/resume use coordinator manual claims and stop revokes the pending continuation. Accurate cuts and editor exports honor HUB_REPLAY_VIDEO_ENCODER: nvenc tries CUDA decoding and GPU H.264 P5/CQ24; unsupported CUDA decoding retries CPU decoding with NVENC; software retains x264 veryfast/CRF18. GPU encoder capability failures retry software only after the shared conversion owner has closed the failed process, within the same total deadline and two-unit CPU budget. Cancellation, disk and invalid-media errors do not retry. Full resolution, every audio track, timing, source retention and atomic partial-file publication remain; stream-copy cuts bypass encoding. Every admitted capture emits a scoped recording.replay request containing a unique marker ID, original button time, label and duration; successful saves emit the same ID with the finished clip path. League recording queues these events on its existing poll, preserving markers across delayed encoding and file moves. No feature peer import or recording worker is added.",
       "steps": [
         {
           "id": "0",
@@ -125,10 +125,10 @@
         }
       ],
       "owner_hashes": {
-        "twitch_clips": "2fde67d62597cc39d8a19e01fc620734354b4fc9b4f2a12c1d71c0d3bc75d287",
         "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "instant_replay": "86e51ede3fbd17fa67878dbb2f85ea4a3d3b33555c414cf73017e8a4e63e6112",
         "conversion": "b714ec8a6641880ed03bdde834c87c760b5b902d357ffd74361bc6101d768e07",
-        "instant_replay": "1067a8f9ab3dfc22ac30675c89073576bd403c559800328cfe9e7c5a87a06101"
+        "twitch_clips": "2fde67d62597cc39d8a19e01fc620734354b4fc9b4f2a12c1d71c0d3bc75d287"
       },
       "edges": [
         {
@@ -157,17 +157,47 @@
         {
           "path": "mini projects/instant_replay/capture.py",
           "symbol": "ReplayCapture._on_save",
-          "hash": "908983acce9e2c2106c2e423781646178c7668719504c24de849357b11924916"
+          "hash": "b0bc48ada73bb41d288d185e0bd39882eed833523ac37a5f2df318d97442eadd"
         },
         {
           "path": "mini projects/instant_replay/main.py",
           "symbol": "run",
-          "hash": "1795059cba727e1608167b6980013adb98577f4e5b0b7297d2a8c9e835d982c5"
+          "hash": "4684fab92f6a1db34cb0ed83344d1dbb2ed8051e5337d5921243f51d8ba137de"
         },
         {
           "path": "mini projects/instant_replay/capture.py",
           "symbol": "ReplayCapture._on_mark",
           "hash": "c91a45b0b3d28aee4400c64d8d05c2b8545a7dbb328b389fe0f84618593ed122"
+        },
+        {
+          "path": "mini projects/instant_replay/commands.py",
+          "symbol": "parse_command",
+          "hash": "b95dccb7694070c7d0c8983751b11471592b9afde25aa01b3dacd2eaf5f3956f"
+        },
+        {
+          "path": "mini projects/instant_replay/library.py",
+          "symbol": "remember_capture",
+          "hash": "3e4a6b712b8db436558e79ab90c293b1c229032e01b2bf491febf324547d82ed"
+        },
+        {
+          "path": "mini projects/instant_replay/selection.py",
+          "symbol": "ReplaySelection.capture_and_replay",
+          "hash": "bf5e8b5245636df4533d20446e5e4443cec2316f5315f1b762e3741926282717"
+        },
+        {
+          "path": "mini projects/instant_replay/voice_controls.py",
+          "symbol": "ReplayVoiceControls.dispatch",
+          "hash": "a723f3bb930413545b4ce1019f48de543942ad5bfd73289fee1459bd70ddc58a"
+        },
+        {
+          "path": "mini projects/instant_replay/encoding.py",
+          "symbol": "run_cut",
+          "hash": "ae0d280c1ce47e98d36f26fd7064b97a073b441a2d3a11aa6b5797bef1b981d5"
+        },
+        {
+          "path": "mini projects/instant_replay/trimming.py",
+          "symbol": "trim_from_end",
+          "hash": "0f4f1ac762a3cbd36cbc6e99515ae22317ed9e4396822b449d566cca4ff2bbe3"
         }
       ],
       "effects": [
@@ -194,7 +224,7 @@
         "event": "source.playback",
         "kind": "event"
       },
-      "detail": "Explicit replay always selects Quick Replay. Short Move/Wipe/Fade handles entry and owned return; showcase retains its selected full transition. Browser handoff cues keep live/camera visible between clips. Offline and runtime management share the same inventory and linked-copy visibility. The existing source worker consumes a revision/session-scoped upcoming queue. Random playback publishes six actual next choices and refills until stopped. Drag/drop and buttons edit only upcoming entries; current clips and stale sessions cannot be changed. Final cleanup closes queue admission before releasing the source.",
+      "detail": "Explicit replay always selects Quick Replay. Short Move/Wipe/Fade handles entry and owned return; showcase retains its selected full transition. Browser handoff cues keep live/camera visible between clips. Offline and runtime management share the same inventory and linked-copy visibility. The existing source worker consumes a revision/session-scoped upcoming queue. Random playback publishes six actual next choices and refills until stopped. Drag/drop and buttons edit only upcoming entries; current clips and stale sessions cannot be changed. Final cleanup closes queue admission before releasing the source. Literal play name searches bypass tag/game matching; highlight shortcuts match complete selections. Press | and say next/pause/resume/stop during playback.",
       "steps": [
         {
           "id": "0",
@@ -247,10 +277,10 @@
         }
       ],
       "owner_hashes": {
-        "media_workers": "430dcd38f7473e0ef7852463e4282093c752c1e3ce682b8b599edad0ed625c55",
         "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
-        "instant_replay": "1067a8f9ab3dfc22ac30675c89073576bd403c559800328cfe9e7c5a87a06101",
-        "coordination": "75830bfb9b0c501c3bde2e42d470c914410b3e8310d04af7c61f48505744b6d5"
+        "coordination": "75830bfb9b0c501c3bde2e42d470c914410b3e8310d04af7c61f48505744b6d5",
+        "instant_replay": "abc9cf7748945dd6cf61ea55bafe0bf027e7a21ad4cca01bde1a21ab3f2fdcf8",
+        "media_workers": "a23931f02ef2614b1357960ee7825f499225ec6fcf6f1ae77f82f514c3be7367"
       },
       "edges": [
         {
@@ -297,7 +327,7 @@
         {
           "path": "mini projects/instant_replay/selection.py",
           "symbol": "ReplaySelection._on_play",
-          "hash": "3981f44984fa24e5da7f7ae6c3f20089e5196e011800bde4bc516d55c77d6a31"
+          "hash": "ba31840b1a6c5f693540f3987472ea7a45cc629ad5843a15a1240e1ffff34a58"
         },
         {
           "path": "mini projects/instant_replay/play_queue.py",
@@ -403,7 +433,7 @@
         }
       ],
       "owner_hashes": {
-        "instant_replay": "1067a8f9ab3dfc22ac30675c89073576bd403c559800328cfe9e7c5a87a06101"
+        "instant_replay": "abc9cf7748945dd6cf61ea55bafe0bf027e7a21ad4cca01bde1a21ab3f2fdcf8"
       },
       "edges": [
         {
@@ -427,7 +457,7 @@
         {
           "path": "mini projects/instant_replay/main.py",
           "symbol": "run",
-          "hash": "1795059cba727e1608167b6980013adb98577f4e5b0b7297d2a8c9e835d982c5"
+          "hash": "4684fab92f6a1db34cb0ed83344d1dbb2ed8051e5337d5921243f51d8ba137de"
         },
         {
           "path": "mini projects/instant_replay/cleanup.py",
@@ -476,7 +506,7 @@
         "event": "replay.review",
         "kind": "control"
       },
-      "detail": "A thumbnail library and montage gallery allocate one private editor only when selected. Notes and trim drafts guard editor close/navigation. All clips, Favorites and Trash are the primary views; review states and purposes remain separate filters. Delete moves clips to recoverable library Trash and preserves original media, personal metadata and montage membership. The API snapshots settings, serializes the current-entry check with library writes, and removes deleted upcoming entries from the same playback queue. Restore reverses the Trash flag. Private previews never start OBS playback.",
+      "detail": "A thumbnail library and montage gallery allocate one private editor only when selected. Unsaved notes and montage drafts guard editor close/navigation. All clips, To review, Kept, Favorites and Trash are visible filters. The private editor places a large preview beside visible Start/End controls, exact-second inputs, cut audition and Save trimmed copy. Actions have 44-pixel targets and independent sliders have 36-pixel handles; narrow windows stack the editor while keeping Done reachable. Capture settings and the voice reference follow the library. Purposes remain a separate filter. Delete moves clips to recoverable library Trash and preserves original media, personal metadata and montage membership. The API snapshots settings, serializes the current-entry check with library writes, and removes deleted upcoming entries from the same playback queue. Restore reverses the Trash flag. Private previews never start OBS playback. The feature publishes a read-only voice reference through its public API; the management page renders literal text once and ignores reads after disposal. Accurate cuts and editor exports honor HUB_REPLAY_VIDEO_ENCODER: nvenc tries CUDA decoding and GPU H.264 P5/CQ24; unsupported CUDA decoding retries CPU decoding with NVENC; software retains x264 veryfast/CRF18. GPU encoder capability failures retry software only after the shared conversion owner has closed the failed process, within the same total deadline and two-unit CPU budget. Cancellation, disk and invalid-media errors do not retry. Full resolution, every audio track, timing, source retention and atomic partial-file publication remain; stream-copy cuts bypass encoding.",
       "steps": [
         {
           "id": "0",
@@ -568,6 +598,16 @@
           "path": "mini projects/instant_replay/api.py",
           "symbol": "mutate_library",
           "hash": "710ac278e87d142c157ebbf770f0ca36419f6298322d1b807b8fd03855915f1c"
+        },
+        {
+          "path": "mini projects/instant_replay/encoding.py",
+          "symbol": "run_cut",
+          "hash": "ae0d280c1ce47e98d36f26fd7064b97a073b441a2d3a11aa6b5797bef1b981d5"
+        },
+        {
+          "path": "mini projects/instant_replay/editing.py",
+          "symbol": "_export",
+          "hash": "157203fc9a8052d3623335da42e7660534cd6375d73b5643cf7ad05029070039"
         }
       ],
       "effects": [
@@ -585,8 +625,8 @@
         }
       ],
       "owner_hashes": {
-        "instant_replay": "1067a8f9ab3dfc22ac30675c89073576bd403c559800328cfe9e7c5a87a06101",
-        "conversion": "b714ec8a6641880ed03bdde834c87c760b5b902d357ffd74361bc6101d768e07"
+        "conversion": "b714ec8a6641880ed03bdde834c87c760b5b902d357ffd74361bc6101d768e07",
+        "instant_replay": "abc9cf7748945dd6cf61ea55bafe0bf027e7a21ad4cca01bde1a21ab3f2fdcf8"
       }
     }
   ]

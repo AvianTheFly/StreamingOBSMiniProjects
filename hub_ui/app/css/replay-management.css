@@ -1,15 +1,49 @@
-/* Browse visually; opening a card reveals only that clip's editor. */
-#irClipDesk .ir-workspace{display:block;margin-top:10px!important}
+/* Clip library presentation; personal metadata and capture remain feature-owned. */
+.replay-workspace{width:100%;max-width:1560px;margin-inline:auto}
+.replay-workspace>.page-header{margin-bottom:20px}
+.replay-workspace>.page-header .page-title{font-size:30px;letter-spacing:-.035em}
+.replay-workspace .page-subtitle{margin-top:6px;font-size:14px}
+.replay-workspace .ir-mark-action{gap:8px}
+.replay-workspace .ir-mark-action>.btn{min-height:44px;font-size:13px}
+.replay-workspace>.ir-management-settings{margin-top:24px}
+.replay-workspace>.ir-help{margin:8px 0 24px}
+.replay-workspace>.ir-help>summary{min-height:44px;align-content:center;font-size:13px}
+.replay-workspace>.ir-live{display:none!important}
+#irClipDesk .ir-workspace{display:block;margin-top:0!important}
 #irClipDesk .ir-library{padding:0;border:0;background:transparent}
-.ir-manage-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0}
-.ir-library-filters{margin-bottom:12px}.ir-library-filters input{max-width:400px}
-.ir-queue-tabs{align-items:center;gap:9px;border:0;margin-bottom:8px}.ir-queue-tabs button{padding:7px 10px;font-size:12px}.ir-queue-tabs span{font-size:10px}
-.ir-manage-filters{margin-left:auto;position:relative;font-size:11px;color:var(--muted)}.ir-manage-filters summary{cursor:pointer;padding:7px}.ir-manage-filters>div{position:absolute;right:0;top:100%;z-index:5;background:var(--panel);padding:12px;box-shadow:0 6px 25px #0006;border:1px solid var(--line);border-radius:8px;min-width:180px;display:grid}.ir-manage-filters button{border:0;text-align:left}.ir-manage-filters select{width:100%;padding:7px;font-size:11px}
-#irClipDesk .ir-card-grid{grid-template-columns:repeat(4,minmax(0,1fr));max-height:64vh;gap:14px;min-height:200px}#irClipDesk .ir-card-copy{padding:10px}#irClipDesk .ir-card-copy strong{font-size:12px;font-weight:500}#irClipDesk .ir-card-play{font-size:22px}.ir-selection{min-height:34px;font-size:11px;margin-bottom:10px}.ir-card-restore{width:100%;padding:8px;border:0;border-top:1px solid var(--line);color:var(--accent);background:var(--panel);cursor:pointer;font-size:12px}
-.ir-editor-dialog{width:min(700px,94vw);max-height:90vh;margin:auto;padding:16px 20px 22px;border:1px solid var(--line);border-radius:13px;background:var(--panel);color:var(--text);overflow:auto}.ir-editor-dialog::backdrop{background:#03090ecc;backdrop-filter:blur(3px)}.ir-editor-dialog>header{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:11px;margin-bottom:12px}.ir-editor-dialog>header button{font-size:18px;padding:3px 9px}.ir-editor-dialog .ir-review-player{max-height:360px}.ir-editor-dialog .ir-review-heading h2{font-size:19px;margin-bottom:14px}.ir-editor-dialog .ir-review-actions{margin-top:10px}.ir-editor-dialog #irPreviewHint{font-size:10px}.ir-editor-dialog .ir-review-fold summary{font-size:13px}.ir-editor-dialog .ir-file-path{font-size:10px}.ir-editor-dialog [hidden],#irClipDesk [hidden]{display:none!important}
-.ir-editor-dialog .ir-sequence-row{display:grid;grid-template-columns:18px 70px minmax(0,1fr) 32px 32px 32px;gap:7px;border:1px solid var(--line);border-radius:7px;padding:6px;margin:7px 0}.ir-editor-dialog .ir-sequence-name{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ir-montage-add{font-size:12px;margin:16px 0}.ir-montage-add summary{cursor:pointer;color:var(--accent)}.ir-montage-available{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));max-height:220px;overflow:auto;gap:8px;padding:10px 0}.ir-montage-choice{position:relative;min-width:0;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:6px;padding:0;overflow:hidden;cursor:pointer}.ir-montage-choice img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}.ir-montage-choice img:not([src]){background:#183139}.ir-montage-choice>span:not([hidden]){display:block;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:6px}.ir-montage-choice b{position:absolute;top:4px;right:4px;background:#07141dca;border-radius:4px;padding:1px 5px}.ir-montage-add input{width:100%;padding:8px;font-size:12px;margin-top:10px}
-.replay-workspace>.ir-help{display:none}.replay-workspace>.ir-live{display:none!important}
-.ir-montage-pages{display:flex;align-items:center;justify-content:center;gap:12px;margin:10px 0;color:var(--muted);font-size:11px}
-@media(min-width:1600px){#irClipDesk .ir-card-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
-@media(max-width:1000px){#irClipDesk .ir-card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:600px){#irClipDesk .ir-card-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;max-height:63vh}.ir-manage-top{gap:8px}.ir-manage-top>.btn{font-size:11px;padding:8px}.ir-editor-dialog{padding:12px;max-height:94vh}.ir-editor-dialog .ir-sequence-row{grid-template-columns:14px 48px minmax(0,1fr) 25px 25px 25px;gap:4px}.ir-editor-dialog .ir-sequence-row .btn{padding:4px;font-size:11px}.ir-montage-available{grid-template-columns:repeat(3,minmax(0,1fr))}.ir-queue-tabs{gap:2px}.ir-queue-tabs button{font-size:11px;padding:7px 5px}.ir-queue-tabs span{margin-left:2px}}
+.ir-manage-top{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0 0 14px}
+#irClipDesk .ir-manage-top .ir-library-filters{flex:1;margin:0;min-width:160px}
+#irClipDesk .replay-picker-tabs button{min-height:44px;min-width:90px;font-size:14px}
+#irClipDesk .btn{min-height:44px;min-width:44px;padding:10px 14px;font-size:13px;line-height:1.3}
+#irClipDesk .ir-library-filters{margin-bottom:14px;gap:10px}
+#irClipDesk .ir-library-filters input{max-width:none;min-height:46px;font-size:14px;padding:12px 15px;border-radius:10px}
+#irClipDesk .ir-queue-tabs{flex-wrap:wrap;align-items:center;gap:6px;border:0;margin-bottom:8px;padding:0}
+#irClipDesk .ir-queue-tabs button{min-height:44px;padding:10px 13px;border:1px solid transparent;border-radius:8px;font-size:13px}
+#irClipDesk .ir-queue-tabs button[aria-pressed=true]{background:#65c7a418;border-color:var(--accent-dim);color:var(--text)}
+#irClipDesk .ir-queue-tabs span{font-size:12px;opacity:1;color:var(--muted);margin-left:6px}
+.ir-manage-filters{margin-left:auto;position:relative;font-size:13px;color:var(--muted)}
+.ir-manage-filters summary{cursor:pointer;min-height:44px;padding:12px}
+.ir-manage-filters>div{position:absolute;right:0;top:100%;z-index:5;background:var(--panel);padding:12px;box-shadow:var(--shadow);border:1px solid var(--line);border-radius:10px;min-width:210px;display:grid;gap:10px}
+.ir-manage-filters button{text-align:left}.ir-manage-filters select{width:100%;min-height:44px;font-size:13px;padding:8px}
+#irClipDesk .ir-selection{min-height:52px;font-size:13px;margin-bottom:14px;gap:16px;border-bottom:0;padding:0}
+#irClipDesk .ir-selection>label{min-height:44px;cursor:pointer;padding-right:8px}
+#irClipDesk .ir-selection input,#irClipDesk .ir-card-check input{width:20px;height:20px;flex:0 0 20px}
+#irClipDesk .ir-bulk-actions{align-items:center;gap:8px;background:var(--panel);padding:10px;border-radius:10px}
+#irClipDesk .ir-card-grid{grid-template-columns:repeat(3,minmax(0,1fr));max-height:none;overflow:visible;gap:18px;min-height:180px;padding:3px}
+#irClipDesk .ir-clip-card{border-radius:13px}
+#irClipDesk .ir-clip-card:hover{border-color:var(--accent);box-shadow:0 4px 20px #0003}
+#irClipDesk .ir-card-copy{padding:14px}
+#irClipDesk .ir-card-copy strong{font-size:15px;font-weight:550;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;min-height:43px;line-height:1.45}
+#irClipDesk .ir-card-meta{font-size:12px;gap:8px;margin-top:10px}
+#irClipDesk .ir-card-meta span{font-size:12px;margin:0}
+#irClipDesk .ir-card-play{inset:auto auto 12px 12px;width:40px;height:40px;z-index:1;border-radius:50%;background:#081015c9;color:#fff;font-size:22px;opacity:1}
+#irClipDesk .ir-card-duration{font-size:12px;padding:4px 7px;color:#fff}
+#irClipDesk .ir-card-check{left:6px;top:6px;width:44px;height:44px;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;background:#071116bb}
+.ir-card-restore{width:100%;min-height:44px;padding:10px;border:0;border-top:1px solid var(--line);color:var(--accent);background:var(--panel);cursor:pointer;font-size:13px}
+#irClipDesk .ir-pagination{margin-top:20px;font-size:13px}
+#irClipDesk [hidden]{display:none!important}
+#irClipDesk :is(button,input,select,summary):focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+@media(min-width:1600px){#irClipDesk .ir-card-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:1000px){.ir-manage-top{flex-wrap:wrap}#irClipDesk .ir-manage-top .ir-library-filters{order:2;flex-basis:100%}}
+@media(max-width:700px){#irClipDesk .ir-card-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.replay-workspace>.page-header .page-title{font-size:26px}.ir-page-heading{flex-wrap:wrap}.ir-manage-filters{margin-left:0}.ir-manage-filters>div{left:0;right:auto}#irClipDesk .ir-queue-tabs button{padding:10px}}
+@media(max-width:440px){#irClipDesk .ir-card-grid{grid-template-columns:minmax(0,1fr)}.ir-manage-top{flex-wrap:wrap;gap:10px}#irClipDesk .ir-card-copy strong{min-height:0}}

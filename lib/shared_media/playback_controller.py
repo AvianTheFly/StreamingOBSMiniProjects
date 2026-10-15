@@ -125,7 +125,7 @@ class MediaPlayback:
             raise
         return done
 
-    def play_asset_concurrent(self, name: str) -> threading.Event | None:
+    def play_asset_concurrent(self, name: str, *, interrupt_music=True) -> threading.Event | None:
         if self.stop_event.is_set():
             return
         entry = self.name_index.get(name)
@@ -135,9 +135,10 @@ class MediaPlayback:
         with self.play_lock:
             source_name = self._choose_shared_source(self.current_source_name[0]) if self._single_source_mode else entry[1]
             worker = self.worker_for(source_name)
-            return worker.submit(lambda cancelled: self._play_asset_concurrent(name, source_name, cancelled))
+            return worker.submit(lambda cancelled: self._play_asset_concurrent(
+                name, source_name, cancelled, interrupt_music=interrupt_music))
 
-    def _play_asset_concurrent(self, name: str, source_name: str, cancelled) -> None:
+    def _play_asset_concurrent(self, name: str, source_name: str, cancelled, *, interrupt_music=True) -> None:
         if cancelled.is_set() or self.stop_event.is_set():
             return
         entry = self.name_index.get(name)
@@ -153,13 +154,14 @@ class MediaPlayback:
         print(f"[{self.cfg.project_name}] Playing (concurrent): '{source_name}'")
         with self.visible_lock:
             self.visible_sources.add(source_name)
-        self._play_source(name, filepath, source_name, cancelled)
+        self._play_source(name, filepath, source_name, cancelled, interrupt_music=interrupt_music)
 
-    def _play_source(self, name, filepath, source_name, cancelled, *, ticket=None):
+    def _play_source(self, name, filepath, source_name, cancelled, *, ticket=None, interrupt_music=True):
         try:
             self.asset_player.play(name, filepath, source_name,
                 cancelled=lambda: cancelled.is_set() or self.stop_event.is_set(),
-                allowed=ticket.allowed.is_set if ticket is not None else self.layered_permission.is_set)
+                allowed=ticket.allowed.is_set if ticket is not None else self.layered_permission.is_set,
+                interrupt_music=interrupt_music)
         finally:
             with self.visible_lock:
                 self.visible_sources.discard(source_name)

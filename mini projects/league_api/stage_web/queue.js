@@ -75,7 +75,7 @@ function render(state){
   data=state.queue_timer||{};sample=performance.now();card.hidden=!data.active;
   // Queue API clock corrections update the digits, never seek the artwork.
   if(visualEpoch===null&&data.active)visualEpoch=sample-(Number(data.seconds)||0)*1000;
-  dirty=true;document.querySelector('#queueStatus').textContent=data.status||'IN QUEUE';
+  dirty=true;document.querySelector('#queueStatus').textContent='IN QUEUE';
   const roles=document.querySelector('#queueRoles');roles.replaceChildren();
   (data.roles||[]).forEach((role,i)=>{const span=document.createElement('span'),small=document.createElement('small');small.textContent=i?'SECONDARY':'PRIMARY';span.append(small,labels[role]||'');roles.append(span);});
   if(!roles.childNodes.length)roles.textContent='Roles unavailable for this queue';

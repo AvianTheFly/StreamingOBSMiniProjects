@@ -18,6 +18,7 @@ _live: dict = {}
 
 class _SpecificSongInterface(PlayerInterface):
     name              = "specific_song"
+    background_music  = True
     controlled_scenes = ["SpecificSongs"]
     playing_attribute = "current_source"
     random_idle_activity = "random mode (idle between songs)"

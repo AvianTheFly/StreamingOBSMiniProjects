@@ -16,7 +16,50 @@
       "max_interval": 0.8
     }
   },
-  "hub_workflows": [],
+  "hub_workflows": [
+    {
+      "id": "keep_game_recording",
+      "name": "Keep latest game recording",
+      "enabled": true,
+      "sequence": "*k*",
+      "max_interval": 0.8,
+      "steps": [
+        {
+          "kind": "project",
+          "project": "league_api",
+          "action": "keep_recording"
+        }
+      ]
+    },
+    {
+      "id": "delete_game_recording",
+      "name": "Delete latest game recording",
+      "enabled": true,
+      "sequence": "*d*",
+      "max_interval": 0.8,
+      "steps": [
+        {
+          "kind": "project",
+          "project": "league_api",
+          "action": "delete_recording"
+        }
+      ]
+    },
+    {
+      "id": "mark_game_recording",
+      "name": "Mark moment in game recording",
+      "enabled": true,
+      "sequence": "/*",
+      "max_interval": 0.8,
+      "steps": [
+        {
+          "kind": "project",
+          "project": "league_api",
+          "action": "mark_recording"
+        }
+      ]
+    }
+  ],
   "project_trigger_modes": {},
   "whisper_model": "small.en",
   "whisper_device": "cuda",

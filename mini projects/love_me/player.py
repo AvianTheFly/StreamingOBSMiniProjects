@@ -3,6 +3,7 @@ import threading
 
 import obs
 from lib.shared_media.playback_worker import PlaybackWorker
+from lib.audio_focus import interrupt_audio
 from .config import SCENE, ITEMS, POLL_INTERVAL, MEDIA_START_TIMEOUT, MEDIA_TOTAL_TIMEOUT
 
 
@@ -40,10 +41,17 @@ class SequentialPlayer:
             self._active_cancel = cancelled
 
         display_name = item['display_name']
+        release_audio = lambda: None
         try:
             print(f"[love_me] Playing {index + 1}/{len(self.items)}: "
                   f"display='{display_name}' monitor='{item['monitor_name']}'")
             self.hide_all_sources()
+            if stopped():
+                return
+            settings = obs.get_obs().get_input_settings(item['monitor_name']).input_settings
+            file = settings.get('local_file') if isinstance(settings, dict) else None
+            if file:
+                release_audio = interrupt_audio(file, cancelled=stopped, music=True)
             if stopped():
                 return
             obs.show_source(SCENE, display_name)
@@ -64,9 +72,13 @@ class SequentialPlayer:
             try:
                 obs.hide_source(SCENE, display_name)
             finally:
-                with self.lock:
-                    self._is_busy = False
-                    self._active_cancel = None
+                try:
+                    obs.stop_media(item['monitor_name'])
+                finally:
+                    release_audio()
+                    with self.lock:
+                        self._is_busy = False
+                        self._active_cancel = None
 
     def _finish(self, generation):
         with self.lock:

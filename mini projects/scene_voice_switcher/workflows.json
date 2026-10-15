@@ -445,7 +445,7 @@
         "event": "scene.decision",
         "kind": "event"
       },
-      "detail": "The feature publishes complete per-world source and placement data. Shared mechanics resolve required resources, snapshot before the first repair, and update only named layers when their settings, visibility, placement or relative stacking differ. The publication/presentation lock keeps a saved edit from racing an older layout. Unowned image settings, nested camera filters, personal CSS and unowned overlays survive; only active chat browsers remain loaded. Deferred and stale scene intents do not repair anything until accepted. Ready worlds optionally publish a transparent living-world layer after its original foreground (or camera for a flat painting) and before dedicated chat, with all three saved live apertures passed explicitly. Other worlds retain their authored layers. Locations may be groups in the single Lobbies scene. Enumeration uses the group transport; missing group children reject before mutation and require offline structural repair. Spirit Afterparty uses the original clubhouse plate without a desktop display. Its layout hides only its Hub Display Capture link, while all camera layers reuse FaceCamWithProps and its existing Parsec capture and filters. Painted background remains underneath keyed video and chat; the foreground alone clears their saved apertures. Afterparty uses the aligned room plate with both original wall plaques. The booth is centered at x960, with the default camera centered above its deck; saved per-location overrides still win. Text retains the painted sign material, and media projects inside the same fitted plaques. Each layout publishes the explicit shared display selection as complete data. Udyr animation is the installed default. Nested client, desktop and Chrome references remain selectable; the private legacy desktop gate cannot undo an explicit choice. Parent per-world placement and every original input/filter/volume remain untouched. Four curated full-scenery worlds explicitly configure versioned Base and Foreground file references through this same plan. Versioned native masks open the authored camera rectangles; all earlier source files are retained; browser and native backings match even through a keyed camera. Scenery only publishes a null display selection, hiding allowed nested media without touching unknown overlays. Media visibility is observed independently by the browser; hiding a display also removes its frame and reveals the new background. The October 13 distinct habitat revision authors four independent camera/chat/media placements in habitat-designs.js, exported to habitat-layouts.json. User-requested installation saves these four placements through configure_lobby, after snapshotting. Unknown settings, rotation and all other worlds remain preserved. Native foreground masks open the rectangular camera area; browser camera-occlusion restores the physical prop below its measured contour. Custom camera bounds disable that contour. Explicit per-location overrides continue to win.",
+      "detail": "The feature publishes complete per-world source and placement data. Shared mechanics resolve required resources, snapshot before the first repair, and update only named layers when their settings, visibility, placement or relative stacking differ. The publication/presentation lock keeps a saved edit from racing an older layout. Unowned image settings, nested camera filters, personal CSS and unowned overlays survive; only active chat browsers remain loaded. Deferred and stale scene intents do not repair anything until accepted. Ready worlds optionally publish a transparent living-world layer after its original foreground (or camera for a flat painting) and before dedicated chat, with all three saved live apertures passed explicitly. Other worlds retain their authored layers. Locations may be groups in the single Lobbies scene. Enumeration uses the group transport; missing group children reject before mutation and require offline structural repair. Spirit Afterparty uses the original clubhouse plate without a desktop display. Its layout hides only its Hub Display Capture link, while all camera layers reuse FaceCamWithProps and its existing Parsec capture and filters. Painted background remains underneath keyed video and chat; the foreground alone clears their saved apertures. Afterparty uses the aligned room plate with both original wall plaques. The booth is centered at x960, with the default camera centered above its deck; saved per-location overrides still win. Text retains the painted sign material, and media projects inside the same fitted plaques. Each layout publishes the explicit shared display selection as complete data. Udyr animation is the installed default. Nested client, desktop and Chrome references remain selectable; the private legacy desktop gate cannot undo an explicit choice. Parent per-world placement and every original input/filter/volume remain untouched. Four curated full-scenery worlds explicitly configure versioned Base and Foreground file references through this same plan. Versioned native masks open the authored camera rectangles; all earlier source files are retained; browser and native backings match even through a keyed camera. Scenery only publishes a null display selection, hiding allowed nested media without touching unknown overlays. Media visibility is observed independently by the browser; hiding a display also removes its frame and reveals the new background. The October 13 distinct habitat revision authors four independent camera/chat/media placements in habitat-designs.js, exported to habitat-layouts.json. User-requested installation saves these four placements through configure_lobby, after snapshotting. Unknown settings, rotation and all other worlds remain preserved. Native foreground masks open the rectangular camera area; browser camera-occlusion restores the physical prop below its measured contour. Custom camera bounds disable that contour. Explicit per-location overrides continue to win. Published display data includes named League idle/client and queue/recap modes. Scene preparation selects one from a copied plan, removes only that plan's optional selected-input fit, and never saves over the manual screen preference. The recap counts as visible display content for the painted aperture. Normal manual display selections hide the automatic recap along with other allowed media; unknown overlays and saved transforms remain untouched.",
       "steps": [
         {
           "id": "0",
@@ -531,14 +531,14 @@
         {
           "path": "lib/coordination/lobbies.py",
           "symbol": "_prepare_lobby",
-          "hash": "138dbdedf366dd26782c8c62c1e8074b806562dc78bd22f81db112c3cd5cf7d3"
+          "hash": "0c1b806197622eab7bb92968396d88921a5a6dcf10592748d0abae176f18c02a"
         }
       ],
       "owner_hashes": {
-        "coordination": "75830bfb9b0c501c3bde2e42d470c914410b3e8310d04af7c61f48505744b6d5",
-        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
-        "scene_voice_switcher": "215cdfef2f651abb9ae0abc790205400be614d103ad7a711190619d2d638d185",
-        "settings_history": "c0de7909c62939f1fd4a5e9801a1e697f7ce5ce1ec4dd05940d65e2224805cd6"
+        "coordination": "37b0606604e99b29de80fbed8d088ba86048a590fd7bda803b93bebf414c819e",
+        "settings_history": "c0de7909c62939f1fd4a5e9801a1e697f7ce5ce1ec4dd05940d65e2224805cd6",
+        "scene_voice_switcher": "aa52ba58f3c31f0691cc35e472f0f3a86b5e97cbb527840821e5bea3df26b2c5",
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c"
       },
       "effects": [
         {
@@ -637,7 +637,7 @@
       ],
       "owner_hashes": {
         "browser_effects": "646313d93b5c9e0e2ee60afb214945dc23975389c178cf8bfedefc21914bf933",
-        "scene_voice_switcher": "215cdfef2f651abb9ae0abc790205400be614d103ad7a711190619d2d638d185"
+        "scene_voice_switcher": "a42f9f33d472fb5965efd3861a444fc2a703114352dd91f462c22d6587b6037c"
       }
     },
     {
@@ -720,7 +720,7 @@
         "kind": "control",
         "event": "hub_action"
       },
-      "detail": "The Hub offers Scenery only, Udyr animation, League client, Desktop and Google Chrome for the existing lobby display. The feature validates installed references, snapshots settings and atomically saves only screen_content while preserving unknown personal fields. Inventory republishes complete layout data; shared mechanics select exactly one owned reference or hide all allowed references for Scenery only and preserve unknown overlays. No program scene, media file, original input setting, volume, filter or saved per-world screen placement changes. The installer creates an independent unfiltered Hub Lobby Udyr media input using the original media settings and current gain/mute, fits its new nested display item, and hides only the old tilted input reference inside Hub Display Capture. It retains the original input, filters, and all other scene placements; repeated installation preserves the dedicated input settings and placement. The off-stream installer adds missing references inside the existing shared nested scene and chooses Udyr; ordinary Hub choices do not require a restart. The feature visibility API reads the real parent reference and active supported nested sources. It never infers media visibility from the saved choice or desktop alone. A visible browser document reads this through the shared cancellable poller and only displays the media frame when a source is actually shown; hidden documents cancel requests. Existing unknown overlays are not treated as selected media and remain intact.",
+      "detail": "The Hub offers Scenery only, Udyr animation, League client, Desktop and Google Chrome for the existing lobby display. The feature validates installed references, snapshots settings and atomically saves only screen_content while preserving unknown personal fields. Inventory republishes complete layout data; shared mechanics select exactly one owned reference or hide all allowed references for Scenery only and preserve unknown overlays. No program scene, media file, original input setting, volume, filter or saved per-world screen placement changes. The installer creates an independent unfiltered Hub Lobby Udyr media input using the original media settings and current gain/mute, fits its new nested display item, and hides only the old tilted input reference inside Hub Display Capture. It retains the original input, filters, and all other scene placements; repeated installation preserves the dedicated input settings and placement. The off-stream installer adds missing references inside the existing shared nested scene and chooses Udyr; ordinary Hub choices do not require a restart. The feature visibility API reads the real parent reference and active supported nested sources. It never infers media visibility from the saved choice or desktop alone. A visible browser document reads this through the shared cancellable poller and only displays the media frame when a source is actually shown; hidden documents cancel requests. Existing unknown overlays are not treated as selected media and remain intact. Udyr selection publishes a full 1920 by 1080 inner-fit transform for its dedicated nested item. Shared mechanics validate selected ownership and snapshot before repairing drift. Per-room parent screen rectangles, other input transforms, media settings, filters and volumes remain untouched. Published display data includes named League idle/client and queue/recap modes. Scene preparation selects one from a copied plan, removes only that plan's optional selected-input fit, and never saves over the manual screen preference. The recap counts as visible display content for the painted aperture. Normal manual display selections hide the automatic recap along with other allowed media; unknown overlays and saved transforms remain untouched.",
       "steps": [
         {
           "id": "0",
@@ -768,22 +768,22 @@
         {
           "path": "mini projects/scene_voice_switcher/screen_content.py",
           "symbol": "blueprint",
-          "hash": "24ead42bf51ac293613de98f2d42a45a8df6e9eaca685e056048ef846dc0164d"
+          "hash": "e45f8145d5d98a56cfad93c91704a3f306bfebf4f4b7a886073eba7a2b526837"
         },
         {
           "path": "lib/display_capture.py",
           "symbol": "apply_content",
-          "hash": "f7e2778f3f0866de76cdf58638cb7d9fd162b3d65d4fa4830701bd6252668d36"
+          "hash": "48f9b6cf78a13316385cfaf3588fe45a47d0916f844612ecb26245198d116486"
         },
         {
           "path": "mini projects/scene_voice_switcher/screen_content.py",
           "symbol": "visibility",
-          "hash": "cbea668ab755c1eb74289420f9095654652c263d7b53bbc30397d2d7f38f0bd9"
+          "hash": "dd59a5be49b7d55aac6d02e31e50031a04a17b89c889d864a8f18130862ac6cb"
         }
       ],
       "effects": [],
       "owner_hashes": {
-        "scene_voice_switcher": "e83cbc6f69cec3b2baa8842dd67cb30f8def236c75297477ffb091498a484fcb",
+        "scene_voice_switcher": "aa52ba58f3c31f0691cc35e472f0f3a86b5e97cbb527840821e5bea3df26b2c5",
         "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c"
       }
     }

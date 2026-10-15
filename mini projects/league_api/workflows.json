@@ -17,7 +17,7 @@
         "event": "league_client.phase",
         "kind": "poll"
       },
-      "detail": "Confirmed matchmaking and ready-check events choose the private lobby through SceneDirector from any current scene. Lobby and queue share a dashboard view. Manual Queue validates the current client phase and captured manual revision. A manual draft privacy choice lasts until the next planning, banning, picking or finalization event. Unchanged observations preserve manual scene choices. Streamer holds defer automatic preparation; result and replay owners retain their gates. Missing draft data stays private. The queue badge follows confirmed queue or missing draft data and hides when the draft presentation begins or the client disconnects. The existing client worker refreshes HTTP periodically even on a quiet event socket and after subscription failure. HTTP availability and event-stream availability are published separately; socket failure alone does not remove a healthy client owner. Automatic lobby delegation requires enabled automation and available HTTP observations. No new worker or client transport owner is added. Planning and unfinished bans retain the queue lobby and its timer. Those events keep an already visible lobby fixed; if another scene is visible, new banning intent returns to the queue destination. Completed bans select the draft presentation; no-ban queues require confirmed picking. Explicit Hub display choices select Udyr, client, desktop or Chrome inside the saved screen aperture. An observed League replay process suspends these automatic routes, independent of launcher phase or Replay API availability. Replay closure requires a fresh client phase before routing resumes; newer manual scene intent remains protected.",
+      "detail": "Confirmed matchmaking and ready-check events choose the private lobby through SceneDirector from any current scene. Lobby and queue share a dashboard view. Manual Queue validates the current client phase and captured manual revision. A manual draft privacy choice lasts until the next planning, banning, picking or finalization event. Unchanged observations preserve manual scene choices. Streamer holds defer automatic preparation; result and replay owners retain their gates. Missing draft data stays private. The queue badge follows confirmed queue or missing draft data and hides when the draft presentation begins or the client disconnects. The existing client worker refreshes HTTP periodically even on a quiet event socket and after subscription failure. HTTP availability and event-stream availability are published separately; socket failure alone does not remove a healthy client owner. Automatic lobby delegation requires enabled automation and available HTTP observations. No new worker or client transport owner is added. Planning and unfinished bans retain the queue lobby and its timer. Those events keep an already visible lobby fixed; if another scene is visible, new banning intent returns to the queue destination. Completed bans select the draft presentation; no-ban queues require confirmed picking. Accepted automatic idle entries select the published League client display mode; queue entries select the recap mode and hide the client. Named modes are applied within the SceneDirector preparation, retaining saved manual display preferences, input settings and per-room transforms. Cancellation returns to the client; ready check and unfinished bans retain the recap lobby. An observed League replay process suspends these automatic routes, independent of launcher phase or Replay API availability. Replay closure requires a fresh client phase before routing resumes; newer manual scene intent remains protected.",
       "steps": [
         {
           "id": "0",
@@ -67,9 +67,9 @@
         }
       ],
       "owner_hashes": {
-        "league_api": "d803485042a51f7c0d12379508011709413c1c0014827c3bca09ed70086775a1",
-        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
-        "coordination": "75830bfb9b0c501c3bde2e42d470c914410b3e8310d04af7c61f48505744b6d5"
+        "coordination": "37b0606604e99b29de80fbed8d088ba86048a590fd7bda803b93bebf414c819e",
+        "league_api": "05bdea7f2e449f079c6f542b8f1e768db3f38565b3ec8d2ef5572304758f3ea0",
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c"
       },
       "edges": [
         {
@@ -128,6 +128,11 @@
           "path": "mini projects/league_api/client_scenes.py",
           "symbol": "ClientScenes.routes_lobbies",
           "hash": "c5ef3e3ed21e7472880af92c5c3bff7628b4d5ed8fb3d075cb9b5423574eda1c"
+        },
+        {
+          "path": "mini projects/league_api/scene_routing.py",
+          "symbol": "_prepare_scene",
+          "hash": "ee72ac96a1c830cf7ea8d5de8bb91c20cbd41d236d6c0b9205e8943dc732806b"
         }
       ],
       "effects": [
@@ -167,7 +172,7 @@
         "event": "league_client.phase",
         "kind": "poll"
       },
-      "detail": "Automatic champion presentation begins after all observed ban actions complete, or confirmed picking in a mode without bans. Planning and unfinished bans stay in the private queue lobby. The queue journey remains running through ready check and bans, then freezes and hides on draft entry. Each new draft event renews destination intent; planning and banning do not reshuffle an already visible queue lobby; unchanged roster and timer updates cannot reclaim a manual scene. Manual Champ select requires confirmed draft data and current manual intent, and lasts until the next draft event. Manual Queue can hide it again. The overlay uses applied draft state even with automatic routing disabled. Hidden documents stop state requests; visibility immediately refreshes current picks and chat, rejecting late hidden responses. New phase events clear manual overrides and withdraw obsolete deferred requests. The existing browser-recovery worker refreshes the installed draft browser once after HTTP startup, retrying while OBS is unavailable. Draft scene activation reloads its page so an early OBS launch cannot retain a failed page. Personal filters, dimensions and camera placement are preserved. Draft portraits and team chat use exposed aliases or numbered participants. Each artwork has individually measured portrait and ban apertures; reveals stay inside the fixed frames, and Astral receives matching fifth ban medallions on its empty rail ends. Pick captions display TOP, JUNGLE, MID, BOT or SUPPORT on a separate line from the alias. Missing or unrecognized client-assigned lanes display ROLE TBD; champion identity and slot order never infer a lane. GameStart/InProgress before the observed image-clock GameStart boundary requests the Spirit Loading scene with available roster data. The image-clock GameStart boundary withdraws pending loading; existing League gameplay admission selects the game. Manual scene revisions and automatic holds still win. Gameplay admission notifies the loading owner through game_scene_policy before the game scene is queued, preventing competing polling order from restoring loading. The existing client worker refreshes HTTP periodically even on a quiet event socket and after subscription failure. HTTP availability and event-stream availability are published separately; socket failure alone does not remove a healthy client owner. Automatic lobby delegation requires enabled automation and available HTTP observations. No new worker or client transport owner is added. An observed League replay process suspends these automatic routes, independent of launcher phase or Replay API availability. Replay closure requires a fresh client phase before routing resumes; newer manual scene intent remains protected. Four replacement Udyr-inspired worlds use new still paintings: Thunderclaw bear, Jade Aegis turtle, Golden Summit ram and Ash & Aurora phoenix. Retired saved themes resolve in memory to a successor without rewriting personal settings. layout.js owns fixed 1920x1080 shrines and ban sockets; role and name plates are separate and local selection uses an inset diamond. scene-map.js measures the actual basin and guardian contacts. No painting is warped: world-art.js draws independent weather, source light and articulated objects; spirit-locks.js charges the measured basin for .42 seconds, accelerates for .30 seconds and impacts at .72 seconds with painted storm claws, a jade barrier, a charging molten ram or an ice/fire phoenix. Analytic lightning, droplets, stone fragments and feathers dissipate at different rates while light settles into the chosen shrine and dais. vfx-timing.js drives portrait, ban and chat responses from that same canvas clock; independent CSS cue clocks are removed. vfx-ink.js owns bounded analytic drawing and vfx-texture.js precomputes sixteen 384px erosion frames per active world, avoiding per-frame texture synthesis. Bans, chat and ready state have distinct cues. spirit-secrets.js rotates three miniature guest acts per world one at a time, with quiet intervals and draft-event priority. world-assets.js owns a background, one transparent effect painting, its bounded erosion atlas and three poses, rejecting late loads and releasing all images and atlas canvases while hidden. world-motion.js owns one capped 30 FPS clock and twenty cues expiring after 4.2 seconds; role/name plates are cleared from the effects and the original camera aperture remains. Local fonts retain readable role labels without external font requests. Existing visibility stops drawing and polling, and initial/new generation/theme/hidden return establishes a baseline without replaying historical events. Reduced motion freezes the composition. Rehearsal controls, including Hidden detail, do not save preferences or send actions. Automatic timing remains after bans. No new worker, transport or scene writer is introduced.",
+      "detail": "Automatic champion presentation begins after all observed ban actions complete, or confirmed picking in a mode without bans. Planning and unfinished bans stay in the private queue lobby. The queue journey remains running through ready check and bans, then freezes and hides on draft entry. Each new draft event renews destination intent; planning and banning do not reshuffle an already visible queue lobby; unchanged roster and timer updates cannot reclaim a manual scene. Manual Champ select requires confirmed draft data and current manual intent, and lasts until the next draft event. Manual Queue can hide it again. The overlay uses applied draft state even with automatic routing disabled. Hidden documents stop state requests; visibility immediately refreshes current picks and chat, rejecting late hidden responses. New phase events clear manual overrides and withdraw obsolete deferred requests. The existing browser-recovery worker refreshes the installed draft browser once after HTTP startup, retrying while OBS is unavailable. Draft scene activation reloads its page so an early OBS launch cannot retain a failed page. Personal filters, dimensions and camera placement are preserved. Draft portraits and team chat use exposed aliases or numbered participants. Each artwork has individually measured portrait and ban apertures; reveals stay inside the fixed frames, and Astral receives matching fifth ban medallions on its empty rail ends. Pick captions display TOP, JUNGLE, MID, BOT or SUPPORT on a separate line from the alias. Missing or unrecognized client-assigned lanes display ROLE TBD; champion identity and slot order never infer a lane. GameStart/InProgress before the observed image-clock GameStart boundary requests the Spirit Loading scene with available roster data. The image-clock GameStart boundary withdraws pending loading; existing League gameplay admission selects the game. Manual scene revisions and automatic holds still win. Gameplay admission notifies the loading owner through game_scene_policy before the game scene is queued, preventing competing polling order from restoring loading. The existing client worker refreshes HTTP periodically even on a quiet event socket and after subscription failure. HTTP availability and event-stream availability are published separately; socket failure alone does not remove a healthy client owner. Automatic lobby delegation requires enabled automation and available HTTP observations. No new worker or client transport owner is added. An observed League replay process suspends these automatic routes, independent of launcher phase or Replay API availability. Replay closure requires a fresh client phase before routing resumes; newer manual scene intent remains protected. Four replacement Udyr-inspired worlds use new still paintings: Thunderclaw bear, Jade Aegis turtle, Golden Summit ram and Ash & Aurora phoenix. Retired saved themes resolve in memory to a successor without rewriting personal settings. layout.js owns fixed 1920x1080 shrines and ban sockets; role and name plates are separate and local selection uses an inset diamond. scene-map.js measures the actual basin and guardian contacts. No painting is warped: world-art.js draws independent weather, source light and articulated objects; spirit-locks.js acknowledges the selected card immediately and impacts inside its portrait at .18 seconds with painted storm claws, a jade barrier, a charging molten ram or an ice/fire phoenix. Analytic lightning, droplets, stone fragments and feathers dissipate at different rates while light settles into the chosen shrine and dais. vfx-timing.js drives portrait, ban and chat responses from that same canvas clock; independent CSS cue clocks are removed. vfx-ink.js owns bounded analytic drawing and vfx-texture.js precomputes sixteen 384px erosion frames per active world, avoiding per-frame texture synthesis. Bans, chat and ready state have distinct cues. spirit-secrets.js rotates three miniature guest acts per world one at a time, with quiet intervals and draft-event priority. world-assets.js owns a background, one transparent effect painting, its bounded erosion atlas and three poses, rejecting late loads and releasing all images and atlas canvases while hidden. world-motion.js owns one deadline-paced 60 FPS clock and twenty cues expiring after 4.2 seconds; role/name plates are cleared from the effects and the original camera aperture remains. Local fonts retain readable role labels without external font requests. Existing visibility stops drawing and polling, and initial/new generation/theme/hidden return establishes a baseline without replaying historical events. Reduced motion freezes the composition. Rehearsal controls, including Hidden detail, do not save preferences or send actions. Automatic timing remains after bans. No new worker, transport or scene writer is introduced. Loading roster observations enrich one ten-slot match roster rather than replacing it. Draft local-team orientation and slot order survive reordered gameflow and live arrays; exposed identities or an unambiguous champion match each participant. Missing fields retain icons, names and observed roles. Confirmed live names outrank older gameflow names and draft aliases. New match IDs and non-game phases clear old data. The browser retains ten player cards and updates changed text or icon URLs only. The redesigned loading lobby places two opposing wings of five stable numbered champion cards around a central spirit ceremony, with cached portrait sleeves, unchanged icon nodes and separate observed-role badges. A pure fourteen-second cadence blends thunder claws and branching lightning, a jade aegis and water rings, a molten ram and forge embers, and a fire/ice phoenix with articulated wings and feather currents. Etched orbit rings and team tethers share that same clock. At most four 512px patches reuse the existing local spirit paintings through shared PaintedPatch mechanics; hidden pages abort pending reads, reject late decodes and release all prepared artwork. One 24 FPS half-resolution canvas stops with OBS source invisibility; reduced motion keeps a static ceremony, and page exit releases drawing and polling. The selected loading backdrop is retained. No setting, source transform, worker or scene writer is added. Champion-select chat.js owns a ten-message presentation snapshot and ResizeObserver; whole non-shrinking cards retire oldest-first according to measured panel space. Text is 22px at the native canvas with a compact single header and stable sender colors. Client-exposed aliases or numbered participants label cards; unavailable mappings have no repeated TEAM prefix. Numeric-string summoner IDs match their roster entry, while hidden zero IDs never identify a player. The newest oversized message uses a measured line clamp with an ellipsis and full plain-text title. Resize and font readiness reconsider the complete bounded snapshot; unchanged polls retain the DOM. Page disposal disconnects the observer and rejects late font completion. It adds no worker, request, setting, hook or scene writer. Draft lettering is native browser text over text-free paintings. Clean local-font roles and champion names, larger system-font aliases and reduced text shadows improve clarity. Expanded lower plaques retain two-line champion names and a visible player line; the scenic canvas clears their complete area. The HTTP allowlist serves chat.js so the page import graph loads completely. Typography review covers all four themes, broadcast and preview sizes, long names, literal text and non-overlapping labels. Player labels prefer nonblank exposed obfuscatedSummonerName, followed by gameName, riotIdGameName and summonerName; unavailable or malformed names retain numbered team slots. Ranked aliases are never replaced by another available name, and there is no identity lookup or new client request. Rehearsal cards show sample ranked aliases before and after picks. The shared draft document has no LIVE badge in any of its four themes. team-resonance.js sends a distance-timed material wave from each locked portrait through its own team, then replies from neighboring frames, platform seams, basin and guardian. At most two traveling waves per team coexist, and replacement cues cancel old slot effects. world-details.js adds analytical storm constellations, koi and lotus ripples, forge runes and molten droplets, and thermal feathers on the same clock. vfx-lights.js caches at most 32 small glow tiles per active canvas, released on hide/dispose. DOM responses cache their nodes without forced layout. Draft OBS recovery applies the authored 60 FPS and custom-frame-rate flag while preserving personal dimensions, filters and placement.",
       "steps": [
         {
           "id": "0",
@@ -218,8 +223,8 @@
       ],
       "owner_hashes": {
         "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
-        "league_api": "83d9eb0dfe80099dab2b3f1867a09d0f64786ae31efb87db14b02e29d5d384da",
-        "coordination": "75830bfb9b0c501c3bde2e42d470c914410b3e8310d04af7c61f48505744b6d5"
+        "coordination": "37b0606604e99b29de80fbed8d088ba86048a590fd7bda803b93bebf414c819e",
+        "league_api": "dd690119a116fdfa8d6a5373f879f24d15822e7f43d1287f0ec60a67a0932f87"
       },
       "edges": [
         {
@@ -267,7 +272,7 @@
         {
           "path": "mini projects/league_api/stage_state.py",
           "symbol": "StageState",
-          "hash": "ba19eb62737aa102b3d4db0ced6a664708949c4395174d92a4f92ef2f2381166"
+          "hash": "6c0323f4a10cfcab233852b88e7aba03b4e1ea1f145fa4e590cb31d669e59094"
         },
         {
           "path": "mini projects/league_api/client_scenes.py",
@@ -297,7 +302,27 @@
         {
           "path": "mini projects/league_api/http_server.py",
           "symbol": "make_handler",
-          "hash": "8e6f2072b15ce317826dc0a5dc89f5f9828a1e8d8027dc5daa2bb23f2d696cd2"
+          "hash": "a4c0884c175e510fd7e03882819876caabe1aa7ddf10ef46c17396b9b0648167"
+        },
+        {
+          "path": "mini projects/league_api/stage_roster.py",
+          "symbol": "StageRoster",
+          "hash": "e1c90d1cd369c6d036eeb3dc863c231c5d4b2b9bf6a05ba74705d2530fba775a"
+        },
+        {
+          "path": "lib/league_client.py",
+          "symbol": "LeagueClient.chat_messages",
+          "hash": "14559ffa68ba1a6ea137afea7ff00e5389083d03853708794b5edf8cc9b4934f"
+        },
+        {
+          "path": "mini projects/league_api/champ_select.py",
+          "symbol": "project",
+          "hash": "350f5b3da00dd2e8bc469ccd09caba0e7b4a2ca377649df0427d1dd49705ccc3"
+        },
+        {
+          "path": "mini projects/league_api/champ_select.py",
+          "symbol": "_player_label",
+          "hash": "7c68727a46326f47726bfd727a4cf6cc17ad3e1b45868aa15d349bc5ec3a750a"
         }
       ],
       "effects": [
@@ -387,8 +412,8 @@
         }
       ],
       "owner_hashes": {
-        "league_api": "d803485042a51f7c0d12379508011709413c1c0014827c3bca09ed70086775a1",
         "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "league_api": "67fb9724a2d4c20e7f6c82e5a6196fdfd071fed29a6ff262357832b6e55854ea",
         "coordination": "75830bfb9b0c501c3bde2e42d470c914410b3e8310d04af7c61f48505744b6d5"
       },
       "edges": [
@@ -538,8 +563,8 @@
         }
       ],
       "owner_hashes": {
-        "league_api": "d803485042a51f7c0d12379508011709413c1c0014827c3bca09ed70086775a1",
-        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c"
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "league_api": "67fb9724a2d4c20e7f6c82e5a6196fdfd071fed29a6ff262357832b6e55854ea"
       },
       "edges": [
         {
@@ -637,8 +662,8 @@
         }
       ],
       "owner_hashes": {
-        "league_api": "d803485042a51f7c0d12379508011709413c1c0014827c3bca09ed70086775a1",
-        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c"
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "league_api": "67fb9724a2d4c20e7f6c82e5a6196fdfd071fed29a6ff262357832b6e55854ea"
       },
       "edges": [
         {
@@ -736,8 +761,8 @@
         }
       ],
       "owner_hashes": {
-        "league_api": "d803485042a51f7c0d12379508011709413c1c0014827c3bca09ed70086775a1",
-        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c"
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "league_api": "67fb9724a2d4c20e7f6c82e5a6196fdfd071fed29a6ff262357832b6e55854ea"
       },
       "edges": [
         {
@@ -835,8 +860,8 @@
         }
       ],
       "owner_hashes": {
-        "league_api": "d803485042a51f7c0d12379508011709413c1c0014827c3bca09ed70086775a1",
-        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c"
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "league_api": "67fb9724a2d4c20e7f6c82e5a6196fdfd071fed29a6ff262357832b6e55854ea"
       },
       "edges": [
         {
@@ -934,8 +959,8 @@
         }
       ],
       "owner_hashes": {
-        "league_api": "d803485042a51f7c0d12379508011709413c1c0014827c3bca09ed70086775a1",
-        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c"
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "league_api": "67fb9724a2d4c20e7f6c82e5a6196fdfd071fed29a6ff262357832b6e55854ea"
       },
       "edges": [
         {
@@ -1033,8 +1058,8 @@
         }
       ],
       "owner_hashes": {
-        "league_api": "d803485042a51f7c0d12379508011709413c1c0014827c3bca09ed70086775a1",
-        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c"
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "league_api": "67fb9724a2d4c20e7f6c82e5a6196fdfd071fed29a6ff262357832b6e55854ea"
       },
       "edges": [
         {
@@ -1094,7 +1119,7 @@
         {
           "path": "mini projects/league_api/main.py",
           "symbol": "Service.poll",
-          "hash": "e9d35e873ce417040197e824527f43566bdcc79d64e4e7e5a8e60f0d54fd4020"
+          "hash": "0eaa45582c6bf545abfc2503e9dfd9bfaaf9d15b3e3ddcd9150e15a2dd744f81"
         },
         {
           "path": "mini projects/league_api/match_screens.py",
@@ -1222,7 +1247,7 @@
       ],
       "effects": [],
       "owner_hashes": {
-        "league_api": "d803485042a51f7c0d12379508011709413c1c0014827c3bca09ed70086775a1"
+        "league_api": "67fb9724a2d4c20e7f6c82e5a6196fdfd071fed29a6ff262357832b6e55854ea"
       }
     },
     {
@@ -1277,7 +1302,7 @@
         {
           "path": "mini projects/league_api/interface.py",
           "symbol": "LeagueAPIInterface.run_action",
-          "hash": "d5fc79d3d562a5de0b8d23cfb3c0c2a88397fae6ef5d1b0321e70535e20cfa68"
+          "hash": "2f816f055630f98c52e83588874d1d675d0be01a7fc5ca8bf7ff696fcfa1ba7c"
         },
         {
           "path": "mini projects/league_api/client_scenes.py",
@@ -1286,8 +1311,8 @@
         }
       ],
       "owner_hashes": {
-        "league_api": "d803485042a51f7c0d12379508011709413c1c0014827c3bca09ed70086775a1",
         "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "league_api": "67fb9724a2d4c20e7f6c82e5a6196fdfd071fed29a6ff262357832b6e55854ea",
         "coordination": "75830bfb9b0c501c3bde2e42d470c914410b3e8310d04af7c61f48505744b6d5"
       }
     },
@@ -1300,7 +1325,7 @@
         "kind": "poll",
         "event": "league_client.phase"
       },
-      "detail": "The existing client worker reads local matchmaking time and first/second role preferences. QueueState seeds one monotonic journey, follows client time during initial search, and keeps running through ready check and bans. Finished bans freeze and hide the timer before draft entry. Automatic dodge requeues resume the same journey even if client queue time resets. Confirmed cancellation or leaving queue resets to zero; an unknown intermediate dodge Lobby has a bounded two-second bridge. API loss hides the overlay without inventing roles or a phase. Four native bear, turtle, ram and phoenix themes offer fixed selection or shuffled rotation. The public snapshot publishes journey identity and theme_mode. queue.js seeds one monotonic artwork clock from the initial queue sample; later API corrections update timer digits without seeking the animation. queue-theme.js owns shuffled four-spirit batches without adjacent repeats, a 45-second cadence, four-second spatial handoffs, and two choreography variations plus one supporting accent per appearance. Nineteen-second gestures begin fifteen seconds apart; normalized overlapping cue weights interpolate corresponding geometry through every boundary. queue-performances.js owns persistent ice-cathedral, lotus-garden, forge and phoenix-aviary worlds: shared projection, shaded facets, curved petals, weighted tools, articulated feather motion, camera drift and analytic trailing paths. Worlds remain present between acts. Original lore-inspired layers add a channeling spirit-walker, a spectral storm-bear and thunder claws, a swimming jade turtle with protective veils and prayer beads, ram horns above a volcanic forge, and branching frost currents around a cryophoenix. Bear, ram and phoenix evoke Freljord spirits; the retained turtle draws from Spirit Guard's Ionian protection. All layers use the same absolute clock and bounded analytical geometry. The four variations per spirit change formation, opening, orbit, flight and depth continuously. queue-effects.js supplies eight supporting accents per spirit on the same clock. queue-background.js owns compositing, text masks and four bounded prepared Udyr still surfaces; missing textures retain the complete procedural world. Original video and OBS inputs remain untouched. queue-art.js owns faceted left-hand badges, heraldic flourishes and the elemental track. The enlarged heading and role chips occupy a protected central column; filler captions stay removed. The demo-only spirit picker, all-act selector, New mix, pause/play and scrubber never save settings or fetch live state. Selected acts move continuously without thirteen- or forty-five-second world resets. New choices blend from the visible choreography without rewinding; rapid selections retain at most twelve merged cue entries. Scrubbing deliberately seeks within the current appearance and pauses. Production contains no preview controls. queue.js owns the sole animation callback and caps all three surfaces at 24 FPS; hidden sources stop drawing and polling. Page exit aborts pending art loads and releases prepared surfaces; late bitmaps close. Reduced motion keeps the artwork static and removes digit reveals. Theme saving preserves manual scene intent. Queue observations continue during League replay viewing, but replay viewing takes scene precedence until its game process closes.",
+      "detail": "The existing client worker reads local matchmaking time and first/second role preferences. QueueState seeds one monotonic journey, follows client time during initial search, and keeps running through ready check and bans. Finished bans freeze and hide the timer before draft entry. Automatic dodge requeues resume the same journey even if client queue time resets. Confirmed cancellation or leaving queue resets to zero; an unknown intermediate dodge Lobby has a bounded two-second bridge. API loss hides the overlay without inventing roles or a phase. Four native bear, turtle, ram and phoenix themes offer fixed selection or shuffled rotation. The public snapshot publishes journey identity and theme_mode. queue.js seeds one monotonic artwork clock from the initial queue sample; later API corrections update timer digits without seeking the animation. queue-theme.js owns shuffled four-spirit batches without adjacent repeats, a 45-second cadence, four-second spatial handoffs, and two choreography variations plus one supporting accent per appearance. Nineteen-second gestures begin fifteen seconds apart; normalized overlapping cue weights interpolate corresponding geometry through every boundary. queue-performances.js owns persistent ice-cathedral, lotus-garden, forge and phoenix-aviary worlds: shared projection, shaded facets, curved petals, weighted tools, articulated feather motion, camera drift and analytic trailing paths. Worlds remain present between acts. Original lore-inspired layers add a channeling spirit-walker, a spectral storm-bear and thunder claws, a swimming jade turtle with protective veils and prayer beads, ram horns above a volcanic forge, and branching frost currents around a cryophoenix. Bear, ram and phoenix evoke Freljord spirits; the retained turtle draws from Spirit Guard's Ionian protection. All layers use the same absolute clock and bounded analytical geometry. The four variations per spirit change formation, opening, orbit, flight and depth continuously. queue-effects.js supplies eight supporting accents per spirit on the same clock. queue-background.js owns compositing, text masks and four bounded prepared Udyr still surfaces; missing textures retain the complete procedural world. Original video and OBS inputs remain untouched. queue-art.js owns faceted left-hand badges, heraldic flourishes and the elemental track. The enlarged heading and role chips occupy a protected central column; filler captions stay removed. The demo-only spirit picker, all-act selector, New mix, pause/play and scrubber never save settings or fetch live state. Selected acts move continuously without thirteen- or forty-five-second world resets. New choices blend from the visible choreography without rewinding; rapid selections retain at most twelve merged cue entries. Scrubbing deliberately seeks within the current appearance and pauses. Production contains no preview controls. queue.js owns the sole animation callback and caps all three surfaces at 24 FPS; hidden sources stop drawing and polling. Page exit aborts pending art loads and releases prepared surfaces; late bitmaps close. Reduced motion keeps the artwork static and removes digit reveals. Theme saving preserves manual scene intent. Queue observations continue during League replay viewing, but replay viewing takes scene precedence until its game process closes. The broadcast label stays IN QUEUE through ready check and unfinished bans. The browser also masks older server phase labels; existing timer and ban-completion scene timing remain intact.",
       "steps": [
         {
           "id": "0",
@@ -1338,7 +1363,7 @@
         {
           "path": "mini projects/league_api/queue_state.py",
           "symbol": "QueueState",
-          "hash": "b8ffcc42c7603017540c8ba6a15398dcffa92396c99bf06e24e8f17a9e32c142"
+          "hash": "7844777ad61e1cd172efe67147eab0c0dc06900835c65d97c87157af58c71b31"
         },
         {
           "path": "mini projects/league_api/queue_state.py",
@@ -1363,13 +1388,13 @@
         {
           "path": "mini projects/league_api/http_server.py",
           "symbol": "make_handler",
-          "hash": "8e6f2072b15ce317826dc0a5dc89f5f9828a1e8d8027dc5daa2bb23f2d696cd2"
+          "hash": "767e447998794e61379f1297f0b71a30a8b02d70c647cfbcbc074ffb1e8a19a8"
         }
       ],
       "effects": [],
       "owner_hashes": {
-        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
-        "league_api": "83d9eb0dfe80099dab2b3f1867a09d0f64786ae31efb87db14b02e29d5d384da"
+        "league_api": "e91ce70002ad5bfbe61fb5ac01cae32e162aea0edf3d10b2a0d430fc859b3076",
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c"
       }
     },
     {
@@ -1454,7 +1479,7 @@
         }
       ],
       "owner_hashes": {
-        "league_api": "d803485042a51f7c0d12379508011709413c1c0014827c3bca09ed70086775a1",
+        "league_api": "67fb9724a2d4c20e7f6c82e5a6196fdfd071fed29a6ff262357832b6e55854ea",
         "coordination": "75830bfb9b0c501c3bde2e42d470c914410b3e8310d04af7c61f48505744b6d5"
       }
     },
@@ -1514,7 +1539,7 @@
         }
       ],
       "owner_hashes": {
-        "league_api": "d803485042a51f7c0d12379508011709413c1c0014827c3bca09ed70086775a1"
+        "league_api": "67fb9724a2d4c20e7f6c82e5a6196fdfd071fed29a6ff262357832b6e55854ea"
       }
     },
     {
@@ -1604,8 +1629,100 @@
         }
       ],
       "owner_hashes": {
-        "league_api": "d803485042a51f7c0d12379508011709413c1c0014827c3bca09ed70086775a1"
+        "league_api": "67fb9724a2d4c20e7f6c82e5a6196fdfd071fed29a6ff262357832b6e55854ea"
       }
+    },
+    {
+      "id": "league_api.recording",
+      "label": "Record champion select and game",
+      "topic": "Game recordings",
+      "trigger": {
+        "label": "Confirmed champion select or gameplay",
+        "event": "league_client.phase",
+        "kind": "poll"
+      },
+      "detail": "League production's `match_recording.py` owns opt-in champion-select/game recording, OBS status verification and the 60-second confirmed-end tail on `Service.poll`. Live game evidence wins over stale idle client phases; transport loss never stops a recording. Only owned outputs can be stopped. A fresh draft closes the previous tail. Two stable file samples precede finalization; failures retry without duplicate entries. Journaled closure resumes after restart, while already active OBS recordings remain manual after restart. `recording_audio.py` preflights clean OBS track 2 and full-mix track 3. One video contains both synchronized audio streams. `recording_timeline.py` maps original button times to OBS media time, correcting encoder startup and observed pauses. `recording_library.py` owns atomic capture history, active decisions, markers and three-day expiry. `recording_storage.py` validates exact folders and size/mtime for collision-safe moves or removal. Cleanup runs once a minute on the existing poll while OBS is stopped; kept files never expire. Legacy pending files receive a fresh three-day grace period. Durable deletion intent permits crash recovery; unrelated videos and replay clips never become deletion targets. Keep/Delete target the current owned game or latest completed capture, never an older fallback. An active delete waits for closure and Keep cancels it. Explicit review IDs can target older managed files. Instant Replay emits recording.replay request/completion events with one marker ID and original button time. League's bounded callback queue is registered only during service lifetime and drained by its existing worker. `recording_web/` owns visible-only polling, clear action feedback and seekable markers through thin HTTP routes. League production links to this review page. Existing keyboard workflows support case-insensitive *K* and *D*, plus /* markers. No new worker, encoder or keyboard hook is introduced.  ",
+      "steps": [
+        {
+          "id": "0",
+          "label": "Recording enabled?",
+          "owner": "league_api",
+          "kind": "gate",
+          "detail": "",
+          "setting": {
+            "path": "mini projects/league_api/match_recording_settings.json",
+            "key": "enabled"
+          }
+        },
+        {
+          "id": "1",
+          "label": "Verify OBS recording",
+          "owner": "league_api",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "2",
+          "label": "Wait 60 seconds after confirmed end",
+          "owner": "league_api",
+          "kind": "wait",
+          "detail": ""
+        },
+        {
+          "id": "3",
+          "label": "Stop owned recording and retain file",
+          "owner": "league_api",
+          "kind": "action",
+          "detail": ""
+        },
+        {
+          "id": "4",
+          "label": "Keep, delete, mark or expire after 3 days",
+          "owner": "league_api",
+          "kind": "end",
+          "detail": "Current game or latest closed capture; explicit IDs allow older managed files. Kept games never expire."
+        }
+      ],
+      "owner_hashes": {
+        "league_api": "4b5d06782df0c01240f580c18367f42cefb06dd7deddef262f1ec75215b550b5"
+      },
+      "evidence": [
+        {
+          "path": "mini projects/league_api/match_recording.py",
+          "symbol": "MatchRecording",
+          "hash": "2cbde6d173162cb852aa6d2f277c6813895180ca5b623d2cb8ff03be764d7292"
+        },
+        {
+          "path": "mini projects/league_api/main.py",
+          "symbol": "Service.poll",
+          "hash": "0eaa45582c6bf545abfc2503e9dfd9bfaaf9d15b3e3ddcd9150e15a2dd744f81"
+        },
+        {
+          "path": "mini projects/league_api/interface.py",
+          "symbol": "LeagueAPIInterface.run_action",
+          "hash": "d00c5bd7b5d43ac012d549615d13523f0d26b7e47c790fa705a5f8e955bbeaa0"
+        },
+        {
+          "path": "mini projects/league_api/recording_library.py",
+          "symbol": "RecordingLibrary",
+          "hash": "f25aade2f7a9bad10531afc94d981ed7cf6b8e05c58b2be09e1e683e8682286b"
+        },
+        {
+          "path": "mini projects/league_api/recording_storage.py",
+          "symbol": "RecordingStorage",
+          "hash": "b99fb02e38b76948241465e664359f80a5e57ad47a5c87a64fcc2aebd3aecf17"
+        },
+        {
+          "path": "mini projects/league_api/recording_timeline.py",
+          "symbol": "observe_clock",
+          "hash": "c720aaf527459e0c08f9b8167a88cada5e390fbd0117b265589a37350d5a83d0"
+        },
+        {
+          "path": "mini projects/league_api/recording_audio.py",
+          "symbol": "verify_audio",
+          "hash": "02e82417e5051c493723608b8b58a56416b30ec2f091107637e6cf74585c98b8"
+        }
+      ]
     }
   ]
 }

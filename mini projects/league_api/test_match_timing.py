@@ -89,6 +89,14 @@ class MatchTimingTests(unittest.TestCase):
         service.match_screens = self.screens
         service.match_timing = self.timing
         service.client_scenes = Mock(intent_revision=0)
+        service.client_scenes.snapshot.return_value = {'phase': 'InProgress', 'connected': True,
+                                                      'watching_replay': False}
+        recording_calls = []
+        def record_tick(phase, **kwargs):
+            self.assertFalse(service.lock._is_owned())
+            recording_calls.append((phase, kwargs))
+        service.match_recording = Mock()
+        service.match_recording.tick.side_effect = record_tick
         service.match_handoff = Mock(screen_id=None, origin=('Test', 0))
         service.stop_event = Mock()
         service.stop_event.is_set.side_effect = [False]*7 + [True]
@@ -106,6 +114,8 @@ class MatchTimingTests(unittest.TestCase):
         self.assertEqual(signals, [('game.connected', 100.5), ('game.disconnected', 102.5)])
         service.client_scenes.game_started.assert_called_once()
         service.client_scenes.game_ended.assert_called_once_with(expected_manual_revision=0)
+        self.assertEqual(len(recording_calls), 7)
+        self.assertEqual(sum(call[1]['ended'] for call in recording_calls), 1)
 
     def test_provider_is_withdrawn_and_callbacks_run_outside_contract_lock(self):
         policy = GameScenePolicy()

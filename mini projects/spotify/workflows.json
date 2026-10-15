@@ -17,7 +17,7 @@
         "event": "spotify.track",
         "kind": "poll"
       },
-      "detail": "The existing media observer also hosts scoped native playback interruption; overlay hide/show controls retain their existing behavior. Spotify capture discovers its root PID from the shared bounded process inventory; capture identity checks and its existing parent-owned process lifetime remain unchanged.",
+      "detail": "The existing Windows observer detects native Spotify starts/resumes and aborts registered background music through public source-owner APIs once per transport start. Song owners also cancel random mode and pending requests. Pausing Spotify never resumes an aborted Hub song. A newer Hub music selection pauses native Spotify before its source starts; no reciprocal coordinator pause claim or extra worker is added.",
       "steps": [
         {
           "id": "0",
@@ -49,8 +49,8 @@
         }
       ],
       "owner_hashes": {
-        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
-        "spotify": "9e4419de8bdf1a54758c2f69bb8a5c7c995614e1dc0c6a10e646aff39b5e040a"
+        "spotify": "08757d08a57bfee6ca8054ba686de92395e6fdd336b7149a1b10ff4be5fb8918",
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c"
       },
       "edges": [
         {
@@ -130,7 +130,7 @@
         {
           "path": "mini projects/spotify/service.py",
           "symbol": "watch_media",
-          "hash": "1c773027e18571403868f6cc7b261827bdb6c30b5fc531d2e8cf425747f6c7a9"
+          "hash": "2b27da5c0abc785267ed37cc93b0654070c4958ce4146efd30ebfcfc479d60b7"
         },
         {
           "path": "mini projects/spotify/http_server.py",
@@ -168,7 +168,7 @@
         "event": "source.request",
         "kind": "control"
       },
-      "detail": "Audio-stream metadata is checked before playback. Audible assets acquire a Spotify interruption immediately before source startup and release after source cleanup, including cancellation, timeout and failure. Silent or unknown media leaves Spotify alone. Overlapping claims restore only after the final release; already-paused Spotify stays paused. User resumes, changed tracks and stopped/replaced sessions revoke restoration. No fallback timer or extra worker is created. Native pause/play calls run on the existing WinRT observer. Admission is bounded and cancelled/expired claims are removed before delayed observation. Shutdown unregisters the provider, unblocks waiters and releases the owned pause.",
+      "detail": "New Hub songs and mood music explicitly request music focus: native Spotify must pause before source startup; failed music admission prevents overlapping playback. A newer song can reclaim focus after a user Spotify resume. Native Spotify starts/resumes abort registered background music and random playback through public revert contracts, once per transport start. Ordinary clip claims retain reference counting, cancelled/expired admission, same-session/track restoration and user-change revocation. Leases release after source cleanup; no additional worker or timer is added.",
       "steps": [
         {
           "id": "0",
@@ -225,15 +225,15 @@
         }
       ],
       "owner_hashes": {
-        "media_workers": "430dcd38f7473e0ef7852463e4282093c752c1e3ce682b8b599edad0ed625c55",
-        "spotify": "962a5537a6bae0e4cb656dfb136af8aab00f7c5fcc2b2febb2c6cc94707d3e6f",
-        "hub": "824b939a953686456ad9058cf90f8465df8d828350ec7da60ade3f47addf76ec"
+        "media_workers": "a23931f02ef2614b1357960ee7825f499225ec6fcf6f1ae77f82f514c3be7367",
+        "spotify": "14722a805c0ba8593c6746efcad48071f9c2e70991ed2f861295a14160b93926",
+        "hub": "058fd2de0786fa7a66fa9694713222e63cb37dd647035bd7e82ad65b9b8a7bfd"
       },
       "evidence": [
         {
           "path": "lib/audio_focus.py",
           "symbol": "interrupt_audio",
-          "hash": "c6e66744d3321bc32e2f6e3c2ffad4ff8248f9bffc05f52c7af99a0b1de60832"
+          "hash": "d9d1b2b51d7c61471e76fe11575cc6da917a05dee5bfa8193bbd1e160e800587"
         },
         {
           "path": "lib/media_metadata.py",
@@ -243,12 +243,17 @@
         {
           "path": "mini projects/spotify/playback_control.py",
           "symbol": "PlaybackControl",
-          "hash": "35ecf2c46f1c3bdbd9df537ffb1f955735d59dbd9fec7430bc16613a288f6f9b"
+          "hash": "1ca76e2ca0bf697aafa25de248f7d68b6bbdfb981d969884ae33bffba050a626"
         },
         {
           "path": "mini projects/spotify/service.py",
           "symbol": "watch_media",
-          "hash": "1c773027e18571403868f6cc7b261827bdb6c30b5fc531d2e8cf425747f6c7a9"
+          "hash": "2b27da5c0abc785267ed37cc93b0654070c4958ce4146efd30ebfcfc479d60b7"
+        },
+        {
+          "path": "mini projects/spotify/music_focus.py",
+          "symbol": "MusicFocus",
+          "hash": "ad495f35358e928cbfd4bdc1eaffaa90f3c83b32b8c4909e44b8ce1db8216f54"
         }
       ]
     }

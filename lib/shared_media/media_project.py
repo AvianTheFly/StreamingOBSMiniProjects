@@ -162,7 +162,10 @@ def run_media_project(
 
         target = play_asset_concurrent if data.get("concurrent", False) else play_asset
 
-        target(source)
+        if data.get("concurrent", False):
+            target(source, interrupt_music=data.get("interrupt_music", True))
+        else:
+            target(source)
 
     if cfg.event_name:
         hub_events.subscribe(cfg.event_name, on_event)

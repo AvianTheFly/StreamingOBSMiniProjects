@@ -1,0 +1,9 @@
+{
+  "enabled": true,
+  "excluded_audio_sources": [
+    "Desktop Audio",
+    "google chrome",
+    "ss__player",
+    "Hub Love_Me Effects"
+  ]
+}

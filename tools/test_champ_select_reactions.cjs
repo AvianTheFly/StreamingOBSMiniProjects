@@ -73,12 +73,11 @@ async function semantics() {
       const {WorldAssets}=await import('/champ-select/world-assets.js');const a=new WorldAssets();
       await Promise.all([a.load('bear'),a.load('turtle')]);
       const last={theme:a.theme,ready:a.ready,poses:a.poses.length};
-      a.dispose();return {...last,released:a.images.length===0&&a.poses.length===0};
+      a.dispose();return {...last,released:a.images.length===0&&a.poses.length===0&&a.guestFrames.size===0};
     });
     assert.deepEqual(lifetime,{theme:'turtle',ready:true,poses:3,released:true});
-    const secrets=await page.evaluate(async()=>{const {secretState}=await import('/champ-select/spirit-secrets.js');return [0,8,18,44,80].map(secretState);});
-    assert.deepEqual(secrets.map(s=>s.active),[false,true,false,true,true]);
-    assert.deepEqual(secrets.filter(s=>s.active).map(s=>s.variant),[0,1,2]);
+    const secrets=await page.evaluate(async()=>{const {secretProgram}=await import('/champ-select/secret-program.js');return Array.from({length:108},(_,t)=>secretProgram('bear',t).filter(s=>s.active).length);});
+    assert.ok(secrets.every(count=>count>=2&&count<=3),'two or three staggered discoveries throughout the rotation');
     const source=fs.readFileSync(path.join(feature,'champ_select_web/world-assets.js'),'utf8');
     assert.ok(!source.includes('PaintedPatch')&&!source.includes('mesh.draw'),'background artwork must not morph');
     assert.deepEqual(errors,[]);

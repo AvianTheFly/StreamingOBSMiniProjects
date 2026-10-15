@@ -276,7 +276,7 @@
         "event": "league:respawn_3s",
         "kind": "event"
       },
-      "detail": "Start Halo while still dead with 3.5 seconds remaining: its final beep is about three seconds into the asset, and the intentional extra polling interval compensates detection and playback startup. Fire once per death; never start on the actual respawn event.",
+      "detail": "Start Halo while still dead with 3.5 seconds remaining, once per death. The concurrent sfx.play event explicitly sets interrupt_music=False so the cue layers over Hub music and Spotify. The sound-effects source owner retains its module gate and serialized cleanup; detection and polling compensation are unchanged.",
       "steps": [
         {
           "id": "0",
@@ -308,10 +308,10 @@
         }
       ],
       "owner_hashes": {
-        "coordination": "c4fc5a67e5e47be4bc18ef0c9359201377f1dcd8de6671d557968aab81c68b17",
-        "sound_effects": "65bc17c0f7ab29429802b35c59fa6efcad6523e844464de8e612baeecf2eac3d",
         "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
-        "league": "91267dbdf4b7a8a30f3e3e1d628858e033c7a73d1082edec1315f33de7c8b05e"
+        "sound_effects": "65bc17c0f7ab29429802b35c59fa6efcad6523e844464de8e612baeecf2eac3d",
+        "league": "34842f507064fae850ca169d3cc9270dbfe136fdf71419c774f48e7f850a0b86",
+        "coordination": "75830bfb9b0c501c3bde2e42d470c914410b3e8310d04af7c61f48505744b6d5"
       },
       "edges": [
         {
@@ -331,7 +331,7 @@
         {
           "path": "mini projects/league/handlers/player_events.py",
           "symbol": "make_respawn_sfx_handler",
-          "hash": "ecda03697bc299226a525505ac3238acdc25edc4c72dc42881fc74b377c10eba"
+          "hash": "58d4aa0c8b582f6b7557253732e88afc24cf43322e3b9a4cf93d5788cdc1e11b"
         }
       ]
     },

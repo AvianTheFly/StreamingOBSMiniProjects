@@ -77,8 +77,8 @@ def replay_paths(paths):
     return _eligible_paths(paths, replay_candidate)
 
 
-def remember_capture(path, *, tag="untagged", saved_at=None, purpose='highlight', capture_source=None):
-    """Persist a newly saved cut's selection metadata without touching UI data."""
+def remember_capture(path, *, tag="untagged", saved_at=None, purpose='highlight', capture_source=None, title=None):
+    """Persist capture purpose and an optional title; retain other personal fields."""
     path = Path(path).resolve()
     with LOCK, json_transaction(STATE_FILE):
         data = read()
@@ -89,6 +89,8 @@ def remember_capture(path, *, tag="untagged", saved_at=None, purpose='highlight'
                     review_state='pending' if purpose == 'review_later' else 'kept')
         if capture_source:
             meta['capture_source'] = str(Path(capture_source).resolve())
+        if title is not None and str(title).strip():
+            meta['title'] = ' '.join(str(title).split())[:160]
         _write(data)
 
 

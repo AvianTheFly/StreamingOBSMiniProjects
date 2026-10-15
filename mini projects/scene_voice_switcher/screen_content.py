@@ -9,6 +9,7 @@ SOURCES = {'udyr': 'Hub Lobby Udyr', 'client': 'League of Legends champ select',
            'desktop': 'Display Capture', 'chrome': 'google chrome'}
 LABELS = {'udyr': 'Udyr animation', 'client': 'League client', 'desktop': 'Desktop', 'chrome': 'Google Chrome'}
 HIDDEN = 'none'
+RECAP_SOURCE = 'League Match Chronicle Auto'
 
 
 def choice(data=None):
@@ -21,7 +22,10 @@ def choice(data=None):
 
 def blueprint(data=None):
     selected = choice(data)
-    return ({'scene': CAPTURE_SCENE, 'sources': [*SOURCES.values(), ORIGINAL_UDYR], 'selected': SOURCES.get(selected)}
+    from .presentation import transform
+    return ({'scene': CAPTURE_SCENE, 'sources': [*SOURCES.values(), ORIGINAL_UDYR, RECAP_SOURCE], 'selected': SOURCES.get(selected),
+             'modes': {'league_idle': SOURCES['client'], 'league_queue': RECAP_SOURCE}}
+            | {'transforms': {SOURCES['udyr']: transform((0, 0, 1920, 1080))} if selected == 'udyr' else {}}
             if selected is not None else None)
 
 
@@ -65,7 +69,7 @@ def visibility(source, *, client=None):
         parent = container_items(client, source).scene_items
         linked = any(r['sourceName'] == CAPTURE_SCENE and r['sceneItemEnabled'] for r in parent)
         children = client.get_scene_item_list(CAPTURE_SCENE).scene_items
-        active = any(r['sourceName'] in SOURCES.values() and r['sceneItemEnabled'] for r in children)
+        active = any(r['sourceName'] in (*SOURCES.values(), RECAP_SOURCE) and r['sceneItemEnabled'] for r in children)
         return {'source': source, 'visible': linked and active}
 
 

@@ -67,7 +67,6 @@
         "middle of the night": 0.66,
         "I'm an albatroz": -4.31,
         "When you win in UNO": 2.1,
-        "wasteland": -3.41,
         "Breath Backstreet Euphoria": 1.39,
         "el gato on my mind": -10.24,
         "I hope your life sucks": -6.21,
@@ -85,7 +84,8 @@
         "ODST": 2.1,
         "cat rave": -6.21,
         "monster": -3.3,
-        "toothless": -3.41
+        "toothless": -3.41,
+        "wasteland": 2.1
       },
       "group_names": {},
       "display_names": {},

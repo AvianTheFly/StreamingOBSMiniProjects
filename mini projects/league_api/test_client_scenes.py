@@ -163,6 +163,21 @@ class ClientSceneTests(unittest.TestCase):
         self.assertEqual(reader.chat_messages({'chatDetails': {'chatRoomName': 'draft-room'}}),
                          [{'id': '3', 'body': 'test message', 'sender': 'TEAM'}])
 
+    def test_chat_sender_matches_numeric_strings_without_mapping_hidden_zero_ids(self):
+        reader = LeagueClient()
+        reader.get = lambda path: ([{'id': 'draft', 'type': 'championSelect'}]
+            if path.endswith('conversations') else [
+                {'id': 'a', 'body': 'local', 'fromSummonerId': '42', 'type': 'chat'},
+                {'id': 'b', 'body': 'alias', 'fromSummonerId': '43', 'type': 'chat'},
+                {'id': 'c', 'body': 'hidden', 'fromSummonerId': '0', 'type': 'chat'},
+                {'id': 'd', 'body': 'missing', 'type': 'chat'}])
+        data = {'localPlayerCellId': 0, 'myTeam': [
+            {'cellId': 0, 'summonerId': 42},
+            {'cellId': 1, 'summonerId': 43, 'obfuscatedSummonerName': 'Krugs'},
+            {'cellId': 2, 'summonerId': 0, 'obfuscatedSummonerName': 'Gromp'}]}
+        self.assertEqual([m['sender'] for m in reader.chat_messages(data)],
+                         ['YOU', 'Krugs', 'TEAM', 'TEAM'])
+
     def test_phase_routes_keep_queue_through_bans_then_show_draft(self):
         for phase in ['Matchmaking', 'ReadyCheck']:
             self.assertEqual(route(phase), 'queue')

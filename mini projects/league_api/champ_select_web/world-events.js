@@ -1,5 +1,6 @@
 import {scenes,path,light,clamp,smooth,traceSlot} from './scene-map.js';
 import {layouts} from './layout.js';
+import {paintResonance} from './team-resonance.js';
 import {paintLock} from './spirit-locks.js';
 import {BAN,CHAT} from './vfx-timing.js';
 import {TAU,seed,out,arc,ribbon,lightning,ring,feather,burst,mist,apparition} from './vfx-ink.js';
@@ -58,6 +59,8 @@ function ready(c,t,theme,e,assets){
 }
 export function paintEvents(c,t,theme,events,assets){
  c.save();c.globalCompositeOperation='screen';
+ // At most two traveling waves per team; every selected card keeps its local impact.
+ for(const enemy of [false,true])for(const e of events.filter(e=>e.kind==='lock'&&!!e.enemy===enemy).slice(-2))paintResonance(c,t,theme,e);
  for(const e of events){if(e.kind==='lock')paintLock(c,t,theme,e,assets);else if(e.kind==='ban')ban(c,t,theme,e,assets);else if(e.kind==='chat')chat(c,t,theme,e,assets);else if(e.kind==='ready')ready(c,t,theme,e,assets);}
  c.restore();
 }

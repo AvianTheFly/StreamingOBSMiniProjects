@@ -56,3 +56,57 @@ most 30 seconds share the first-kill anchor. Replay-only quick captures retain
 their existing selectable duration. Storage remains `C:\StreamingMedia\Replays`.
 A pre-change profile copy is in `C:\StreamingMedia\HubReviewArtifacts\replay-minute-20261010`;
 it may include private settings and must not be published.
+
+## Automatic League recordings (updated 2026-10-14)
+
+Champion select starts recording; gameplay verifies OBS every two seconds.
+Confirmed end stops it after 60 seconds; a new draft closes the old file first.
+Live gameplay overrides stale idle client phases. Transport loss alone never
+stops a recording. OBS and REPLAY_DIR remain C:/StreamingMedia/Replays.
+
+- *K* or *k*: keep the current owned game or the latest completed game permanently.
+- *D* or *d*: delete the latest completed game, or queue the active game for
+  deletion after OBS closes it. Keep cancels a queued active-game delete.
+- / then *: mark a moment in the active owned game. Type the whole sequence
+  within 0.8 seconds. Existing *- and -* screen shortcuts remain unchanged.
+- Instant Replay saves add original-button-time markers and attach the finished
+  clip path, including when encoding finishes after the game has closed.
+
+Completed files move to Unreviewed Games and expire after three days unless kept.
+Keep moves them to Kept Games; kept files never expire. Cleanup runs once a
+minute while the Hub is running and OBS recording is stopped. Missed deadlines
+run on the next eligible Hub poll. Existing journaled pending files without an
+expiry get a fresh three-day grace period. Other videos, old F: recordings and
+separate replay clips are never swept. Delete checks allowed folders and exact
+size/mtime, saves intent before unlink, and recovers interrupted removal. Moves
+wait for closed, stable files and preserve both filenames on collision.
+
+Open League production → Game recordings & markers in the Hub, or
+http://127.0.0.1:7431/recordings. Select a game and click a marker to seek. Older
+managed games have individual Keep/Delete controls. Deleted games retain metadata.
+The atomic match_recordings.json stores decisions, expiry, markers, clock anchors
+and audio labels, preserving unknown fields. Existing manual recordings remain
+manual. An active recording survives Hub shutdown and stays manual after restart;
+a journaled file already being finalized resumes finalization on startup.
+
+### Audio
+
+OBS Simple recording uses tracks 2 and 3 (RecTracks=6): one video stream and two
+synchronized audio streams, with no duplicate video or separate sidecar to lose.
+The first audio stream is clean game/microphone audio; the second is the full
+mix with music. The browser previews clean audio. Select the second stream in
+a video editor or a player with audio-track selection. Both share a time origin.
+
+Desktop Audio, Chrome capture, ss__player and Hub Love_Me Effects are excluded
+from track 2. Spotify/Chrome playback reaches the full mix through Desktop Audio;
+application-specific League and Discord captures supply clean audio. Track 3
+mirrors the existing live-mix routing. Volumes, filters and placements survive.
+Preflight blocks changed output tracks or known music sources on track 2.
+Music physically picked up by the microphone cannot be removed by app routing.
+The replay buffer also retains both tracks, with clean audio first.
+
+Diagnostic recordings and replays verified one video/two synchronized audio
+streams and isolated test tones. Diagnostic footage is outside personal inventory
+under C:/StreamingMedia/HubReviewArtifacts/game-recording-20261014 and
+output/game-recording-update. OBS profile backups remain outside the checkout
+under LOCALAPPDATA/StreamingHub/recording-audio-backup-20261014.

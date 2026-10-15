@@ -5,7 +5,7 @@ from .champ_select_obs import SOURCE, URL, recover_browser
 
 
 class DraftBrowserRecoveryTests(unittest.TestCase):
-    def test_refresh_after_server_start_repairs_only_url_and_activation(self):
+    def test_refresh_after_server_start_repairs_delivery_and_frame_rate_only(self):
         client = Mock()
         client.send.side_effect = [
             {'inputs': [{'inputName': SOURCE, 'inputKind': 'browser_source'}]},
@@ -15,7 +15,7 @@ class DraftBrowserRecoveryTests(unittest.TestCase):
             self.assertTrue(recover_browser(client))
             backups.return_value.snapshot.assert_called_once()
         self.assertEqual(client.send.call_args_list[2].args, ('SetInputSettings', {
-            'inputName': SOURCE, 'inputSettings': {'url': URL, 'restart_when_active': True},
+            'inputName': SOURCE, 'inputSettings': {'url': URL, 'restart_when_active': True, 'fps': 60, 'fps_custom': True},
             'overlay': True}))
         self.assertEqual(client.send.call_args_list[3].args[0], 'PressInputPropertiesButton')
 
@@ -29,7 +29,7 @@ class DraftBrowserRecoveryTests(unittest.TestCase):
         client = Mock()
         client.send.side_effect = [
             {'inputs': [{'inputName': SOURCE, 'inputKind': 'browser_source'}]},
-            {'inputSettings': {'url': URL, 'restart_when_active': True}}, {}]
+            {'inputSettings': {'url': URL, 'restart_when_active': True, 'fps': 60, 'fps_custom': True}}, {}]
         with patch('league_api.champ_select_obs.SettingsBackups') as backups:
             self.assertTrue(recover_browser(client))
             backups.assert_not_called()

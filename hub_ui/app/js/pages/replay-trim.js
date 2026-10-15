@@ -10,17 +10,18 @@ export function mountTrim(host, video, clip, onSaved, onRevision) {
   let disposed = false, frame, timer;
   const $ = selector => host.querySelector(selector);
   host.innerHTML = `<section class="ir-trim" aria-label="Trim replay">
-    <div class="ir-heading"><h3>Trim a moment</h3><span id="irTrimLength" class="ir-muted"></span></div>
-    <p class="ir-muted">Scrub the preview, then set your start and end. Save the moment as a new clip.</p>
+    <div class="ir-heading"><h3>Keep the good part</h3></div>
+    <p class="ir-muted">Drag Start and End, then preview your cut.</p>
+    <div id="irTrimLength" class="ir-trim-selection"></div>
     <fieldset id="irTrimControls" disabled>
       <div class="ir-trim-track" aria-hidden="true"><span id="irTrimRegion"></span><i id="irTrimCursor"></i></div>
-      <div class="ir-trim-range"><label for="irTrimStart">Start</label><input id="irTrimStart" type="range" min="0" step="0.1" value="0"><input id="irTrimStartNumber" type="number" min="0" step="0.1" value="0" aria-label="Trim start in seconds"></div>
-      <div class="ir-trim-range"><label for="irTrimEnd">End</label><input id="irTrimEnd" type="range" min="0.1" step="0.1"><input id="irTrimEndNumber" type="number" min="0.1" step="0.1" aria-label="Trim end in seconds"></div>
-      <div class="ir-actions"><button class="btn btn-secondary btn-sm" id="irTrimSetStart">Start here</button><button class="btn btn-secondary btn-sm" id="irTrimSetEnd">End here</button><span id="irTrimPosition" class="ir-muted"></span></div>
+      <div class="ir-trim-range"><label for="irTrimStart">Start <small>seconds</small></label><input id="irTrimStartNumber" type="number" min="0" step="0.1" value="0" aria-label="Trim start in seconds"><input id="irTrimStart" type="range" min="0" step="0.1" value="0"></div>
+      <div class="ir-trim-range"><label for="irTrimEnd">End <small>seconds</small></label><input id="irTrimEndNumber" type="number" min="0.1" step="0.1" aria-label="Trim end in seconds"><input id="irTrimEnd" type="range" min="0.1" step="0.1"></div>
       <div class="ir-actions"><button class="btn btn-secondary btn-sm" data-last="10">Last 10s</button><button class="btn btn-secondary btn-sm" data-last="30">Last 30s</button><button class="btn btn-secondary btn-sm" id="irTrimReset">Full clip</button></div>
-      <div class="ir-actions"><button class="btn btn-secondary btn-sm" id="irTrimPreview">Preview selection</button><label class="ir-check ir-muted"><input id="irTrimLoop" type="checkbox"> Loop selection</label></div>
+      <div class="ir-actions ir-trim-audition"><button class="btn btn-secondary" id="irTrimPreview">▷ Preview cut</button><label class="ir-check ir-muted"><input id="irTrimLoop" type="checkbox"> Loop</label></div>
       <label class="ir-trim-name" for="irTrimName">New clip name<input id="irTrimName" maxlength="160" value="${esc((clip.title + " (cut)").slice(0, 160))}"></label>
-      <div class="ir-actions"><button class="btn btn-primary btn-sm" id="irTrimSave">Save trimmed copy</button><span class="ir-muted">Original kept · full resolution</span></div>
+      <div class="ir-trim-save"><button class="btn btn-primary" id="irTrimSave">Save trimmed copy</button><span class="ir-muted">Your original stays untouched.</span></div>
+      <details class="ir-trim-fine"><summary>Use the current video position</summary><div class="ir-actions"><button class="btn btn-secondary btn-sm" id="irTrimSetStart">Start here</button><button class="btn btn-secondary btn-sm" id="irTrimSetEnd">End here</button><span id="irTrimPosition" class="ir-muted"></span></div></details>
     </fieldset>
     <p id="irTrimStatus" class="ir-muted" role="status">Loading clip duration…</p>
   </section>`;
@@ -37,7 +38,7 @@ export function mountTrim(host, video, clip, onSaved, onRevision) {
     $("#irTrimLength").textContent = `${time(start)} → ${time(end)} · ${(end - start).toFixed(1)}s selected`;
     $("#irTrimRegion").style.left = `${100 * start / (duration || 1)}%`;
     $("#irTrimRegion").style.width = `${100 * (end - start) / (duration || 1)}%`;
-    $("#irTrimPreview").textContent = audition ? "Stop preview" : "Preview selection";
+    $("#irTrimPreview").textContent = audition ? "Ⅱ Stop preview" : "▷ Preview cut";
     $("#irTrimSave").disabled = saving || !duration || !$("#irTrimName").value.trim();
     $("#irTrimSave").textContent = saving ? "Saving copy…" : "Save trimmed copy";
     position();
@@ -69,7 +70,7 @@ export function mountTrim(host, video, clip, onSaved, onRevision) {
   function loaded() {
     if (!Number.isFinite(video.duration) || video.duration < 0.1) return;
     duration = Math.floor(video.duration * 10) / 10; end = duration;
-    $("#irTrimStatus").textContent = "Times are in seconds. Drag either slider or enter an exact time.";
+    $("#irTrimStatus").textContent = "";
     update();
   }
   function changeRange(which, value) {

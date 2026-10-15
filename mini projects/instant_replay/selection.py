@@ -32,10 +32,12 @@ class ReplaySelection:
         if self._deferred_thread is not None:
             self._deferred_thread.join(timeout=2)
 
-    def capture_and_replay(self, capture, *, seconds=0, purpose='highlight', pressed_at=None):
+    def capture_and_replay(self, capture, *, seconds=0, purpose='highlight', pressed_at=None,
+                           tag='', full_save=False):
         if self.playback._playback_gate.locked() or self._deferred_gate.locked():
             return False
-        if not capture._on_save(clip_seconds=seconds, purpose=purpose, pressed_at=pressed_at):
+        options = dict(tag=tag, full_save=full_save) if tag or full_save else {}
+        if not capture._on_save(clip_seconds=seconds, purpose=purpose, pressed_at=pressed_at, **options):
             return False
         return self.queue_saved_replay(force_replay=True, mode='replay')
 
@@ -88,13 +90,18 @@ class ReplaySelection:
           "<tag>"              -> most recent clip of that tag
           "<tag> <N>"          -> Nth clip of that tag
 
-        During multi-clip playback, pressing '|' skips to the next clip.
+        During playback, press '|' and say next, pause, resume or stop.
         """
         spec_lower = spec.strip().lower()
         force_replay = spec_lower == 'replay'
         force_showcase = spec_lower == 'showcase'
         if force_replay or force_showcase:
             spec_lower = 'last'
+        if spec_lower.startswith('name '):
+            from . import library
+            clips = library.search_paths(spec_lower[5:].strip(), REPLAY_DIR)
+            self.playback._play_all_clips_sequential(clips)
+            return
         if spec_lower.startswith(('intro ', 'group ')):
             from . import library
             try:
@@ -108,7 +115,7 @@ class ReplaySelection:
             if not candidates:
                 print('[instant_replay] No saved clips available for random playback.')
                 return
-            print(f"[instant_replay] 🎲 Continuous random started ({len(candidates)} clip(s)). Press '|' again or say 'stop replay' to leave; use Stop Replay in the Hub too.")
+            print(f"[instant_replay] 🎲 Continuous random started ({len(candidates)} clip(s)). Press '|' and say 'stop' to leave; use Stop Replay in the Hub too.")
             self.playback._play_all_clips_sequential([], random_forever=True)
             return
         game_match = re.match('game\\s+(\\d+|one|two|three|four|five|six|seven|eight|nine|ten|last|latest)$', spec_lower)
@@ -144,7 +151,7 @@ class ReplaySelection:
             print(f'[instant_replay] Playing legacy reel: {reel_path.name}')
             self.playback._play_all_clips_sequential([str(reel_path)], presentation='highlights')
             return
-        if spec_lower and any((kw in spec_lower for kw in _HIGHLIGHTS_KEYWORDS)):
+        if spec_lower in _HIGHLIGHTS_KEYWORDS:
             with self.state._lock:
                 current_clips = [e['path'] for e in self.state._clip_registry]
                 prev_clips = [e['path'] for e in self.state._previous_game_clips]
@@ -169,11 +176,11 @@ class ReplaySelection:
                     print("[instant_replay] No game clips yet. Save some with '|' + 'save' during a game.")
                     return
             if clips:
-                print(f"[instant_replay] Playing {label}. Press '|' to skip to next clip.")
+                print(f"[instant_replay] Playing {label}. Press '|' and say 'next' to skip.")
                 self.playback._play_all_clips_sequential(clips, presentation='highlights')
                 return
         if spec_lower and spec_lower not in ('last',):
-            if not any((kw in spec_lower for kw in _HIGHLIGHTS_KEYWORDS)):
+            if spec_lower not in _HIGHLIGHTS_KEYWORDS:
                 clips = self.library._resolve_play_spec(spec_lower)
                 if not clips:
                     print(f'[instant_replay] ⚠  No clips match {spec!r}. Available tags: {self.library._format_tag_summary()}')

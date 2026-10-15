@@ -1,10 +1,11 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Spirit sanctuary · Loading</title><link rel="stylesheet" href="/stage/stage.css"></head>
 <body><main id="stage" hidden>
-  <div class="sanctuary"></div><div class="shade"></div>
-  <header><span>THE FOUR SPIRITS</span><span>SUMMONER’S RIFT</span></header>
-  <div class="invocation"><span class="seal">✧</span><small>THE SPIRITS GATHER</small><h1>Awaken the wild.</h1></div>
-  <section class="roster left" aria-label="Team one"><h2>TEAM ONE</h2><div id="allies"></div></section>
-  <section class="roster right" aria-label="Team two"><h2>TEAM TWO</h2><div id="enemies"></div></section>
-  <footer><div class="spirits"><span>BEAR</span><i></i><span>BOAR</span><i></i><span>RAM</span><i></i><span>PHOENIX</span></div><div class="loading"><i></i><span id="loadingLabel">ENTERING THE RIFT</span></div></footer>
+  <div class="sanctuary"></div><div class="shade"></div><canvas id="loadingEffects" width="960" height="540" aria-hidden="true"></canvas><div class="vignette"></div>
+  <header><div class="brand-mark">◇</div><div class="brand"><span>LEAGUE OF LEGENDS</span><strong>THE SUMMONING CHAMBER</strong></div><div class="location"><span>SUMMONER’S RIFT</span><small>THE FOUR SPIRITS</small></div></header>
+  <div class="ceremony-caption"><span class="ceremony-rule"></span><small id="spiritTitle">THUNDER AWAKENS</small><span class="ceremony-rule"></span></div>
+  <div class="invocation"><small>TEN CHAMPIONS. ONE RIFT.</small><h1>The wild<br><em>awakens.</em></h1><div class="ritual-line"><i></i><span>A NEW BATTLE IS TAKING SHAPE</span><i></i></div></div>
+  <section class="roster left" aria-label="Allied team"><div class="team-heading"><span class="team-emblem">Ⅰ</span><div><small>BOUND BY PURPOSE</small><h2>YOUR ALLIANCE</h2></div><b>01 — 05</b></div><div id="allies"></div></section>
+  <section class="roster right" aria-label="Opposing team"><div class="team-heading"><span class="team-emblem">Ⅱ</span><div><small>DESTINED TO COLLIDE</small><h2>RIVAL ALLIANCE</h2></div><b>06 — 10</b></div><div id="enemies"></div></section>
+  <footer><div class="spirits"><span data-spirit="bear"><b>ϟ</b>BEAR<small>THUNDER</small></span><span data-spirit="turtle"><b>◇</b>TURTLE<small>JADE</small></span><span data-spirit="ram"><b>⋈</b>RAM<small>FORGE</small></span><span data-spirit="phoenix"><b>✧</b>PHOENIX<small>AURORA</small></span></div><div class="loading"><i></i><span id="loadingLabel">ENTERING THE RIFT</span><i></i></div></footer>
 </main><aside id="queue" hidden><span class="queue-seal">✧</span><div><small>LEAGUE OF LEGENDS</small><strong id="queueLabel">IN QUEUE</strong></div><span class="queue-pulse"></span></aside><script type="module" src="/stage/stage.js"></script></body></html>

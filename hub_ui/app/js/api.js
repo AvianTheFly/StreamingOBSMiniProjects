@@ -49,6 +49,7 @@ export const api = {
 
   // ── Instant replay ────────────────────────────────────────────────────
   getReplayClips: () => _req("GET", "/api/projects/instant_replay/clips"),
+  getReplayCommands: () => _req('GET', '/api/projects/instant_replay/commands'),
   getReplayQueue: () => _req('GET', '/api/projects/instant_replay/queue'),
   editReplayQueue: data => _req('POST', '/api/projects/instant_replay/queue', data),
   playReplayPaths: paths => _req('POST', '/api/projects/instant_replay/play', {paths,mode:'showcase'}),

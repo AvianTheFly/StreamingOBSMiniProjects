@@ -1,8 +1,8 @@
 import {clamp,smooth,pulse,path,light,scenes} from './scene-map.js';
 import {bird} from './world-art.js';
-// One miniature act, then 26 seconds of quiet. No labels, timers or global cues.
-export function secretState(t){const cycle=Math.floor(t/36),age=t%36-8;return {variant:cycle%3,age,active:age>=0&&age<10};}
-const contacts={bear:[230,962,38],turtle:[533,958,43],ram:[606,933,36],phoenix:[1540,1000,39]};
+import {secretProgram} from './secret-program.js';
+import {paintVisitor} from './secret-visitors.js';
+export {secretState} from './secret-program.js';
 const shadow=(c,x,y)=>{c.save();c.fillStyle='#031014';c.globalAlpha=.35;c.beginPath();c.ellipse(x,y,18,4,0,0,Math.PI*2);c.fill();c.restore();};
 function pearl(c,x,y,r=4){light(c,x,y,r*2,r*2,'#cbffe2',.35);c.fillStyle='#dcf3db';c.globalAlpha=1;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();}
 function prop(c,theme,x,y){c.save();c.globalAlpha=.95;
@@ -11,9 +11,8 @@ function prop(c,theme,x,y){c.save();c.globalAlpha=.95;
  if(theme==='ram'){c.fillStyle='#394044';c.fillRect(x+18,y-13,25,6);c.fillRect(x+24,y-7,14,7);path(c,[[x+16,y-14],[x+45,y-14],[x+49,y-18]],'#c6a265',2,.9);}
  if(theme==='phoenix'){path(c,[[x+25,y],[x+25,y-23]],'#c4b79b',2,.8);c.fillStyle='#222936';c.beginPath();c.moveTo(x+10,y-20);c.lineTo(x+25,y-30);c.lineTo(x+40,y-20);c.closePath();c.fill();}
  c.restore();}
-export function paintSecrets(c,t,theme,events,assets,clock=t){const [x,y,h]=contacts[theme],s=secretState(clock),color=scenes[theme].colors[0];prop(c,theme,x,y);
- if(!s.active||events.some(e=>t-e.at<2.8))return;
- const {age:a,variant:v}=s,enter=smooth(a/1.6),exit=smooth((a-8.2)/1.8),alpha=enter*(1-exit),walk=-32*(1-enter)+exit*38;
+function paintOriginal(c,t,theme,assets,s){const {x,y,h}=s,color=scenes[theme].colors[0];prop(c,theme,x,y);
+ const a=s.age*10/16,v=s.variant,enter=smooth(a/1.2),exit=smooth((a-8.8)/1.2),alpha=enter*(1-exit),walk=-24*(1-enter)+exit*24;
  let pose=0,dx=walk,dy=0,turn=0,squash=1;shadow(c,x+dx,y);
  if(theme==='bear'){
   // Curious Kirby: test conductor / thunder sneeze / tiny grounded lightning kite.
@@ -40,4 +39,15 @@ export function paintSecrets(c,t,theme,events,assets,clock=t){const [x,y,h]=cont
   if(a>=5&&a<8){pose=2;dy+=pulse(a,5,2)*8;if(v===0){for(let k=0;k<3;k++)light(c,x-18+k*3,y-25-(a-5)*14,2,4,'#cceeff',alpha*.4);}if(v===1){c.fillStyle='#e6f8ff';c.globalAlpha=alpha;c.beginPath();c.ellipse(x,y-h+2,14,5,0,0,Math.PI*2);c.fill();}if(v===2)bird(c,x-22-(a-5)*10,y-26-(a-5)*7,5,a,color,alpha);}
  }
  assets.sprite(c,pose,x+dx,y+dy,h,{alpha,turn,squash});
+}
+
+// Keep every act inside its own scenery pocket, including props and shadows.
+export function paintSecrets(c,t,theme,events,assets,clock=t){
+ for(const spot of secretProgram(theme,clock)){
+  if(!spot.active)continue;
+  c.save();c.beginPath();c.rect(...spot.box);c.clip();
+  if(spot.original)paintOriginal(c,t,theme,assets,spot);
+  else paintVisitor(c,clock,theme,spot,assets);
+  c.restore();
+ }
 }

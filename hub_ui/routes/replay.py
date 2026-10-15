@@ -3,7 +3,10 @@ import urllib.parse
 
 class ReplayRoutes:
     def _get_replay(self, action):
-        if action == "clips":
+        if action == 'commands':
+            from instant_replay.api import voice_commands
+            self._json(200, voice_commands())
+        elif action == "clips":
             try:
                 from instant_replay.api import clips
                 query = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)

@@ -1,5 +1,6 @@
 import {objectiveName,objectiveIcon,icon} from './postgame-stories.js';
-import {highlights,tempo,combat,economy,vision} from './postgame-analysis.js';
+import {tempo,economy,vision} from './postgame-analysis.js';
+import {overview,teamDamage,visualStory} from './postgame-visuals.js';
 const el=id=>document.getElementById(id);
 export const time=v=>Number.isFinite(v)?`${Math.floor(v/60)}:${String(Math.floor(v%60)).padStart(2,'0')}`:'—';
 const num=(v,d=0)=>Number.isFinite(v)?v.toLocaleString('en-US',{maximumFractionDigits:d,minimumFractionDigits:d}):'—';
@@ -16,7 +17,7 @@ export function renderReport(s){const r=s.match,m=r.metrics||{},l=s.lifetime;
  el('chronicle').classList.toggle('loss',r.win===false);
  const champion=catalog.champions?.[r.champion_id];el('backdrop').style.backgroundImage=champion?.splash?`url("${champion.splash}")`:'';
  el('portrait').innerHTML=art('champions',r.champion_id,r.champion,'portrait');
- el('identity').textContent=r.champion||'Match recap';el('role').textContent=r.role||'';el('duration').textContent=time(r.duration);el('outcome').textContent=r.win==null?'Partial':'◆';el('outcome').setAttribute('aria-label',r.win===true?'Win':r.win===false?'Loss':'Partial capture');
+ el('identity').textContent=r.champion||'Match recap';el('role').textContent=r.role||'';el('duration').textContent=time(r.duration);el('outcome').textContent=r.win==null?'PARTIAL':r.win?'WIN':'LOSS';el('outcome').setAttribute('aria-label',r.win===true?'Win':r.win===false?'Loss':'Partial capture');
  el('kda').innerHTML=`${num(m.kills)} <span class="deaths">/ ${num(m.deaths)}</span> / ${num(m.assists)}`;
  el('scoreline').innerHTML=metric('Kill participation',Number.isFinite(m.kill_participation)?num(m.kill_participation)+'%':'—')+metric('CS / min',num(m.cs_per_minute,1))+metric('Champion damage',short(m.damage_champions))+metric('Gold earned',short(m.gold_earned))+metric('Vision score',num(m.vision_score));
  el('items').innerHTML=(r.items||[]).slice(0,7).map(i=>art('items',i.id,i.name)).join('')||'<span class="quiet">Inventory unavailable</span>';
@@ -30,16 +31,18 @@ function build(s,cycle){const v=s.visuals||{},p=v.build||[],skills=v.skills||[],
 }
 const glyph={kill:'⚔',death:'×',assist:'✦',objective:'◆',vision:'◉',skill:'↑',level:'↑',milestone:'★',item:'▣'};
 function eventHTML(e){const labels={kill:'Kill',death:'Death',assist:'Assist',skill:'Upgrade'};return `<div class="event" data-kind="${esc(e.kind)}" data-side="${esc(e.side)}"><span class="event-icon" aria-hidden="true">${e.item_id?art('items',e.item_id,e.detail):e.kind==='objective'?icon(objectiveIcon(e.label)):glyph[e.kind]||'◆'}</span><div><time>${time(e.time)}${e.source==='observed'?' ≈':''}</time><b title="${esc(e.label)}">${esc(e.kind==='objective'?objectiveName(e.label):labels[e.kind]||e.label)}</b><small title="${esc(e.detail)}">${esc(e.detail)}</small></div></div>`;}
-export const views=['Highlights','Tempo','Combat','Build','Economy','Vision','Moments'];
+export const views=['Highlights','Tempo','Combat','Build','Economy','Vision','Moments','Story'];
 export function renderView(s,index,cycle=0){let content,pageNote='';
- if(index===0){content=highlights(s,cycle);pageNote=cycle%2?'Your recent baseline':'Your match highlights';}
+ if(index===0){content=overview(s);pageNote='Your match at a glance';}
  if(index===1){content=tempo(s,cycle);pageNote='Progress over time';}
  if(views[index]==='Build'){content=build(s,cycle);pageNote='Purchase & upgrade order';}
  if(views[index]==='Moments'){const events=s.stories?.moments||s.events||[],count=Math.max(1,Math.ceil(events.length/6)),page=cycle%count;content=`<div class="events-grid">${events.slice(page*6,page*6+6).map(eventHTML).join('')||quiet('No personal combat or objectives recorded')}</div>`;pageNote=`${page+1}/${count} · ${events.length} moments`;}
- if(views[index]==='Combat'){content=combat(s);pageNote='Damage, survival & spell use';}
+ if(views[index]==='Combat'){content=teamDamage(s,art);pageNote='Team damage';}
  if(views[index]==='Economy'){content=economy(s);pageNote='Gold flow';}
  if(views[index]==='Vision'){content=vision(s,cycle);pageNote='Wards & objective timings';}
+ if(views[index]==='Story'){content=visualStory(s,cycle);pageNote='A different angle on your game';}
  el('view').innerHTML=content;el('pageLabel').textContent=pageNote;
+ document.querySelector('nav').dataset.title=views[index];
  // Keep focused controls mounted while the shared playhead updates.
  if(!el('tabs').children.length)el('tabs').innerHTML=views.map((v,i)=>`<button data-view="${i}" aria-current="false">${v}</button>`).join('');
  el('tabs').querySelectorAll('button').forEach((b,i)=>b.setAttribute('aria-current',String(i===index)));

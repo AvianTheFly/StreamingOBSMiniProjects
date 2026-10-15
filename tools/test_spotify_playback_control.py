@@ -125,6 +125,57 @@ class ControlTests(unittest.IsolatedAsyncioTestCase):
         release(); second(); await self.reconcile()
         self.assertEqual(self.session.plays, 0)
 
+    async def test_new_music_choice_reclaims_focus_after_spotify_resume(self):
+        first = await self.acquire()
+        self.session.status = PLAYING
+        await self.reconcile()
+        self.assertEqual(self.session.pauses, 1)
+        task = asyncio.create_task(asyncio.to_thread(self.control.acquire_music, lambda: False))
+        await asyncio.wait_for(self.wakes.get(), 1)
+        # Synchronize with the actual new claim, not a previous release wake.
+        while not self.control.music_claims:
+            await asyncio.sleep(0)
+        await self.reconcile()
+        second = await asyncio.wait_for(task, 1)
+        self.assertEqual(self.session.pauses, 2)
+        first(); await self.reconcile()
+        self.assertEqual(self.session.plays, 0)
+        second(); await self.reconcile()
+        self.assertEqual(self.session.plays, 1)
+
+    async def test_rejected_music_pause_cannot_admit_overlapping_song(self):
+        self.session.pause_result = False
+        task = asyncio.create_task(asyncio.to_thread(self.control.acquire_music, lambda: False))
+        await asyncio.wait_for(self.wakes.get(), 1)
+        await self.reconcile()
+        with self.assertRaisesRegex(RuntimeError, 'could not pause'):
+            await asyncio.wait_for(task, 1)
+        self.assertFalse(self.control.claims)
+        self.assertEqual(self.session.status, PLAYING)
+
+    async def test_cancelled_new_music_does_not_repause_for_an_older_clip(self):
+        first = await self.acquire()
+        self.session.status = PLAYING
+        await self.reconcile()
+        cancel = threading.Event()
+        task = asyncio.create_task(asyncio.to_thread(self.control.acquire_music, cancel.is_set))
+        await asyncio.wait_for(self.wakes.get(), 1)
+        entered, proceed = asyncio.Event(), asyncio.Event()
+        async def props():
+            entered.set()
+            await proceed.wait()
+        self.session.on_props = props
+        reconciliation = asyncio.create_task(self.reconcile())
+        await entered.wait()
+        cancel.set()
+        release = await asyncio.wait_for(task, 1)
+        proceed.set()
+        await reconciliation
+        self.assertEqual(self.session.pauses, 1)
+        self.session.on_props = None
+        first(); release(); await self.reconcile()
+        self.assertEqual(self.session.plays, 0)
+
     async def test_new_claim_during_restore_keeps_spotify_paused(self):
         release = await self.acquire()
         release()
@@ -189,7 +240,157 @@ class ControlTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(self.control.claims)
 
 
+class MusicFocusTests(unittest.TestCase):
+    def setUp(self):
+        from lib.project_runtime import _ProjectRegistry, ProjectStatus
+        from spotify.music_focus import MusicFocus
+        self.registry = _ProjectRegistry()
+        self.music = Mock(name='music-interface')
+        self.music.name, self.music.background_music = 'music', True
+        self.music.get_status.return_value = ProjectStatus('music', True, 'song', [], True)
+        self.cue = Mock(name='cue-interface')
+        self.cue.name, self.cue.background_music = 'sound_effects', False
+        self.registry.register(self.music); self.registry.register(self.cue)
+        self.focus = MusicFocus(self.registry)
+
+    def test_spotify_start_aborts_music_once_and_pause_never_resumes_it(self):
+        self.focus.observe(True)
+        self.music.revert.assert_called_once()
+        self.music.pause.assert_not_called()
+        self.cue.pause.assert_not_called()
+        self.cue.revert.assert_not_called()
+        self.focus.observe(True)
+        self.music.revert.assert_called_once()
+        self.focus.observe(False)
+        self.focus.close()
+        self.music.resume.assert_not_called()
+
+    def test_each_native_resume_cancels_new_music_without_touching_pause_claims(self):
+        from lib.coordination.playback import PlayCoordinator
+        coordination = PlayCoordinator(self.registry)
+        self.addCleanup(coordination.shutdown)
+        self.focus.observe(True)
+        music = coordination.request('music', lambda ticket: None)
+        coordination.snapshot()
+        self.assertTrue(music.allowed.is_set(), 'new music must not deadlock behind older Spotify')
+        self.focus.observe(False)  # New Hub music paused Spotify.
+        self.focus.observe(True)   # User deliberately resumes Spotify.
+        self.assertEqual(self.music.revert.call_count, 2)
+        coordination.manual_action('music', 'pause')
+        self.focus.close()
+        coordination.snapshot()
+        self.music.resume.assert_not_called()
+        self.assertFalse(music.allowed.is_set())
+        music.finish().result(2)
+
+    def test_song_owner_stops_random_mode_and_cancels_active_and_pending_songs(self):
+        from specific_song.interface import _SpecificSongInterface
+        from specific_song.player import SongPlayer
+        with patch('specific_song.player.obs'):
+            player = SongPlayer()
+        player._is_busy = True
+        player._stop_and_hide_source = Mock()
+        player._requests = Mock()
+        stop_random = Mock()
+        interface = _SpecificSongInterface({'player': player, 'stop_random': stop_random})
+        self.registry.register(interface)
+        self.focus.observe(True)
+        stop_random.assert_called_once()
+        player._requests.cancel.assert_called_once()
+        self.assertTrue(player._cancelled())
+        player._stop_and_hide_source.assert_called_once()
+        self.focus.observe(False)
+        self.assertTrue(player._cancelled())
+
+    def test_one_failed_owner_cannot_prevent_other_music_from_stopping(self):
+        self.music.revert.side_effect = RuntimeError('unavailable source')
+        mood = Mock()
+        mood.name, mood.background_music = 'mood', True
+        self.registry.register(mood)
+        self.focus.observe(True)
+        mood.revert.assert_called_once()
+
+
 class ContractTests(unittest.TestCase):
+    def test_song_parks_before_releasing_spotify_and_failed_admission_never_loads(self):
+        from pathlib import Path
+        from contextlib import nullcontext
+        from specific_song.player import SongPlayer
+        sequence = []
+        with patch('specific_song.player.obs') as obs, \
+             patch('specific_song.player.BASS_ANIMATION_ENABLED', False), \
+             patch('specific_song.player.media_startup', side_effect=lambda *args, **kwargs: nullcontext()), \
+             patch('specific_song.player._resolve_audio_file', return_value=Path('song.mp3')), \
+             patch('specific_song.player.interrupt_audio') as interrupt:
+            player = SongPlayer()
+            player.remember_obs_volume = Mock()
+            player.volume_for_stem = Mock(return_value=-12)
+            player._wait_for_media_file = Mock(return_value=True)
+            player._apply_fullscreen = Mock()
+            player._set_monitor_and_output = Mock()
+            player._poll_until_done = Mock(return_value=True)
+            obs.park_media_source.side_effect = lambda *args: sequence.append('park')
+            interrupt.return_value = lambda: sequence.append('release')
+            player.play('ss__song')
+            obs.show_source.assert_called_once()
+            player._poll_until_done.assert_called_once()
+            self.assertEqual(sequence, ['park', 'release'])
+            self.assertTrue(interrupt.call_args.kwargs['music'])
+            obs.set_media_source_file.reset_mock()
+            interrupt.side_effect = RuntimeError('Spotify could not pause')
+            player.play('ss__song')
+            obs.set_media_source_file.assert_not_called()
+
+    def test_music_and_respawn_use_distinct_interruption_policy(self):
+        provider = Mock()
+        audio_focus.register(provider)
+        self.addCleanup(audio_focus.unregister, provider)
+        with patch.object(audio_focus, 'probe_media', return_value=SimpleNamespace(has_audio=True)):
+            audio_focus.interrupt_audio('song.mp3', music=True)()
+        provider.acquire_music.assert_called_once()
+        provider.acquire.assert_not_called()
+        from league.handlers.player_events import make_respawn_sfx_handler
+        with patch('league.handlers.player_events.hub_events.emit') as emit:
+            make_respawn_sfx_handler()({'respawnTimer': 3.4})
+        self.assertTrue(emit.call_args.kwargs['concurrent'])
+        self.assertFalse(emit.call_args.kwargs['interrupt_music'])
+
+    def test_failed_music_admission_propagates_to_source_owner(self):
+        provider = Mock()
+        provider.acquire_music.side_effect = RuntimeError('Spotify could not pause')
+        audio_focus.register(provider)
+        self.addCleanup(audio_focus.unregister, provider)
+        with patch.object(audio_focus, 'probe_media', return_value=SimpleNamespace(has_audio=True)):
+            with self.assertRaisesRegex(RuntimeError, 'could not pause'):
+                audio_focus.interrupt_audio('song.mp3', music=True)
+
+    def test_layered_respawn_bypasses_spotify_claim_but_keeps_module_gate(self):
+        from lib.shared_media.playback_controller import MediaPlayback
+        gate = threading.Event(); gate.set()
+        cancelled = threading.Event()
+        cfg = SimpleNamespace(project_name='sound_effects', scene='effects',
+                              media_start_timeout=1, media_total_timeout=5)
+        obs = Mock()
+        player = AssetPlayback(cfg, obs_api=obs, start_source=Mock(return_value=True),
+            state_for=lambda source: None, apply_media=Mock(), apply_audio=Mock(), layout_for=lambda *args: None)
+        with patch('lib.shared_media.playback_controller.coordinator') as coordination, \
+             patch('lib.shared_media.asset_playback.interrupt_audio') as interrupt:
+            coordination.permission.return_value = gate
+            playback = MediaPlayback(cfg, threading.Event(), {'halo': ('halo.wav', 'player')}, player)
+            done = playback.play_asset_concurrent('halo', interrupt_music=False)
+            self.assertTrue(done.wait(2))
+            interrupt.assert_not_called()
+            coordination.request.assert_not_called()
+            self.assertTrue(obs.wait_for_media_end.call_args.kwargs['allowed']())
+            obs.park_media_source.assert_called_once()
+            gate.clear()
+            player.start_source.reset_mock()
+            done = playback.play_asset_concurrent('halo', interrupt_music=False)
+            self.assertFalse(done.wait(.1))
+            player.start_source.assert_not_called()
+            playback.cancel_all_playback()
+            self.assertTrue(done.wait(2))
+
     def test_silent_unknown_cancelled_and_unregistered_requests_do_not_acquire(self):
         provider = Mock()
         audio_focus.register(provider)

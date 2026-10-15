@@ -1,5 +1,6 @@
 """Public feature authoring controls; HTTP adapters never access live objects."""
 from .settings import VariationStore
+from .config import LISTENER_HOTKEY, LISTENER_SECONDS, ORIGINAL_HOTKEY
 
 
 def _store():
@@ -23,7 +24,9 @@ def state():
             row['audio_ready']=False
             row['audio_error']=str(exc)
     return {**data,'runtime':service.snapshot() if service else {'busy':False},
-            'ready':bool(service), 'original_hotkey':'987',
+            'ready':bool(service), 'original_hotkey':ORIGINAL_HOTKEY,
+            'listener_hotkey':LISTENER_HOTKEY, 'listener_seconds':LISTENER_SECONDS,
+            'listener':_live['hotkeys'].snapshot() if _live.get('hotkeys') else {'listening':False,'remaining_seconds':0},
             'preview_url':'http://127.0.0.1:7444/presentation/love_me/preview.html'}
 
 

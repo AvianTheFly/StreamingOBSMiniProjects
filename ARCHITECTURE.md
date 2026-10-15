@@ -1,5 +1,48 @@
 # Streaming Hub responsibilities
 
+Music/Spotify exclusivity uses `ProjectInterface.background_music` to identify
+the song and mood players. Spotify's `music_focus.py` observes transport starts
+and resumes on the existing media loop and calls those players' public `revert`
+contracts once per start. Source owners cancel active/pending music and random
+mode; pausing Spotify or shutting down never resumes an aborted Hub song.
+No Spotify coordinator pause claim is retained. A newer Hub music choice can
+start normally. `audio_focus.interrupt_audio(..., music=True)` admits a newly selected
+song by pausing native Spotify, rejecting an unconfirmed pause. Song and mood
+source owners retain the lease through cleanup. Native Spotify resumes revoke
+restoration and abort Hub music. Observation failure retains the last observed
+transport state; the next confirmed start can cancel music. Other/manual
+coordinator pause claims remain with their owners.
+League's respawn cue publishes `interrupt_music=False` on its concurrent SFX
+event. The generic media owner carries that request to asset playback, bypassing
+Spotify interruption while retaining the module gate, personal asset state and
+serialized source cleanup. No additional observer, keyboard hook or timer is added.
+
+League production's `match_recording.py` owns opt-in champion-select/game
+recording, OBS status verification and the 60-second confirmed-end tail on
+`Service.poll`. Live game evidence wins over stale idle client phases; transport
+loss never stops a recording. Only owned outputs can be stopped. A fresh draft
+closes the previous tail. Two stable file samples precede finalization; failures
+retry without duplicate entries. Journaled closure resumes after restart, while
+already active OBS recordings remain manual after restart.
+`recording_audio.py` preflights clean OBS track 2 and full-mix track 3. One video
+contains both synchronized audio streams. `recording_timeline.py` maps original
+button times to OBS media time, correcting encoder startup and observed pauses.
+`recording_library.py` owns atomic capture history, active decisions, markers and
+three-day expiry. `recording_storage.py` validates exact folders and size/mtime
+for collision-safe moves or removal. Cleanup runs once a minute on the existing
+poll while OBS is stopped; kept files never expire. Legacy pending files receive
+a fresh three-day grace period. Durable deletion intent permits crash recovery;
+unrelated videos and replay clips never become deletion targets.
+Keep/Delete target the current owned game or latest completed capture, never an
+older fallback. An active delete waits for closure and Keep cancels it. Explicit
+review IDs can target older managed files. Instant Replay emits recording.replay
+request/completion events with one marker ID and original button time. League's
+bounded callback queue is registered only during service lifetime and drained
+by its existing worker. `recording_web/` owns visible-only polling, clear action
+feedback and seekable markers through thin HTTP routes. League production links
+to this review page. Existing keyboard workflows support case-insensitive *K*
+and *D*, plus /* markers. No new worker, encoder or keyboard hook is introduced.
+
 League Stats' `six_seven.py` owns exact live scoreboard discoveries (6 kills /
 7 deaths, 67 CS, and either 6–7 team-score orientation). `Tracker.ingest` advances
 it only after accepting a fresh verified match snapshot and emits
@@ -97,10 +140,32 @@ saved feature choice; shared `display_capture.apply_content` accepts a null
 selection to hide just the published allowed references. Unknown overlays,
 input filters, volumes, and per-world placements remain untouched.
 
+Instant Replay's `commands.py` owns a leading-action grammar and shared capture
+options for mark, save, replay now and save-and-replay. Literal names shield title
+words; invalid or conflicting duration options cannot fall back to a default save.
+`voice_controls.py` delivers these intents to existing capture/selection owners,
+uses coordinator manual pause/resume and cancels pending capture playback on stop.
+The feature's keyboard adapter always sends `|` to the existing VoicePTT, including
+during playback. `command_guide.py` publishes the read-only reference through
+the public API; `replay-voice-guide.js` renders it literally and rejects late reads.
+Selection handles named searches before game keywords and matches highlight
+shortcuts completely. No new microphone, keyboard listener, worker or setting is
+introduced; personal tag aliases and saved metadata remain with their owners.
+
 The supported entry point is `Run Hub.bat` / `hub.py` in this checkout. Feature
 packages own their policy and personal data. Shared infrastructure owns common
 resources, admission, and coordination. Compatibility facades retain old imports
 while implementation lives with its actual owner.
+
+Instant Replay's `commands.py` owns explicit free-form capture names: `name
+Dragon steal` saves a highlight, and `save 30 name Dragon steal` keeps duration
+policy before the name. The label retains case and is shielded from command,
+duration and fuzzy-tag matching. Capture forwards the same label to the existing
+Twitch clip owner and atomically persists the local title/tag through
+`library.remember_capture`; unnamed captures preserve existing personal titles,
+notes and unknown fields. Named save-and-replay uses the existing selection
+handshake and original button cutoff. No new microphone session, hook, worker,
+Twitch request path, settings default or media-file rename is introduced.
 
 `lib/browser_effects/web/visible-poll.js` owns cancellable read-only presentation
 polling, visibility and stale-response rejection. Existing Hub and League HTTP
@@ -212,15 +277,38 @@ observations and chat handling retain their cadence; pending queues and manual
 refresh intent survive until the phase leaves gameplay. The public enrichment
 snapshot explains the deferral. No new game detector or worker is introduced.
 
-League Stats' `recap_show.py` owns a revision-checked shared playhead and bounded
-manual display intent, sampled by existing reads without a timer or worker.
-`Tracker.control_postgame` assembles that policy with saved automatic-display
-preferences. The public action is `postgame-control`; the HTTP route remains a
-thin adapter. `recap_stories.py` derives covered personal comparisons, best
-60-second personal takedown windows and confirmed lane gold leads. Presentation
-selects four short visual stories rather than rotating raw metrics. The Hub
-controller embeds the same page and explicitly disposes its iframe/resize observer;
-OBS reads the same playhead. No scene write or additional OBS connection is added.
+League Stats' `recap_show.py` owns the shared revision-checked playhead and
+queue-entry reset. The existing collector observes phase edges even while OBS
+unloads the recap. `Tracker.postgame_report` admits the last completed account
+match during matchmaking, ready check and draft, without an age expiry; lobby,
+end screens, gameplay, replay and lost-client states hide it. The native draft
+scene takes over at picks. Manual pause, hold, hide and stale-control rules remain.
+`postgame-visuals.js` owns visual overview rings, measured team damage bars and
+short-label story graphics; `postgame-broadcast.css` gives charts priority in the
+960x540 and 640x360 frames. Detailed statistics stay in the controller. Existing
+cached analysis supplies evidence; missing data never becomes zero or a grade.
+
+The lobby feature publishes named client/recap selections in its display data.
+League scene routing requests the idle or queue mode inside accepted SceneDirector
+preparation. `lib/coordination/lobbies.py` applies a copied plan's selected mode
+without saving over manual preferences or changing input and parent transforms.
+Recap is part of the allowed exclusive display set and the frame visibility read.
+No new OBS owner, worker, timer, network transport or personal setting is added.
+
+League Stats' `recap_narratives.py` derives at most twenty short covered stories
+from that cached report: fight windows, sampled farm bursts, confirmed lane gaps,
+personal baselines, survival, casts, build openings and team objective context.
+The retained narrative projection remains available in report data; the broadcast
+Story view uses `postgame-visuals.js` on the existing shared playhead. Enrichment revisions replace the complete deck and new matches
+reset it; no generation service, worker, archive write or extra poller is added.
+The automatic recap's native browser item lives above media inside Hub Display
+Capture, inheriting each lobby's saved screen rectangle. Installation hides the
+old idle-scene reference while retaining its transform and the review placement.
+Udyr's owner publishes its selected nested canvas fit; `display_capture` validates
+that ownership and snapshots before repairing drift without touching parent
+placements, other input transforms, filters or gain. Queue presentation always
+labels its active journey IN QUEUE, including ready check and unfinished bans;
+the existing finished-ban handoff and monotonic timer remain authoritative.
 
 League Stats' `capture.py` retains bounded ten-second personal progression and
 observed level changes on that same collector. `recap_events.py` projects only
@@ -239,8 +327,8 @@ shared visibility-aware transport;
 there is no extra gameplay worker. `obs_presentation.py` and the finite composition
 tool `tools/install_league_postgame.py` add browser sources to the configured idle
 scene and a dedicated review scene, preserving existing sources. Automatic display
-requires the same recent match, a confirmed between-game client phase, and a
-15-minute freshness window; lost transport hides the automatic report. Existing
+requires the latest completed account match and a confirmed queue/draft phase;
+there is no age expiry, and lost transport hides the automatic report. Existing
 League scene routing retains every program-scene decision.
 
 `lib/browser_effects/presentations.py` publishes explicitly named feature artwork
@@ -268,7 +356,7 @@ alongside saved rules, preserving newer intent precedence and completion ownersh
 | Lobby display | `scene_voice_switcher/screen_content.py`; `lib/display_capture.py` | The feature owns Udyr/client/desktop/Chrome selection in lossless lobby preferences and publishes complete display data with its layouts. Shared mechanics only toggle allowed references inside Hub Display Capture; original input settings, filters, volumes, parent screen placements and unknown overlays remain intact. Test retains its gameplay capture. `screen_content.install` creates the independent unfiltered `Hub Lobby Udyr` input with the original media settings and current gain/mute, fits only its new display item, and retires only the original tilted input's nested display reference. The original input/filter chain and other scene placements remain intact. `tools/install_queue_presentation.py` installs the display off-stream and verifies unchanged program scene and original settings; no playback worker or program-scene write is added. |
 | Cross-project playback admission | `lib/coordination/playback.py`, `pauses.py`, `serial_actions.py`, `rules.py` | Latest pending exclusive intent per project, request-specific completion, reference-counted pause claims, manual claims, and layered permission gates; callbacks schedule promptly |
 | Cross-feature policy contracts | `lib/coordination/game_policy.py`, `lib/twitch_clip_session.py` | League publishes scene policy and complete image-clock match state; Twitch publishes clip-session availability; callers never read another feature's private state |
-| Voice and keyboard | `voice/service.py`, `voice/listener.py`, `voice/ptt.py`, `voice/transcription.py`, `lib/global_hotkeys.py` | Optional upload word timing consumes the same model under its exclusive lease; one microphone/model lifetime and one keyboard child; feature adapters receive commands/keys |
+| Voice and keyboard | `voice/service.py`, `voice/listener.py`, `voice/endpoint.py`, `voice/ptt.py`, `voice/transcription.py`, `lib/global_hotkeys.py` | Service owns one session watchdog, speech-aware quiet-pause completion, a five-second absolute limit and one-second normal-trigger rearm guard. Endpoint supplies bounded Silero speech evidence on the existing microphone drain worker using the same cached detector; native-rate fallback is normalized before VAD/ASR. Listener bounds stored capture to five seconds and retains its independent stale-audio discard. PTT reserves one trigger worker before scheduling and captures session/revision intent so delayed Finish cannot restart capture. Optional upload word timing consumes the same model under its exclusive lease; one microphone/model lifetime and one keyboard child; feature adapters receive commands/keys |
 | League kill audio | `mini projects/league/kill_audio_player.py` | Feature-owned selection and personal gain; one shared PlaybackWorker owns replacement through parking cleanup, follows the League permission gate, and leaves idle media hidden to prevent scene-entry replay |
 | Physical media source ownership | `lib/shared_media/playback_worker.py`, `playback_controller.py` | One worker per source through cleanup; cancellation and one replaceable pending source request; layered sources remain separate |
 | OBS asset presentation | `lib/shared_media/asset_playback.py`, `source_playback.py`, `source_audio.py`, `asset_layout.py`, `source_setup.py` | Source setup, load confirmation, audio application, layout selection, and asset capture/parking are separate components |
@@ -278,6 +366,7 @@ alongside saved rules, preserving newer intent precedence and completion ownersh
 | Decoder startup | `lib/shared_media/media_startup.py` | Shared startup admission and real playback progress checks |
 | Asset preparation and metadata | `lib/asset_preparation.py`, `lib/media_metadata.py` | One paced preparation worker and bounded shared metadata cache; one admitted probe, with cached reads independent of unrelated misses. `cpu_headroom.py` samples nonblocking CPU counters on that worker: optional probes/reads pause at 70% and resume below 55%, outside the decoder slot. Foreground playback bypasses this gate and shutdown interrupts waits. `media_metadata_store.py` validates and atomically persists at most 512 derived records / 2 MiB outside the checkout. Hub startup hydrates them before feature imports; exact path/size/mtime still gate reuse. Misses coalesce writes and the existing preparation worker flushes trailing changes; no unchanged writes or new worker. Persistence failures fall back to probes and never modify media or personal settings |
 | Finite media conversions | `lib/media_jobs.py` | Weighted CPU budget, user-before-preview queue order, bounded FFmpeg threads, cancellation and child reaping |
+| Replay export encoding | `mini projects/instant_replay/encoding.py`; `trimming.py`, `editing.py` | Replay policy selects explicit CUDA decode/NVENC or the existing software preset. Unsupported CUDA decoding retries CPU decode/NVENC; unavailable encoding retries software after shared media_jobs process cleanup, under the same CPU budget and total deadline. Cancellation, bad media and disk errors do not retry. Callers retain cut boundaries, all audio tracks, original files and atomic publication; stream-copy cuts bypass encoding. |
 | Persistence | `lib/json_store.py`, `lib/project_settings.py`, `lib/shared_media/profile_store.py` | Atomic unique temporary writes and shared in-process read/modify/write transactions; malformed personal files are preserved |
 | Media review intent | `lib/media_review.py` | Read-only portable producer catalog `{clips: {id: {path, purpose}}}`; explicit replay-only files are excluded from automatic review, with legacy metadata and personal decisions preserved. Capture policy and classification writes remain in Instant Replay; Footage Desk composes the reader in `review_pool.py`. |
 | Personalization and faders | `lib/settings_backups.py`, `lib/asset_fader.py`, `lib/shared_media/single_source_state.py`, `layout_rules.py`, `controls.py` | External history, loaded-asset level ownership, filters/transforms, per-asset placement precedence, latest project/profile/category/file offsets |
@@ -584,7 +673,7 @@ the Hub appearance editor provides reusable URLs and original text-free PNG link
 | Scene voice switcher | `commands.py` owns pure matching; `layouts.py` owns artwork, apertures and legacy aliases; `settings.py` owns lossless rotation/placement preferences; `presentation.py` publishes authored layer data and repairs through shared mechanics; each active chat viewport uses its board dimensions, with inactive browsers shut down. `inventory.py` discovers groups/nested scenes and the existing Spirit Afterparty, publishing complete layer plans, rotation and exclusions; `routing.py` owns director requests; `api.py` exposes gallery, configuration, installed presentation destinations, current-world effects and repair controls; `main.py` owns one command/event/hold loop and catalog lifetime. Rejected/stale requests never prepare visibility; direct Hub/native OBS entries repair published layers without another scene writer. The gallery provides current-location feedback, search, per-world rotation/placement, and explicit entry with desktop visible; Live desk uses the same labeled catalog. Lobby browser mode reuses the chat transport/channel with full-opacity, persistent messages without changing desktop preferences. `passages.lua` owns the installed OBS-lifetime native item handoffs and one frontend subscription, released on unload, with no worker/socket/timer; it preserves personal transitions. `passage_installation.py` owns pure script-entry policy; `tools/install_lobby_passages.py` is the finite off-air collection adapter, while `verify_lobby_passages.py` owns finite native QA through SceneSession. Neither installer nor Lua writes program scenes |
 | Sound effects / TikTok | Feature configuration and trigger policy over the generic media components |
 | Living lobby artwork | `scene_voice_switcher/motion.py` and `web/reef-*.js`, `stage.js`, `studio.js` | Eleven authored worlds (Reef, Forge, Sanctuary, Sky Harbor, Storm Coast, Phoenix Observatory, Spirit Railway, Tavern, Future Lounge, Spirit Arcade and Aurora Camp) animate cached regions of their original paintings and admit finite thematic visitors with soft pressure and novelty weighting. worlds.js loads the chosen world; each world owns landmarks, atmosphere and guest performances. painted-world.js shares decoded-art assembly within this feature; five redesigned worlds optionally paint versioned full artwork through their existing living layer before the same complete saved apertures are cleared. chaos-cast.js assembles their setup/payoff choreography and chaos-ink.js their comic props. lobby-residents.js owns three connected-alpha sprite caches per redesigned world and continuous room routines; lobby-cameos.js supplies finite painted-character performances through PaintedWorld.drawVisitor. Residents vacate their perches while participating in a cameo. `visitor-staging.js` owns per-cue environmental anchors, whole-act scale and background selection weighting for all eleven worlds; resident perches use small silhouettes and contact gestures. Dynamic captions are removed from artists, with invitation labels kept in the studio. Decode, pause and teardown share the existing presentation lifetime. Original OBS image settings and files are retained, and the studio replaces one iframe when the selected world changes. Feature policy supplies cast, landmarks, saved apertures and choreography. Public `lib/browser_effects/web/world-motion.js` supplies only bounded scheduling and cached triangle-mesh mechanics. Each patch retains fixed topology/source coefficients and reuses projected coordinates; disposal releases all mesh buffers with its canvas. `effects.py` owns validated world-specific action envelopes and generated metadata. `web/live-actions.js` subscribes through the existing Hub SSE transport only in a visible native document, rejects stale/wrong-world/duplicate cues with bounded history, and closes on hiding or teardown. Private previews never subscribe. The stage owns one visible-document loop and tears down instances and canvases; complete screen/camera/chat apertures are cleared after all accents. The optional published layer follows the original foreground, or the camera in flat paintings, and precedes dedicated chat; native OBS shuts it down while inactive. `tools/build_lobby_motion.py` owns finite provenance-preserving static publication; `tools/build_lobby_actions.mjs` is the standalone finite metadata exporter from actual authored artists, with no OBS or settings writes; `install_lobby_motion.py` owns finite off-air installation and preservation checks. Original art, personal inputs, filters and placements survive. No new Hub worker, socket, keyboard hook or scene writer is introduced; the existing Spirit Afterparty retains its own automatic party renderer |
-| Mood cues / Love Me | `love_me/catalog.py` and `score.py` own authored directions and editable file-time word cues; `montage_catalog.py` owns the cinematic still selection and provenance; `assets.py` publishes explicit mood-owned C: image/font files, installed by the finite maintenance owners `tools/install_signal_assets.py`, `tools/install_mood_montage.py` and `tools/install_mood_fonts.py`; `web/montage.js` owns full-frame cover layout, an independent saved file-time musical-hit entrance, a non-repeating file-clock cut sequence starting immediately on the hit, compensated crossfades and closing transparency; `web/signal.js` owns larger typeface cycling and held-word fading; `web/type-ink.js` owns bounded worn glyph rendering; `settings.py` owns lossless variations/audio imports; `service.py` serializes original stages and repeat sessions on one worker; `presentation.py` owns asset faders, routing and ID-scoped browser cleanup. `main.py` owns one keyboard subscription and a bounded intent queue. `api.py`/`interface.py` expose public controls; `hub_ui/routes/mood_cues.py` is the declared HTTP adapter and `pages/mood-cues.js` owns the private editor/preview. Original assets and `987` remain intact. |
+| Mood cues / Love Me | `love_me/catalog.py` and `score.py` own authored directions and editable file-time word cues; `montage_catalog.py` owns the cinematic still selection and provenance; `assets.py` publishes explicit mood-owned C: image/font files, installed by the finite maintenance owners `tools/install_signal_assets.py`, `tools/install_mood_montage.py` and `tools/install_mood_fonts.py`; `web/montage.js` owns full-frame cover layout, an independent saved file-time musical-hit entrance, a non-repeating file-clock cut sequence starting immediately on the hit, compensated crossfades and closing transparency; `web/signal.js` owns larger typeface cycling and held-word fading; `web/type-ink.js` owns bounded worn glyph rendering; `settings.py` owns lossless variations/audio imports; `service.py` serializes original stages and repeat sessions on one worker; `presentation.py` owns asset faders, routing and ID-scoped browser cleanup. `hotkeys.py` owns a lock-protected five-second keyboard selection deadline: `987` arms only, `1` advances original Love Me and editable variation choices include `2` for Where Have You Been. Selection, Escape, expiry, reload and shutdown close the window without changing playback; no timer or new hook is added. `main.py` owns one keyboard subscription and a bounded intent queue. `api.py`/`interface.py` expose public controls; `hub_ui/routes/mood_cues.py` is the declared HTTP adapter and `pages/mood-cues.js` owns the private editor/preview. Original assets and playback behavior remain intact; `987` opens the selection window. |
 | Twitch celebrations | `main.py` owns Hub assembly and shutdown, `service.py` owns synchronized queue/settings and one-second condition waits, `obs_source.py` owns source attachment. Idle browsers wait for event/control notifications with bounded requests; settings transactions preserve unknown external fields. Legacy polling and active show cadence remain supported. |
 | Spotify | Spotify's `audio_texture.py` owns a bounded salient-partial roughness proxy from the existing FFT; `audio_analysis.py` owns fixed-gain waveform and unsaturated full-window presence, absolute-range spectral measurements, causal frequency-dependent apertures, fixed-gain Parseval energy per register, per-register stereo space, batched register reductions and bounded immutable FFT/display plans; `process_audio.py` owns Spotify-only packet capture and capture-clock metadata; `audio_worker.py` owns one isolated process, parent-death exit, newest-sample relay and bounded cleanup; `audio_runtime.py` assembles its MTA capture thread and existing HTTP socket so the audio-to-browser path stays in that process; `audio_channel.py` owns fixed complete-generation mailboxes for newest audio and Hub controls; `presentation_state.py` bridges Hub media/visibility policy and publishes the ready worker identity; `obs_presentation.py` owns browser attachment and a settings-preserving refresh once each HTTP/capture worker is ready, including replacements; `media_notifications.py` owns bounded WinRT event subscriptions and prompt media-loop wakeups; `service.py` owns session/state lifetime and bounded idle/media and latest-audio change notifications; `http_server.py` owns loopback state/static transport, persistent no-delay connections and bounded client cleanup; `web/reactive.js` owns conditioned signal features and optional legacy mesh simulation; `music_motion.js` owns absolute-register onset articulation, ordinary-fluctuation rejection thresholds, released frequency accents, stereo response and bounded bass spring/peaks and eight local spectral voices, separate smoothed structural presence, sustained texture phases and phrase envelopes; `music_pacing.js` owns a separate sustained body-size presence envelope, phrase-scale intensity, spectral activity, relative dynamics, held timbre tension/roundness, bounded swelling/release gestures and eased movement speed independently of fast articulation; `music_strings.js` owns the fixed 8-by-65 coupled-string state, amplitude pulls, wave propagation, neighbour coupling and damping; `music_space.js` owns a fixed 96-by-8 spectral memory, arrangement entropy, register focus and an audio-integrated, bounded yaw/pitch/roll orbit; `journey.js` owns scene selection, transition progress, musical travel, continuous structural evolution and palette phase and bounded band history; `stage_palette.js` owns pure color families and restrained phrase lift/release accents; `stage_geometry.js` owns shared contour mechanics, read-only sampling of the physical string field, scene-specific deformation budgets and abstract compositions; `music_dance.js` owns bounded capture-clock torsion, directional pitch flow, stereo sway and traveling gesture history; `stage_designs.js` owns pure vortex, folded fan, aurora, trefoil, medusa and mandala ensembles with shared joints and delayed counter-motion; `stage_articulation.js` maps musical history into a continuous XYZ and material field without added geometry; `stage_morph.js` owns canonical curve sampling, bounded correspondence by contour role, spatial subdivision of repeated open curves, XYZ contraction of unmatched decorative contours, surface-density budgets and live geometric transport; `stage_depth.js` owns the pure eight-voice counterpoint paths, continuous scene correspondence and rigid XYZ view transforms, fixed focal length and frame scale throughout the foreground orbit, an inverse view basis and consistent spatial/material projection; `stage_renderer.js` owns the pure phrase/bass body-scale mapping, direct visible-canvas presentation, fixed GPU resources, bounded reusable command records/buffer views and retained current-depth sorting with insertion-order ties, transparent geometry depth ordering, analytic facet lighting, measured fine surface grain fixed in model space through perspective-correct interpolation and same-scene Canvas fallback; presentations read simulation state without advancing it; `music_feed.js` owns bounded track input calibration, generation rejection and capture-clock simulation advancement independently of paint cadence; `overlay.js` owns polling, visibility, viewport scaling, temporary WebGL surface recovery and frame lifetime, skipping off-scene painting while retaining musical history; common lifetimes and controls remain shared |
 | Footage Desk | Separate supported application and lifecycle; preserve its process when restarting the Hub. `visual_analysis.py` owns offline visual observations; `visual_lobby.py` owns the cheap user-reference background matcher; `temporal.py` owns League boundary/replay policy; `audio_analysis.py` owns selected-track speech, game-overlapping chunk admission, explicit sparse checkpoint coverage and per-game normalization; `analysis.py` owns finite analysis batches and full-file verified duplicate reuse; `jobs.py` owns the single worker, foreground priority, cooperative yields and public job snapshots that retain active work; `analysis_store.py` publishes atomic generations; `analysis_cache.py` owns disposable resumable checkpoints and content fingerprints; `scoring.py` owns configurable ranking; `analysis_api.py` is the public review and lightweight queue-plan contract; `analysis_store.py` selects unfinished or source-changed generations without decoding full results; `web/find_moments.js` presents the simple local-analysis launcher; `cleanup_plan.py` owns the explicit buffered-game retention policy and protection of ambiguous desktop gaps; `cleanup.py` owns finite cleanup batches on the existing worker, current-source/review checks, verified retained exports, permanent original deletion and a metadata-only completion ledger; `find_moments.py` is a standalone HTTP client that submits to the existing worker, never owns a database or decoder; `review_pool.py` composes the shared read-only capture-intent catalog for scan, library, CSV and analysis exclusion, preserving stored review decisions. `web/workflow.js` owns review/saved-clips/clear-space presentation and pending feedback through explicit `app.js` owner callbacks; it never writes the catalogue or deletes files directly. `web/workflow.css` owns the desk layout. Existing `store.py` owns personal review markers and `media.py` owns bounded decoder/encoder commands and verified optional exports with portable source metadata. |
@@ -718,12 +807,20 @@ Stream session ownership: `scene_voice_switcher/session_controls.py` owns Break/
 
 `desk-sections.js` owns current-stage compartments and private destination selection. Opening tabs or galleries never issues output commands. Starting artwork and rotation use existing Starting Soon APIs and revision checks. Scene-switcher `settings.selection/save_selection` owns shuffle versus fixed lobby policy, preserving the separate rotation membership and layout maps. Inventory publishes selection and layers from one settings snapshot through the existing shared lobby contract. Its public catalog is available without OBS and does not claim installation; actual live inventory gates Show controls.
 
-Champion-select browser recovery belongs to `mini projects/league_api/champ_select_obs.py`; the existing production recovery worker calls it once after HTTP startup, with stop-scoped retries. Only the owned URL and activation reload flag are repaired; personal presentation remains intact.
+Champion-select browser recovery belongs to `mini projects/league_api/champ_select_obs.py`; the existing production recovery worker calls it once after HTTP startup, with stop-scoped retries. Only the owned URL, activation reload flag and authored 60 FPS delivery are repaired; personal presentation remains intact.
 
 Champion-select `champ_select_web/layout.js` owns ten fixed 1920x1080 shrine
 apertures, ten ban sockets and the preserved camera opening. `app.js` presents
 client-assigned roles in dedicated plaques and names in separate plates; it never
-infers lanes from champion identity. `scene-map.js` owns four Udyr-spirit worlds,
+infers lanes from champion identity. These are native browser text over text-free
+paintings. `style.css` owns sharp local-font lettering, larger system-font aliases
+and two-line champion captions; the scenic canvas clears their full lower plate.
+`champ_select.py` chooses exposed ranked aliases before game/Summoner names,
+ignores blank or malformed names and retains numbered labels when withheld.
+It adds no identity lookup. Demo cards show sample ranked aliases, and the shared
+draft document omits the LIVE badge across all themes.
+`chat.js` owns the bounded native-text conversation renderer and is served by the
+same HTTP allowlist. `scene-map.js` owns four Udyr-spirit worlds,
 measured source/guardian contacts and lossless legacy-name mapping. Original
 paintings remain still. `world-assets.js` owns one decoded background, one alpha
 VFX texture, a bounded erosion atlas and three small guest poses, rejecting late
@@ -731,12 +828,20 @@ loads and disposing on theme/hide/teardown. `vfx-texture.js` builds sixteen 384p
 erosion frames once per active world. `world-art.js` draws independent weather,
 source currents and reflections. `world-events.js` owns ban seals, chat couriers
 and ready rails; `spirit-locks.js` owns four material-specific lock performances.
+`team-resonance.js` propagates each lock from its portrait through its own team,
+with distance-timed neighbor, platform, basin and guardian responses. At most two
+traveling waves per team coexist; replacement cues cancel old slot effects.
+`world-details.js` owns analytical koi, constellations, forge runes and thermal
+feathers on that same clock. `vfx-lights.js` owns at most 32 small glow tiles per
+active canvas and releases them when hidden or disposed.
 `vfx-ink.js` provides bounded analytic ribbons, lightning and ballistic particles.
 `vfx-timing.js` supplies shared impact times and DOM responses driven by the same
-world clock. No independent CSS lock/ban/chat clocks can drift from the impact. `spirit-secrets.js` stages twelve miniature discoveries, one at a time
+world clock. Lock acknowledgment is immediate and the portrait impact is at
+0.18 seconds. Cached DOM bindings avoid per-frame selector scans and layout reads.
+No independent CSS lock/ban/chat clocks can drift from the impact. `spirit-secrets.js` stages twelve miniature discoveries, one at a time
 with quiet intervals and draft-event priority. `draft-cues.js` deduplicates visible
 state changes and resets for a new generation/theme or hidden return.
-`world-motion.js` owns one capped 30 FPS clock, twenty finite 4.2-second cues,
+`world-motion.js` owns one deadline-paced 60 FPS clock, twenty finite 4.2-second cues,
 reduced motion, camera masking and final clearing of role/name plates. The existing
 visible poller remains the only transport. `draft-demo.js` owns local rehearsals,
 including Hidden detail, without writes. Fonts and artwork are feature-owned;
@@ -750,7 +855,30 @@ Living-world frame-rate policy belongs to `scene_voice_switcher/motion.py`. It e
 
 Stream stage presentation: `league_api/stage_state.py` projects the observed queue,
 ban and loading phases plus available draft/gameflow/live roster data under
-`ClientScenes.lock`. It owns no threads or transports. ClientScenes requests the
+`ClientScenes.lock`. `stage_roster.py` owns ten match-scoped slots and at most
+32 private identity tokens per player. Draft order and local-team orientation
+survive reordered gameflow/live readings; exposed identities and unambiguous
+champions match participants without guessing hidden names or lanes. Nonempty
+live fields outrank gameflow fields, which outrank draft aliases. Missing data
+never erases established artwork, roles or names; a new game ID or non-game
+phase clears old match data. Snapshots omit matching evidence.
+`stage_web/loading-roster.js` owns ten persistent opposing-wing player cards,
+portrait sleeves, stable numbered slots and separate observed-role tags; it
+changes only updated text or artwork URLs. `loading-ceremony.js` owns the pure
+14-second thunder/jade/forge/aurora cadence. `loading-art.js` prepares at most
+four 512px patches from the existing local spirit paintings through shared
+`PaintedPatch` mechanics and rejects late decodes. `loading-motion.js` owns
+one half-resolution canvas, etched orbit rings, painted-spirit deformation,
+team tethers and bounded elemental paths on one 24 FPS clock.
+Source invisibility stops drawing and CSS motion through the shared poller's
+visibility contract; reduced motion paints a static ceremony, and page exit
+releases the canvas. Hidden/closed pages dispose all four patches and abort
+pending local artwork reads. Saved backgrounds and OBS placements remain unchanged.
+`tools/build_loading_overlay.cjs` is the finite local publisher of the generated
+`loading-effects.js` browser entry from those three source owners. Its `--check`
+rejects stale publication. The existing HTTP route serves that single entry,
+so loading artwork can refresh without adding a server or restarting Hub workers.
+`stage_state.py` owns no threads or transports. ClientScenes requests the
 configured loading scene through SceneDirector with the existing manual-revision
 and hold checks. `league_api/match_timing.py` owns match-boundary policy on the
 existing image service worker: observed GameStart admits gameplay at clock zero;
@@ -852,7 +980,7 @@ session's queue while the physical source gate is still held. Saved montages kee
 their full sequence; new queue additions are capped at 200.
 `replay-clip-desk.js` presents a full thumbnail library and montage gallery with
 one modal editor allocated only on selection. The management page assembles
-collapsed capture options; notes/trim drafts guard editor close and navigation.
+collapsed capture options; notes/montage drafts guard editor close and navigation.
 `replay-card-labels.js` derives concise labels without rewriting saved titles.
 Library-owned recoverable Trash retains original files, labels, unknown fields
 and montage membership. Trashed clips leave catalogue playback and automatic
@@ -867,7 +995,15 @@ while their details are open; closing details releases those documents.
 `instant-replay.js` assembles capture controls, presentation and the local Clip desk.
 `replay-clip-desk.js` owns catalogue snapshots, queue/type/search filters, visible
 selection and revisions; `replay-review.js` owns one local player, its draft and
-reversible review decisions; `replay-trim.js` owns optional range controls;
+reversible review decisions; `replay-trim.js` owns the visible Start/End range
+controls, exact-second inputs, private cut audition and save-copy feedback.
+`replay-management.css` owns the library's readable cards and review filters;
+`replay-editor.css` owns the responsive two-column editor, sticky close control,
+44-pixel action targets and independent 36-pixel trim handles. The main library
+uses ordinary page scrolling; selecting cards never starts a drag operation.
+Capture settings and voice reference follow the library. Mouse drag, keyboard
+adjustment, preview cutoff, save payload and narrow-screen reachability are
+covered by `tools/replay_usability_checks.cjs` through the studio fixture.
 `replay-collections.js` owns editable sequence drafts. `replay-posters.js` requests
 stills only for visible cards with two local requests. `hub_ui/replay_media.py`
 owns the existing single preview worker and cached still/video mechanics, sharing
@@ -941,3 +1077,15 @@ caches its public output with the report. `postgame-analysis.js` and its CSS own
 the seven-view broadcast charts. The existing RecapShow monotonic playhead owns
 a 30-second selection hold and explicit persistent pause; no timer or worker is
 added. Chart axes use actual timestamps and break across missing/long sample gaps.
+
+Champion-select `champ_select_web/chat.js` owns the bounded ten-message DOM
+snapshot, sender colors and measured whole-card admission. It uses the existing
+state poller, text-only rendering, local fonts and one resize observer; page exit
+disconnects that observer and rejects late font completion. Older cards retire
+before overflow; an oversized newest card has an ellipsis and full text title.
+Larger text, a single header and unnamed cards for unavailable mappings replace
+repeated TEAM prefixes. `LeagueClient.chat_messages` retains current-room filtering
+and client-exposed roster identity policy: numeric strings match numeric IDs,
+and hidden zero IDs never identify an ally. No new transport, worker, setting,
+keyboard hook or scene writer is added. `tools/test_champ_select_chat.cjs` verifies
+busy/long chat geometry, responsive reflow, plain text and all four worlds.

@@ -9,6 +9,7 @@ from .audio_worker import relay_audio
 from .audio_analysis import AudioAnalysis, quiet_features, spectrum
 from .media_notifications import MediaNotifications
 from .playback_control import PlaybackControl
+from .music_focus import MusicFocus
 from lib import audio_focus
 
 
@@ -116,6 +117,7 @@ async def watch_media(state, stop):
     manager = None
     notifications = MediaNotifications(asyncio.get_running_loop())
     control = PlaybackControl(notifications._notify)
+    music_focus = MusicFocus()
     registration = audio_focus.register(control)
     metadata_revision, metadata_at, metadata = -1, -1000., None
     try:
@@ -128,8 +130,12 @@ async def watch_media(state, stop):
                 sessions = list(manager.get_sessions())
                 session = select_spotify(sessions, Status.PLAYING)
                 await control.reconcile(sessions, session, Status.PLAYING, getattr(Status, 'PAUSED', None))
+                # Transport focus must not wait for the slower metadata read.
+                music_focus.observe(session is not None and
+                                    session.get_playback_info().playback_status == Status.PLAYING)
                 notifications.bind_session(session)
                 if session is None:
+                    music_focus.observe(False)
                     metadata = None
                     state.set_media(playing=False, title='', artist='', error='Open Spotify on this computer')
                 else:
@@ -142,6 +148,7 @@ async def watch_media(state, stop):
                         metadata_revision, metadata_at = revision, time.monotonic()
                     # Read status AFTER metadata so a pause during the read cannot reveal stale content.
                     playing = session.get_playback_info().playback_status == Status.PLAYING
+                    music_focus.observe(playing)
                     state.set_media(playing=playing and bool(metadata[0]), title=metadata[0],
                                     artist=metadata[1], error='')
             except Exception as exc:
@@ -151,6 +158,7 @@ async def watch_media(state, stop):
                 notifications.reset()
             await notifications.wait()
     finally:
+        music_focus.close()
         audio_focus.unregister(registration)
         control.close()
         try:

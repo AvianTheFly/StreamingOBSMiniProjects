@@ -11,24 +11,25 @@ export function mountReview(host, clip, options) {
   let disposed = false, dirty = false, saving = false, timer, disposeTrim;
   let revision = options.revision;
   const $ = selector => host.querySelector(selector);
-  host.innerHTML = `<div class="ir-review-heading"><h2>${esc(displayTitle(clip))}</h2></div>
+  host.innerHTML = `<div class="ir-review-layout"><div class="ir-review-main"><div class="ir-review-heading"><h2>${esc(displayTitle(clip))}</h2></div>
     <div id="irPreview" class="ir-review-player" role="region" aria-label="Local clip preview"><span>Preparing preview…</span></div>
     <p id="irPreviewHint" class="ir-muted">Private preview</p>
-    <div class="ir-review-actions"><button id="irKeep" class="btn btn-primary">✓ Keep</button><button id="irReviewNext" class="btn btn-secondary">Next →</button><button id="irTrashClip" class="btn btn-secondary">${clip.trashed?'Restore':'Delete'}</button></div>
+    <div class="ir-review-actions"><button id="irKeep" class="btn btn-secondary">✓ Keep &amp; next</button><button id="irReviewNext" class="btn btn-secondary">Next clip →</button><button id="irTrashClip" class="btn btn-secondary">${clip.trashed?'Restore':'Move to Trash'}</button></div>
     <p id="irDecision" class="ir-muted" role="status"></p>
-    <details id="irTrimPanel" class="ir-review-fold"><summary>✂ Trim clip <span>Save a shorter copy</span></summary><div id="irTrim"><p class="ir-muted">The trim controls appear when your preview is ready.</p></div></details>
     <details class="ir-review-fold"><summary>Name &amp; notes</summary><form id="irClipForm" class="ir-form"><label>Clip name<input id="irTitle" maxlength="160" value="${esc(clipTitle(clip))}" required></label><label>Notes<textarea id="irNotes" rows="2" maxlength="4000" placeholder="What made this moment interesting?">${esc(clip.notes || '')}</textarea></label><label class="ir-check"><input id="irFavorite" type="checkbox" ${clip.favorite ? 'checked' : ''}> Favorite</label><div class="ir-actions"><button id="irSaveDetails" class="btn btn-primary btn-sm" disabled>Save details</button><span id="irSaveState" class="ir-muted" role="status">Saved</span></div></form></details>
-    <details class="ir-review-fold"><summary>More options</summary><div class="ir-use"><label for="irPurpose">Use for</label><select id="irPurpose"><option value="review_later">Review later</option><option value="highlight">Replay ready</option><option value="replay_only">Replay only</option></select><span id="irPurposeHint" class="ir-muted"></span></div><div class="ir-actions"><button id="irSetAside" class="btn btn-secondary">Set aside</button><select id="irClipMode" class="ir-preview-mode" aria-label="Clip presentation"><option value="showcase">Clip Showcase</option><option value="replay">Quick Replay</option></select><button id="irPlayClip" class="btn btn-secondary btn-sm">Play in OBS</button><button id="irClipCollect" class="btn btn-secondary btn-sm">＋ Montage</button></div><p class="ir-file-path">${esc(clip.path)}</p></details>`;
+    <details class="ir-review-fold"><summary>More options</summary><div class="ir-use"><label for="irPurpose">Use for</label><select id="irPurpose"><option value="review_later">Review later</option><option value="highlight">Replay ready</option><option value="replay_only">Replay only</option></select><span id="irPurposeHint" class="ir-muted"></span></div><div class="ir-actions"><button id="irSetAside" class="btn btn-secondary">Set aside</button><select id="irClipMode" class="ir-preview-mode" aria-label="Clip presentation"><option value="showcase">Clip Showcase</option><option value="replay">Quick Replay</option></select><button id="irPlayClip" class="btn btn-secondary btn-sm">Play in OBS</button><button id="irClipCollect" class="btn btn-secondary btn-sm">＋ Montage</button></div><p class="ir-file-path">${esc(clip.path)}</p></details></div>
+    <section id="irTrimPanel" class="ir-trim-panel" aria-label="Trim clip"><div id="irTrim"><h3>Trim clip</h3><p class="ir-muted">Your trim controls will be ready with the preview.</p></div></section></div>`;
   function canLeave() { return !saving && (!dirty || window.confirm('Discard your unsaved name or notes?')); }
   function labels() {
+    $('.ir-review-heading h2').textContent = displayTitle(clip);
     $('#irPurpose').value = clip.purpose;
     $('#irPurposeHint').textContent = clip.purpose === 'review_later' ? 'Saved for you. Excluded from automatic replays.' : clip.purpose === 'replay_only' ? 'Can replay this moment. Excluded from highlight compilations.' : 'Eligible for automatic replays and highlights.';
     $('#irDecision').textContent = clip.trashed?'In Trash · restore anytime':clip.review_state==='kept'?'Kept':clip.review_state==='dismissed'?'Set aside':'';
-    $('#irTrashClip').disabled=saving||!options.canTrash?.();$('#irTrashClip').textContent=clip.trashed?'Restore':'Delete';
+    $('#irTrashClip').disabled=saving||!options.canTrash?.();$('#irTrashClip').textContent=clip.trashed?'Restore':'Move to Trash';
     $('#irKeep').hidden=!!clip.trashed;
     $('#irTrimPanel').hidden=!!clip.trashed;$('#irPurpose').disabled=saving||!!clip.trashed;$('#irSetAside').disabled=saving||!!clip.trashed;$('#irClipCollect').disabled=saving||!!clip.trashed;
     $('#irSetAside').textContent = clip.review_state === 'dismissed' ? 'Restore to review' : 'Set aside';
-    $('#irKeep').textContent = clip.review_state === 'kept' ? '✓ Kept' : '✓ Keep';
+    $('#irKeep').textContent = clip.review_state === 'kept' ? '✓ Kept' : '✓ Keep & next';
     $('#irKeep').disabled = saving || clip.review_state === 'kept';
     $('#irPlayClip').disabled = !options.canPlay() || saving || clip.trashed;
   }
@@ -75,7 +76,7 @@ export function mountReview(host, clip, options) {
       if (result.status === 'ready') {
         $('#irPreview').innerHTML = `<video controls preload="metadata" aria-label="Local clip preview" src="/api/projects/instant_replay/preview-media?path=${encodeURIComponent(clip.path)}"></video>`;
         $('#irPreviewHint').textContent = 'Private preview';
-        disposeTrim = mountTrim($('#irTrim'), $('video'), {path:clip.path,title:clipTitle(clip)}, async (result, open) => {
+        disposeTrim = mountTrim($('#irTrim'), $('video'), {path:clip.path,title:displayTitle(clip)}, async (result, open) => {
           await options.reload();
           if (!disposed) open.onclick = () => { if (canLeave()) options.open(result.path, true); };
         }, result => { if (revision === result.previous_revision) revision = result.revision; });

@@ -122,6 +122,19 @@ an old pixel or DSP snapshot is not a permanent artistic requirement.
 For a deliberate unchanged-art comparison, `test_supporter_rendering.cjs`
 supports `--capture-followers` and `--compare-followers`. Normal runs do not
 silently enforce a fingerprint left by an earlier review.
+These flags also work on its current owner, `test_subscriber_party.cjs`.
+Capture and compare are separate runs; the default reference is
+`output/subscriber-party/follower-fingerprints.json`. Set `FOLLOWER_REFERENCE_FILE`
+to use a different reference explicitly. A historical file's presence alone
+must never enable a comparison.
+
+When changing a feature, distinguish a defect from an intentionally changed
+contract. Keep tests for the behavior that still matters; revise the scenario
+when the requested behavior changes. Do not restore obsolete UI, artwork, catalog
+sizes or private implementation just to satisfy an old assertion. Catalog tests
+should check identities, coverage and valid behavior, so an additional valid
+entry passes while a missing, duplicate or unreachable entry fails. Exact counts
+remain useful for controlled fixtures and bounded resources.
 
 The default Python suite covers Hub runtime, installers and Footage Desk.
 The ten standalone `stream_brand` export suites are listed in `ARTIFACT_MODULES`

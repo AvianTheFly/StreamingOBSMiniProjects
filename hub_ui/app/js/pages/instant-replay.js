@@ -4,18 +4,21 @@ import { state } from '../state.js';
 import { toast } from '../toast.js';
 import { mountPresentation } from './replay-presentation.js';
 import { mountClipDesk } from './replay-clip-desk.js';
+import { mountVoiceGuide } from './replay-voice-guide.js';
 
-let root, desk, disposePresentation, unwatch, ready = false, busy = false, bufferActive = null, generation = 0;
+let root, desk, disposePresentation, disposeVoiceGuide, unwatch, ready = false, busy = false, bufferActive = null, generation = 0;
 const $ = selector => root?.querySelector(selector);
 const button = (id,label) => `<button id="${id}" class="btn btn-secondary btn-sm">${label}</button>`;
 
 export function mount(container) {
   root=container;ready=false;busy=false;bufferActive=null;const token=++generation;root.classList.add('replay-workspace');
-  root.innerHTML=`<div class="page-header ir-page-heading"><div><div class="page-title">Manage clips</div><div class="page-subtitle">Trim, add notes, and build montages.</div></div><div class="ir-mark-action"><button id="irMark" class="btn btn-primary">◇ Mark last 60s</button><a href="#dashboard" class="desk-text-link">Back to live desk ↗</a></div></div>
+  root.innerHTML=`<div class="page-header ir-page-heading"><div><div class="page-title">Your clips</div><div class="page-subtitle">Find a moment. Keep the good part.</div></div><div class="ir-mark-action"><button id="irMark" class="btn btn-secondary">◇ Mark last 60s</button><a href="#dashboard" class="desk-text-link">Back to live desk ↗</a></div></div>
     <details class="ir-management-settings"><summary>Capture &amp; replay settings</summary><section id="irPresentation" aria-label="Replay presentation studio"></section></details>
     <div class="ir-live card"><div><span id="irIndicator" class="state-indicator"></span> <strong id="irStatus">Connecting…</strong><span id="irActivity" class="ir-muted"></span></div><div id="irBufferSetup" hidden><span id="irBufferStatus" class="ir-muted"></span> ${button('irStartBuffer','Start replay buffer')}</div><div class="ir-actions">${button('irPause','Pause')}${button('irResume','Resume')}${button('irSkip','Next clip')}${button('irStop','Return to live')}</div></div>
-    <details class="ir-help"><summary>Voice shortcuts <span class="ir-muted">· press |, then speak</span></summary><div class="ir-help-grid"><div><h3>Save for later</h3><p><code>mark</code> saves the last 60 seconds for review. <code>mark 30</code> changes the length; <code>mark full</code> saves the buffer. These clips stay out of automatic replays.</p></div><div><h3>Replay a moment</h3><p><code>quick replay</code> captures and replays 15 seconds. <code>quick replay 30</code> changes its duration. <code>replay</code> plays the latest eligible capture.</p></div><div><h3>Keep a highlight</h3><p><code>save</code> captures the game moment and requests a Twitch clip. <code>save 30</code> chooses its length. <code>save and replay</code> also plays it. <code>showcase</code> and <code>random</code> use replay-ready highlights.</p></div></div></details><section id="irClipDesk"></section>`;
-  $('#irPresentation').parentElement.append($('.ir-live'),$('.ir-help'));
+    <details class="ir-help"><summary>Voice commands</summary><div id="irVoiceGuide"></div></details><section id="irClipDesk"></section>`;
+  disposeVoiceGuide=mountVoiceGuide($('#irVoiceGuide'));
+  root.append($('.ir-management-settings'),$('.ir-help'));
+  $('#irPresentation').parentElement.append($('.ir-live'));
   disposePresentation=mountPresentation($('#irPresentation'),{canCapture:()=>ready&&bufferActive===true&&!busy});
   const bind=(id,fn)=>$(id)?.addEventListener('click',fn);
   for(const [id,action] of [['irRandom','play_random'],['irHighlights','play_highlights'],['irSaveReplay','save_replay'],['irReplay','play_replay'],['irLatest','play_showcase']])bind(`#${id}`,()=>live(()=>api.runProjectAction('instant_replay',action)));
@@ -36,7 +39,7 @@ export function mount(container) {
   unwatch=state.watch('projects',updateStatus);updateStatus(state.get('projects'));
 }
 export function beforeLeave(){return desk?.beforeLeave() ?? true;}
-export function unmount(){generation++;unwatch?.();disposePresentation?.();desk?.dispose();root?.classList.remove('replay-workspace');root=null;desk=null;unwatch=null;disposePresentation=null;}
+export function unmount(){generation++;unwatch?.();disposePresentation?.();disposeVoiceGuide?.();desk?.dispose();root?.classList.remove('replay-workspace');root=null;desk=null;unwatch=null;disposePresentation=null;disposeVoiceGuide=null;}
 async function perform(fn,message){try{const data=await fn();if(data?.ok===false)throw Error(data.error||'Action unavailable');if(message)toast.success(message);return data;}catch(e){toast.error(e.message);return null;}}
 async function live(fn,message='Playback requested in OBS'){
   if(!ready){toast.error('Replay playback is offline. Open OBS to enable it.');return;}

@@ -55,6 +55,8 @@ class VoiceLifecycleTests(unittest.TestCase):
                   '_recording_generation': 0, '_transcription_busy': False,
                   '_recording_started': time.monotonic(), '_startup_error': None,
                   '_ready_event': threading.Event()}
+        values.update(_activity_snapshot={}, _activity=None, _activity_error=None,
+                      _vad_model=None, _capture_sample_rate=16000)
         for name, value in values.items():
             setting = patch.object(listener, name, value)
             setting.start()
@@ -113,6 +115,49 @@ class VoiceLifecycleTests(unittest.TestCase):
         for _ in range(256):
             listener._capture_audio(np.zeros((512, 1), dtype=np.float32))
         self.assertEqual(listener._audio_q.qsize(), 128)
+
+    def test_payload_cannot_grow_beyond_five_seconds_even_if_watchdog_is_delayed(self):
+        listener.start_recording('test')
+        for _ in range(200):
+            with listener._rec_lock:
+                listener._append_audio_locked((listener._recording_generation, np.ones(512)))
+        self.assertEqual(sum(map(len, listener._buffer)), 5 * 16000)
+
+    def test_new_session_cannot_reuse_old_speech_evidence(self):
+        listener.start_recording('first')
+        listener._activity_snapshot.update(speech_detected=True, last_speech_at=99)
+        listener.cancel_recording('first')
+        listener.start_recording('second')
+        self.assertNotIn('last_speech_at', listener.capture_activity('second'))
+
+    def test_endpoint_work_runs_outside_recording_lock_and_cancel_drops_context(self):
+        activity = Mock()
+        activity.snapshot.return_value = dict(speech_detected=True, last_speech_at=1)
+        def measure(chunk):
+            self.assertTrue(listener._rec_lock.acquire(blocking=False))
+            listener._rec_lock.release()
+        activity.feed.side_effect = measure
+        listener.start_recording('test')
+        listener._activity = activity
+        listener._activity_error = None
+        listener._measure_activity((listener._recording_generation, np.zeros(512)))
+        self.assertTrue(listener.capture_activity('test')['speech_detected'])
+        listener.cancel_recording('test')
+        self.assertIsNone(listener._activity)
+        self.assertEqual(listener._activity_snapshot, {})
+
+    def test_cancel_during_measurement_cannot_publish_into_replacement_session(self):
+        listener.start_recording('first')
+        activity = Mock()
+        def replace(chunk):
+            listener.cancel_recording('first')
+            listener.start_recording('second')
+        activity.feed.side_effect = replace
+        activity.snapshot.return_value = dict(speech_detected=True, last_speech_at=1)
+        listener._activity = activity
+        listener._activity_error = None
+        listener._measure_activity((listener._recording_generation, np.zeros(512)))
+        self.assertNotIn('speech_detected', listener.capture_activity('second'))
 
     def test_safety_timeout_discards_pending_audio_instead_of_transcribing(self):
         listener.start_recording('test')

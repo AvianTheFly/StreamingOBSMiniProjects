@@ -15,6 +15,79 @@ from .test_client_scenes import FakeOBS, session
 
 
 class StageTests(unittest.TestCase):
+    def loading_fixture(self):
+        catalog = {'77': {'name': 'Udyr', 'id': 'Udyr'}, '103': {'name': 'Ahri', 'id': 'Ahri'},
+                   '22': {'name': 'Ashe', 'id': 'Ashe'}}
+        draft_session = {'gameId': 10, 'myTeam': [
+            {'championId': 77, 'summonerName': 'Walker', 'obfuscatedSummonerName': 'Gromp', 'assignedPosition': 'jungle'},
+            {'championId': 103, 'summonerName': 'Fox', 'assignedPosition': 'middle'}],
+            'theirTeam': [{'championId': 22, 'summonerName': 'Arrow', 'assignedPosition': 'bottom'}]}
+        state = StageState()
+        state.client('ChampSelect', 'champions', project(draft_session, catalog), draft_session, catalog)
+        # Local team is on CHAOS; both observations reorder its participants.
+        flow = {'gameData': {'gameId': 10, 'teamOne': [{'championId': 22, 'summonerName': 'Arrow'}],
+                            'teamTwo': [{'championId': 103, 'summonerName': 'Fox'}, {'championId': 77, 'summonerName': 'Walker'}]}}
+        live = {'gameData': {'gameTime': 0}, 'activePlayer': {'summonerName': 'Walker'}, 'allPlayers': [
+            {'championName': 'Ashe', 'summonerName': 'Arrow', 'team': 'ORDER'},
+            {'championName': 'Ahri', 'summonerName': 'Fox', 'team': 'CHAOS'},
+            {'championName': 'Udyr', 'riotIdGameName': 'Spirit Walker', 'summonerName': 'Walker', 'team': 'CHAOS', 'position': 'NONE'}]}
+        return state, catalog, flow, live
+
+    def test_alternating_loading_sources_keep_icons_names_roles_and_local_slots(self):
+        state, catalog, flow, live = self.loading_fixture()
+        state.client('GameStart', None, {}, flow, catalog)
+        state.live(live)
+        expected = state.snapshot(True)['roster']
+        allies = [p for p in expected if p['team'] == 'allies']
+        self.assertEqual([p['name'] for p in allies[:2]], ['Udyr', 'Ahri'])
+        self.assertEqual(allies[0]['label'], 'Spirit Walker')
+        self.assertEqual(allies[0]['role'], 'jungle')
+        self.assertEqual(allies[0]['image'], '/champ-select/icons/77.png')
+        for _ in range(20):
+            state.client('InProgress', None, {}, flow, catalog)
+            self.assertEqual(state.roster, expected)
+            state.live(live)
+            self.assertEqual(state.roster, expected)
+        self.assertTrue(state.snapshot(True)['loading'])
+
+    def test_partial_loading_samples_and_catalog_outage_do_not_erase_roster(self):
+        state, catalog, flow, live = self.loading_fixture()
+        state.client('GameStart', None, {}, flow, catalog); state.live(live)
+        expected = state.roster
+        for session in [None, {}, {'gameData': []}, {'gameData': {'teamOne': [None], 'teamTwo': []}}]:
+            state.client('InProgress', None, {}, session, {})
+            self.assertEqual(state.roster, expected)
+        for players in [[], [None], [{'team': 'UNKNOWN'}], [{'championName': 'Udyr', 'team': 'CHAOS'}]]:
+            state.live({'gameData': {'gameTime': 0}, 'allPlayers': players})
+            self.assertEqual(state.roster, expected)
+        snap = state.snapshot(True); snap['roster'][0]['label'] = 'Mutated'
+        self.assertEqual(state.roster, expected)
+
+    def test_live_only_roster_gains_icons_and_keeps_order_after_late_client(self):
+        _, catalog, flow, live = self.loading_fixture()
+        state = StageState(); state.client('GameStart', None, {})
+        state.live(live)
+        self.assertEqual([p['name'] for p in state.roster if p['team'] == 'allies'], ['Ahri', 'Udyr'])
+        state.client('InProgress', None, {}, flow, catalog)
+        allies = [p for p in state.roster if p['team'] == 'allies']
+        self.assertEqual([p['name'] for p in allies], ['Ahri', 'Udyr'])
+        self.assertTrue(all(p['image'] for p in allies))
+        self.assertEqual(allies[1]['label'], 'Spirit Walker')
+
+    def test_mirrored_champions_match_exposed_players_and_new_match_discards_old_data(self):
+        state = StageState(); catalog = {'77': {'name': 'Udyr', 'id': 'Udyr'}}
+        draft = {'gameId': 10, 'myTeam': [{'championId': 77, 'summonerName': 'Mine'}],
+                 'theirTeam': [{'championId': 77, 'summonerName': 'Theirs'}]}
+        state.client('ChampSelect', 'champions', project(draft, catalog), draft, catalog)
+        flow = {'gameData': {'gameId': 10, 'teamOne': [{'championId': 77, 'summonerName': 'Theirs'}],
+                            'teamTwo': [{'championId': 77, 'summonerName': 'Mine'}]}}
+        state.client('GameStart', None, {}, flow, catalog)
+        self.assertEqual(state.roster[0]['label'], 'Mine')
+        state.client('InProgress', None, {}, {'gameData': {'gameId': 11, 'teamOne': [{'championId': 77, 'summonerName': 'New'}]}}, catalog)
+        self.assertEqual([p['label'] for p in state.roster], ['New'])
+        state.client('Lobby', 'idle', {})
+        self.assertEqual(state.roster, [])
+
     def test_badge_tracks_queue_through_bans_but_not_manual_privacy(self):
         state = StageState()
         for phase, target in [('Matchmaking', 'queue'), ('ReadyCheck', 'queue'), ('ChampSelect', 'queue')]:

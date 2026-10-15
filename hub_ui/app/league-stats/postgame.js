@@ -1,7 +1,7 @@
 import {pollVisible} from '/shared/visible-poll.js';
 import {renderReport,renderView,loadArt} from './postgame-render.js';
 const params=new URLSearchParams(location.search),stream=params.get('stream')==='1',control=params.get('control')==='1';
-const el=id=>document.getElementById(id),views=['highlights','tempo','combat','build','economy','vision','moments'];
+const el=id=>document.getElementById(id),views=['highlights','tempo','combat','build','economy','vision','moments','story'];
 document.body.classList.toggle('stream',stream);document.body.classList.toggle('controller',control);
 el('showControls').hidden=!control;
 let latest=null,signature='',viewSignature='',pending=false,closed=false;
@@ -9,11 +9,11 @@ let abort=new AbortController();
 function controls(){if(!latest)return;const show=latest.show||{};
  el('rotation').textContent=show.hold_remaining>0?'Auto in '+Math.ceil(show.hold_remaining)+'s':show.playing?'Auto':'Paused';
  el('pause').textContent=show.playing?'Ⅱ':'▶';el('pause').setAttribute('aria-label',show.playing?'Pause automatic pages':'Resume automatic pages');
- el('showStatus').textContent=show.visible?'● Ready for OBS':show.safe===false?'Preview · waiting for lobby':'○ Preview only';
+ el('showStatus').textContent=show.visible?'● Ready for OBS':show.safe===false?'Preview · waiting for queue':'○ Preview only';
  el('showStatus').classList.toggle('on-air',!!show.visible);
  el('showToggle').textContent=show.visible?'Hide from OBS':'Show on OBS';
  el('showToggle').disabled=pending||!latest.match||(!show.visible&&!show.safe);
- el('autoToggle').textContent=show.auto?'✓ Auto after games':'Auto after games';el('autoToggle').setAttribute('aria-pressed',String(!!show.auto));
+ el('autoToggle').textContent=show.auto?'✓ Auto in queue':'Auto in queue';el('autoToggle').setAttribute('aria-pressed',String(!!show.auto));
  el('autoToggle').disabled=pending;
  document.querySelectorAll('#tabs button,#pause,#next,#previous').forEach(b=>b.disabled=pending||!control||!latest.match);
 }

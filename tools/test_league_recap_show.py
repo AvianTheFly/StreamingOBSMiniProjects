@@ -13,12 +13,32 @@ class RecapShowTests(unittest.TestCase):
     setUp=fixtures.PostgameTests.setUp
     new_tracker=fixtures.PostgameTests.new_tracker
     advance=fixtures.PostgameTests.advance
+    def test_queue_starts_at_overview_and_loops_until_cancelled(self):
+        self.tracker.enrich(match(),'p');self.tracker.account='p'
+        for phase in ['EndOfGame', 'Lobby']:
+            self.tracker.client_phase=phase
+            self.assertFalse(self.tracker.postgame_report()['visible'])
+        self.advance(3600)
+        self.tracker.client_phase='Matchmaking'
+        report=self.tracker.postgame_report()
+        self.assertTrue(report['visible']);self.assertEqual(report['show']['view'],'highlights')
+        self.advance(96)
+        report=self.tracker.postgame_report()
+        self.assertTrue(report['visible']);self.assertEqual(report['show']['page'],1)
+        for phase in ['ReadyCheck', 'ChampSelect']:
+            self.tracker.client_phase=phase
+            self.assertTrue(self.tracker.postgame_report()['visible'])
+        self.tracker.client_phase='Lobby'
+        self.assertFalse(self.tracker.postgame_report()['visible'])
+        self.tracker.client_phase='Matchmaking'
+        self.assertEqual(self.tracker.postgame_report()['show']['page'],0)
+
     def command(self, action, **fields):
         r=self.tracker.postgame_report()
         return self.tracker.control_postgame(dict(action=action,match_id=r['match']['id'],revision=r['show']['revision'],**fields))
 
     def test_shared_playhead_manual_selection_and_pause(self):
-        self.tracker.enrich(match(),'p');self.tracker.account='p';self.tracker.client_phase='Lobby'
+        self.tracker.enrich(match(),'p');self.tracker.account='p';self.tracker.client_phase='Matchmaking'
         first=self.tracker.postgame_report()
         self.assertEqual(first['show']['view'],'highlights')
         self.advance(13)
@@ -40,7 +60,7 @@ class RecapShowTests(unittest.TestCase):
         self.assertEqual(self.tracker.postgame_report()['show']['view'],'economy')
 
     def test_hide_persists_and_manual_show_cannot_override_gameplay(self):
-        self.tracker.enrich(match(),'p');self.tracker.account='p';self.tracker.client_phase='Lobby'
+        self.tracker.enrich(match(),'p');self.tracker.account='p';self.tracker.client_phase='Matchmaking'
         with patch('league_stats.config.SettingsBackups'):
             self.command('hide')
         self.assertFalse(self.new_tracker().settings['postgame_auto'])
@@ -49,11 +69,11 @@ class RecapShowTests(unittest.TestCase):
         self.tracker.client_phase='InProgress'
         self.assertFalse(self.tracker.postgame_report()['visible'])
         with self.assertRaises(ValueError):self.command('show')
-        self.tracker.client_phase='Lobby';self.advance(1801)
+        self.tracker.client_phase='Matchmaking';self.advance(1801)
         self.assertFalse(self.tracker.postgame_report()['visible'])
 
     def test_stale_controls_rejected_after_new_match_or_other_controller(self):
-        self.tracker.enrich(match(),'p');self.tracker.account='p';self.tracker.client_phase='Lobby'
+        self.tracker.enrich(match(),'p');self.tracker.account='p';self.tracker.client_phase='Matchmaking'
         r=self.tracker.postgame_report();old=dict(action='hide',match_id=r['match']['id'],revision=r['show']['revision'])
         self.command('pause')
         with self.assertRaises(ValueError):self.tracker.control_postgame(old)

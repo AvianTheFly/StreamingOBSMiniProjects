@@ -12,6 +12,9 @@ import time
 from typing import Callable
 
 from . import listener
+from .endpoint import MAX_CAPTURE_SECONDS
+
+REARM_SECONDS = 1.0
 
 
 @dataclass
@@ -36,6 +39,9 @@ class Session:
     text: str = ""
     cancelled: bool = False
     timer: threading.Timer | None = None
+    stop_watch: threading.Event | None = None
+    monotonic_started: float = 0.0
+    finish_reason: str = ""
 
 
 class VoiceService:
@@ -84,10 +90,12 @@ class VoiceService:
                 return self._active.state
             return "idle"
 
-    def begin(self, consumer):
+    def begin(self, consumer, *, expected_sequence=None):
         from events import inspect_event
         with self._lock:
             if self._consumers.get(consumer.tag) is not consumer:
+                return False
+            if expected_sequence is not None and expected_sequence != self._sequence:
                 return False
             reason = ""
             if self._active:
@@ -106,11 +114,12 @@ class VoiceService:
             if not self.backend.start_recording(consumer.tag):
                 return False
             self._sequence += 1
-            session = Session(self._sequence, consumer, consumer.generation, pressed_at)
+            session = Session(self._sequence, consumer, consumer.generation, pressed_at,
+                              monotonic_started=time.monotonic(), stop_watch=threading.Event())
             self._active = session
             inspect_event('voice.session', owner=consumer.tag, phase='listening', session_id=session.id)
-            session.timer = threading.Timer(consumer.timeout,
-                lambda: self.finish(consumer, session.id))
+            # One bounded watchdog per session, not a new timer per audio frame.
+            session.timer = threading.Timer(0.0, lambda: self._watch(session))
             session.timer.daemon = True
             try:
                 session.timer.start()
@@ -120,7 +129,53 @@ class VoiceService:
                 raise
             return True
 
-    def finish(self, consumer=None, session_id=None):
+    def _watch(self, session):
+        while not session.stop_watch.wait(.1):
+            if not self._check_endpoint(session):
+                return
+
+    def _check_endpoint(self, session):
+        """Decide against the exact session under its ownership lock."""
+        with self._lock:
+            if self._active is not session or session.state != "listening":
+                return False
+            try:
+                activity = self.backend.capture_activity(session.consumer.tag)
+            except Exception as exc:
+                activity = {"endpoint_error": f"Speech activity unavailable: {exc}"}
+            # Backends without speech evidence retain the bounded manual flow.
+            if not isinstance(activity, dict):
+                activity = {}
+            elapsed = time.monotonic() - session.monotonic_started
+            speech = bool(activity.get("speech_detected"))
+            last_speech = activity.get("last_speech_at")
+            if elapsed >= MAX_CAPTURE_SECONDS:
+                if speech and not activity.get("endpoint_error"):
+                    self.finish(session.consumer, session.id, reason="five-second safety limit")
+                else:
+                    # Do not infer silence or a stale command on a failed mic/VAD.
+                    session.finish_reason = ("speech detector unavailable" if activity.get("endpoint_error")
+                                             else "no speech before safety limit")
+                    session.state = "processing"
+                    self._stop_watch(session)
+                    self.backend.cancel_recording(session.consumer.tag)
+                    self._complete(session)
+                return False
+            if (speech and isinstance(last_speech, (int, float)) and
+                    not activity.get("endpoint_error") and
+                    time.monotonic() - last_speech >= session.consumer.timeout):
+                self.finish(session.consumer, session.id, reason="quiet pause after speech")
+                return False
+            return True
+
+    @staticmethod
+    def _stop_watch(session):
+        if session.stop_watch:
+            session.stop_watch.set()
+        if session.timer:
+            session.timer.cancel()
+
+    def finish(self, consumer=None, session_id=None, *, reason="finished manually"):
         with self._lock:
             session = self._active
             if not session or session.state != "listening":
@@ -130,7 +185,8 @@ class VoiceService:
             if session_id is not None and session.id != session_id:
                 return False
             session.state = "processing"
-            session.timer.cancel()
+            session.finish_reason = reason
+            self._stop_watch(session)
             session.consumer.lockout_until = time.monotonic() + session.consumer.lockout
         from events import inspect_event
         inspect_event('voice.session', owner=session.consumer.tag, phase='processing', session_id=session.id)
@@ -153,9 +209,9 @@ class VoiceService:
             if not session or (consumer is not None and session.consumer is not consumer):
                 return False
             session.cancelled = True
+            session.finish_reason = reason
             session.consumer.generation += 1
-            if session.timer:
-                session.timer.cancel()
+            self._stop_watch(session)
             if session.state == "listening":
                 self.backend.cancel_recording(session.consumer.tag)
                 self._complete(session, reason)
@@ -175,9 +231,12 @@ class VoiceService:
             if self._active is not session:
                 return
             self._active = None
+            session.consumer.lockout_until = max(session.consumer.lockout_until,
+                                                  time.monotonic() + (REARM_SECONDS if session.consumer.lockout else 0))
             record = {"id": session.id, "owner": session.consumer.tag,
                       "started_at": session.started_at, "finished_at": time.time(),
                       "text": session.text, "error": error,
+                      "finish_reason": session.finish_reason,
                       "outcome": "cancelled" if session.cancelled else
                                  "error" if error else "transcribed" if session.text else "empty"}
             self._history.append(record)
@@ -266,10 +325,18 @@ class VoiceService:
                 "state": session.state if session else "idle",
                 "owner": session.consumer.tag if session else None,
                 "session_id": session.id if session else None,
+                "sequence": self._sequence,
                 "started_at": session.started_at if session else None,
                 "last_rejection": dict(self._last_rejection) if self._last_rejection else None}
+            result.update(max_capture_seconds=MAX_CAPTURE_SECONDS,
+                          silence_seconds=session.consumer.timeout if session else None)
+            if session and session.state == "listening":
+                activity = self.backend.capture_activity(session.consumer.tag)
+                if isinstance(activity, dict):
+                    result.update(activity)
             if include_details:
                 result.update(consumers=[{"tag": c.tag, "timeout": c.timeout,
+                                         "silence_seconds": c.timeout,
                                          "state": self.state(c)} for c in self._consumers.values()],
                               history=[dict(item) for item in reversed(self._history)])
             return result

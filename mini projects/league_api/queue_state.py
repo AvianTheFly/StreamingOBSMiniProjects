@@ -83,7 +83,8 @@ class QueueState:
         if phase in {'ReadyCheck', 'ChampSelect'}:
             self.extended = True
         self.active = True
-        self.status = 'MATCH FOUND' if phase == 'ReadyCheck' else 'BANNING' if phase == 'ChampSelect' else 'IN QUEUE'
+        # The broadcast journey deliberately conceals ready-check/draft progress.
+        self.status = 'IN QUEUE'
         if phase == 'ChampSelect' and bans_finished(session):
             if self.frozen is None:
                 self.frozen = max(0, now - self.started)

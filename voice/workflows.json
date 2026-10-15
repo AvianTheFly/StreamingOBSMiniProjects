@@ -17,7 +17,7 @@
         "event": "voice.session",
         "kind": "event"
       },
-      "detail": "One microphone/model owner and exclusive session. Editor uploads share that inference lease; optional word timing disables speech VAD for musical uploads, consumes segment iteration under the same lease, and releases temporary files and busy state on success, cancellation or error. Normal command transcription is unchanged.",
+      "detail": "One microphone/model owner and exclusive session. Trigger once to start; trigger again while listening finishes early. Saved timeout measures a quiet pause after confirmed speech, not recording length. One session watchdog ends capture after that pause or the five-second absolute safety limit; no speech or failed detection is discarded without inference and empty completion releases feature state. Normal triggers rearm one second after completion; processing presses and stale session/revision intents cannot reopen capture. The cached bundled Silero detector runs only on active audio in the existing drain worker with two seconds of bounded context and native-rate normalization warmed before readiness. Stored PCM cannot exceed five seconds. Editor uploads share the exclusive inference lease and preserve optional word timing and cleanup.",
       "steps": [
         {
           "id": "0",
@@ -28,24 +28,24 @@
         },
         {
           "id": "1",
-          "label": "Capture for this module",
+          "label": "Listen for this module",
           "owner": "voice",
           "kind": "action",
-          "detail": ""
+          "detail": "Measure speech on the existing drain worker. Finish after the saved quiet pause, explicit Finish, or the five-second cap. No-speech and detector-failure deadlines release capture without inference."
         },
         {
           "id": "2",
           "label": "Transcribe once",
           "owner": "voice",
           "kind": "action",
-          "detail": ""
+          "detail": "One inference lease. Original capture-start timestamp is preserved for replay cutoffs; no speech sends only empty completion."
         },
         {
           "id": "3",
           "label": "Deliver to the same session",
           "owner": "voice",
           "kind": "gate",
-          "detail": "Cancellation or a newer generation discards stale text."
+          "detail": "Cancellation, replacement, and old trigger/watchdog/UI session IDs reject stale work. A one-second normal-trigger rearm guard prevents an immediate restart after automatic completion."
         },
         {
           "id": "4",
@@ -56,8 +56,8 @@
         }
       ],
       "owner_hashes": {
-        "hub": "2651a208dfe2c15d06a55506164c7fc7795423742dfa750511fa1a7762484d50",
-        "voice": "59877feb7aa4c30cfb7a877cd2d0a388f528f3ccc816c6ee37964870389e0964"
+        "voice": "546f9a48ec3b41ed6cea89aa9064189c408889f174a5ad28062ca4c38fb877ac",
+        "hub": "e4267515dce040c89184745481b01594a4432bc95d2d2740334aa372b743c47a"
       },
       "edges": [
         {
@@ -81,17 +81,32 @@
         {
           "path": "voice/service.py",
           "symbol": "VoiceService.begin",
-          "hash": "29e02c01c021fef5b199cf0eaadd20335eb4b34d063f0c7476667cfed8680086"
+          "hash": "77b2e033d915cfc7db61c5bfc608a2a5fdd16baa73b3864fd1c6ab148706dded"
         },
         {
           "path": "voice/service.py",
           "symbol": "VoiceService.finish",
-          "hash": "b3295b4490824acd973d4280c2fae956318d79160ef273036b14f5c8b6694dcb"
+          "hash": "d9add3295b11471eeb2ebfc3787ada6baeaecb3776f00f1ab8c5a1b987ca527d"
         },
         {
           "path": "voice/service.py",
           "symbol": "VoiceService._deliver",
           "hash": "7cbb1a721749812885fcc521911a4271bee63fdbb340c9835964820db8dd3a70"
+        },
+        {
+          "path": "voice/service.py",
+          "symbol": "VoiceService._check_endpoint",
+          "hash": "2a47bc58bf2bffc2206a214e74e74e1376e33a17d18fc5858baea0748c2884b4"
+        },
+        {
+          "path": "voice/endpoint.py",
+          "symbol": "SpeechActivity",
+          "hash": "991fdd0b02c87a754d63cffd1ca7391517d598eb39bf29cf893209aae9ecf150"
+        },
+        {
+          "path": "voice/ptt.py",
+          "symbol": "VoicePTT.on_trigger",
+          "hash": "3e507025d19da631d6b8992207ad3a87690c8d1834db03f6e2429b755c12f097"
         }
       ]
     }

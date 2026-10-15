@@ -13,6 +13,7 @@ import threading
 from datetime import datetime
 
 from .commands import parse_command as _parse_command
+from .voice_controls import ReplayVoiceControls
 from . import stage
 from .trimming import trim_from_end as _trim_from_end
 from lib.global_hotkeys import key_char, subscribe_global_hotkeys, unsubscribe_global_hotkeys
@@ -53,38 +54,26 @@ def run(
     views = ReplayInventory(state)
     playback = ReplayPlayback(state, _live)
     selection = ReplaySelection(state, views, playback)
-    _cancel_watcher = state._cancel_watcher
     _clip_registry = state._clip_registry
     _current_game_label = state._current_game_label
-    _is_multi_clip_active = state._is_multi_clip_active
-    _last_save_cmd_time = state._last_save_cmd_time
     _lock = state._lock
     _previous_game_clips = state._previous_game_clips
-    _random_playback_active = state._random_playback_active
     _replay_active = state._replay_active
     _replay_paused = state._replay_paused
-    _save_done_event = state._save_done_event
-    _save_in_progress = state._save_in_progress
-    _scene_session = state._scene_session
     _skip_clip = state._skip_clip
     _tag_counters = state._tag_counters
     _was_in_game = state._was_in_game
-    _watcher_thread = state._watcher_thread
     _on_mark = capture._on_mark
     _on_save = capture._on_save
     _list_clips = views._list_clips
-    _get_most_recent_clip = views._get_most_recent_clip
-    _get_all_clips_in_order = views._get_all_clips_in_order
-    _resolve_play_spec = views._resolve_play_spec
-    _format_tag_summary = views._format_tag_summary
     _on_play = selection._on_play
     _play_clip_path = selection._play_clip_path
     def _end_replay(*, cancelled=False):
         selection.cancel_pending()
         playback._end_replay(cancelled=cancelled)
 
-    def _save_replay(pressed_at=None):
-        return selection.capture_and_replay(capture, pressed_at=pressed_at)
+    def _save_replay(pressed_at=None, **options):
+        return selection.capture_and_replay(capture, pressed_at=pressed_at, **options)
     def _quick_replay(seconds=15, pressed_at=None):
         return selection.capture_and_replay(capture, seconds=seconds,
                                             purpose='replay_only', pressed_at=pressed_at)
@@ -108,83 +97,19 @@ def run(
         'save_replay': _save_replay, 'quick_replay': _quick_replay,
     }
 
-    # VoiceService delivers commands outside the microphone/inference worker.
-
-    def _run_voice_command(text: str, pressed_at: float | None) -> None:
-        if stop_event.is_set():
-            return
-        print(f"[instant_replay] 💬 Heard: {text!r}")
-        cmd, spec, clip_seconds, full_save = _parse_command(text)
-        if cmd == "save":
-            _on_save(tag=spec, clip_seconds=clip_seconds, full_save=full_save, pressed_at=pressed_at)
-        elif cmd == 'save_replay':
-            _save_replay(pressed_at)
-        elif cmd == 'quick_replay':
-            _quick_replay(clip_seconds or 15, pressed_at)
-        elif cmd == "play":
-            _on_play(spec)
-        elif cmd == "mark":
-            _on_mark(tag=spec, clip_seconds=clip_seconds, full_save=full_save, pressed_at=pressed_at)
-        elif cmd == "stop":
-            print("[instant_replay] ⏹ Leaving replay.")
-            _cancel_watcher.set()
-            _end_replay(cancelled=True)
-        elif cmd == "next":
-            if _replay_active[0]:
-                _skip_clip.set()
-        elif cmd == "screen":
-            stage.set_companion(spec == "on")
-        elif cmd == 'view':
-            stage.set_view(spec)
-        else:
-            print(
-                f"[instant_replay] ⚠  Didn't recognise a command in {text!r}. "
-                "Say 'random', 'stop replay', 'play last', 'save', or 'mark'. See Instant Replay in the Hub for all commands."
-            )
-
+    # VoiceService owns microphone, transcription and bounded delivery.
+    voice = ReplayVoiceControls(capture, selection, playback, state, stop_event)
     ptt = VoicePTT(
         timeout=RECORD_TIMEOUT_SECONDS,
-        on_transcript=lambda text: _run_voice_command(text, None),
-        on_timed_transcript=_run_voice_command,
+        on_transcript=voice.dispatch,
+        on_timed_transcript=voice.dispatch,
         tag="instant_replay",
     )
 
-
-    def _on_listen_key() -> None:
-        if stop_event.is_set():
-            return
-        # Pressing "|" during replay:
-        #   • Single-clip playback  → cancel immediately (existing behaviour)
-        #   • Multi-clip playback   → first press skips to next clip;
-        #                             second press (while still in multi) cancels all
-        with _lock:
-            replay_running = _replay_active[0]
-            is_multi = _is_multi_clip_active[0]
-            is_random = _random_playback_active[0]
-
-        if replay_running:
-            if is_random:
-                print("[instant_replay] ⏹ Hotkey pressed during random replay — leaving replay.")
-                _cancel_watcher.set()
-                _end_replay(cancelled=True)
-            elif is_multi and not _skip_clip.is_set():
-                print("[instant_replay] ⏭  Hotkey pressed — skipping to next clip.")
-                _skip_clip.set()
-            else:
-                print("[instant_replay] ⏹  Hotkey pressed during replay — cancelling.")
-                _cancel_watcher.set()
-                _end_replay(cancelled=True)
-            return
-
-        ptt.on_trigger()
-
-
     def on_press(key) -> None:
-        if stop_event.is_set():
-            return
-        char = key_char(key)
-        if char == HOTKEY_LISTEN:
-            threading.Thread(target=_on_listen_key, daemon=True).start()
+        if not stop_event.is_set() and key_char(key) == HOTKEY_LISTEN:
+            # The same gesture listens while idle, playing, paused or waiting.
+            ptt.on_trigger()
 
     kb_token = subscribe_global_hotkeys(on_press)
     try:
@@ -197,8 +122,8 @@ def run(
     _live.update(bindings)
     print(
         f"[instant_replay] ⌨  Armed — press '{HOTKEY_LISTEN}' to start recording, "
-        "then press 'C' or trigger again to transcribe (auto-transcribes in 2s). "
-        "Say 'save [tag]', 'mark', 'play [spec]', or 'stop replay'."
+        "then finish speaking and pause, or press 'C' or trigger again to transcribe. "
+        "Say 'mark', 'save', 'replay now', or 'play last'. During replay: 'pause', 'resume', 'next', 'stop'."
     )
     if startup_event is not None:
         startup_event.set()

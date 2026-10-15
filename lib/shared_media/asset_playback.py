@@ -19,7 +19,7 @@ class AssetPlayback:
         self.apply_audio = apply_audio
         self.layout_for = layout_for
 
-    def play(self, stem, path, source, *, cancelled, allowed=None):
+    def play(self, stem, path, source, *, cancelled, allowed=None, interrupt_music=True):
         store = self.state_for(source)
         loaded = False
         release_audio = lambda: None
@@ -41,7 +41,8 @@ class AssetPlayback:
                 return
             shared = bool(getattr(self.cfg, 'single_source_mode', False))
             settle = max(0, int(getattr(self.cfg, 'media_swap_settle_ms', 0) or 0)) if shared else 0
-            release_audio = interrupt_audio(path, cancelled=cancelled)
+            if interrupt_music:
+                release_audio = interrupt_audio(path, cancelled=cancelled)
             if cancelled():
                 return
             loaded = self.start_source(scene=self.cfg.scene, source_name=source,

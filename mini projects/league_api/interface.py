@@ -17,9 +17,13 @@ class LeagueAPIInterface(ProjectInterface):
                 'stage': client['stage'],
                 'manual_stage': client['manual_stage'],
                 'manual_revision': client['manual_revision'],
+                'recording': service.match_recording.snapshot(),
                 'lobby_scene': client['settings']['lobby_scene']}
     def action_catalog(self):
         return [*super().action_catalog(),
+                {'key':'keep_recording','label':'Keep latest game recording'},
+                {'key':'delete_recording','label':'Delete latest game recording'},
+                {'key':'mark_recording','label':'Mark this moment in game recording'},
                 {'key':'champion_select','label':'Show champion select'},
                 {'key':'loading','label':'Show loading screen'},
                 {'key':'show_draft','label':'Choose draft scene'},
@@ -28,6 +32,12 @@ class LeagueAPIInterface(ProjectInterface):
                 {'key':'queue_lobby','label':'Hide for queue'}]
     def run_action(self, action, **kwargs):
         service = _live.get('service')
+        if action in {'keep_recording', 'delete_recording', 'mark_recording'}:
+            if service is None:
+                return {'ok':False,'error':'League recording controls are still starting'}
+            if action == 'mark_recording':
+                return service.match_recording.mark()
+            return service.match_recording.decide('kept' if action == 'keep_recording' else 'deleted')
         if action in {'show_draft', 'show_loading', 'show_queue'}:
             if service is None:
                 return {'ok':False,'error':'League scene controls are still starting'}

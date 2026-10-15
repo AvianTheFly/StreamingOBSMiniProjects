@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Game recordings</title><link rel="stylesheet" href="/recordings/style.css"></head>
+<body><header><a href="/production">← League production</a><h1>Game recordings</h1>
+<p>Unkept games expire after 3 days. Kept games stay until you delete them.</p>
+<p><kbd>*K*</kbd> Keep · <kbd>*D*</kbd> Delete · <kbd>/*</kbd> Mark a moment. Capitalization does not matter; type each sequence within 0.8 seconds.</p></header>
+<section aria-label="Recording status"><h2>Now</h2><p id="status">Connecting…</p><p id="error" role="alert"></p><p id="cleanup"></p>
+<div id="current-actions"><button data-current="kept">Keep current / latest</button><button data-current="deleted">Delete current / latest</button><button id="mark">Mark now</button></div>
+<p id="feedback" role="status" aria-live="polite"></p><p id="audio"></p></section>
+<main><section><h2>Your games</h2><p>Choose a game to review its markers. Deleting a game does not delete separately saved replay clips.</p><div id="games"></div></section>
+<section id="review"><h2 id="selected-title">Select a recording</h2><p id="path"></p><video id="video" controls preload="metadata"></video><div id="markers"></div></section></main>
+<script type="module" src="/recordings/app.js"></script></body></html>

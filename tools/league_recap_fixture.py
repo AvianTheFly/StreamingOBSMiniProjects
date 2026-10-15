@@ -31,6 +31,10 @@ def main():
                    totalDamageTaken=22000,damageSelfMitigated=15000,totalHeal=7000,timeCCingOthers=24,spell1Casts=77,spell2Casts=35,spell3Casts=28,spell4Casts=9,wardsPlaced=8,wardsKilled=3,
                    challenges=dict(skillshotsDodged=15,turretPlatesTaken=3),item0=3006,item1=3031,item2=3085,item3=3036,item4=3072)
         raw['info']['participants'][1]['kills']=20
+        raw['info']['participants'][1]['totalDamageDealtToChampions']=12300
+        for pid,champion_id,damage in [(4,77,24600),(5,103,28100),(6,266,19800)]:
+            raw['info']['participants'].append(dict(participantId=pid,championId=champion_id,
+                teamId=100,kills=5,totalDamageDealtToChampions=damage))
         for player in raw['info']['participants']:player.pop('stats',None)
         tracker.enrich(raw,'p')
         events=[]
@@ -45,7 +49,7 @@ def main():
         frames=[dict(timestamp=i*60000,participantFrames={'1':dict(totalGold=500+i*450,currentGold=150+(i%5)*320,minionsKilled=i*7+jungle_bonus(i),jungleMinionsKilled=0,level=min(18,1+i//2),damageStats=dict(totalDamageDoneToChampions=i*i*34)),
                     '3':dict(totalGold=500+i*420,minionsKilled=i*6,jungleMinionsKilled=0)},events=[e for e in events if (i-1)*60000<e['timestamp']<=i*60000]) for i in range(33)]
         tracker.enrich_timeline(dict(metadata=dict(matchId='NA1_7'),info=dict(frames=frames)),'p:7')
-        tracker.account='p';tracker.client_phase='EndOfGame'
+        tracker.account='p';tracker.client_phase='Matchmaking'
 
         class Handler(BaseHTTPRequestHandler):
             def log_message(self,*args):pass

@@ -86,17 +86,17 @@ class PostgameTests(unittest.TestCase):
     def test_stream_gates_age_phase_identity_and_unknown_result(self):
         self.ingest()
         self.tracker.disconnected()
-        self.tracker.client_phase = 'EndOfGame'
+        self.tracker.client_phase = 'Matchmaking'
         report = self.tracker.postgame_report()
         self.assertTrue(report['visible'])
         self.assertIsNone(report['match']['win'])
         self.assertIn('Partial', report['coverage'])
-        for phase in ('InProgress', 'Reconnect', 'Matchmaking', 'ChampSelect', 'WatchInProgress', ''):
+        for phase in ('EndOfGame', 'Lobby', 'None', 'InProgress', 'Reconnect', 'WatchInProgress', ''):
             self.tracker.client_phase = phase
             self.assertFalse(self.tracker.postgame_report()['visible'], phase)
-        self.tracker.client_phase = 'Lobby'
+        self.tracker.client_phase = 'Matchmaking'
         self.advance(901)
-        self.assertFalse(self.tracker.postgame_report()['visible'])
+        self.assertTrue(self.tracker.postgame_report()['visible'])
 
     def test_no_older_match_displayed_during_new_match(self):
         self.ingest()

@@ -44,14 +44,15 @@ class LobbyCatalog:
 
 
 def prepare_lobby(client, scene, candidates, *, selected=None, exclusions=(),
-                  chooser=random.choice, hide_screen=False):
+                  chooser=random.choice, hide_screen=False, display_mode=None):
     with lobby_catalog.presentation_lock:
         return _prepare_lobby(client, scene, candidates, selected=selected,
-                              exclusions=exclusions, chooser=chooser, hide_screen=hide_screen)
+                              exclusions=exclusions, chooser=chooser, hide_screen=hide_screen,
+                              display_mode=display_mode)
 
 
 def _prepare_lobby(client, scene, candidates, *, selected=None, exclusions=(),
-                   chooser=random.choice, hide_screen=False):
+                   chooser=random.choice, hide_screen=False, display_mode=None):
     """Validate first, then select one location without touching unrelated overlays.
 
 Call only from SceneDirector.request(prepare=...). A rejected/deferred request
@@ -68,6 +69,12 @@ currently visible location; retries with an active lobby are handled by caller.
         choices = [n for n in available if not indexed[n]['sceneItemEnabled']]
         selected = chooser(choices or available)
     plan = lobby_catalog.layout(selected)
+    # The feature publishes optional named selections; this transaction applies
+    # one without overwriting its saved preference or any personal transform.
+    content = plan.get('display_content') if plan else None
+    if content and display_mode in content.get('modes', {}):
+        content['selected'] = content['modes'][display_mode]
+        content.pop('transforms', None)
     if plan:
         from .lobby_layout import apply_layout, transform_matches
         apply_layout(client, selected, plan)

@@ -29,7 +29,7 @@ const sample=(id,locked=true)=>({championId:id,name:'Ahri',locked,role:'MIDDLE',
     const first=await canvas.evaluate(c=>c.toDataURL());
     const before=await page.evaluate(()=>drawAudit.frames);await page.waitForTimeout(1100);
     const frames=await page.evaluate(()=>drawAudit.frames)-before;
-    assert.ok(frames>=8&&frames<=35,`bounded cadence: ${frames}`);
+    assert.ok(frames>=40&&frames<=72,`bounded cadence: ${frames}`);
     assert.notEqual(await canvas.evaluate(c=>c.toDataURL()),first,'world must actually animate');
     await page.evaluate(()=>dispatchEvent(new CustomEvent('obsSourceVisibleChanged',{detail:{visible:false}})));
     const hidden=await page.evaluate(()=>drawAudit.frames);
@@ -47,7 +47,7 @@ const sample=(id,locked=true)=>({championId:id,name:'Ahri',locked,role:'MIDDLE',
     const lock=await page.evaluate(()=>drawAudit.lastStrokes);
     assert.ok(lock>base,`live lock emits a finite burst: ${base} -> ${lock}`);
     await page.waitForTimeout(4300);
-    assert.ok(await page.evaluate(()=>drawAudit.lastStrokes)<=base+1,'lock burst must expire');
+    assert.equal(await page.locator('.react-lock').count(),0,'lock burst must expire');
     // The drawing mask must use the exact theme aperture, keeping camera pixels clear.
     for(const theme of ['bear','ram','phoenix','turtle']) {
       state.theme=theme;

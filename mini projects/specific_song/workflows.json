@@ -17,7 +17,7 @@
         "event": "source.request",
         "kind": "control"
       },
-      "detail": "",
+      "detail": "One serialized source worker obtains an actual song ticket, honors cancellation and its ongoing permission gate, then admits native Spotify interruption before loading audio. Spotify starts/resumes abort this music and stop random playback through the public interface; a newly selected song pauses Spotify before loading. Asset levels remain personal. Park the source and stop the visualizer before releasing Spotify and finishing the actual ticket.",
       "steps": [
         {
           "id": "0",
@@ -56,9 +56,9 @@
         }
       ],
       "owner_hashes": {
-        "obs": "6a6a674c2c8c99f5f3ce753c7ac54202cc29a552b652748793ed6deb3e52105f",
-        "specific_song": "e7e1202a6974b27ae26f8bd293bc731a9b8950027cb12ec7468309b3f8f6c66d",
-        "media_workers": "99a1a00f5854b87301b5e62b0837f5e035bf87e45a4552403c603e0e3de1f064"
+        "media_workers": "a23931f02ef2614b1357960ee7825f499225ec6fcf6f1ae77f82f514c3be7367",
+        "obs": "3de82701e42a7f4b71c82c8c36352455cf77e5b072127ac59f42b335e6dbb72c",
+        "specific_song": "62c4a0921ecdbb209927f476eae089b42ffe5b36a16c6ada9dd11cdfd5a67f99"
       },
       "edges": [
         {
@@ -87,7 +87,7 @@
         {
           "path": "mini projects/specific_song/player.py",
           "symbol": "SongPlayer",
-          "hash": "d7b234f6122d69697d684568d94531ce6dd01d080f63307250f54f30e95c1da0"
+          "hash": "f5af756c1551092480fdf190d7d5eb3e6ffd20e2a75405a99904e310994fae1d"
         }
       ]
     }

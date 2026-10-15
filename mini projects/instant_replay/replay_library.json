@@ -1,5 +1,5 @@
 {
-  "revision": 144,
+  "revision": 158,
   "clips": {
     "b4599b300815a05841074ac3": {
       "path": "C:\\StreamingMedia\\Replays\\clips\\Game 1023 2026-09-14\\Replay 2026-09-14 15-32-21_ir_trimmed.mkv",
@@ -595,6 +595,92 @@
         "C:\\StreamingMedia\\Replays\\Replay 2026-10-12 22-24-51_ir_trimmed.mkv"
       ],
       "game": ""
+    },
+    "27262de2374386939ba18718": {
+      "path": "C:\\StreamingMedia\\Replays\\clips\\Game 1181 2026-10-13\\Replay 2026-10-13 13-00-06_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1791910840.5256467,
+      "kept": true,
+      "purpose": "highlight",
+      "review_state": "kept",
+      "archived_from": [
+        "C:\\StreamingMedia\\Replays\\Replay 2026-10-13 13-00-06_ir_trimmed.mkv"
+      ],
+      "game": "Game 1181 2026-10-13"
+    },
+    "4b864d730f237db1dc910691": {
+      "path": "C:\\StreamingMedia\\Replays\\clips\\Game 1184 2026-10-13\\Replay 2026-10-13 16-30-16_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1791923497.411972,
+      "kept": true,
+      "purpose": "highlight",
+      "review_state": "kept",
+      "archived_from": [
+        "C:\\StreamingMedia\\Replays\\Replay 2026-10-13 16-30-16_ir_trimmed.mkv"
+      ],
+      "game": "Game 1184 2026-10-13"
+    },
+    "5c6d5ac06bc5a369d8c2597c": {
+      "path": "C:\\StreamingMedia\\Replays\\clips\\Game 1186 2026-10-13\\Replay 2026-10-13 23-03-46_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1791947068.8138967,
+      "kept": true,
+      "purpose": "highlight",
+      "review_state": "kept",
+      "archived_from": [
+        "C:\\StreamingMedia\\Replays\\Replay 2026-10-13 23-03-46_ir_trimmed.mkv"
+      ],
+      "game": "Game 1186 2026-10-13"
+    },
+    "0378f33c54f22c450af12816": {
+      "path": "C:\\StreamingMedia\\Replays\\clips\\Game 1186 2026-10-13\\Replay 2026-10-13 23-06-31_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1791947247.519728,
+      "kept": true,
+      "purpose": "highlight",
+      "review_state": "kept",
+      "archived_from": [
+        "C:\\StreamingMedia\\Replays\\Replay 2026-10-13 23-06-31_ir_trimmed.mkv"
+      ],
+      "game": "Game 1186 2026-10-13"
+    },
+    "800ec2ea69d13b36beba2809": {
+      "path": "C:\\StreamingMedia\\Replays\\clips\\Game 1187 2026-10-14\\Replay 2026-10-13 23-37-15_ir_trimmed.mkv",
+      "tag": "untagged",
+      "saved_at": 1791949090.178885,
+      "kept": true,
+      "purpose": "highlight",
+      "review_state": "kept",
+      "archived_from": [
+        "C:\\StreamingMedia\\Replays\\Replay 2026-10-13 23-37-15_ir_trimmed.mkv"
+      ],
+      "game": "Game 1187 2026-10-14"
+    },
+    "26e1200720ee47749ef42274": {
+      "path": "C:\\StreamingMedia\\Replays\\clips\\Game 1187 2026-10-14\\Replay 2026-10-13 23-43-19.mp4",
+      "tag": "awesome",
+      "saved_at": 1791949399.4737322,
+      "kept": true,
+      "purpose": "highlight",
+      "review_state": "kept",
+      "title": "awesome",
+      "archived_from": [
+        "C:\\StreamingMedia\\Replays\\Replay 2026-10-13 23-43-19.mp4"
+      ],
+      "game": "Game 1187 2026-10-14"
+    },
+    "df05efd483fb9e1af8897eb6": {
+      "path": "C:\\StreamingMedia\\Replays\\clips\\Game 1190 2026-10-14\\Replay 2026-10-14 15-18-10_ir_trimmed.mkv",
+      "tag": "going over walls a deer",
+      "saved_at": 1792005522.7571728,
+      "kept": true,
+      "purpose": "highlight",
+      "review_state": "kept",
+      "title": "going over walls a deer",
+      "archived_from": [
+        "C:\\StreamingMedia\\Replays\\Replay 2026-10-14 15-18-10_ir_trimmed.mkv"
+      ],
+      "game": "Game 1190 2026-10-14"
     }
   },
   "groups": []

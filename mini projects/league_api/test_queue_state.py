@@ -43,6 +43,14 @@ class QueueJourneyTests(unittest.TestCase):
         self.now += 15
         self.assertEqual(self.observe('ChampSelect', session(bans=[False]))['seconds'], 85)
 
+    def test_broadcast_label_conceals_ready_check_and_bans(self):
+        for phase, draft in [('Matchmaking', None), ('ReadyCheck', None),
+                             ('ChampSelect', session('PLANNING', [False])),
+                             ('ChampSelect', session(bans=[False]))]:
+            row = self.observe(phase, draft)
+            self.assertTrue(row['active'])
+            self.assertEqual(row['status'], 'IN QUEUE')
+
     def test_transient_dodge_lobby_bridges_but_cancel_resets_immediately(self):
         self.observe('Matchmaking', seconds=20)
         self.observe('ChampSelect', session(bans=[False]))

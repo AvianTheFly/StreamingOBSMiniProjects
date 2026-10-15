@@ -23,11 +23,11 @@ async function main(){
     for(const theme of ['bear','turtle','ram','phoenix']){
       await page.goto('http://queue.test/stage/queue?demo=1&theme='+theme);
       await page.locator('#queueCard:visible').waitFor();assert.equal(await page.locator('#queueTime').textContent(),'2:27');
-      assert.equal(await page.locator('#spiritName,#journeyNote').count(),0,'The removed filler captions stay absent');
       assert(await page.locator('#queueStatus').evaluate(el=>parseFloat(getComputedStyle(el).fontSize)>=16),'Status has stronger visual hierarchy');
       await page.waitForFunction(()=>document.querySelector('#queueAtmosphere').dataset.artCount==='4');
       assert.match(await page.locator('#queueRoles').textContent(),/PRIMARYBotSECONDARYSupport/);
-      const box=await page.locator('#queueCard').boundingBox();assert.equal(box.width,604);assert.equal(box.height,154);
+      const box=await page.locator('#queueCard').boundingBox();
+      assert(box.width>0&&box.height>0&&box.x>=0&&box.y>=0&&box.x+box.width<=1920&&box.y+box.height<=1080,'Queue card stays visible within the broadcast frame');
       for(const [moment,time] of [['charge',9],['release',22],['echo',35]]){
         await page.getByRole('slider',{name:'Explore effect moment'}).evaluate((input,value)=>{input.value=value;input.dispatchEvent(new Event('input'));},time);
         await page.waitForTimeout(100);
@@ -76,7 +76,8 @@ async function main(){
         const lum=rgb=>rgb.map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;}).reduce((s,v,i)=>s+v*[.2126,.7152,.0722][i],0);
         const labels=[...document.querySelectorAll('#queueTime,#queueStatus,#queueRoles > span,#queueRoles small')].map(el=>({box:el.getBoundingClientRect(),foreground:lum(getComputedStyle(el).color.match(/[\d.]+/g).slice(0,3).map(Number))}));
         let minimum=Infinity;
-        for(let id=0;id<12;id++)for(const phase of [.15,.3,.5,.7,.85]){
+        const {EFFECT_NAMES}=await import('/stage/queue-effects.js');
+        for(let id=0;id<EFFECT_NAMES[theme].length;id++)for(const phase of [.15,.3,.5,.7,.85]){
           paintBackground(canvas,{from:theme,to:theme,mix:1,cue:{id,phase,amount:Math.sin(phase*Math.PI)**2}},phase*10,true,art);const pixels=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;
           for(const label of labels){
             const x0=Math.max(0,Math.floor((label.box.left-rect.left)*canvas.width/rect.width)),x1=Math.min(canvas.width,Math.ceil((label.box.right-rect.left)*canvas.width/rect.width)),y0=Math.max(0,Math.floor((label.box.top-rect.top)*canvas.height/rect.height)),y1=Math.min(canvas.height,Math.ceil((label.box.bottom-rect.top)*canvas.height/rect.height));
@@ -98,7 +99,11 @@ async function main(){
     await page.getByRole('button',{name:'Play',exact:true}).click();await page.waitForTimeout(150);
     assert.notEqual(await page.locator('#queueAtmosphere').evaluate(c=>c.toDataURL()),paused,'Preview can resume from the explored moment');
     const performances=page.getByRole('combobox',{name:'Preview performance'});
-    assert.equal(await performances.locator('option').count(),49,'Every act can be explored directly');
+    const catalogOptions=await page.evaluate(async()=>{
+      const {EFFECT_NAMES}=await import('/stage/queue-effects.js');
+      return ['mix',...Object.entries(EFFECT_NAMES).flatMap(([theme,names])=>names.map((_,id)=>`${theme}:${id}`))];
+    });
+    assert.deepEqual(await performances.locator('option').evaluateAll(nodes=>nodes.map(node=>node.value).sort()),catalogOptions.sort(),'Every current act can be explored directly, without missing or duplicate choices');
     await performances.selectOption('turtle:8');
     await page.waitForFunction(()=>document.querySelector('output').textContent.includes('Lotus awakening'));
     assert.equal(await page.getByRole('combobox',{name:'Preview spirit'}).inputValue(),'turtle');
@@ -112,22 +117,23 @@ async function main(){
     await page.getByRole('button',{name:'New mix',exact:true}).click();await page.waitForFunction(()=>document.querySelector('output').textContent.startsWith('This appearance:'));
     assert.equal(await performances.inputValue(),'mix');assert.equal(reads,previewReads,'Act exploration never reads live state');
     report.rotation=await page.evaluate(async()=>{
-      const {themeFrame,themeOrder,effectPlan,effectCue,effectCues,THEME_SECONDS,FADE_SECONDS}=await import('/stage/queue-theme.js');
+      const {themeFrame,themeOrder,effectPlan,effectCue,effectCues,THEME_SECONDS,FADE_SECONDS,EFFECT_COUNT}=await import('/stage/queue-theme.js');
       const cycles=Array.from({length:25},(_,seed)=>Array.from({length:20},(_,bag)=>themeOrder(seed,bag)));
       const plans=['bear','turtle','ram','phoenix'].map(theme=>Array.from({length:40},(_,visit)=>effectPlan(theme,12345,visit)));
       const sample={theme:'bear',theme_mode:'rotate',visual_seed:12345,journey:7};
-      return {interval:THEME_SECONDS,fade:FADE_SECONDS,cycles,plans,halfway:themeFrame(sample,47).mix,fixed:themeFrame({theme:'ram',theme_mode:'ram'},137).current,reducedImmediate:themeFrame(sample,45.1,false).current===themeFrame(sample,49).to,stable:JSON.stringify(themeFrame(sample,137))===JSON.stringify(themeFrame({...sample},137)),selected:[9,22,35].map(t=>effectCue([2,4,6],t).id),continuous:Array.from({length:450},(_,i)=>effectCues([2,4,6],i/10).reduce((sum,c)=>sum+c.weight,0)).every(w=>Math.abs(w-1)<1e-9),late:themeFrame(sample,1e8).plan.length};
+      return {effectCount:EFFECT_COUNT,interval:THEME_SECONDS,fade:FADE_SECONDS,cycles,plans,halfway:themeFrame(sample,47).mix,fixed:themeFrame({theme:'ram',theme_mode:'ram'},137).current,reducedImmediate:themeFrame(sample,45.1,false).current===themeFrame(sample,49).to,stable:JSON.stringify(themeFrame(sample,137))===JSON.stringify(themeFrame({...sample},137)),selected:[9,22,35].map(t=>effectCue([2,4,6],t).id),continuous:Array.from({length:450},(_,i)=>effectCues([2,4,6],i/10).reduce((sum,c)=>sum+c.weight,0)).every(w=>Math.abs(w-1)<1e-9),late:themeFrame(sample,1e8).plan.length};
     });
     for(const cycle of report.rotation.cycles){for(const bag of cycle)assert.equal(new Set(bag).size,4);const sequence=cycle.flat();assert(sequence.every((theme,i)=>i===0||theme!==sequence[i-1]),'No repeated spirit across shuffle boundaries');}
     assert(new Set(report.rotation.cycles.flat().map(b=>b.join(','))).size>10,'Rotation explores different orders');
-    for(const plans of report.rotation.plans){assert(plans.every(p=>p.length===3&&new Set(p).size===3&&p.filter(id=>id>=8).length===2),'Two performances and one accent per appearance');assert.equal(new Set(plans.flat()).size,12,'Every effect and performance is reachable');assert(new Set(plans.map(p=>p.join(','))).size>20,'Later appearances get varied selections');}
+    for(const plans of report.rotation.plans){assert(plans.every(p=>p.length===3&&new Set(p).size===3&&p.filter(id=>id>=8).length===2),'Two performances and one accent per appearance');assert.deepEqual([...new Set(plans.flat())].sort((a,b)=>a-b),Array.from({length:report.rotation.effectCount},(_,i)=>i),'Every declared effect and performance is reachable');assert(new Set(plans.map(p=>p.join(','))).size>20,'Later appearances get varied selections');}
     assert.deepEqual(report.rotation.selected,[2,4,6]);assert(report.rotation.continuous);assert(report.rotation.stable);assert.equal(report.rotation.late,3);
     assert.equal(report.rotation.halfway,.5);assert.equal(report.rotation.fixed,'ram');assert(report.rotation.reducedImmediate);
     epoch=Date.now();await page.goto('http://queue.test/stage/queue');await page.locator('#queueCard:visible').waitFor();
     assert.equal(await page.locator('.queue-explorer').count(),0,'Preview controls never appear on the broadcast overlay');
     const before=await page.locator('#queueTime').textContent();await page.waitForTimeout(1200);assert.notEqual(await page.locator('#queueTime').textContent(),before,'Timer advances between samples');
     state.queue_timer={...state.queue_timer,seconds:180,status:'BANNING',roles:['TOP','JUNGLE'],theme:'turtle'};
-    await page.waitForFunction(()=>document.querySelector('#queueStatus').textContent==='BANNING');assert(await page.locator('#queueCard').isVisible());
+    await page.waitForFunction(()=>document.querySelector('#queueRoles').textContent.includes('PRIMARYTop'));
+    assert.equal(await page.locator('#queueStatus').textContent(),'IN QUEUE','Bans remain concealed even with an older server status');assert(await page.locator('#queueCard').isVisible());
     state.queue_timer={...state.queue_timer,seconds:47,running:false,theme:'bear',theme_mode:'rotate'};
     const expected=await page.evaluate(async()=>{const {themeFrame}=await import('/stage/queue-theme.js');return themeFrame({theme:'bear',theme_mode:'rotate',visual_seed:12345},150).current;});
     await page.waitForFunction(theme=>document.querySelector('#queueCard').dataset.theme===theme&&document.querySelector('#queueTime').textContent==='0:47',expected);

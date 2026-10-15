@@ -23,7 +23,10 @@ class BorderCatalogTests(unittest.TestCase):
             self.director.preview(key);show=self.director.snapshot()['effect']
             self.assertTrue(.6<=show['duration']<=5,key)
             self.assertIn(show['theme'],{'earth','fire','water','air','hextech','chemtech','elder','gold','void','blood','mint','cyan','ash','arcane'})
-        self.assertEqual(len(manifest(self.settings)),58)
+        # Cover the current catalog without making its historical size a limit.
+        entries = manifest(self.settings)
+        self.assertTrue(entries)
+        self.assertCountEqual([entry['key'] for entry in entries], CATALOG)
 
     def test_common_events_have_cooldowns_and_major_plays_bypass_minor_spacing(self):
         emit=lambda key:[{'key':key,'confidence':'observed'}]

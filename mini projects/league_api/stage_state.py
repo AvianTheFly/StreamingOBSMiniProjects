@@ -2,6 +2,7 @@
 import copy
 import math
 from lib.league_match import MatchLifecycle
+from .stage_roster import StageRoster
 
 GAME_PHASES = {'GameStart', 'InProgress', 'Reconnect', 'WatchInProgress'}
 
@@ -11,7 +12,7 @@ class StageState:
     def __init__(self):
         self.phase = None
         self.playing = False
-        self.roster = []
+        self.roster_state = StageRoster()
         self.queue = False
         self.ended = False
         self.lifecycle = MatchLifecycle()
@@ -24,28 +25,17 @@ class StageState:
             self.playing = False
             self.ended = False
         if phase == 'ChampSelect':
-            self.roster = [dict(p, team=side) for side in ('allies', 'enemies')
-                           for p in draft.get(side, [])]
+            if isinstance(session, dict) or draft.get('allies') or draft.get('enemies'):
+                self.roster_state.draft(draft, session, catalog)
         elif phase not in GAME_PHASES:
-            self.roster = []
+            self.roster_state.clear()
+            self.lifecycle = MatchLifecycle()
         if phase in GAME_PHASES and isinstance(session, dict):
-            game = session.get('gameData') or {}
-            rows = []
-            for field, side in [('teamOne', 'allies'), ('teamTwo', 'enemies')]:
-                for index, player in enumerate((game.get(field) or [])[:5]):
-                    if not isinstance(player, dict):
-                        continue
-                    champion = (catalog or {}).get(str(player.get('championId')), {})
-                    previous = [p for p in self.roster if p.get('championId') and p.get('championId') == player.get('championId')]
-                    prior = previous[0] if len(previous) == 1 else {}
-                    role = str(player.get('selectedPosition') or player.get('assignedPosition') or '')[:24]
-                    if role.upper() in {'NONE', 'UNSELECTED', ''}:
-                        role = prior.get('role', '')
-                    rows.append(dict(label=str(player.get('gameName') or player.get('summonerName') or prior.get('label') or f'Player {index+1}')[:64],
-                                     championId=player.get('championId'), name=champion.get('name', ''), role=role,
-                                     image=f"/champ-select/icons/{player['championId']}.png" if champion else '', team=side))
-            if rows:
-                self.roster = rows
+            self.roster_state.client(session, catalog)
+
+    @property
+    def roster(self):
+        return self.roster_state.snapshot()
 
     def live(self, data):
         value = data.get('gameData', {}).get('gameTime')
@@ -60,11 +50,7 @@ class StageState:
         players = data.get('allPlayers')
         if not isinstance(players, list) or not players or ended:
             return
-        self.roster = [dict(label=str(p.get('riotIdGameName') or p.get('summonerName') or 'Player')[:64],
-                            name=str(p.get('championName') or '')[:64],
-                            role=str(p.get('position') or '')[:24],
-                            team='allies' if p.get('team') == 'ORDER' else 'enemies')
-                       for p in players[:10] if isinstance(p, dict)]
+        self.roster_state.live(data)
 
     def snapshot(self, connected):
         return {'queue': self.queue and connected,

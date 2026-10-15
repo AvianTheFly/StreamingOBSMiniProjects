@@ -49,9 +49,11 @@ class VariationSettingsTests(unittest.TestCase):
             with self.assertRaises(ValueError):self.save(opacity=.3)
             self.assertEqual(self.store.path.read_text(),raw)
 
-    def test_hotkeys_are_unique_and_987_reserved(self):
-        for key in ['987','984']:
+    def test_hotkeys_are_unique_and_listener_and_original_reserved(self):
+        for key in ['987','1','984']:
             with self.assertRaises(ValueError):self.save(hotkey=key)
+        self.save(hotkey='2')
+        self.assertEqual(self.store.get('signal_found')['hotkey'],'2')
         self.save(hotkey='abc')
         self.assertEqual(self.store.get('signal_found')['hotkey'],'abc')
 

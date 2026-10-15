@@ -14,6 +14,7 @@ from typing import Callable
 
 import numpy as np
 from lib.performance_monitor import note_media_load
+from .endpoint import MAX_CAPTURE_SECONDS, SpeechActivity, at_model_rate
 
 from hub_config import (
     MIC_CHUNK_SAMPLES,
@@ -49,6 +50,11 @@ _transcription_busy = False
 MAX_RECORDING_SECONDS = 10
 _recording_started = 0.0
 _recording_generation = 0
+_capture_sample_rate = MIC_SAMPLE_RATE
+_vad_model = None
+_activity = None
+_activity_error = None
+_activity_snapshot = {}
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -81,6 +87,7 @@ def start_recording(owner: str = "unknown") -> bool:
     abort its recording flow.  Nothing is modified in that case.
     """
     global _recording, _buffer, _recording_owner, _recording_started, _recording_generation
+    global _activity, _activity_error
     if not _ready_event.is_set():
         return False
 
@@ -99,6 +106,10 @@ def start_recording(owner: str = "unknown") -> bool:
         _recording_generation += 1
         _recording_owner = owner
         _recording_started = time.monotonic()
+        _activity = (SpeechActivity(_vad_model, _capture_sample_rate, _recording_started)
+                     if _vad_model is not None else None)
+        _activity_error = None if _activity else "Speech detector unavailable; finish manually"
+        _activity_snapshot.clear()
         _recording       = True
 
     print(f"  [voice] Recording started [{owner}]. "
@@ -146,6 +157,7 @@ def stop_and_transcribe(send_fn: SendFn, owner: str = "", *,
             stopped_owner    = _recording_owner
             _recording_owner = ""
             _transcription_busy = bool(audio_snapshot)
+            _clear_activity_locked()
 
     if rejected:
         if on_complete:
@@ -153,7 +165,7 @@ def stop_and_transcribe(send_fn: SendFn, owner: str = "", *,
         return
 
     chunk_count = len(audio_snapshot)
-    duration    = chunk_count * MIC_CHUNK_SAMPLES / MIC_SAMPLE_RATE
+    duration    = sum(map(len, audio_snapshot)) / _capture_sample_rate
     print(f"  [voice] Recording stopped [{stopped_owner}]. "
           f"{chunk_count} chunk(s) / {duration:.2f}s buffered.")
 
@@ -198,6 +210,7 @@ def cancel_recording(owner: str = "") -> bool:
         _recording_owner = ""
         _buffer.clear()
         _clear_audio_queue()
+        _clear_activity_locked()
     print(f"  [voice] Recording cancelled [{owner}].")
     return True
 
@@ -209,6 +222,7 @@ def cancel_recording(owner: str = "") -> bool:
 def _init_and_drain(stop_event: threading.Event) -> None:
     """Load Whisper, open mic stream, then drain the audio queue forever."""
     global _model, _stream, _startup_error, _recording, _recording_owner
+    global _vad_model, _capture_sample_rate
     _ready_event.clear()
     _startup_error = None
 
@@ -236,6 +250,14 @@ def _init_and_drain(stop_event: threading.Event) -> None:
         print(f"  [voice] Failed to load Whisper: {e}")
         return
 
+    if stop_event.is_set():
+        return
+
+    try:
+        from faster_whisper.vad import get_vad_model
+        _vad_model = get_vad_model()  # Same cached detector used by transcription.
+    except Exception as exc:
+        print(f"  [voice] Speech endpoint detector unavailable: {exc}")
     if stop_event.is_set():
         return
 
@@ -280,13 +302,17 @@ def _init_and_drain(stop_event: threading.Event) -> None:
                 latency="high",
                 callback=_sd_callback,
             )
+            # Warm the optional fallback resampler before admitting capture.
+            if rate != SpeechActivity.RATE:
+                at_model_rate(np.zeros(512, dtype=np.float32), rate)
             _stream.start()
+            _capture_sample_rate = rate
             print(f"  [voice] Mic open: [{device_idx if device_idx is not None else 'default'}] "
                   f"'{device_name}' @ {rate} Hz")
             if rate != MIC_SAMPLE_RATE:
                 print(
                     f"  [voice] WARNING: running at {rate} Hz instead of 16000 Hz. "
-                    "Whisper accuracy may be reduced."
+                    "Audio will be normalized to 16000 Hz for speech detection and Whisper."
                 )
             break
         except Exception as e:
@@ -314,6 +340,7 @@ def _init_and_drain(stop_event: threading.Event) -> None:
 
             with _rec_lock:
                 _append_audio_locked(captured)
+            _measure_activity(captured)
     finally:
         _ready_event.clear()
         with _rec_lock:
@@ -321,6 +348,7 @@ def _init_and_drain(stop_event: threading.Event) -> None:
             _recording_owner = ""
             _buffer.clear()
             _clear_audio_queue()
+            _clear_activity_locked()
         try:
             _stream.stop()
         finally:
@@ -348,9 +376,12 @@ def _append_audio_locked(captured: tuple[int, np.ndarray]) -> None:
         _recording = False
         _recording_owner = ""
         _buffer.clear()
+        _clear_activity_locked()
         print("  [voice] Recording safety timeout; discarded stale command.")
     else:
-        _buffer.append(chunk)
+        remaining = int(MAX_CAPTURE_SECONDS * _capture_sample_rate) - sum(map(len, _buffer))
+        if remaining > 0:
+            _buffer.append(chunk[:remaining])
 
 
 def _flush_audio_queue_locked() -> None:
@@ -360,6 +391,41 @@ def _flush_audio_queue_locked() -> None:
         except queue.Empty:
             return
         _append_audio_locked(captured)
+
+
+def _measure_activity(captured):
+    """Inference runs off the audio callback and outside the recording lock."""
+    global _activity_error
+    generation, chunk = captured
+    with _rec_lock:
+        activity = _activity
+        if not _recording or generation != _recording_generation or activity is None or _activity_error:
+            return
+    try:
+        activity.feed(chunk)
+        snapshot = activity.snapshot()
+        with _rec_lock:
+            if _recording and generation == _recording_generation and _activity is activity:
+                _activity_snapshot.update(snapshot)
+    except Exception as exc:
+        with _rec_lock:
+            if generation == _recording_generation:
+                _activity_error = f"Speech detector failed: {exc}; finish manually"
+
+
+def capture_activity(owner):
+    with _rec_lock:
+        if not _recording or owner != _recording_owner:
+            return {}
+        return {**(_activity_snapshot if _activity else {}),
+                "endpoint_error": _activity_error}
+
+
+def _clear_activity_locked():
+    global _activity, _activity_error
+    _activity = None
+    _activity_error = None
+    _activity_snapshot.clear()
 
 
 def _clear_audio_queue() -> None:
@@ -376,8 +442,8 @@ def _transcribe_and_send(chunks: list[np.ndarray], send_fn: SendFn) -> None:
         print("  [voice] Whisper not ready yet — try again in a moment.")
         return
 
-    audio    = np.concatenate(chunks)
-    duration = len(audio) / MIC_SAMPLE_RATE
+    audio    = at_model_rate(np.concatenate(chunks), _capture_sample_rate)
+    duration = len(audio) / SpeechActivity.RATE
     print(f"  [voice] Transcribing {duration:.2f}s of audio…")
 
     try:

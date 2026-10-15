@@ -5,7 +5,8 @@ from unittest.mock import Mock, patch
 
 from lib.display_capture import apply_content, CAPTURE_SCENE
 from lib.coordination.lobbies import LobbyCatalog
-from scene_voice_switcher.screen_content import SOURCES, ORIGINAL_UDYR, blueprint, choice, install, select
+from scene_voice_switcher.screen_content import SOURCES, ORIGINAL_UDYR, RECAP_SOURCE, blueprint, choice, install, select
+from scene_voice_switcher.presentation import transform
 
 
 class LobbyScreenTests(unittest.TestCase):
@@ -13,6 +14,8 @@ class LobbyScreenTests(unittest.TestCase):
         self.rows = [dict(sourceName=name, sceneItemEnabled=i == 1, sceneItemId=i)
                      for i, name in enumerate(SOURCES.values())]
         self.rows.append(dict(sourceName='Personal overlay', sceneItemEnabled=True, sceneItemId=80))
+        for row in self.rows:
+            row['sceneItemTransform'] = transform((0, 0, 1920, 1080))
         self.client = Mock()
         self.client.get_scene_item_list.return_value = SimpleNamespace(scene_items=self.rows)
         def enabled(scene, identifier, value):
@@ -29,6 +32,28 @@ class LobbyScreenTests(unittest.TestCase):
         self.client.set_scene_item_transform.assert_not_called()
         self.client.set_current_program_scene.assert_not_called()
 
+    def test_phase_selections_replace_client_with_recap_without_saved_preference_edits(self):
+        from lib.coordination.lobbies import prepare_lobby, lobby_catalog
+        self.rows.append(dict(sourceName=RECAP_SOURCE, sceneItemId=99, sceneItemEnabled=True))
+        spec=blueprint({'screen_content':'udyr'})
+        plan={'layers':[], 'display_content':spec}
+        parent=[dict(sourceName='World',sceneItemId=200,sceneItemEnabled=True)]
+        self.client.get_scene_item_list.side_effect=lambda scene: SimpleNamespace(
+            scene_items=parent if scene=='Lobbies' else self.rows)
+        with patch.object(lobby_catalog,'layout',side_effect=lambda _:copy.deepcopy(plan)), \
+             patch('lib.coordination.lobby_layout.apply_layout') as layout, \
+             patch('lib.display_capture.set_visible'):
+            for mode, expected in [('league_idle',SOURCES['client']),('league_queue',RECAP_SOURCE),
+                                   ('league_idle',SOURCES['client'])]:
+                prepare_lobby(self.client,'Lobbies',['World'],selected='World',
+                              hide_screen=True,display_mode=mode)
+                self.assertEqual(layout.call_args.args[2]['display_content']['selected'],expected)
+                self.assertEqual([r['sourceName'] for r in self.rows if r['sceneItemEnabled']],
+                                 [expected,'Personal overlay'] if mode=='league_idle' else ['Personal overlay',expected])
+        self.assertEqual(spec['selected'],SOURCES['udyr'])
+        self.client.set_input_settings.assert_not_called()
+        self.client.set_scene_item_transform.assert_not_called()
+
     def test_missing_and_duplicate_destinations_fail_before_visibility_writes(self):
         self.rows[:] = [r for r in self.rows if r['sourceName'] != SOURCES['udyr']]
         with self.assertRaises(ValueError): apply_content(blueprint({'screen_content': 'udyr'}), client=self.client)
@@ -36,6 +61,23 @@ class LobbyScreenTests(unittest.TestCase):
         self.rows.extend([dict(sourceName=SOURCES['udyr']), dict(sourceName=SOURCES['udyr'])])
         with self.assertRaises(ValueError): apply_content(blueprint({'screen_content': 'udyr'}), client=self.client)
         self.client.set_scene_item_enabled.assert_not_called()
+
+    def test_udyr_canvas_fit_repairs_drift_without_touching_parent_or_filters(self):
+        udyr = next(r for r in self.rows if r['sourceName'] == SOURCES['udyr'])
+        udyr['sceneItemTransform']['positionX'] = 150
+        with patch('lib.settings_backups.SettingsBackups') as backups:
+            apply_content(blueprint({'screen_content': 'udyr'}), client=self.client)
+        backups.return_value.snapshot.assert_called_once()
+        self.client.set_scene_item_transform.assert_called_once_with(
+            CAPTURE_SCENE, udyr['sceneItemId'], transform((0, 0, 1920, 1080)))
+        self.client.set_input_settings.assert_not_called()
+        self.client.set_input_volume.assert_not_called()
+        self.client.set_current_program_scene.assert_not_called()
+
+    def test_client_choice_keeps_its_personal_transform(self):
+        self.rows[1]['sceneItemTransform']['positionX'] = 77
+        apply_content(blueprint({'screen_content': 'client'}), client=self.client)
+        self.client.set_scene_item_transform.assert_not_called()
 
     def test_unconfigured_data_preserves_existing_display_until_install(self):
         self.assertIsNone(blueprint({'personal': True}))

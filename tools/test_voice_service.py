@@ -14,6 +14,7 @@ class VoiceServiceTests(unittest.TestCase):
         self.backend.is_ready.return_value = True
         self.backend.start_recording.return_value = True
         self.backend.diagnostics.return_value = {"ready": True}
+        self.backend.capture_activity.return_value = {}
         self.service = VoiceService(self.backend)
         self.callback = Mock()
         self.done = threading.Event()
@@ -210,6 +211,109 @@ class VoiceServiceTests(unittest.TestCase):
         self.assertEqual(ptt.state, "processing")
         self.infer()
         self.assertEqual(ptt.state, "idle")
+
+    def test_speech_can_continue_past_old_two_second_deadline(self):
+        with patch('voice.service.time.monotonic', return_value=100):
+            self.service.begin(self.client)
+        session = self.service._active
+        self.backend.capture_activity.return_value = dict(speech_detected=True, last_speech_at=103)
+        with patch('voice.service.time.monotonic', return_value=103.2):
+            self.assertTrue(self.service._check_endpoint(session))
+        self.backend.stop_and_transcribe.assert_not_called()
+        self.assertEqual(self.service.state(self.client), 'listening')
+
+    def test_quiet_pause_finishes_once_and_preserves_original_replay_cutoff(self):
+        self.client.timed_callback = Mock()
+        with patch('voice.service.time.monotonic', return_value=100):
+            self.service.begin(self.client)
+        session = self.service._active
+        self.backend.capture_activity.return_value = dict(speech_detected=True, last_speech_at=101)
+        with patch('voice.service.time.monotonic', return_value=102.9):
+            self.assertTrue(self.service._check_endpoint(session))
+        with patch('voice.service.time.monotonic', return_value=103.1):
+            self.assertFalse(self.service._check_endpoint(session))
+            self.assertFalse(self.service._check_endpoint(session))
+        self.backend.stop_and_transcribe.assert_called_once()
+        self.infer('save dragon')
+        self.assertTrue(self.done.wait(2))
+        self.client.timed_callback.assert_called_once_with('save dragon', session.started_at)
+        self.assertEqual(self.service.diagnostics()['history'][0]['finish_reason'], 'quiet pause after speech')
+
+    def test_five_second_cap_even_while_speaking(self):
+        with patch('voice.service.time.monotonic', return_value=100):
+            self.service.begin(self.client)
+        session = self.service._active
+        self.backend.capture_activity.return_value = dict(speech_detected=True, last_speech_at=105)
+        with patch('voice.service.time.monotonic', return_value=105):
+            self.assertFalse(self.service._check_endpoint(session))
+        self.assertEqual(self.service.state(self.client), 'processing')
+        self.assertEqual(session.finish_reason, 'five-second safety limit')
+
+    def test_no_speech_releases_capture_without_inference_and_completes_consumer(self):
+        with patch('voice.service.time.monotonic', return_value=100):
+            self.service.begin(self.client)
+        session = self.service._active
+        with patch('voice.service.time.monotonic', return_value=102.1):
+            self.assertTrue(self.service._check_endpoint(session))
+        with patch('voice.service.time.monotonic', return_value=105):
+            self.assertFalse(self.service._check_endpoint(session))
+        self.assertTrue(self.done.wait(2))
+        self.callback.assert_not_called()
+        self.backend.stop_and_transcribe.assert_not_called()
+        self.backend.cancel_recording.assert_called_once_with('music')
+        self.assertEqual(self.service.diagnostics()['history'][0]['outcome'], 'empty')
+
+    def test_failed_detector_remains_bounded_and_never_automatically_delivers_audio(self):
+        with patch('voice.service.time.monotonic', return_value=100):
+            self.service.begin(self.client)
+        session = self.service._active
+        self.backend.capture_activity.return_value = dict(speech_detected=True,
+            last_speech_at=101, endpoint_error='detector failed')
+        with patch('voice.service.time.monotonic', return_value=104):
+            self.assertTrue(self.service._check_endpoint(session))
+        with patch('voice.service.time.monotonic', return_value=105):
+            self.assertFalse(self.service._check_endpoint(session))
+        self.backend.stop_and_transcribe.assert_not_called()
+
+    def test_activity_read_failure_does_not_disable_safety_limit(self):
+        with patch('voice.service.time.monotonic', return_value=100):
+            self.service.begin(self.client)
+        session = self.service._active
+        self.backend.capture_activity.side_effect = RuntimeError('device unavailable')
+        with patch('voice.service.time.monotonic', return_value=103):
+            self.assertTrue(self.service._check_endpoint(session))
+        with patch('voice.service.time.monotonic', return_value=105):
+            self.assertFalse(self.service._check_endpoint(session))
+        self.backend.cancel_recording.assert_called_once_with('music')
+
+    def test_stale_watchdog_and_delayed_finish_cannot_restart_or_stop_new_capture(self):
+        ptt = VoicePTT(2, Mock(), tag='adapter', voice_service=self.service, lockout_seconds=0)
+        ptt.begin()
+        old = self.service._active
+        tasks = []
+        def thread(**kwargs):
+            tasks.append(lambda: kwargs['target'](*kwargs['args']))
+            return Mock()
+        with patch('voice.ptt.threading.Thread', side_effect=thread):
+            ptt.on_trigger()
+            ptt.on_trigger()  # Already reserved: no second worker.
+        self.assertEqual(len(tasks), 1)
+        self.service.cancel(ptt.consumer)
+        ptt.begin()
+        self.assertFalse(self.service._check_endpoint(old))
+        tasks[0]()
+        self.assertTrue(ptt.is_recording)
+        self.backend.stop_and_transcribe.assert_not_called()
+
+    def test_normal_rearm_guard_prevents_finish_press_reopening_capture(self):
+        ptt = VoicePTT(2, Mock(), tag='adapter', voice_service=self.service)
+        with patch('voice.service.time.monotonic', return_value=100):
+            ptt.begin()
+            ptt.stop()
+            self.infer()
+            self.assertFalse(ptt.begin())
+        with patch('voice.service.time.monotonic', return_value=101.1):
+            self.assertTrue(ptt.begin())
 
 
 if __name__ == "__main__":

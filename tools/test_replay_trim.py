@@ -13,6 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from lib.paths import ensure_import_paths, load_project_env
 ensure_import_paths(); load_project_env()
 from instant_replay import editing as replay_trim
+from instant_replay import encoding
 from instant_replay import library
 from lib.asset_fader import AssetFader
 from lib.media_jobs import MediaJobBudget, MediaJobCancelled
@@ -77,6 +78,35 @@ class ReplayTrimTests(unittest.TestCase):
         self.assertEqual(self.cut(1, 99)["status"], "error")
         self.assertEqual(hashlib.sha256(self.source.read_bytes()).hexdigest(), self.original)
         self.assertEqual(list(self.root.rglob("*.partial")), [])
+
+    def test_gpu_failure_replaces_partial_without_losing_tracks_or_personal_metadata(self):
+        original_run = encoding.jobs.run
+        attempts = []
+        def unavailable_once(args, **kwargs):
+            if 'h264_nvenc' in args:
+                attempts.append(args)
+                Path(args[-1]).write_bytes(b'incomplete GPU output')
+                return subprocess.CompletedProcess(args, 1, b'', b'OpenEncodeSessionEx failed: out of memory')
+            return original_run(args, **kwargs)
+        library.remember_capture(self.source, purpose='review_later', tag='escape')
+        data = library.read()
+        data['clips'][library.clip_id(self.source)].update(notes='Personal note', custom={'keep': True})
+        library._write(data)
+        with patch.dict('os.environ', {'HUB_REPLAY_VIDEO_ENCODER': 'nvenc'}), \
+             patch.object(encoding.jobs, 'run', side_effect=unavailable_once):
+            result = self.cut()
+        self.assertEqual(len(attempts), 1)
+        self.assertEqual(result['status'], 'ready')
+        media = json.loads(subprocess.run(['ffprobe', '-v', 'error', '-show_streams', '-show_format',
+                           '-of', 'json', result['path']], capture_output=True, text=True,
+                           check=True, creationflags=replay_trim._flags).stdout)
+        self.assertEqual(sum(s['codec_type'] == 'audio' for s in media['streams']), 2)
+        self.assertAlmostEqual(float(media['format']['duration']), 1.5, delta=.12)
+        saved = library.read()['clips'][library.clip_id(result['path'])]
+        self.assertEqual((saved['notes'], saved['custom'], saved['purpose']),
+                         ('Personal note', {'keep': True}, 'review_later'))
+        self.assertEqual(hashlib.sha256(self.source.read_bytes()).hexdigest(), self.original)
+        self.assertEqual(list(self.root.rglob('*.partial')), [])
 
     def test_review_cut_inherits_intent_notes_and_personal_fields(self):
         library.remember_capture(self.source,purpose='review_later',tag='escape')

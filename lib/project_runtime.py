@@ -65,6 +65,7 @@ class ProjectInterface:
     name:              str       = ""
     controlled_scenes: list[str] = []
     produces_audio:    bool      = False  # True → this project outputs audible audio
+    background_music:  bool      = False  # Music that yields to native Spotify playback.
 
     def get_status(self) -> ProjectStatus:
         raise NotImplementedError

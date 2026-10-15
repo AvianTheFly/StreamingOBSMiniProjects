@@ -33,7 +33,6 @@
         "I am addicted to league of legends": -11.0,
         "i dont like this build": -11.0,
         "I know I can't beat you but he can": -11.0,
-        "jungler diff": -11.0,
         "just walk away": -11.0,
         "miss the caitlyn ult": -11.0,
         "Mom get the camera": -11.0,
@@ -61,7 +60,8 @@
         "hit the nexus not the vlad": -21.31,
         "cc'd for so long": -16.29,
         "the jungler telling you to play safe": -21.15,
-        "kayle farming": -19.26
+        "kayle farming": -19.26,
+        "jungler diff": -23.59
       },
       "group_names": {
         "2": "e",

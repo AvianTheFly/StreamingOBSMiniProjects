@@ -37,6 +37,20 @@ def make_handler(service, *, root: Path, port: int, load_config):
             if self.headers.get('Host') not in self.local_origins():
                 self.send_error(403); return
             path=unquote(urlparse(self.path).path)
+            if path == '/recordings/state':
+                self.send_bytes(json.dumps(service.match_recording.snapshot()).encode()); return
+            if path == '/recordings/media':
+                try:
+                    identity=parse_qs(urlparse(self.path).query).get('id',[''])[0]
+                    target=service.match_recording.media_path(identity)
+                    from lib.http_files import serve_file
+                    serve_file(self,target,content_type=mimetypes.guess_type(target.name)[0])
+                except (ValueError, OSError): self.send_error(404)
+                return
+            if path in {'/recordings', '/recordings/app.js', '/recordings/style.css'}:
+                name={'/recordings':'index.html','/recordings/app.js':'app.js','/recordings/style.css':'style.css'}[path]
+                file=root/'recording_web'/name
+                self.send_bytes(file.read_bytes(),mimetypes.guess_type(name)[0] or 'text/plain'); return
             if path.startswith('/purchase-assets/'):
                 name=path.removeprefix('/purchase-assets/')
                 if not re.fullmatch(r'(?:[1-9][0-9]{0,6}\.png|ka-ching\.wav)',name):
@@ -57,6 +71,7 @@ def make_handler(service, *, root: Path, port: int, load_config):
                 except (ValueError,FileNotFoundError): self.send_error(404)
                 return
             if path in {'/stage/loading', '/stage/queue', '/stage/stage.js', '/stage/stage.css',
+                        '/stage/loading-roster.js', '/stage/loading-effects.js',
                         '/stage/queue.js', '/stage/queue.css', '/stage/queue-art.js',
                         '/stage/queue-theme.js', '/stage/queue-background.js', '/stage/queue-effects.js',
                         '/stage/queue-performances.js',
@@ -73,10 +88,12 @@ def make_handler(service, *, root: Path, port: int, load_config):
                 self.send_bytes(json.dumps(service.client_scenes.overlay_snapshot()).encode()); return
             if path == '/champ-select':
                 self.send_bytes((root/'champ_select_web'/'index.html').read_bytes(), 'text/html; charset=utf-8'); return
-            if path in {'/champ-select/app.js', '/champ-select/layout.js', '/champ-select/style.css',
+            if path in {'/champ-select/app.js', '/champ-select/chat.js', '/champ-select/layout.js', '/champ-select/style.css',
                         '/champ-select/world-motion.js', '/champ-select/world-art.js',
+                        '/champ-select/world-details.js', '/champ-select/team-resonance.js', '/champ-select/vfx-lights.js',
                         '/champ-select/world-events.js', '/champ-select/world-assets.js',
                         '/champ-select/vfx-texture.js', '/champ-select/vfx-ink.js', '/champ-select/vfx-timing.js', '/champ-select/spirit-locks.js',
+                        '/champ-select/secret-program.js', '/champ-select/secret-visitors.js',
                         '/champ-select/world-guests.js', '/champ-select/spirit-secrets.js', '/champ-select/scene-map.js',
                         '/champ-select/draft-cues.js', '/champ-select/draft-demo.js'}:
                 file = root/'champ_select_web'/path.rsplit('/', 1)[-1]
@@ -90,7 +107,7 @@ def make_handler(service, *, root: Path, port: int, load_config):
                 self.send_bytes((root/'media'/'champ-select'/'vfx'/name).read_bytes(), 'image/png'); return
             if path.startswith('/champ-select/guests/'):
                 name = path.removeprefix('/champ-select/guests/')
-                if not re.fullmatch(r'game-(kirby|boo|crewmate|goose)-[0-2]\.png', name):
+                if not re.fullmatch(r'game-(kirby|boo|crewmate|goose|creeper|climber|hornet|salvager)-[0-2]\.png', name):
                     self.send_error(404); return
                 self.send_bytes((root/'media'/'draft-guests'/name).read_bytes(), 'image/png'); return
             if path.startswith('/champ-select/backgrounds/'):
@@ -247,6 +264,10 @@ def make_handler(service, *, root: Path, port: int, load_config):
                 if not 0<size<=65536: raise ValueError('Invalid body size')
                 body=json.loads(self.rfile.read(size))
                 if not isinstance(body,dict): raise ValueError('Expected an object')
+                if path == '/recordings/decision':
+                    self.send_bytes(json.dumps(service.match_recording.decide(body.get('decision'), body.get('id'))).encode()); return
+                if path == '/recordings/mark':
+                    self.send_bytes(json.dumps(service.match_recording.mark()).encode()); return
                 if path=='/purchases/preview':
                     self.send_bytes(json.dumps(service.preview_purchase(body.get('item_id',3078))).encode()); return
                 if path=='/client-scenes':
@@ -308,4 +329,5 @@ def make_handler(service, *, root: Path, port: int, load_config):
                     else: self.send_error(404); return
                 self.send_bytes(b'{}')
             except (ValueError,TypeError) as exc: self.send_bytes(json.dumps({'error':str(exc)}).encode(),status=400)
+            except OSError as exc: self.send_bytes(json.dumps({'error':str(exc)}).encode(),status=503)
     return Handler

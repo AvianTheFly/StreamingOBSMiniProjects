@@ -13,6 +13,7 @@ export function mount(element) {
       <div class="page-subtitle">Shared microphone, transcription, and project delivery</div></div>
       <a href="#settings" class="btn btn-sm">Voice settings</a></div>
     <div class="card mb-16"><div id="voiceStatus" aria-live="polite">Connecting…</div>
+      <p>Press your voice trigger once to listen. Press again to finish early, or pause after speaking to finish automatically. Recording always stops within five seconds.</p>
       <div class="page-actions mt-12">
         <button class="btn btn-primary btn-sm" id="voiceFinish" disabled>Finish recording</button>
         <button class="btn btn-sm" id="voiceCancel" disabled>Cancel command</button>
@@ -54,21 +55,26 @@ async function refresh() {
     if (container !== element || controller !== request) return;
     sessionId = data.session_id;
     const elapsed = data.started_at ? ` · ${Math.max(0, (Date.now()/1000-data.started_at)).toFixed(1)}s` : "";
+    const listening = data.state === "listening"
+      ? (data.speech_detected ? "Speech heard · waiting for a quiet pause" : "Listening · waiting for speech")
+      : data.state === "processing" ? "Transcribing · trigger waits until ready" : data.state;
     element.querySelector("#voiceStatus").innerHTML = `
-      <strong>${esc(data.ready ? data.state : "Starting / unavailable")}</strong>
+      <strong>${esc(data.ready ? listening : "Starting / unavailable")}</strong>
       ${data.owner ? ` · ${esc(data.owner)}${elapsed}` : ""}
       <p>${esc(data.model)} · ${esc(data.device)} · ${esc(data.compute)}</p>
       ${data.startup_error ? `<p>${esc(data.startup_error)}</p>` : ""}
+      ${data.endpoint_error ? `<p>${esc(data.endpoint_error)} · five-second safety limit still applies.</p>` : ""}
       ${data.last_rejection ? `<p>Last blocked request: ${esc(data.last_rejection.owner)} · ${esc(data.last_rejection.reason)}</p>` : ""}
       ${data.state === "cancelling" ? "<p>Result will be discarded when inference finishes.</p>" : ""}`;
     element.querySelector("#voiceFinish").disabled = data.state !== "listening";
     element.querySelector("#voiceCancel").disabled = !data.session_id || data.state === "cancelling";
     element.querySelector("#voiceConsumers").innerHTML = (data.consumers || []).map(c =>
-      `<p><strong>${esc(c.tag)}</strong> · ${esc(c.state)} · auto stop ${esc(c.timeout)}s</p>`).join("") || "No projects registered.";
+      `<p><strong>${esc(c.tag)}</strong> · ${esc(c.state)} · finish after ${esc(c.silence_seconds ?? c.timeout)}s quiet · five-second maximum</p>`).join("") || "No projects registered.";
     element.querySelector("#voiceHistory").innerHTML = (data.history || []).map(item => `
       <div class="mb-16"><strong>${esc(item.owner)}</strong> · ${esc(item.outcome)} ·
         ${esc(new Date(item.started_at*1000).toLocaleTimeString())}
         <p>${esc(item.text || (item.outcome === "empty" ? "No speech detected" : ""))}</p>
+        ${item.finish_reason ? `<p>${esc(item.finish_reason)}</p>` : ""}
         ${item.error ? `<p>${esc(item.error)}</p>` : ""}</div>`).join("") || "No voice sessions yet.";
   } catch (error) {
     if (error.name !== "AbortError" && container === element)

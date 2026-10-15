@@ -1,20 +1,26 @@
 # Mood cues / Love Me
 
-Open the Hub's **Mood cues / Love Me** page. Existing `987` stages, OBS files,
+Open the Hub's **Mood cues / Love Me** page. Existing Love Me stages, OBS files,
 transforms, groups, filters and audio levels are preserved. New music moments
 use a transparent browser source inside `LoveMe`; no program-scene change.
 
-| Sequence | Variation | Suggested sound / feeling |
+| Keys | Variation | Suggested sound / feeling |
 | --- | --- | --- |
-| `987` | Original Love Me | Existing four OBS stages |
-| `986` | Signal found | Rihanna, Where Have You Been orchestral edit; longing and recognition |
-| `985` | Heart on sleeve | The Cardigans, Lovefool; playful devotion |
-| `984` | Golden | JVKE, golden hour; awe and warmth |
-| `983` | Afterglow | Beach House, Space Song; nostalgic dreaminess |
+| `987` → `1` | Original Love Me | Existing four OBS stages |
+| `987` → `2` | Signal found | Rihanna, Where Have You Been orchestral edit; longing and recognition |
+| `987` → `985` | Heart on sleeve | The Cardigans, Lovefool; playful devotion |
+| `987` → `984` | Golden | JVKE, golden hour; awe and warmth |
+| `987` → `983` | Afterglow | Beach House, Space Song; nostalgic dreaminess |
 
-Type within 300 ms. The same variation toggles off. Different variations replace
-the current cue after cleanup. Original `987` advances, toggles off at its last
-stage, and resets after idle. Buttons and project actions work in Hub workflows.
+Type `987` within 300 ms to open the module’s keyboard listener for five seconds.
+It does not start or stop playback. Then choose `1` for original Love Me or `2`
+for Where Have You Been (Signal found). A choice closes the listener; Escape
+cancels it, and expiry leaves playback alone. Open it again for each selection.
+The same variation toggles off; different variations replace it after cleanup.
+Love Me still advances, toggles off at its last stage, and resets after idle.
+Buttons and project actions work in Hub workflows. Variation choices accept
+1–8 letters/digits in the editor; multi-key choices must be typed within 300 ms.
+Unarmed keys never select a mood cue.
 
 Choose one shot, fixed **total plays**, or continuous until stopped. **Make a
 variation** clones a direction with independent text, hotkey, timing, audio,

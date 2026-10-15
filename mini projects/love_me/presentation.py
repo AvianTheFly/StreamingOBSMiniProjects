@@ -7,6 +7,7 @@ from lib.browser_effects.audio import prepare_audio
 from lib.browser_effects.obs_source import attach, source_name
 from lib.browser_effects.runtime import get_channel
 from lib.project_settings import audio_settings_transaction
+from lib.audio_focus import interrupt_audio
 
 PROJECT = 'love_me'
 SOURCE = source_name(PROJECT)
@@ -84,9 +85,13 @@ class MoodPresentation:
                               dict(inputName=SOURCE, propertyName='refreshnocache'), raw=True)
         if cancelled():
             return
-        identity = self.channel.begin(row['id'], media, {**row, 'audio':bool(media)})
+        release_audio = interrupt_audio(file, cancelled=cancelled, music=True) if media else lambda: None
+        identity = None
         started = time.monotonic()
         try:
+            if cancelled():
+                return
+            identity = self.channel.begin(row['id'], media, {**row, 'audio':bool(media)})
             while not self.channel.done.wait(.05):
                 if cancelled():
                     return
@@ -101,7 +106,11 @@ class MoodPresentation:
             if self.channel.error and not cancelled():
                 raise RuntimeError('Audio could not play or the excerpt was too short. Check trim start, length and file format.')
         finally:
-            self.channel.stop(identity)
+            try:
+                if identity is not None:
+                    self.channel.stop(identity)
+            finally:
+                release_audio()
 
     def pause(self, paused):
         self.channel.pause(paused)

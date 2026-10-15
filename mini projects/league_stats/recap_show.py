@@ -1,6 +1,6 @@
 """Shared recap playhead and manual intent; evaluated on reads, no timer/worker."""
-VIEWS = ('highlights', 'tempo', 'combat', 'build', 'economy', 'vision', 'moments')
-SAFE_PHASES = {'WaitingForStats', 'PreEndOfGame', 'EndOfGame', 'Lobby', 'None'}
+VIEWS = ('highlights', 'tempo', 'combat', 'build', 'economy', 'vision', 'moments', 'story')
+SAFE_PHASES = {'Matchmaking', 'ReadyCheck', 'ChampSelect'}
 
 
 class RecapShow:
@@ -13,6 +13,16 @@ class RecapShow:
         self.playing = True
         self.manual_until = 0
         self.hold_until = 0
+        self.queue_active = False
+
+    def observe_phase(self, phase):
+        active = phase in SAFE_PHASES
+        if active and not self.queue_active:
+            self.position = 0
+            self.anchor = self.clock()
+            self.hold_until = 0
+            self.revision += 1
+        self.queue_active = active
 
     def sync(self, match):
         if match != self.match:

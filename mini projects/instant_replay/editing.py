@@ -9,6 +9,7 @@ import uuid
 from . import library
 from lib.media_jobs import jobs, MediaJobCancelled
 from lib.json_store import json_transaction
+from .encoding import run_cut
 
 _pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="replay-trim")
 _lock = threading.Lock()
@@ -42,15 +43,14 @@ def _export(source, root, start, end, name):
     output = folder / f"{source.stem[:100]}_cut_{uuid.uuid4().hex[:10]}.mkv"
     temporary = output.with_suffix(".partial")
     try:
-        result = jobs.run([
+        result = run_cut([
             "ffmpeg", "-nostdin", "-v", "error", "-y", "-threads", "2",
             "-filter_threads", "1",
             "-ss", str(start), "-i", str(source), "-t", str(end - start),
             "-map", "0:v:0", "-map", "0:a?", "-map_metadata", "0",
-            "-c:v", "libx264", "-preset", "veryfast", "-crf", "18",
-            "-threads", "2", "-c:a", "aac", "-b:a", "192k",
+        ], ["-c:a", "aac", "-b:a", "192k",
             "-f", "matroska", str(temporary),
-        ], kind='replay-editor-cut', weight=2, priority=0, timeout=1800)
+        ], kind='replay-editor-cut')
         if result.returncode or not temporary.is_file() or temporary.stat().st_size == 0:
             raise ValueError("Could not save this cut. The original clip is unchanged.")
         with library.LOCK, json_transaction(library.STATE_FILE):

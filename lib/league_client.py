@@ -105,13 +105,15 @@ class LeagueClient:
                              if isinstance(p, dict) and local_cell is not None and p.get('cellId') == local_cell), {})
         local_summoner = local_player.get('summonerId')
         def sender(message):
-            identity = message.get('fromSummonerId')
-            if local_summoner and identity == local_summoner:
+            identity = str(message.get('fromSummonerId') or '').strip()
+            if identity in {'', '0'}:
+                return 'TEAM'
+            if local_summoner and identity == str(local_summoner):
                 return 'YOU'
             for index, player in enumerate(session.get('myTeam') or []):
                 if not isinstance(player, dict):
                     continue
-                if identity and str(identity) == str(player.get('summonerId')):
+                if identity == str(player.get('summonerId')):
                     return str(player.get('obfuscatedSummonerName') or player.get('gameName')
                                or player.get('summonerName') or f'Teammate {index + 1}')[:64]
             # Never infer an identity when the client withholds its mapping.
