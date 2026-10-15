@@ -48,6 +48,23 @@ def application_files(root=ROOT):
         yield from (root / 'mini projects' / project).rglob('*.py')
 
 
+def operation_error(action, relative):
+    """One policy for direct calls, imported aliases and captured methods.
+
+    Checking references as well as calls prevents handing a forbidden operation
+    to a callback from bypassing the same ownership boundary.
+    """
+    if action == 'set_current_program_scene' and relative != SCENE_OWNER:
+        return 'Program-scene writes belong to SceneDirector'
+    if action in {'ReqClient', 'EventClient'} and relative not in CONNECTION_OWNERS:
+        return 'OBS connections belong to shared transport/lifecycle owners'
+    if action in {'pause_all', 'resume_all'}:
+        return 'Use a scoped pause claim; bulk pause/resume loses ownership'
+    if action in {'request_to_play', 'announce_finished'} and relative != 'lib/coordination/playback.py':
+        return 'Use PlaybackTicket completion rather than a project name'
+    return None
+
+
 def inspect_source(source, relative):
     errors = []
     tree = ast.parse(source, filename=relative)
@@ -66,20 +83,23 @@ def inspect_source(source, relative):
         if (relative.startswith('hub_ui/') and isinstance(node, ast.ImportFrom)
                 and any(alias.name == '_live' for alias in node.names)):
             errors.append((node.lineno, 'HTTP adapters must use public feature APIs, not private live state'))
+        if isinstance(node, ast.Attribute):
+            message = operation_error(node.attr, relative)
+            if message:
+                errors.append((node.lineno, message))
+            if relative.startswith('hub_ui/') and node.attr == '_live':
+                errors.append((node.lineno, 'HTTP adapters must use public feature APIs, not private live state'))
+        elif isinstance(node, ast.ImportFrom):
+            for alias in node.names:
+                message = operation_error(alias.name, relative)
+                if message:
+                    errors.append((node.lineno, message))
         if not isinstance(node, ast.Call):
             continue
         action = node.func.attr if isinstance(node.func, ast.Attribute) else None
-        if action == 'set_current_program_scene' and relative != SCENE_OWNER:
-            errors.append((node.lineno, 'Program-scene writes belong to SceneDirector'))
         if action == 'send' and any(isinstance(v, ast.Constant) and v.value == 'SetCurrentProgramScene'
-                                    for v in node.args):
+                                    for v in [*node.args, *(kw.value for kw in node.keywords)]):
             errors.append((node.lineno, 'Raw program-scene writes bypass SceneDirector'))
-        if action in {'ReqClient', 'EventClient'} and relative not in CONNECTION_OWNERS:
-            errors.append((node.lineno, 'OBS connections belong to shared transport/lifecycle owners'))
-        if action in {'pause_all', 'resume_all'}:
-            errors.append((node.lineno, 'Use a scoped pause claim; bulk pause/resume loses ownership'))
-        if action in {'request_to_play', 'announce_finished'} and relative != 'lib/coordination/playback.py':
-            errors.append((node.lineno, 'Use PlaybackTicket completion rather than a project name'))
     return errors
 
 

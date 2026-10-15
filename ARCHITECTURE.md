@@ -1,5 +1,26 @@
 # Streaming Hub responsibilities
 
+## Start with the control-flow guide
+
+For navigation, startup/shutdown, playback admission, scene ownership and HTTP/event
+boundaries, read [Streaming Hub: navigation and control flow](docs/ARCHITECTURE.md).
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before changing runtime behavior and
+[AGENTS.md](AGENTS.md) before touching personal settings.
+
+This file is the detailed responsibility reference. Use these sections directly:
+
+- [Dependency direction](#dependency-direction)
+- [Shared owners](#shared-owners)
+- [Feature responsibilities](#feature-responsibilities)
+- [Ownership rules](#ownership-rules)
+- [Visibility and verification](#visibility-and-verification)
+
+The [2026-10-15 audit](docs/ARCHITECTURE-AUDIT-2026-10-15.md) distinguishes verified
+boundaries, corrected guidance and remaining review work. Add feature detail beside
+its existing owner below; keep the navigation guide focused on stable contracts.
+
+## Detailed feature and resource notes
+
 Music/Spotify exclusivity uses `ProjectInterface.background_music` to identify
 the song and mood players. Spotify's `music_focus.py` observes transport starts
 and resumes on the existing media loop and calls those players' public `revert`
@@ -662,7 +683,7 @@ the Hub appearance editor provides reusable URLs and original text-free PNG link
 | Soundboard | `main.py` wires profiles, commands and triggers and registers a runtime asset catalog/selection provider with bounded cleanup; `desk.py` owns manual selection policy, and `interface.py` exposes `asset_catalog()` / `play_asset(source)` to the generic HTTP project adapter. Desk selection uses the same admitted playback path and current per-asset settings as keys/voice, stopping its random mode first. `player.py` adapts its OBS/browser presentation to shared source workers and coordination gates |
 | Specific Song | `commands.py` interprets controls/categories; `library.py` loads aliases/bindings; `matcher.py` ranks; `player.py` owns song presentation; `api.py` exposes library/commands; `main.py` assembles |
 | Instant Replay | `capture.py` owns independent highlight/replay-only/review-later captures and save results; `inventory.py` owns one fresh filesystem inventory for runtime and offline management, including tags and linked raw-copy suppression; `lib/file_inventory.py` supplies scoped directory metadata snapshots without a retained cache or watcher, reused for filtering, sorting and UI sizes; `selection.py` owns candidate selection and one cancellable save continuation; `playback.py` owns presentation through final cleanup; `source_playback.py` prepares the hidden decoder, waits for a settled first frame and holds it through entry or clip reveal; `presentation.py` owns pure mode/copy/viewport policy; `stage_settings.py` owns personal presentation preferences; `stage.py` publishes complete stage/capture/progress snapshots, reconciles current labels after library edits and owns revision-scoped cover/reveal acknowledgments with bounded native fallback; `obs_stage.py` owns dedicated backdrop/motion/matte inputs and scene-item references to existing capture/camera sources; browser `replay-stage/clip-transition.js` renders finite viewport-only handoffs without controlling playback; `audio.py` restores desktop audio; `editing.py` owns saved cuts; `trimming.py` handles capture cuts; `library.py` owns atomic metadata, independent capture purpose/review decisions, eligibility and archived aliases; `runtime_state.py` owns the feature handshake; `api.py` exposes controls; `main.py` wires lifecycle |
-| League API | `service.py` owns runtime services; `client_scenes.py` chooses client-phase and configurable between-games policy once per transition, guards delayed intent and preserves newer scene choices; `scene_routing.py` prepares and requests presentation through the director; shared game policy exposes automatic-lobby/hold decisions |
+| League API | `main.py: Service` currently owns runtime service orchestration; `client_scenes.py` chooses client-phase and configurable between-games policy once per transition, guards delayed intent and preserves newer scene choices; `scene_routing.py` prepares and requests presentation through the director; shared game policy exposes automatic-lobby/hold decisions |
 | League events | Interpret game events and production presentation; Live Client traffic shares `lib/league_live_client.py`; production borders use public interface capabilities |
 | League gameplay HUD | `league/core/match_lifecycle.py` gates gameplay on a positive live timer and latches cumulative GameEnd evidence across reconnects; `league/hud_presentation.py` alone owns nested map/HUD and alive-only Udyr visibility. Separate HUD groups retain independent crops/masks over one shared HUD capture; `ScreenCaptureMAPHUD` remains their reusable nested parent. `tools/align_league_hud.py` is the finite, settings-snapshotted OBS calibration owner and supports both scene and group containers. |
 | Udyr stance loops | `league/udyr_stances.py` owns accepted stance intent and the existing `UdyrImageMaskANIMATION` input through one `PlaybackWorker`. `udyr_casts.py` owns bounded Q/W/E/R-to-mana evidence, conservative observed-regeneration correction, expiry and a five-second fallback guard after each Enter press. Outside the guard, ambiguous keys switch immediately; inside it, spending at least one mana accepts the latest candidate. Ignored chat presses never replay on guard expiry. League's existing keyboard subscription supplies candidates; its existing watcher observes at 250 ms during gameplay through the unchanged shared cache (at most four HTTP snapshots/sec). HUD match/alive observations gate both. Repeated selected stances do not restart, respawn retains the stance, and a new match defaults to blue. Replacement waits for cleanup, stale work is discarded, playback follows the League permission gate, and shutdown waits for cleanup. Filters, placement, audio settings, lobby inputs and program scenes retain their existing owners. `tools/prepare_udyr_stances.py` is the finite original-footage matching/blending exporter using the shared media-job budget; versioned clips and provenance live at `C:/StreamingMedia/UdyrStances/v1`. |

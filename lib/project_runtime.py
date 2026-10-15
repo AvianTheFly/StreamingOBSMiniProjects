@@ -16,23 +16,14 @@ from dataclasses import dataclass
 # on import so the hub and other projects can query live state and request
 # clean reverts or pauses without reaching into project internals.
 #
-# Usage from another project:
+# Consumers query public interfaces here. Shared pause/resume policy belongs to
+# lib.coordination.playback; do not use the legacy bulk dispatch helpers below.
 #
-#     from shared import project_registry
-#
-#     # Ask all other projects to pause before you start playing something:
-#     project_registry.pause_all(except_="my_project")
-#     player.play_async(source, on_complete=lambda: project_registry.resume_all(except_="my_project"))
-#
-#     # Emergency stop — revert ALL OBS state for conflicting projects:
-#     project_registry.revert_all(except_="my_project")
-#
-#     # Check who owns the scenes you're about to touch:
-#     conflicts = project_registry.conflicting_projects("my_project", ["My Scene"])
-#
-#     # Snapshot every project's live state:
-#     for name, status in project_registry.get_all_status().items():
-#         print(name, status)
+# A playback owner calls coordinator.request(name, admitted), schedules on its
+# existing source worker, observes the ticket permission/cancellation gates and
+# finishes that exact ticket after cleanup. Manual controls use
+# coordinator.manual_action(name, action). See CONTRIBUTING.md for the contract.
+# Registry status/conflict snapshots are observations, never admission locks.
 
 @dataclass
 class ProjectStatus:
@@ -86,7 +77,7 @@ class ProjectInterface:
     def pause(self) -> None:
         """
         Temporarily pause activity without reverting OBS state.
-        Called by project_registry.pause_all() when another project needs focus.
+        Called by the coordinator when an owned pause claim needs focus.
         Default: no-op (projects that don't support pause are unaffected).
         """
         pass
@@ -94,7 +85,7 @@ class ProjectInterface:
     def resume(self) -> None:
         """
         Resume after a pause() call.
-        Called by project_registry.resume_all() when the other project finishes.
+        Called by the coordinator after eligible pause claims are released.
         Default: no-op.
         """
         pass
@@ -175,7 +166,8 @@ class _ProjectRegistry:
     def conflicting_projects(self, requester: str, scenes: list[str]) -> list[str]:
         """
         Return names of OTHER currently active projects that share any of
-        the given OBS scenes.  An empty list means it is safe to proceed.
+        the given OBS scenes. This observation does not reserve a resource;
+        obtain coordinator admission before starting shared playback.
         """
         scene_set = set(scenes)
         conflicts: list[str] = []
@@ -195,11 +187,11 @@ class _ProjectRegistry:
         self._dispatch_all("revert", except_)
 
     def pause_all(self, except_: str | None = None) -> None:
-        """Temporarily suspend other projects; unsupported pause methods are no-ops."""
+        """Legacy compatibility only; runtime callers must acquire scoped claims."""
         self._dispatch_all("pause", except_)
 
     def resume_all(self, except_: str | None = None) -> None:
-        """Resume after pause_all(); idle projects treat this as a no-op."""
+        """Legacy compatibility only; runtime callers must release their own claims."""
         self._dispatch_all("resume", except_)
 
     def _dispatch_all(self, action: str, except_: str | None) -> None:

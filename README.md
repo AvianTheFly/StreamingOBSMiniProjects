@@ -7,6 +7,10 @@ Local OBS automation hub for running small streaming mini projects together.
 The Hub intentionally loads only these stream modules:
 
 - `league`
+- `league_stats`
+- `starting_soon`
+- `spotify`
+- `twitch_commands`
 - `league_api` — one-source alerts in the `League API` scene; see [setup and media guide](mini%20projects/league_api/README.md).
 - `soundboard`
 - `tik_tok`

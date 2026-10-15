@@ -2,6 +2,8 @@
 
 The application is `hub.py` / `Run Hub.bat` in this checkout. Read `AGENTS.md`
 for personal settings and restart requirements, and `ARCHITECTURE.md` for owners.
+Use [the code navigation and control-flow guide](docs/ARCHITECTURE.md) to trace an
+action from its adapter through admission, execution and cleanup before editing.
 
 ## Choose an owner before writing code
 

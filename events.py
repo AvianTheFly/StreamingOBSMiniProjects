@@ -56,7 +56,8 @@ Usage example
 
   # Subscriber (in project's run() function):
   def _on_game_connected(data: dict) -> None:
-      switch_scene("Test")
+      # Existing feature worker owns execution and stale-intent checks.
+      pending_game_events.put_nowait(dict(data))
 
   events.subscribe("game.connected", _on_game_connected)
 
@@ -169,8 +170,9 @@ def emit(event_name: str, **data) -> None:
     Fire *event_name*, passing *data* as a dict to every subscriber.
 
     Callbacks are called synchronously in the emitting thread.
-    If a callback blocks (e.g. waits for media to end), start it in
-    a daemon thread inside the callback.
+    Callbacks must return promptly. Submit long work to the feature's existing
+    bounded worker/queue; do not create a daemon thread for each event. Copy any
+    intent needed by delayed work and reject stale intent before acting.
     """
     with _lock:
         dispatches = list(_listeners.get(event_name, []))
